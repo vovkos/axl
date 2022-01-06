@@ -64,7 +64,7 @@ public:
 
 public:
 	static
-	uint_t
+	size_t
 	getPendingLength(DecoderState unused) {
 		return 0;
 	}

@@ -347,13 +347,13 @@ class Utf16sDfaBase: public DfaTable
 public:
 	Utf16sDfaBase() {}
 
-	Utf16sDfaBase(uint32_t storage) {
+	Utf16sDfaBase(DecoderState storage) {
 		load(storage);
 	}
 
 	static
-	uint_t
-	getPendingLength(uint_t storage) {
+	size_t
+	getPendingLength(DecoderState storage) {
 		return m_pendingLengthTable[extractState(storage) >> 2];
 	}
 

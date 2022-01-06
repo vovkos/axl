@@ -41,13 +41,13 @@ public:
 public:
 	Utf32sDfaBase() {}
 
-	Utf32sDfaBase(uint32_t storage) {
+	Utf32sDfaBase(DecoderState storage) {
 		load(storage);
 	}
 
 	static
-	uint_t
-	getPendingLength(uint_t storage) {
+	size_t
+	getPendingLength(DecoderState storage) {
 		return extractState(storage) & 3;
 	}
 

@@ -87,7 +87,7 @@ public:
 
 public:
 	static
-	uint_t
+	size_t
 	getPendingLength(DecoderState state) {
 		return Dfa::getPendingLength(state);
 	}

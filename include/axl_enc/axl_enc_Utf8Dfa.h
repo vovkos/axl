@@ -165,13 +165,13 @@ protected:
 public:
 	Utf8Dfa() {}
 
-	Utf8Dfa(uint32_t storage) {
+	Utf8Dfa(DecoderState storage) {
 		load(storage);
 	}
 
 	static
-	uint_t
-	getPendingLength(uint_t storage) {
+	size_t
+	getPendingLength(DecoderState storage) {
 		return m_pendingLengthTable[extractState(storage) >> 3];
 	}
 
@@ -343,13 +343,13 @@ public:
 		m_acc = 0;
 	}
 
-	Utf8ReverseDfa(uint32_t storage) {
+	Utf8ReverseDfa(DecoderState storage) {
 		load(storage);
 	}
 
 	static
-	uint_t
-	getPendingLength(uint_t storage) {
+	size_t
+	getPendingLength(DecoderState storage) {
 		return m_pendingLengthTable[extractState(storage)];
 	}
 

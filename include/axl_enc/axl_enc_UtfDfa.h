@@ -75,19 +75,19 @@ public:
 	}
 
 	void
-	load(uint32_t storage) {
+	load(DecoderState storage) {
 		m_state = storage >> 24;
 		m_cp = storage & 0x00ffffff;
 	}
 
-	uint32_t
+	DecoderState
 	save() const {
 		return (m_state << 24) | (m_cp & 0x00ffffff);
 	}
 
 	static
-	uint32_t
-	extractState(uint32_t storage) {
+	uint_t
+	extractState(DecoderState storage) {
 		return storage >> 24;
 	}
 };
