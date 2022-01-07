@@ -370,7 +370,7 @@ public:
 			utf32_t replacement
 		): EncodingEmitter_u(p, replacement) {
 			ASSERT(end - p >= Decoder::MaxEmitLength * Encoder::MaxEncodeLength);
-			m_end = end - Decoder::MaxEmitLength * Encoder::MaxEncodeLength - 1;
+			m_end = end - (Decoder::MaxEmitLength * Encoder::MaxEncodeLength - 1);
 		}
 
 		bool
