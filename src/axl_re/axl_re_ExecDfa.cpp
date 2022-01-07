@@ -164,7 +164,10 @@ public:
 		}
 
 		if (m_matchEnd) {
-			m_matchEndOffset = m_lastExecOffset + (char*)m_matchEnd - (char*)p0;
+			m_matchEndOffset = IsReverse()() ?
+				m_lastExecEndOffset + (char*)m_matchEnd - (char*)p0 - 1 :
+				m_lastExecOffset + (char*)m_matchEnd - (char*)p0;
+
 			m_matchEnd = NULL;
 		}
 	}

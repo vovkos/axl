@@ -667,7 +667,7 @@ testRegex() {
 	const char* end;
 
 	do {
-		result = regex.compile("?abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
+		result = regex.compile("[a-z]+");
 		if (!result) {
 			printf("error: %s\n", err::getLastErrorDescription().sz());
 			return;
@@ -676,7 +676,42 @@ testRegex() {
 		regex.buildFullDfa();
 		regex.buildFullReverseDfa();
 #if (_AXL_DEBUG)
+		printf("\nDFA:\n");
 		regex.printDfa();
+		printf("\nrDFA:\n");
+		regex.printReverseDfa();
+#endif
+
+		re::State state(re::ExecFlag_Stream | re::ExecFlag_DisableCapture);
+		re::ExecResult result = regex.exec(&state, "abc\n\n");
+		ASSERT(result == re::ExecResult_Match);
+		printf("match: %d..%d\n", state.getMatch()->getOffset(), state.getMatch()->getEndOffset());
+
+		result = regex.exec(&state, "\n\n");
+		ASSERT(result == re::ExecResult_Continue);
+
+		result = regex.exec(&state, "abc\n\n");
+		ASSERT(result == re::ExecResult_ContinueBackward);
+
+		result = regex.exec(&state, "abc\n\n");
+		ASSERT(result == re::ExecResult_MatchOffsetsOnly);
+		printf("match: %d..%d\n", state.getMatch()->getOffset(), state.getMatch()->getEndOffset());
+		return;
+	} while (0);
+
+	do {
+		result = regex.compile("abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
+		if (!result) {
+			printf("error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		regex.buildFullDfa();
+		regex.buildFullReverseDfa();
+#if (_AXL_DEBUG)
+		printf("\nDFA:\n");
+		regex.printDfa();
+		printf("\nrDFA:\n");
 		regex.printReverseDfa();
 #endif
 
@@ -705,7 +740,9 @@ testRegex() {
 		regex.buildFullDfa();
 		regex.buildFullReverseDfa();
 #if (_AXL_DEBUG)
+		printf("\nDFA:\n");
 		regex.printDfa();
+		printf("\nrDFA:\n");
 		regex.printReverseDfa();
 #endif
 
@@ -778,7 +815,6 @@ testRegex() {
 
 	printf("\nDFA:\n");
 	regex.printDfa();
-
 	printf("\nrDFA:\n");
 	regex.printReverseDfa();
 #	endif
@@ -6346,14 +6382,6 @@ main(
 #else
 	uint_t baudRate = argc >= 2 ? atoi(argv[1]) : 38400;
 #endif
-
-	utf32_t s[] = { 'a', 'b', 'c' };
-
-	enc::CharCodec* c = enc::getCharCodec(enc::CharCodecKind_Utf32);
-
-	utf32_t buffer[3];
-	c->decode_utf32_u(buffer, s, sizeof(s));
-
 
 	testRegex();
 	// testUsbRegex();
