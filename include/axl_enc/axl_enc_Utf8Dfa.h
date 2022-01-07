@@ -370,6 +370,17 @@ public:
 		m_acc = 0;
 	}
 
+	void
+	load(uint32_t storage) {
+		m_state = storage >> 24;
+		m_acc = storage & 0x00ffffff;
+	}
+
+	uint32_t
+	save() const {
+		return (m_state << 24) | (m_acc & 0x00ffffff);
+	}
+
 	uint_t
 	decode(uchar_t c);
 
