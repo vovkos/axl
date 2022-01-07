@@ -71,9 +71,9 @@ Utf32sDfaBase<IsBigEndian>::decode(uchar_t c) {
 	uint_t nextState = prevState + 1;
 
 	if (IsBigEndian()())
-		m_cp = prevState ? c << (prevState << 3) : c;
+		m_cp = prevState ? m_cp | (c << ((3 - prevState) << 3)) : c << 24;
 	else
-		m_cp = prevState ? c << ((3 - prevState) << 3) : c << 24;
+		m_cp = prevState ? m_cp | (c << (prevState << 3)) : c;
 
 	return m_state = nextState;
 }

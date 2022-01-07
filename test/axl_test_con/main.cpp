@@ -6347,6 +6347,14 @@ main(
 	uint_t baudRate = argc >= 2 ? atoi(argv[1]) : 38400;
 #endif
 
+	utf32_t s[] = { 'a', 'b', 'c' };
+
+	enc::CharCodec* c = enc::getCharCodec(enc::CharCodecKind_Utf32);
+
+	utf32_t buffer[3];
+	c->decode_utf32_u(buffer, s, sizeof(s));
+
+
 	testRegex();
 	// testUsbRegex();
 	return 0;
