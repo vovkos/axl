@@ -667,7 +667,7 @@ testRegex() {
 	const char* end;
 
 	do {
-		result = regex.compile("abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
+		result = regex.compile("?abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
 		if (!result) {
 			printf("error: %s\n", err::getLastErrorDescription().sz());
 			return;

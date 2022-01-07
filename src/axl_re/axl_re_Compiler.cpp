@@ -315,8 +315,6 @@ Compiler::clone(
 NfaState*
 Compiler::single() {
 	Token token = getToken();
-	ASSERT(token.isValidSingle());
-
 	switch (token.m_tokenKind) {
 	case TokenKind_Group:
 		return (m_flags & CompileFlag_DisableCapture) ?
@@ -381,8 +379,7 @@ Compiler::single() {
 		return anyChar();
 
 	default:
-		ASSERT(false);
-		err::setError("invalid regexp syntax");
+		err::setError("invalid regular expression syntax");
 		return NULL;
 	}
 }
