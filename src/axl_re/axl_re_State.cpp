@@ -184,7 +184,12 @@ StateImpl::createMatch(
 
 size_t
 State::getDfaStateId() const {
-	ASSERT(m_p && m_p->m_engine->getEngineKind() == ExecEngineKind_Dfa);
+	ASSERT(m_p);
+
+	if (!m_p->m_engine)
+		return m_p->m_init.m_dfaStateId;
+
+	ASSERT(m_p->m_engine->getEngineKind() == ExecEngineKind_Dfa);
 	return ((ExecDfaBase*)m_p->m_engine)->getDfaStateId();
 }
 
