@@ -145,8 +145,7 @@ public:
 
 	const Regex*
 	getRegex() const {
-		ASSERT(m_p);
-		return m_p->m_regex;
+		return m_p ? m_p->m_regex : NULL;
 	}
 
 	enc::CharCodecKind
@@ -266,6 +265,7 @@ State::exec(
 	const void* p,
 	size_t size
 ) {
+	ASSERT(m_p && m_p->m_engine);
 	ensureExclusive();
 	size ?
 		m_p->m_engine->exec(p, size) :
@@ -276,6 +276,7 @@ State::exec(
 inline
 ExecResult
 State::eof() {
+	ASSERT(m_p && m_p->m_engine);
 	ensureExclusive();
 	m_p->m_engine->eof();
 	return m_p->m_engine->getExecResult();
