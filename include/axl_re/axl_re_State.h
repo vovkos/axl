@@ -211,6 +211,11 @@ public:
 	}
 
 	void
+	release() {
+		m_p = rc::g_nullPtr;
+	}
+
+	void
 	initialize() {
 		initialize(StateInit());
 	}
