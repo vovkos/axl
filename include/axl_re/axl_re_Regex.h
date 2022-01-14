@@ -289,8 +289,7 @@ public:
 
 	ExecResult
 	eof(State* state) const {
-		ASSERT(state->getRegex() == this && (state->getExecFlags() & ExecFlag_Stream) && !state->isFinal());
-		return state->eof();
+		return exec(state, NULL, 0);
 	}
 
 #if (_AXL_DEBUG)

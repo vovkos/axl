@@ -667,6 +667,44 @@ testRegex() {
 	const char* end;
 
 	do {
+		result = regex.compile("[5-9]+");
+		if (!result) {
+			printf("error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		regex.buildFullDfa();
+		regex.buildFullReverseDfa();
+#if (_AXL_DEBUG)
+		printf("\nDFA:\n");
+		regex.printDfa();
+		printf("\nrDFA:\n");
+		regex.printReverseDfa();
+#endif
+
+		re::StateInit init(re::ExecFlag_Stream | re::ExecFlag_DisableCapture);
+		re::State state(init);
+		re::ExecResult result = regex.exec(&state, "5678");
+		ASSERT(result == re::ExecResult_Continue);
+
+		printf("state: %d\n", state.getDfaStateId());
+
+		result = regex.eof(&state);
+		ASSERT(result == re::ExecResult_ContinueBackward);
+
+		result = regex.exec(&state, "12345678");
+		ASSERT(result == re::ExecResult_Match);
+
+		printf(
+			"match: %d..%d: '%s'\n",
+			state.getMatch()->getOffset(),
+			state.getMatch()->getEndOffset(),
+			state.getMatch()->getText().sz()
+		);
+		return;
+	} while (0);
+
+	do {
 		result = regex.compile("[a-z]+");
 		if (!result) {
 			printf("error: %s\n", err::getLastErrorDescription().sz());

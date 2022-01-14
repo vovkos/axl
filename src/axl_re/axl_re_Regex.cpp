@@ -385,7 +385,7 @@ Regex::exec(
 		return result;
 
 	ASSERT(result == ExecResult_Continue);
-	return state->eof();
+	return state->exec(NULL, 0);
 }
 
 //..............................................................................

@@ -257,9 +257,6 @@ protected:
 		const void* p,
 		size_t size
 	);
-
-	ExecResult
-	eof();
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -272,18 +269,14 @@ State::exec(
 ) {
 	ASSERT(m_p && m_p->m_engine);
 	ensureExclusive();
-	size ?
-		m_p->m_engine->exec(p, size) :
-		m_p->m_engine->eof();
-	return m_p->m_engine->getExecResult();
-}
 
-inline
-ExecResult
-State::eof() {
-	ASSERT(m_p && m_p->m_engine);
-	ensureExclusive();
-	m_p->m_engine->eof();
+	if (size) {
+		m_p->m_engine->exec(p, size);
+	} else {
+		ASSERT(isStream() && !isFinal());
+		m_p->m_engine->eof();
+	}
+
 	return m_p->m_engine->getExecResult();
 }
 
