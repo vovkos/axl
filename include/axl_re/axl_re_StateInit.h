@@ -26,9 +26,12 @@ struct StateInit {
 	enc::DecoderState m_decoderState;
 	uint_t m_prevCharFlags;
 	size_t m_offset;
+	size_t m_dfaStateId;
+
+	// below fields are relevant for reverse DFA only
+
 	uint_t m_baseCharFlags;
 	size_t m_baseOffset;
-	size_t m_dfaStateId;
 	size_t m_matchAcceptId;
 
 	StateInit() {
@@ -65,9 +68,10 @@ StateInit::setup(
 	m_decoderState = 0;
 	m_prevCharFlags = Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary;
 	m_offset = offset;
+	m_dfaStateId = -1;
+
 	m_baseCharFlags = Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary;
 	m_baseOffset = offset;
-	m_dfaStateId = -1;
 	m_matchAcceptId = -1;
 }
 
