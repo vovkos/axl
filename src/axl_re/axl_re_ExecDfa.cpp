@@ -176,6 +176,11 @@ public:
 	void
 	eof() {
 		ASSERT(!IsReverse()() && !isFinalized());
+
+		m_lastExecData = NULL;
+		m_lastExecOffset = m_offset;
+		m_lastExecEndOffset = m_offset;
+
 		processBoundary(m_offset, m_prevCharFlags | Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary);
 		finalize(true);
 	}
