@@ -124,27 +124,26 @@ public:
 	) {
 		const void* p0;
 
-		m_lastExecData = p;
-
 		if (IsReverse()()) {
+			// be careful not to overshoot base offset
+			size_t maxSize = m_offset - m_baseOffset;
+			if (size > maxSize) {
+				size_t delta = size - maxSize;
+				p = (char*)p + delta;
+				size -= delta;
+			}
+
 			const char* end = (char*)p - 1;
 			m_p = p0 = end + size;
+			m_lastExecData = p;
 			m_lastExecOffset = m_offset - size;
 			m_lastExecEndOffset = m_offset;
-
-			// be careful not to overshoot base offset
-
-			if (m_baseOffset > m_lastExecOffset) {
-				size_t delta = m_baseOffset - m_lastExecOffset;
-				end += delta;
-				m_lastExecData = (char*)p + delta;
-				m_lastExecOffset = m_baseOffset;
-			}
 
 			p = Encoding::ReverseDecoder::decode(&m_decoderState, *this, (char*)m_p, end);
 		} else {
 			const char* end = (char*)p + size;
 			m_p = p0 = p;
+			m_lastExecData = p;
 			m_lastExecOffset = m_offset;
 			m_lastExecEndOffset = m_offset + size;
 			p = Encoding::Decoder::decode(&m_decoderState, *this, (char*)p, end);
