@@ -284,7 +284,7 @@ Regex::compile(
 	m_regexKind = RegexKind_Single;
 
 	Compiler compiler(&m_nfaProgram, flags);
-	bool result = compiler.compile(source, 0);
+	bool result = compiler.compile(source, 0) != NULL;
 	if (!result)
 		return false;
 

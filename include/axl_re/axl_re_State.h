@@ -103,7 +103,7 @@ public:
 	}
 
 	operator bool () const {
-		return m_p;
+		return m_p != NULL;
 	}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
