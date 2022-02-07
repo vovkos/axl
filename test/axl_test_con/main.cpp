@@ -667,6 +667,75 @@ testRegex() {
 	const char* end;
 
 	do {
+		result = regex.compile("<[^>]*>");
+		if (!result) {
+			printf("error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		regex.buildFullDfa();
+		regex.buildFullReverseDfa();
+#if (_AXL_DEBUG)
+		printf("\nDFA:\n");
+		regex.printDfa();
+		printf("\nrDFA:\n");
+		regex.printReverseDfa();
+#endif
+
+		re::StateInit init(re::ExecFlag_Stream | re::ExecFlag_DisableCapture);
+		re::State state(init);
+		re::ExecResult result = regex.exec(&state, "abc<def>ghi");
+		ASSERT(result == re::ExecResult_Match);
+
+		printf(
+			"match: %d..%d: '%s'\n",
+			state.getMatch()->getOffset(),
+			state.getMatch()->getEndOffset(),
+			state.getMatch()->getText().sz()
+		);
+		return;
+	} while (0);
+
+	do {
+		result = regex.compile("char|[a-z]*1");
+		if (!result) {
+			printf("error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		regex.buildFullDfa();
+		regex.buildFullReverseDfa();
+#if (_AXL_DEBUG)
+		printf("\nDFA:\n");
+		regex.printDfa();
+		printf("\nrDFA:\n");
+		regex.printReverseDfa();
+#endif
+
+		re::StateInit init(re::ExecFlag_Stream | re::ExecFlag_DisableCapture);
+		re::State state(init);
+		re::ExecResult result = regex.exec(&state, "abcharzzz");
+		ASSERT(result == re::ExecResult_Continue);
+
+		result = regex.eof(&state);
+		ASSERT(result == re::ExecResult_ContinueBackward);
+
+		result = regex.exec(&state, "zz");
+		ASSERT(result == re::ExecResult_ContinueBackward);
+
+		result = regex.exec(&state, "abccharz");
+		ASSERT(result == re::ExecResult_Match);
+
+		printf(
+			"match: %d..%d: '%s'\n",
+			state.getMatch()->getOffset(),
+			state.getMatch()->getEndOffset(),
+			state.getMatch()->getText().sz()
+		);
+		return;
+	} while (0);
+
+	do {
 		result = regex.compile("[5-9]+");
 		if (!result) {
 			printf("error: %s\n", err::getLastErrorDescription().sz());

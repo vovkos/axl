@@ -384,8 +384,15 @@ Regex::exec(
 	if (!result || state->isFinal() || state->isStream())
 		return result;
 
+	// process EOF for non-streams
+
 	ASSERT(result == ExecResult_Continue);
-	return state->exec(NULL, -1);
+	result = state->exec(NULL, -1);
+
+	if (result == ExecResult_ContinueBackward)
+		result = state->exec(p, size); 	// re-submit
+
+	return result;
 }
 
 //..............................................................................

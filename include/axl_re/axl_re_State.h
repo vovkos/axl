@@ -271,7 +271,7 @@ State::exec(
 	ensureExclusive();
 
 	if (size == -1) {
-		ASSERT(isStream() && !isFinal());
+		ASSERT(!isFinal());
 		m_p->m_engine->eof();
 	} else if (size) {
 		m_p->m_engine->exec(p, size);

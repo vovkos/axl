@@ -24,7 +24,7 @@ struct DfaState;
 
 class ExecDfaBase: public ExecEngine {
 protected:
-	ExecDfaBase* m_forwardEngine;     // reverse DFA only
+	ExecDfaBase* m_prevEngine;    // reverse DFA only
 	const DfaState* m_state;
 	const void* m_p;
 	const void* m_matchEnd;
@@ -37,6 +37,11 @@ protected:
 
 public:
 	ExecDfaBase(StateImpl* parent);
+
+	virtual ~ExecDfaBase() {
+		if (m_prevEngine)
+			AXL_MEM_DELETE(m_prevEngine);
+	}
 
 	size_t
 	getDfaStateId() const {
@@ -54,8 +59,17 @@ protected:
 	void
 	copy(const ExecDfaBase* src);
 
-	void
-	setForwardEngine(ExecDfaBase* forwardEngine);
+	static
+	uint_t
+	calcReverseCharFlags(utf32_t c);
+
+	static
+	uint_t
+	calcReverseAnchors(
+		uint_t anchors,
+		uint_t prevCharFlags,
+		uint_t charFlags
+	);
 
 	void
 	gotoStateImpl(const DfaState* state);
