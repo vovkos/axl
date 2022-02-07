@@ -684,12 +684,21 @@ testRegex() {
 
 		re::StateInit init(re::ExecFlag_Stream | re::ExecFlag_DisableCapture);
 		re::State state(init);
-		re::ExecResult result = regex.exec(&state, "5678");
+		re::ExecResult result = regex.exec(&state, "56");
+		ASSERT(result == re::ExecResult_Continue);
+
+		result = regex.exec(&state, "");
+		ASSERT(result == re::ExecResult_Continue);
+
+		result = regex.exec(&state, "78");
 		ASSERT(result == re::ExecResult_Continue);
 
 		printf("state: %d\n", state.getDfaStateId());
 
 		result = regex.eof(&state);
+		ASSERT(result == re::ExecResult_ContinueBackward);
+
+		result = regex.exec(&state, "");
 		ASSERT(result == re::ExecResult_ContinueBackward);
 
 		result = regex.exec(&state, "12345678");

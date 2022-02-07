@@ -289,7 +289,7 @@ public:
 
 	ExecResult
 	eof(State* state) const {
-		return exec(state, NULL, 0);
+		return exec(state, NULL, -1); // using a zero-length buffer as EOF is misuse-prone; better use -1
 	}
 
 #if (_AXL_DEBUG)
