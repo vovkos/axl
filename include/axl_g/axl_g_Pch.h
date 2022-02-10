@@ -578,7 +578,9 @@ public:
 
 // TRACE macro
 
-#ifdef _AXL_DEBUG
+#if (_AXL_DEBUG)
+AXL_SELECT_ANY FILE* axl_g_traceFile = stdout;
+
 #	if (_AXL_OS_WIN)
 void
 axl_trace_va(
@@ -586,8 +588,6 @@ axl_trace_va(
 	axl_va_list va
 );
 #	else
-AXL_SELECT_ANY FILE* axl_g_traceFile = stdout;
-
 inline
 void
 axl_trace_va(

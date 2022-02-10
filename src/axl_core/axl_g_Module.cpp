@@ -93,7 +93,7 @@ Module::addFinalizer(const rc::Ptr<Finalizer>& finalizer) {
 } // namespace g
 } // namespace axl
 
-#if (_AXL_OS_WIN)
+#if (_AXL_OS_WIN && _AXL_DEBUG)
 void
 axl_trace_va(
 	const char* formatString,
@@ -103,11 +103,11 @@ axl_trace_va(
 	axl::sl::String string(axl::rc::BufKind_Stack, buffer, sizeof(buffer));
 	size_t length = string.format_va(formatString, va);
 
-	// send it both to the debugger and to stdout
+	// send it both to the debugger and to the trace file
 
 	::OutputDebugStringA(string);
-	fwrite(string, length, 1, stdout);
-	fflush(stdout);
+	fwrite(string, length, 1, axl_g_traceFile);
+	fflush(axl_g_traceFile);
 }
 #endif
 
