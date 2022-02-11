@@ -57,6 +57,21 @@ public:
 		return m_dataSize;
 	}
 
+	const char*
+	getBuffer() const {
+		return m_buffer;
+	}
+
+	const char*
+	getReader() const {
+		return m_reader;
+	}
+
+	const char*
+	getWriter() const {
+		return m_writer;
+	}
+
 	void
 	clear();
 

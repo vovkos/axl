@@ -359,7 +359,7 @@ enum NfaClosureKind {
 	NfaClosureKind_FirstReverse = NfaClosureKind_ReverseEpsilon,
 };
 
-// forward NFA sets are ORDERED by STATE PRIORITY to mimic PCRE (yield the first leftmost match)
+// forward NFA sets are ORDERED by STATE PRIORITY to mimic backtrackers (yield the first leftmost match)
 // reverse & rollback NFA sets are UNORDERED (yield the longest match)
 
 class NfaStateSet {
