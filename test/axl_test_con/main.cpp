@@ -112,11 +112,11 @@ testWinNetworkAdapterList2() {
 	printf("Using WinIoctl...\n\n");
 
 	printf(
-		"sizeof (sockaddr) = %d\n"
-		"sizeof (sockaddr_in) = %d\n"
-		"sizeof (sockaddr_in6) = %d\n"
-		"sizeof (sockaddr_storage) = %d\n"
-		"sizeof (io::SockAddr) = %d\n",
+		"sizeof(sockaddr) = %d\n"
+		"sizeof(sockaddr_in) = %d\n"
+		"sizeof(sockaddr_in6) = %d\n"
+		"sizeof(sockaddr_storage) = %d\n"
+		"sizeof(io::SockAddr) = %d\n",
 		sizeof(sockaddr),
 		sizeof(sockaddr_in),
 		sizeof(sockaddr_in6),
@@ -3770,7 +3770,7 @@ testConn() {
 
 	static char data[] = "hui govno i muravei";
 
-	printf("sending %d bytes...\n", sizeof (data));
+	printf("sending %d bytes...\n", sizeof(data));
 	socket.send(data, sizeof(data));
 
 	printf("closing...\n");

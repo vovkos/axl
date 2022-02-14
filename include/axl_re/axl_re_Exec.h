@@ -252,17 +252,17 @@ public:
 		const void* p,
 		size_t size
 	) {
-		m_lastExecData = p;
-		m_lastExecOffset = m_offset;
-		m_lastExecEndOffset = m_offset + size;
-		Decoder::decode(&m_decoderState, *static_cast<T*>(this), (char*)p, (char*)p + size);
+		this->m_lastExecData = p;
+		this->m_lastExecOffset = this->m_offset;
+		this->m_lastExecEndOffset = this->m_offset + size;
+		Decoder::decode(&this->m_decoderState, *static_cast<T*>(this), (char*)p, (char*)p + size);
 	}
 
 	// DecodeEmitter
 
 	bool
 	canEmit() const {
-		return m_execResult < 0;
+		return this->m_execResult < 0;
 	}
 
 	void

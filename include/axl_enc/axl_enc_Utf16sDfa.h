@@ -348,13 +348,13 @@ public:
 	Utf16sDfaBase() {}
 
 	Utf16sDfaBase(DecoderState storage) {
-		load(storage);
+		this->load(storage);
 	}
 
 	static
 	size_t
 	getPendingLength(DecoderState storage) {
-		return m_pendingLengthTable[extractState(storage) >> 2];
+		return DfaTable::m_pendingLengthTable[DfaTable::extractState(storage) >> 2];
 	}
 
 	uint_t
@@ -364,8 +364,8 @@ public:
 
 	uint_t
 	count(uchar_t c) {
-		uint_t cc = m_map[c];
-		return m_state = T::m_dfa[m_state + cc];
+		uint_t cc = DfaTable::m_map[c];
+		return this->m_state = DfaTable::m_dfa[this->m_state + cc];
 	}
 };
 
@@ -374,24 +374,24 @@ public:
 template <typename DfaTable>
 uint_t
 Utf16sDfaBase<DfaTable>::decode(uchar_t c) {
-	uint_t cc = m_map[c];
-	uint_t nextState = m_dfa[m_state + cc];
+	uint_t cc = DfaTable::m_map[c];
+	uint_t nextState = DfaTable::m_dfa[this->m_state + cc];
 
-	if (nextState <= State_LastHalf) { // half of the next code-unit
-		m_cp &= 0x0000ffff; // use this byte for storage: 0x00ff0000
-		m_cp |= c << 16;
+	if (nextState <= DfaTable::State_LastHalf) { // half of the next code-unit
+		this->m_cp &= 0x0000ffff; // use this byte for storage: 0x00ff0000
+		this->m_cp |= c << 16;
 	} else {
-		utf16_t cu = IsBigEndian ?
-			((m_cp >> 8) & 0xff00) | c :
-			(m_cp >> 16) | (c << 8);
+		utf16_t cu = DfaTable::IsBigEndian ?
+			((this->m_cp >> 8) & 0xff00) | c :
+			(this->m_cp >> 16) | (c << 8);
 
-		m_cp = nextState == State_ReadyPair ? IsReverse ?
-			0x10000 - (0xd800 << 10) - 0xdc00 + (cu << 10) + (m_cp & 0xffff) :
-			0x10000 - (0xd800 << 10) - 0xdc00 + ((m_cp & 0xffff) << 10) + cu :
+		this->m_cp = nextState == DfaTable::State_ReadyPair ? DfaTable::IsReverse ?
+			0x10000 - (0xd800 << 10) - 0xdc00 + (cu << 10) + (this->m_cp & 0xffff) :
+			0x10000 - (0xd800 << 10) - 0xdc00 + ((this->m_cp & 0xffff) << 10) + cu :
 			cu;
 	}
 
-	return m_state = nextState;
+	return this->m_state = nextState;
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

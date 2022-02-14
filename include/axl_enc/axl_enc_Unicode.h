@@ -284,7 +284,7 @@ public:
 	typedef typename SrcEncoding::C SrcUnit;
 	typedef typename DstEncoding::Encoder Encoder;
 	typedef typename SrcEncoding::Decoder Decoder;
-	typedef ConvertResult<DstUnit, SrcUnit> ConvertResult;
+	typedef ConvertResult<DstUnit, SrcUnit> Result;
 
 	class CountingEmitter {
 	protected:
@@ -375,7 +375,7 @@ public:
 
 		bool
 		canEmit() const {
-			return m_p < m_end;
+			return this->m_p < m_end;
 		}
 	};
 
@@ -427,7 +427,7 @@ public:
 	}
 
 	static
-	ConvertResult
+	Result
 	convert_u(
 		DecoderState* state,
 		DstUnit* dst,
@@ -437,7 +437,7 @@ public:
 	) {
 		EncodingEmitter_u emitter(dst, replacement);
 		src = Decoder::decode(state, emitter, src, srcEnd);
-		return ConvertResult(emitter.p(), src);
+		return Result(emitter.p(), src);
 	}
 
 	static
@@ -449,12 +449,12 @@ public:
 		size_t srcLength,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		ConvertResult result = convert_u(state, dst, src, src + srcLength, replacement);
+		Result result = convert_u(state, dst, src, src + srcLength, replacement);
 		return ConvertLengthResult(result.m_dst - dst, result.m_src - src);
 	}
 
 	static
-	ConvertResult
+	Result
 	convert_u(
 		DstUnit* dst,
 		const SrcUnit* src,
@@ -463,7 +463,7 @@ public:
 	) {
 		EncodingEmitter_u emitter(dst, replacement);
 		src = Decoder::decode(emitter, src, srcEnd);
-		return ConvertResult(emitter.p(), src);
+		return Result(emitter.p(), src);
 	}
 
 	static
@@ -474,12 +474,12 @@ public:
 		size_t srcLength,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		ConvertResult result = convert_u(dst, src, src + srcLength, replacement);
+		Result result = convert_u(dst, src, src + srcLength, replacement);
 		return ConvertLengthResult(result.m_dst - dst, result.m_src - src);
 	}
 
 	static
-	ConvertResult
+	Result
 	convert(
 		DecoderState* state,
 		DstUnit* dst,
@@ -490,7 +490,7 @@ public:
 	) {
 		EncodingEmitter_s emitter(dst, dstEnd, replacement);
 		src = Decoder::decode(state, emitter, src, srcEnd);
-		return ConvertResult(emitter.p(), src);
+		return Result(emitter.p(), src);
 	}
 
 	static
@@ -503,12 +503,12 @@ public:
 		size_t srcLength,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		ConvertResult result = convert(state, dst, dst + dstLength, src, src + srcLength, replacement);
+		Result result = convert(state, dst, dst + dstLength, src, src + srcLength, replacement);
 		return ConvertLengthResult(result.m_dst - dst, result.m_src - src);
 	}
 
 	static
-	ConvertResult
+	Result
 	convert(
 		DstUnit* dst,
 		DstUnit* dstEnd,
@@ -518,7 +518,7 @@ public:
 	) {
 		EncodingEmitter_s emitter(dst, dstEnd, replacement);
 		src = Decoder::decode(emitter, src, srcEnd);
-		return ConvertResult(emitter.p(), src);
+		return Result(emitter.p(), src);
 	}
 
 	static
@@ -530,7 +530,7 @@ public:
 		size_t srcLength,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		ConvertResult result = convert(dst, dst + dstLength, src, src + srcLength, replacement);
+		Result result = convert(dst, dst + dstLength, src, src + srcLength, replacement);
 		return ConvertLengthResult(result.m_dst - dst, result.m_src - src);
 	}
 };

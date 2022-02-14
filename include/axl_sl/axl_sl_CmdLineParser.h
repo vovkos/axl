@@ -16,6 +16,7 @@
 #include "axl_sl_List.h"
 #include "axl_sl_String.h"
 #include "axl_sl_StringHashTable.h"
+#include "axl_err_Error.h"
 
 namespace axl {
 namespace sl {

@@ -433,8 +433,8 @@ void benchFormat() {
 	QString qtString;
 	sl::String axlString;
 
-	printf("sizeof (std::string) = %d\n", sizeof (std::string));
-	printf("sizeof (axl::sl::String) = %d\n", sizeof (axl::sl::String));
+	printf("sizeof(std::string) = %d\n", sizeof(std::string));
+	printf("sizeof(axl::sl::String) = %d\n", sizeof(axl::sl::String));
 
 	uint64_t baseTimestamp;
 	uint64_t time;

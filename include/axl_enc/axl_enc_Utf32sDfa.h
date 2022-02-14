@@ -28,6 +28,8 @@ struct Utf32sDfaRoot {};
 template <typename IsBigEndian>
 class Utf32sDfaBase: public UtfDfa<Utf32sDfaBase<IsBigEndian>, Utf32sDfaRoot> {
 public:
+	typedef UtfDfa<Utf32sDfaBase<IsBigEndian>, Utf32sDfaRoot> BaseType;
+
 	enum State {
 		State_Start    = 0,
 		State_1        = 1,
@@ -42,13 +44,13 @@ public:
 	Utf32sDfaBase() {}
 
 	Utf32sDfaBase(DecoderState storage) {
-		load(storage);
+		this->load(storage);
 	}
 
 	static
 	size_t
 	getPendingLength(DecoderState storage) {
-		return extractState(storage) & 3;
+		return BaseType::extractState(storage) & 3;
 	}
 
 	uint_t
@@ -58,7 +60,7 @@ public:
 
 	uint_t
 	count(uchar_t c) {
-		return m_state = (m_state & 3) + 1;
+		return this->m_state = (this->m_state & 3) + 1;
 	}
 };
 
@@ -67,15 +69,15 @@ public:
 template <typename IsBigEndian>
 uint_t
 Utf32sDfaBase<IsBigEndian>::decode(uchar_t c) {
-	uint_t prevState = m_state & 3;
+	uint_t prevState = this->m_state & 3;
 	uint_t nextState = prevState + 1;
 
 	if (IsBigEndian()())
-		m_cp = prevState ? m_cp | (c << ((3 - prevState) << 3)) : c << 24;
+		this->m_cp = prevState ? this->m_cp | (c << ((3 - prevState) << 3)) : c << 24;
 	else
-		m_cp = prevState ? m_cp | (c << (prevState << 3)) : c;
+		this->m_cp = prevState ? this->m_cp | (c << (prevState << 3)) : c;
 
-	return m_state = nextState;
+	return this->m_state = nextState;
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

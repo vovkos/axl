@@ -122,7 +122,8 @@ public:
 		const C* src,
 		const C* srcEnd
 	) {
-		return decode(Dfa(), emitter, src, srcEnd);
+		Dfa dfa;
+		return decode(dfa, emitter, src, srcEnd);
 	}
 
 protected:

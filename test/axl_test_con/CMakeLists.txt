@@ -117,7 +117,7 @@ endif()
 
 if (BUILD_AXL_RE)
 	add_definitions(-D_AXL_RE=1)
-	list(APPEND OPT_LIB_LIST axl_lex axl_re)
+	list(APPEND OPT_LIB_LIST axl_re axl_lex)
 endif()
 
 if (BUILD_AXL_ZIP)

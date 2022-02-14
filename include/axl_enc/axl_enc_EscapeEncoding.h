@@ -15,6 +15,7 @@
 
 #include "axl_enc_HexEncoding.h"
 #include "axl_enc_CharCodec.h"
+#include "axl_err_Error.h"
 
 namespace axl {
 namespace enc {

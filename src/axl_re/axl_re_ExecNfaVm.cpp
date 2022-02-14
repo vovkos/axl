@@ -242,16 +242,16 @@ public:
 		const char* p,
 		utf32_t c
 	) {
-		uint_t anchors = calcAnchorsUpdateCharFlags(c);
-		advanceNonConsumingThreads(anchors);
+		uint_t anchors = this->calcAnchorsUpdateCharFlags(c);
+		this->advanceNonConsumingThreads(anchors);
 
-		if (m_consumingThreadList.isEmpty()) {
-			finalize(false);
+		if (this->m_consumingThreadList.isEmpty()) {
+			this->finalize(false);
 			return;
 		}
 
-		m_offset = m_lastExecOffset + p - (char*)m_lastExecData;
-		advanceConsumingThreads(c);
+		this->m_offset = this->m_lastExecOffset + p - (char*)this->m_lastExecData;
+		this->advanceConsumingThreads(c);
 	}
 };
 
@@ -263,7 +263,7 @@ public:
 	virtual
 	ExecEngine*
 	createExecEngine(StateImpl* parent) {
-		return AXL_MEM_NEW_ARGS((ExecNfaVm<Decoder>), (parent));
+		return AXL_MEM_NEW_ARGS(ExecNfaVm<Decoder>, (parent));
 	}
 };
 
