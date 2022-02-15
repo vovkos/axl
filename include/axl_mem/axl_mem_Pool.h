@@ -26,6 +26,11 @@ protected:
 	sl::List<T> m_freeList;
 
 public:
+	void
+	clear() {
+		m_freeList.clear();
+	}
+
 	T*
 	get() {
 		return !m_freeList.isEmpty() ? m_freeList.removeHead() : AXL_MEM_NEW(T);
