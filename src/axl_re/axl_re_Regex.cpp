@@ -387,12 +387,7 @@ Regex::exec(
 	// process EOF for non-streams
 
 	ASSERT(result == ExecResult_Continue);
-	result = state->exec(NULL, -1);
-
-	if (result == ExecResult_ContinueBackward)
-		result = state->exec(p, size); 	// re-submit
-
-	return result;
+	return state->eof(true);
 }
 
 //..............................................................................

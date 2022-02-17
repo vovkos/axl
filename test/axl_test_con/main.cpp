@@ -667,6 +667,67 @@ testRegex() {
 	const char* end;
 
 	do {
+		regex.createSwitch();
+
+		result = regex.compileSwitchCase("\\s*(foo\\d*)\\s+(bar\\d*)?\\s*");
+		if (!result) {
+			printf("error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		regex.finalizeSwitch();
+
+		re::StateInit init(re::ExecFlag_AnchorDataBegin);
+		re::State state(init);
+		re::ExecResult result = regex.exec(&state, " foo123 bar567 ");
+		ASSERT(result == re::ExecResult_Match);
+
+		printf(
+			"match(%d): %d..%d (%s)\n",
+			state.getMatchAcceptId(),
+			state.getMatch()->getOffset(),
+			state.getMatch()->getEndOffset(),
+			state.getMatch()->getText().sz()
+		);
+
+		return;
+	} while (0);
+
+	do {
+		regex.createSwitch();
+
+		result =
+			regex.compileSwitchCase("open[ \t]*\\d*[\r\n]") &&
+			regex.compileSwitchCase("close[ \t]*\\d*[\r\n]") &&
+			regex.compileSwitchCase("connect[ \t]*\\d*[\r\n]") &&
+			regex.compileSwitchCase("\\s+");
+
+		if (!result) {
+			printf("error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		regex.finalizeSwitch();
+
+		re::StateInit init(re::ExecFlag_AnchorDataBegin | re::ExecFlag_Stream);
+		re::State state(init);
+		re::ExecResult result = regex.exec(&state, "op");
+		ASSERT(result == re::ExecResult_Continue);
+
+		result = regex.exec(&state, "en 12\n con");
+		ASSERT(result == re::ExecResult_MatchOffsetsOnly);
+
+		printf(
+			"match(%d): %d..%d\n",
+			state.getMatchAcceptId(),
+			state.getMatch()->getOffset(),
+			state.getMatch()->getEndOffset()
+		);
+
+		return;
+	} while (0);
+
+	do {
 		result = regex.compile("<[^>]*>");
 		if (!result) {
 			printf("error: %s\n", err::getLastErrorDescription().sz());
@@ -717,7 +778,7 @@ testRegex() {
 		re::ExecResult result = regex.exec(&state, "abcharzzz");
 		ASSERT(result == re::ExecResult_Continue);
 
-		result = regex.eof(&state);
+		result = regex.eof(&state, false);
 		ASSERT(result == re::ExecResult_ContinueBackward);
 
 		result = regex.exec(&state, "zz");
@@ -764,7 +825,7 @@ testRegex() {
 
 		printf("state: %d\n", state.getDfaStateId());
 
-		result = regex.eof(&state);
+		result = regex.eof(&state, false);
 		ASSERT(result == re::ExecResult_ContinueBackward);
 
 		result = regex.exec(&state, "");
@@ -898,7 +959,7 @@ testRegex() {
 		ASSERT(result == re::ExecResult_MatchOffsetsOnly && state.getMatchAcceptId() == 0 && state.getMatch()->getSize() == 6);
 
 		result = regex.exec(&state, "123456");
-		result = regex.eof(&state);
+		result = regex.eof(&state, true);
 		printf("regex result: %d, match offset: %d, match length: %d, match: %s\n", result, state.getMatch()->getOffset(), state.getMatch()->getSize(), state.getMatch()->getText().sz());
 		ASSERT(result == re::ExecResult_Match && state.getMatchAcceptId() == 0 && state.getMatch()->getSize() == 6);
 

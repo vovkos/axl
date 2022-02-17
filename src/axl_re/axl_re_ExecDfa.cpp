@@ -166,7 +166,7 @@ public:
 
 	virtual
 	void
-	eof() {
+	eof(bool isLastExecDataAvailable) {
 		ASSERT(false);
 	}
 
@@ -297,13 +297,13 @@ public:
 
 	virtual
 	void
-	eof() {
+	eof(bool isLastExecDataAvailable) {
 		ASSERT(!IsReverse()() && !this->isFinalized());
 
-		this->m_p = NULL;
-		this->m_lastExecData = NULL;
-		this->m_lastExecOffset = this->m_offset;
-		this->m_lastExecEndOffset = this->m_offset;
+		if (!isLastExecDataAvailable) {
+			this->resetLastExecData();
+			this->m_p = NULL;
+		}
 
 		processBoundary(this->m_offset, this->m_prevCharFlags | Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary);
 		finalize(true);
@@ -515,7 +515,7 @@ protected:
 			ExecNfaEngine* engine = createExecNfaVm(this->m_parent);
 			engine->initialize(init, nfaState);
 			engine->exec(p, length);
-			engine->eof();
+			engine->eof(true);
 			this->m_execResult = engine->getExecResult();
 			AXL_MEM_DELETE(engine);
 		}

@@ -92,6 +92,15 @@ ExecNfaVmBase::initialize(
 }
 
 void
+ExecNfaVmBase::eof(bool isLastExecDataAvailable) {
+	if (!isLastExecDataAvailable)
+		resetLastExecData();
+
+	advanceNonConsumingThreads(m_prevCharFlags | Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary);
+	finalize(true);
+}
+
+void
 ExecNfaVmBase::advanceNonConsumingThreads(uint32_t anchors) {
 	while (!m_nonConsumingThreadList.isEmpty()) {
 		Thread* thread = m_nonConsumingThreadList.removeHead();

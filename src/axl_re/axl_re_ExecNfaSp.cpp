@@ -68,6 +68,15 @@ ExecNfaSpBase::initialize(
 }
 
 void
+ExecNfaSpBase::eof(bool isLastExecDataAvailable) {
+	if (!isLastExecDataAvailable)
+		resetLastExecData();
+
+	advanceNonConsumingStates(m_prevCharFlags | Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary);
+	finalize(true);
+}
+
+void
 ExecNfaSpBase::addState(const NfaState* state) {
 	if (!state->isConsuming())
 		m_nonConsumingStateSetTable[m_nonConsumingStateSetIdx].add(state);

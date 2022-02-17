@@ -131,7 +131,7 @@ public:
 
 	virtual
 	void
-	eof() = 0;
+	eof(bool isLastExec) = 0;
 
 protected:
 	void
@@ -139,6 +139,9 @@ protected:
 
 	void
 	copy(const ExecEngine* src);
+
+	void
+	resetLastExecData();
 
 	static
 	uint_t
@@ -154,6 +157,14 @@ protected:
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+void
+ExecEngine::resetLastExecData() {
+	m_lastExecData = NULL;
+	m_lastExecOffset = m_offset;
+	m_lastExecEndOffset = m_offset;
+}
 
 inline
 uint_t

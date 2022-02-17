@@ -257,6 +257,9 @@ protected:
 		const void* p,
 		size_t size
 	);
+
+	ExecResult
+	eof(bool isLastExecDataAvailable);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -270,13 +273,22 @@ State::exec(
 	ASSERT(m_p && m_p->m_engine);
 	ensureExclusive();
 
-	if (size == -1) {
+	if ((intptr_t)size < 0) {
 		ASSERT(!isFinal());
-		m_p->m_engine->eof();
+		m_p->m_engine->eof(false);
 	} else if (size) {
 		m_p->m_engine->exec(p, size);
 	}
 
+	return m_p->m_engine->getExecResult();
+}
+
+inline
+ExecResult
+State::eof(bool isLastExecDataAvailable) {
+	ASSERT(m_p && m_p->m_engine && !isFinal());
+	ensureExclusive();
+	m_p->m_engine->eof(isLastExecDataAvailable);
 	return m_p->m_engine->getExecResult();
 }
 

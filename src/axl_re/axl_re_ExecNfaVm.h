@@ -61,10 +61,7 @@ public:
 
 	virtual
 	void
-	eof() {
-		advanceNonConsumingThreads(m_prevCharFlags | Anchor_EndLine | Anchor_EndText | Anchor_WordBoundary);
-		finalize(true);
-	}
+	eof(bool isLastExecDataAvailable);
 
 protected:
 	void

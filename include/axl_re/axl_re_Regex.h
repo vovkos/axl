@@ -238,7 +238,7 @@ public:
 	void
 	buildFullRollbackDfa();
 
-	// execution (match/search)
+	// execution (match/search); pass negative size to simulate EOF
 
 	ExecResult
 	exec(
@@ -288,8 +288,12 @@ public:
 	}
 
 	ExecResult
-	eof(State* state) const {
-		return exec(state, NULL, -1); // using a zero-length buffer as EOF is misuse-prone; better use -1
+	eof(
+		State* state,
+		bool isLastExecDataAvailable
+	) const {
+		ASSERT(state && state->isStream() && !state->isFinal() && state->getRegex() == this);
+		return state->eof(true);
 	}
 
 #if (_AXL_DEBUG)
