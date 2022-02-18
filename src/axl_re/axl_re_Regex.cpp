@@ -297,7 +297,7 @@ Regex::compileSwitchCase(
 	uint_t flags,
 	const sl::StringRef& source
 ) {
-	ASSERT(m_regexKind = RegexKind_Switch);
+	ASSERT(m_regexKind == RegexKind_Switch);
 	ASSERT(!(flags & CompileFlag_MatchOnly)); // CompileFlag_MatchOnly only for finalizeSwitch()
 
 	SwitchCase scase;

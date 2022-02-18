@@ -225,7 +225,7 @@ public:
 
 	void
 	finalizeSwitch(uint_t flags = 0) { // only CompileFlag_MatchOnly makes sense here
-		ASSERT(m_regexKind = RegexKind_Switch);
+		ASSERT(m_regexKind == RegexKind_Switch);
 		m_nfaProgram.finalize((flags & CompileFlag_MatchOnly) != 0);
 	}
 
