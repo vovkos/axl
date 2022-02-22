@@ -148,7 +148,6 @@ any               { createCharToken(ts[0]); };
 
 *|;
 
-
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
 #  quantifier machine

@@ -317,16 +317,6 @@ NfaState::print(FILE* file) const {
 
 //..............................................................................
 
-// instantiate templated closure builders
-
-bool (NfaStateSet::*NfaStateSet_buildClosure0)() = &NfaStateSet::buildEpsilonClosure<sl::False>;
-bool (NfaStateSet::*NfaStateSet_buildClosure1)() = &NfaStateSet::buildEpsilonClosure<sl::True>;
-bool (NfaStateSet::*NfaStateSet_buildClosure2)(uint_t) = &NfaStateSet::buildAnchorClosure<sl::False>;
-bool (NfaStateSet::*NfaStateSet_buildClosure3)(uint_t) = &NfaStateSet::buildAnchorClosure<sl::True>;
-bool (NfaStateSet::*NfaStateSet_buildClosure4)() = &NfaStateSet::buildRollbackClosure;
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 bool
 NfaStateSet::add(const NfaState* state) {
 	if (m_map.getBit(state->m_id) || isAccept())
@@ -569,6 +559,50 @@ NfaProgram::print(FILE* file) const {
 }
 
 #endif
+
+//..............................................................................
+
+// instantiate templated closure builders
+
+template
+bool
+NfaStateSet::buildClosureImpl <
+	sl::False,
+	sl::False,
+	sl::False
+>(uint_t anchors);
+
+template
+bool
+NfaStateSet::buildClosureImpl <
+	sl::False,
+	sl::True,
+	sl::False
+>(uint_t anchors);
+
+template
+bool
+NfaStateSet::buildClosureImpl <
+	sl::False,
+	sl::False,
+	sl::True
+>(uint_t anchors);
+
+template
+bool
+NfaStateSet::buildClosureImpl <
+	sl::False,
+	sl::True,
+	sl::True
+>(uint_t anchors);
+
+template
+bool
+NfaStateSet::buildClosureImpl <
+	sl::True,
+	sl::True,
+	sl::False
+>(uint_t anchors);
 
 //..............................................................................
 
