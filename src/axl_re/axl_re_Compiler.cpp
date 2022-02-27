@@ -257,7 +257,7 @@ Compiler::quantifier(NfaState* start) {
 		link->finalizeLink(link2);
 		link2->createLink(op, link);
 		link = link2;
-	} while (token.isValidSingle());
+	}
 
 	m_program->m_stateList.insertTail(accept);
 	NfaState* sequence = m_program->insertState(start);
@@ -544,7 +544,7 @@ Compiler::capturingGroup() {
 NfaState*
 Compiler::nonCapturingGroup() {
 	Token token = nextToken();
-	ASSERT(token == TokenKind_Group);
+	ASSERT(token == TokenKind_NonCapturingGroup);
 
 	NfaState* start = expression();
 	if (!start)
