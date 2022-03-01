@@ -138,16 +138,28 @@ struct NfaState: sl::ListLink {
 	);
 
 	void
-	createLink(
-		NfaState* opState,
-		NfaState* reverseState
-	);
+	createLink(NfaState* opState);
 
 	void
-	createSequence(
+	createSequence(NfaState* headState);
+
+	void
+	addLink(NfaState* linkState);
+
+	void
+	addSequence(
 		NfaState* headState,
 		NfaState* tailState
 	);
+
+	void
+	addSequence(NfaState* sequenceState) {
+		ASSERT(sequenceState->m_stateKind == NfaStateKind_Sequence);
+		addSequence(sequenceState->m_nextState, sequenceState->m_tailState);
+	}
+
+	void
+	finalizeSequence(NfaState* nextState);
 
 	void
 	createMatchAnchor(
@@ -178,12 +190,6 @@ struct NfaState: sl::ListLink {
 		size_t captureId,
 		NfaState* nextState
 	);
-
-	void
-	finalizeLink(NfaState* nextState)  {
-		ASSERT(m_stateKind == NfaStateKind_Link && !m_nextState);
-		m_nextState = nextState;
-	}
 
 	void
 	addChar(utf32_t c);
@@ -251,28 +257,57 @@ NfaState::createSplit(
 
 inline
 void
-NfaState::createLink(
-	NfaState* opState,
-	NfaState* reverseState
-) {
+NfaState::createLink(NfaState* opState) {
 	ASSERT(!m_stateKind && !m_nextState);
 
 	m_stateKind = NfaStateKind_Link;
 	m_opState = opState;
-	m_reverseState = reverseState;
 }
 
 inline
 void
-NfaState::createSequence(
-	NfaState* headState,
-	NfaState* tailState
-) {
-	ASSERT(!m_stateKind && !m_nextState);
+NfaState::createSequence(NfaState* headState) {
+	ASSERT(!m_stateKind && !m_nextState && headState->m_stateKind == NfaStateKind_Link);
 
 	m_stateKind = NfaStateKind_Sequence;
 	m_nextState = headState;
+	m_tailState = headState;
+}
+
+inline
+void
+NfaState::addLink(NfaState* linkState) {
+	ASSERT(
+		m_stateKind == NfaStateKind_Sequence &&
+		m_tailState->m_stateKind == NfaStateKind_Link &&
+		linkState->m_stateKind == NfaStateKind_Link
+	);
+
+	linkState->m_reverseState = m_tailState;
+	m_tailState->m_nextState = linkState;
+	m_tailState = linkState;
+}
+
+inline
+void
+NfaState::addSequence(
+	NfaState* headState,
+	NfaState* tailState
+) {
+	ASSERT(m_stateKind == NfaStateKind_Sequence);
+
+	headState->m_reverseState = m_tailState;
+	m_tailState->m_nextState = headState;
 	m_tailState = tailState;
+}
+
+inline
+void
+NfaState::finalizeSequence(NfaState* nextState)  {
+	ASSERT(m_stateKind == NfaStateKind_Sequence);
+
+	m_nextState->m_reverseState = nextState;
+	m_tailState->m_nextState = nextState;
 }
 
 inline

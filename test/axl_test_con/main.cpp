@@ -667,6 +667,40 @@ testRegex() {
 	const char* end;
 
 	do {
+		result = regex.compile("a(?:xy){2}bc{2}d");
+		if (!result) {
+			printf("error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		regex.buildFullDfa();
+		regex.buildFullReverseDfa();
+#if (_AXL_DEBUG)
+		printf("\nNFA:\n");
+		regex.printNfa();
+		printf("\nDFA:\n");
+		regex.printDfa();
+		// printf("\nrDFA:\n");
+		// regex.printReverseDfa();
+#endif
+/*
+		re::StateInit init(re::ExecFlag_AnchorDataBegin);
+		re::State state(init);
+		re::ExecResult result = regex.exec(&state, "abb");
+		ASSERT(result == re::ExecResult_Match);
+
+		printf(
+			"match(%d): %d..%d (%s)\n",
+			state.getMatchAcceptId(),
+			state.getMatch()->getOffset(),
+			state.getMatch()->getEndOffset(),
+			state.getMatch()->getText().sz()
+		); */
+
+		return;
+	} while (0);
+
+	do {
 		regex.createSwitch();
 
 		result = regex.compileSwitchCase("\\s*(foo\\d*)\\s+(bar\\d*)?\\s*");

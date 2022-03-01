@@ -109,38 +109,57 @@ Compiler::concat() {
 	if (!token.isValidSingle())
 		return start; // not a sequence
 
+	NfaState* sequence;
+	NfaState* accept;
+	if (start->m_stateKind == NfaStateKind_Sequence) {
+		sequence = start;
+		accept = m_program->m_stateList.removeTail();
+
+		ASSERT(
+			start->m_tailState->m_stateKind == NfaStateKind_Link &&
+			start->m_tailState->m_nextState == accept &&
+			start->m_nextState->m_stateKind == NfaStateKind_Link &&
+			start->m_nextState->m_reverseState == accept
+		);
+	} else {
+		sequence = m_program->insertState(start);
+		accept = AXL_MEM_NEW(NfaState);
+
+		NfaState* link = m_program->getLastState();
+		link->createLink(start);
+		sequence->createSequence(link);
+	}
+
 	uint_t flags = start->m_flags;
-	NfaState* link = m_program->getLastState();
-	NfaState* accept = AXL_MEM_NEW(NfaState);
-	NfaState* head = link;
-	head->createLink(start, accept);
 
 	do {
 		NfaState* op = repeat();
-		if (!op) {
-			AXL_MEM_DELETE(accept);
+		if (!op)
 			return NULL;
-		}
 
 		if (!(op->m_flags & NfaStateFlag_Nullable))
 			flags &= ~NfaStateFlag_Nullable;
 
-		NfaState* link2 = m_program->getLastState();
-		link->finalizeLink(link2);
-		link2->createLink(op, link);
-		link = link2;
+		if (op->m_stateKind == NfaStateKind_Sequence) {
+			NfaState* accept = m_program->getLastState();
+			sequence->addSequence(op);
+			m_program->m_stateList.erase(op);
+			m_program->m_stateList.erase(accept);
+		} else {
+			NfaState* link = m_program->getLastState();
+			link->createLink(op);
+			sequence->addLink(link);
+		}
 
 		token = getToken();
 	} while (token.isValidSingle());
 
+	ASSERT(!accept->m_stateKind);
 	m_program->m_stateList.insertTail(accept);
-	NfaState* sequence = m_program->insertState(start);
-	sequence->createSequence(head, link);
+	sequence->finalizeSequence(accept);
 	sequence->m_flags = flags;
-	link->finalizeLink(accept);
 	return sequence;
 }
-
 
 template <typename IsNonGreedy>
 NfaState*
@@ -245,26 +264,58 @@ Compiler::quantifier(NfaState* start) {
 	if (tokenCount.m_number == 1)
 		return start;
 
-	NfaState* originalAccept = m_program->getLastState();
-	NfaState* link = originalAccept;
-	NfaState* accept = AXL_MEM_NEW(NfaState);
-	NfaState* head = link;
-	head->createLink(start, accept);
+	NfaState* sequence;
+	NfaState* accept;
+	if (start->m_stateKind == NfaStateKind_Sequence) {
+		sequence = start;
+		accept = m_program->m_stateList.removeTail();
 
-	for (size_t i = 1; i < tokenCount.m_number; i++) {
-		NfaState* op = clone(start, originalAccept);
-		NfaState* link2 = m_program->getLastState();
-		link->finalizeLink(link2);
-		link2->createLink(op, link);
-		link = link2;
+		ASSERT(
+			start->m_tailState->m_stateKind == NfaStateKind_Link &&
+			start->m_tailState->m_nextState == accept &&
+			start->m_nextState->m_stateKind == NfaStateKind_Link &&
+			start->m_nextState->m_reverseState == accept
+		);
+
+		NfaState* first = sequence->m_nextState->m_opState;
+		NfaState* last = sequence->m_tailState;
+
+		for (size_t i = 1; i < tokenCount.m_number; i++) {
+			NfaState* head = clone(first, last);
+			NfaState* tail = m_program->getLastState();
+			sequence->addSequence(head, tail);
+		}
+	} else {
+		sequence = m_program->insertState(start);
+		accept = AXL_MEM_NEW(NfaState);
+
+		NfaState* link = m_program->getLastState();
+		link->createLink(start);
+		sequence->createSequence(link);
+
+		for (size_t i = 1; i < tokenCount.m_number; i++) {
+			NfaState* op = clone(start, link);
+			NfaState* link2 = m_program->getLastState();
+			sequence->addLink(link2);
+		}
 	}
 
+	ASSERT(!accept->m_stateKind);
 	m_program->m_stateList.insertTail(accept);
-	NfaState* sequence = m_program->insertState(start);
-	sequence->createSequence(head, link);
+	sequence->finalizeSequence(accept);
 	sequence->m_flags = start->m_flags;
-	link->finalizeLink(accept);
 	return sequence;
+}
+
+inline
+void
+mapNfaStateField(
+	const sl::SimpleHashTable<NfaState*, NfaState*>& stateMap,
+	NfaState*& field
+) {
+	sl::ConstHashTableIterator<NfaState*, NfaState*> mapIt = stateMap.find(field);
+	if (mapIt)
+		field = mapIt->m_value;
 }
 
 NfaState*
@@ -282,10 +333,8 @@ Compiler::clone(
 		newState->copy(*oldState);
 		stateMap[oldState] = newState;
 
-		if (it == last) {
-			newState->clear();
+		if (it == last)
 			break;
-		}
 
 		it++;
 	}
@@ -295,17 +344,21 @@ Compiler::clone(
 	for (; it; it++) {
 		NfaState* state = *it;
 
-		sl::HashTableIterator<NfaState*, NfaState*> mapIt;
-		if (state->m_nextState) {
-			mapIt = stateMap.find(state->m_nextState);
-			if (mapIt)
-				state->m_nextState = mapIt->m_value;
-		}
+		mapNfaStateField(stateMap, state->m_nextState);
 
-		if (state->m_splitState) {
-			mapIt = stateMap.find(state->m_splitState);
-			if (mapIt)
-				state->m_splitState = mapIt->m_value;
+		switch (state->m_stateKind) {
+		case NfaStateKind_Split:
+			mapNfaStateField(stateMap, state->m_splitState);
+			break;
+
+		case NfaStateKind_Sequence:
+			mapNfaStateField(stateMap, state->m_tailState);
+			break;
+
+		case NfaStateKind_Link:
+			mapNfaStateField(stateMap, state->m_opState);
+			mapNfaStateField(stateMap, state->m_reverseState);
+			break;
 		}
 	}
 
