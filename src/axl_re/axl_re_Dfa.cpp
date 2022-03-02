@@ -160,8 +160,10 @@ DfaProgram::createStartState(const NfaState* nfaState) {
 
 DfaState*
 DfaProgram::createRollbackState(const DfaState* dfaState) {
+	ASSERT(m_stateFlags & DfaStateFlag_Reverse);
+
 	NfaStateSet nfaStateSet = dfaState->m_nfaStateSet;
-	nfaStateSet.buildRollbackClosure();
+	nfaStateSet.buildEpsilonClosure<sl::True>();
 	return getState(nfaStateSet);
 }
 
@@ -195,8 +197,9 @@ DfaBuilder::buildTransitionMaps(DfaState* state) {
 
 	bool hasMatchAnchors = buildCharTransitionMap(state);
 	if (hasMatchAnchors)
-		state->m_flags & DfaStateFlag_Reverse ?
-			buildAnchorTransitionMap<sl::True>(state) :
+		if (state->m_flags & DfaStateFlag_Reverse)
+			buildAnchorTransitionMap<sl::True>(state);
+		else
 			buildAnchorTransitionMap<sl::False>(state);
 
 	if (state->m_anchorTransitionMap.isEmpty() &&
@@ -288,8 +291,8 @@ DfaBuilder::buildAnchorTransitionMap(DfaState* dfaState) {
 
 		once[anchors] = true;
 		NfaStateSet nfaStateSet = dfaState->m_nfaStateSet;
-		bool result = nfaStateSet.buildAnchorClosure<IsReverse>(anchors);
-		if (!result)
+		nfaStateSet.buildAnchorClosure<IsReverse>(anchors);
+		if (nfaStateSet.isEmpty())
 			continue;
 
 		DfaState* anchorState = m_program->getState(nfaStateSet);

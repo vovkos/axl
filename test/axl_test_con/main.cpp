@@ -667,7 +667,7 @@ testRegex() {
 	const char* end;
 
 	do {
-		result = regex.compile("a(?:xy){2}bc{2}d");
+		result = regex.compile("^abc");
 		if (!result) {
 			printf("error: %s\n", err::getLastErrorDescription().sz());
 			return;
@@ -680,13 +680,12 @@ testRegex() {
 		regex.printNfa();
 		printf("\nDFA:\n");
 		regex.printDfa();
-		// printf("\nrDFA:\n");
-		// regex.printReverseDfa();
+		printf("\nrDFA:\n");
+		regex.printReverseDfa();
 #endif
-/*
-		re::StateInit init(re::ExecFlag_AnchorDataBegin);
-		re::State state(init);
-		re::ExecResult result = regex.exec(&state, "abb");
+
+		re::State state;
+		re::ExecResult result = regex.exec(&state, "abcd");
 		ASSERT(result == re::ExecResult_Match);
 
 		printf(
@@ -695,7 +694,18 @@ testRegex() {
 			state.getMatch()->getOffset(),
 			state.getMatch()->getEndOffset(),
 			state.getMatch()->getText().sz()
-		); */
+		);
+
+		result = regex.exec(&state, "xyz\nabcd");
+		ASSERT(result == re::ExecResult_Match);
+
+		printf(
+			"match(%d): %d..%d (%s)\n",
+			state.getMatchAcceptId(),
+			state.getMatch()->getOffset(),
+			state.getMatch()->getEndOffset(),
+			state.getMatch()->getText().sz()
+		);
 
 		return;
 	} while (0);

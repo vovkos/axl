@@ -497,29 +497,23 @@ public:
 	add(const NfaState* state);
 
 	template <typename IsReverse>
-	bool
+	void
 	buildEpsilonClosure() {
-		return buildClosureImpl<sl::False, IsReverse, sl::False>(0);
+		buildClosureImpl<IsReverse, sl::False>(0);
 	}
 
 	template <typename IsReverse>
-	bool
+	void
 	buildAnchorClosure(uint_t anchors) {
-		return buildClosureImpl<sl::False, IsReverse, sl::True>(anchors);
-	}
-
-	bool
-	buildRollbackClosure() {
-		return buildClosureImpl<sl::True, sl::True, sl::False>(0);
+		buildClosureImpl<IsReverse, sl::True>(anchors);
 	}
 
 protected:
 	template <
-		typename IsRollback,
 		typename IsReverse,
 		typename UseAnchors
 	>
-	bool
+	void
 	buildClosureImpl(uint_t anchors);
 };
 

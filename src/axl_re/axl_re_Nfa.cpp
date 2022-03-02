@@ -327,84 +327,25 @@ NfaStateSet::add(const NfaState* state) {
 	return true;
 }
 
-// push to stack in inversed order so that we pop in correct order
-
-inline
-void
-initializeClosureStack(
-	sl::Array<const NfaState*>* stack,
-	const sl::ArrayRef<const NfaState*>& array
-) {
-	size_t count = array.getCount();
-	stack->setCount(count);
-	for (size_t i = 0, j = count - 1; i < count; i++, j--)
-		(*stack)[i] = array[j];
-}
-
-// this one takes special care of sequences -- it inverses the order of adjacent nullable sequence entries
-
-inline
-void
-initializeRollbackClosureStack(
-	sl::Array<const NfaState*>* stack,
-	const sl::ArrayRef<const NfaState*>& array
-) {
-	// push to stack in inversed order so that we pop in correct order
-
-	sl::BitMap map;
-
-	size_t count = array.getCount();
-	stack->reserve(count);
-	for (intptr_t i = count - 1; i >= 0; i--) {
-		const NfaState* state = array[i];
-		if (state->m_stateKind != NfaStateKind_Link || map.getBit(state->m_id))
-			continue;
-
-		map.setBitResize(state->m_id);
-
-		if (!(state->m_opState->m_flags & NfaStateFlag_Nullable)) {
-			stack->append(state->m_opState);
-			continue;
-		}
-
-		// special treatment required for nullable sequence entries -- must inverse order within this sequence;
-		// first, scan to the very first non-nullable entry (or all the way to the sequence head)
-
-		const NfaState* p = state;
-		while (p->m_reverseState->m_stateKind == NfaStateKind_Link) {
-			p = p->m_reverseState;
-			if (!(p->m_opState->m_flags & NfaStateFlag_Nullable))
-				break;
-		}
-
-		// now, push all predcessors to gain the reversed order
-
-		for (; p != state; p = p->m_nextState)
-			if (!map.getBit(p->m_id)) {
-				map.setBitResize(p->m_id);
-				stack->append(p->m_opState);
-			}
-
-		// finally, push this nullable entry
-
-		stack->append(state->m_opState);
-	}
-}
-
 template <
-	typename IsRollback,
 	typename IsReverse,
 	typename UseAnchors
 >
-bool
+void
 NfaStateSet::buildClosureImpl(uint_t anchors) {
 	char buffer[256];
 	sl::Array<const NfaState*> stack(rc::BufKind_Stack, buffer, sizeof(buffer));
 
-	if (IsRollback()())
-		initializeRollbackClosureStack(&stack, m_array);
-	else
-		initializeClosureStack(&stack, m_array);
+	if (IsReverse()()) // order doesn't matter
+		stack.copy(m_array);
+	else {
+		// push to stack in inversed order so that we pop in correct order
+
+		size_t count = m_array.getCount();
+		stack.setCount(count);
+		for (size_t i = 0, j = count - 1; i < count; i++, j--)
+			stack[i] = m_array[j];
+	}
 
 	m_closureKind = UseAnchors()() ?
 		IsReverse()() ? NfaClosureKind_ReverseAnchor : NfaClosureKind_Anchor :
@@ -412,8 +353,6 @@ NfaStateSet::buildClosureImpl(uint_t anchors) {
 
 	m_array.clear();
 	m_map.clear();
-
-	bool result = false;
 
 	while (!stack.isEmpty()) {
 		const NfaState* state = stack.getBackAndPop();
@@ -425,16 +364,13 @@ NfaStateSet::buildClosureImpl(uint_t anchors) {
 				m_array.append(state);
 				if (!IsReverse()()) { // we are done! the very first accept matches.
 					m_acceptId = state->m_acceptId;
-	 				return true;
+	 				return;
 				}
 
 				m_acceptId = AXL_MIN(m_acceptId, state->m_acceptId);
 				break;
 
 			case NfaStateKind_Link:
-				if (!IsReverse()()) // links are only needed for rollbacks
-					m_array.append(state);
-
 				state = IsReverse()() ? state->m_reverseState : state->m_nextState;
 				if (state->m_stateKind == NfaStateKind_Link)
 					state = state->m_opState;
@@ -471,7 +407,6 @@ NfaStateSet::buildClosureImpl(uint_t anchors) {
 			case NfaStateKind_MatchCharSet:
 			case NfaStateKind_MatchAnyChar:
 				m_array.append(state);
-				result = true;
 
 				// ... and fall-through
 
@@ -481,8 +416,6 @@ NfaStateSet::buildClosureImpl(uint_t anchors) {
 		}
 	Break2:;
 	}
-
-	return result;
 }
 
 //..............................................................................
@@ -565,43 +498,31 @@ NfaProgram::print(FILE* file) const {
 // instantiate templated closure builders
 
 template
-bool
+void
 NfaStateSet::buildClosureImpl <
-	sl::False,
 	sl::False,
 	sl::False
 >(uint_t anchors);
 
 template
-bool
+void
 NfaStateSet::buildClosureImpl <
-	sl::False,
 	sl::True,
 	sl::False
 >(uint_t anchors);
 
 template
-bool
+void
 NfaStateSet::buildClosureImpl <
-	sl::False,
 	sl::False,
 	sl::True
 >(uint_t anchors);
 
 template
-bool
+void
 NfaStateSet::buildClosureImpl <
-	sl::False,
 	sl::True,
 	sl::True
->(uint_t anchors);
-
-template
-bool
-NfaStateSet::buildClosureImpl <
-	sl::True,
-	sl::True,
-	sl::False
 >(uint_t anchors);
 
 //..............................................................................
