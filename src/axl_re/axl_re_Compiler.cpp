@@ -597,7 +597,7 @@ Compiler::capturingGroup() {
 NfaState*
 Compiler::nonCapturingGroup() {
 	Token token = nextToken();
-	ASSERT(token == TokenKind_NonCapturingGroup);
+	ASSERT(token == TokenKind_Group || token == TokenKind_NonCapturingGroup);
 
 	NfaState* start = expression();
 	if (!start)
