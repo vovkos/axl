@@ -81,6 +81,18 @@ public:
 		return ::SSL_clear_options(m_h, options);
 	}
 
+	const char*
+	getHostname() {
+		ASSERT(m_h);
+		return ::SSL_get_servername(m_h, TLSEXT_NAMETYPE_host_name);
+	}
+
+	void
+	setHostname(const sl::StringRef& hostname) {
+		ASSERT(m_h);
+		::SSL_set_tlsext_host_name(m_h, hostname.sz());
+	}
+
 	void
 	setInfoCallback(SslInfoCallbackFunc* callbackFunc) {
 		ASSERT(m_h);
