@@ -126,12 +126,12 @@ protected:
 
 public:
 	const sl::String&
-	getDeviceName() {
+	getDeviceName() const {
 		return m_deviceName;
 	}
 
 	const sl::String&
-	getDescription() {
+	getDescription() const {
 		return m_description;
 	}
 };
