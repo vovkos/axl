@@ -47,6 +47,20 @@ ensureDirExists(const sl::StringRef& fileName);
 bool
 isDir(const sl::StringRef& fileName);
 
+inline
+bool
+isAbsolutePath(const sl::StringRef& fileName) {
+#if (_AXL_OS_WIN)
+	return !fileName.isEmpty() && (
+		fileName[0] == '/' ||
+		fileName[0] == '\\' ||
+		fileName.getLength() >= 2 && fileName[1] == ':'
+	);
+#else
+	return fileName.isPrefix('/');
+#endif
+}
+
 sl::String
 getFullFilePath(const sl::StringRef& fileName);
 
