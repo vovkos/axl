@@ -583,6 +583,27 @@ public:
 	}
 
 	virtual
+	Point
+	getMousePoint()  {
+		QPoint point = QCursor::pos();
+		return Point(point.x(), point.y());
+	}
+
+	virtual
+	Point
+	mapGlobalToWidget(
+		WidgetDriver* widgetDriver,
+		const Point& point
+	);
+
+	virtual
+	Point
+	mapWidgetToGlobal(
+		WidgetDriver* widgetDriver,
+		const Point& point
+	);
+
+	virtual
 	bool
 	scheduleToolTipMsg(
 		WidgetDriver* widgetDriver,

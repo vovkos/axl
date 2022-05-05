@@ -572,6 +572,24 @@ public:
 	hideCaret(WidgetDriver* widgetDriver) = 0;
 
 	virtual
+	Point
+	getMousePoint() = 0; // global
+
+	virtual
+	Point
+	mapGlobalToWidget(
+		WidgetDriver* widgetDriver,
+		const Point& point
+	) = 0;
+
+	virtual
+	Point
+	mapWidgetToGlobal(
+		WidgetDriver* widgetDriver,
+		const Point& point
+	) = 0;
+
+	virtual
 	bool
 	scheduleToolTipMsg(
 		WidgetDriver* widgetDriver,

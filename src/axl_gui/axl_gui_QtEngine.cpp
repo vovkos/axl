@@ -1034,6 +1034,26 @@ QtEngine::stopWidgetAnimation(WidgetDriver* widgetDriver) {
 	qtWidget->m_animationTimer.stop();
 }
 
+Point
+QtEngine::mapGlobalToWidget(
+	WidgetDriver* widgetDriver,
+	const Point& point
+) {
+	QtWidgetBase* qtWidget = (QtWidgetBase*)widgetDriver->getEngineWidget();
+	QPoint pos = qtWidget->mapFromGlobal(QPoint(point.m_x, point.m_y));
+	return Point(pos.x(), pos.y());
+}
+
+Point
+QtEngine::mapWidgetToGlobal(
+	WidgetDriver* widgetDriver,
+	const Point& point
+) {
+	QtWidgetBase* qtWidget = (QtWidgetBase*)widgetDriver->getEngineWidget();
+	QPoint pos = qtWidget->mapToGlobal(QPoint(point.m_x, point.m_y));
+	return Point(pos.x(), pos.y());
+}
+
 bool
 QtEngine::scheduleToolTipMsg(
 	WidgetDriver* widgetDriver,

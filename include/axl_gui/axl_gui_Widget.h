@@ -394,6 +394,11 @@ public:
 	}
 
 	bool
+	setCursor(StdCursorKind stdCursorKind) {
+		return setCursor(m_engine->getStdCursor(stdCursorKind));
+	}
+
+	bool
 	setCursor(Cursor* cursor) {
 		m_cursor = cursor;
 		return m_engine->setWidgetCursor(this, cursor);
@@ -462,6 +467,11 @@ public:
 	}
 
 	// tooltips
+
+	Point
+	getMousePoint() {
+		return m_engine->mapGlobalToWidget(this, m_engine->getMousePoint());
+	}
 
 	bool
 	scheduleToolTipMsg(uint_t timeout = 0) { // 0 -- use engine default
