@@ -287,6 +287,13 @@ public:
 	}
 
 	Array(
+		ValueArg x,
+		size_t count = 1
+	) {
+		copy(x, count);
+	}
+
+	Array(
 		rc::BufKind bufKind,
 		void* p,
 		size_t size
@@ -518,8 +525,20 @@ public:
 	}
 
 	size_t
-	copy(ValueArg e) {
-		return copy(&e, 1);
+	copy(
+		ValueArg e,
+		size_t count = 1
+	) {
+		bool result = setCount(count);
+		if (!result)
+			return -1;
+
+		T* p = m_p;
+		T* end = p + count;
+		for (; p < end; p++)
+			*p = e;
+
+		return count;
 	}
 
 	size_t
@@ -549,8 +568,11 @@ public:
 	}
 
 	size_t
-	append(ValueArg e) {
-		return insert(-1, e);
+	append(
+		ValueArg e,
+		size_t count = 1
+	) {
+		return insert(-1, e, count);
 	}
 
 	size_t
@@ -637,13 +659,17 @@ public:
 	size_t
 	insert(
 		size_t index,
-		ValueArg e
+		ValueArg e,
+		size_t count = 1
 	) {
-		T* dst = insertSpace(index, 1);
+		T* dst = insertSpace(index, count);
 		if (!dst)
 			return -1;
 
-		*dst = e;
+		T* end = dst + count;
+		for (; dst < end; dst++)
+			*dst = e;
+
 		return this->m_count;
 	}
 
