@@ -288,7 +288,7 @@ public:
 
 	Array(
 		ValueArg x,
-		size_t count = 1
+		size_t count
 	) {
 		copy(x, count);
 	}
