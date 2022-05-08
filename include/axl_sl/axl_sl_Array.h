@@ -598,6 +598,9 @@ public:
 		size_t index,
 		size_t count
 	) {
+		if (count == 0)
+			return this->m_count;
+
 		T* dst = insertSpace(index, count);
 		return dst ? this->m_count : -1;
 	}
@@ -607,6 +610,9 @@ public:
 		size_t index,
 		size_t count
 	) {
+		if (count == 0)
+			return this->m_count;
+
 		T* dst = insertSpace(index, count);
 		if (!dst)
 			return -1;
@@ -622,6 +628,9 @@ public:
 		const T* p,
 		size_t count
 	) {
+		if (count == 0)
+			return this->m_count;
+
 		rc::Ptr<void> shadow;
 		if (this->m_hdr && this->m_hdr->isInsideBuffer(p))
 			shadow = this->m_hdr; // ensure we keep p intact
@@ -642,6 +651,9 @@ public:
 		const T* p,
 		size_t count
 	) {
+		if (count == 0)
+			return this->m_count;
+
 		rc::Ptr<void> shadow;
 		if (this->m_hdr && this->m_hdr->isInsideBuffer(p))
 			shadow = this->m_hdr; // ensure we keep p intact
@@ -662,6 +674,9 @@ public:
 		ValueArg e,
 		size_t count = 1
 	) {
+		if (count == 0)
+			return this->m_count;
+
 		T* dst = insertSpace(index, count);
 		if (!dst)
 			return -1;
@@ -679,6 +694,9 @@ public:
 		ValueArg e,
 		size_t count
 	) {
+		if (count == 0)
+			return this->m_count;
+
 		T* dst = insertSpace(index, count);
 		if (!dst)
 			return -1;
