@@ -533,7 +533,7 @@ public:
 		if (!result)
 			return -1;
 
-		T* p = m_p;
+		T* p = this->m_p;
 		T* end = p + count;
 		for (; p < end; p++)
 			*p = e;
