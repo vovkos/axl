@@ -26,13 +26,18 @@ class AnsiAttrParser {
 protected:
 	typedef
 	void
-	(AnsiAttrParser::*SetAttrFuncPtr) (uint_t);
+	(AnsiAttrParser::*SetAttrFuncPtr)(uint_t attr);
 
 protected:
 	TextAttr* m_targetAttr;
 	TextAttr m_baseAttr;
 	uint_t* m_textColor;
 	uint_t* m_backColor;
+
+	SetAttrFuncPtr m_setAttrExFunc;
+	sl::Array<uint_t> m_attrExBuffer;
+
+	static uint_t m_color256Table[256];
 
 public:
 	AnsiAttrParser();
@@ -146,6 +151,18 @@ protected:
 	setBaseBackColor(uint_t) {
 		*m_backColor = m_baseAttr.m_backColor;
 	}
+
+	void
+	setColor256First(uint_t code) {
+		m_attrExBuffer.copy(code);
+		m_setAttrExFunc = &AnsiAttrParser::setColor256Next;
+	}
+
+	void
+	setColor256Next(uint_t code);
+
+	void
+	finalizeColor256(uint_t color);
 };
 
 //..............................................................................
