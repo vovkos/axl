@@ -3890,7 +3890,7 @@ testConn() {
 
 bool
 testSerial() {
-	char const* port = "COM1";
+	char const* port = "COM6";
 
 	printf("opening %s...\n", port);
 
@@ -3898,8 +3898,8 @@ testSerial() {
 	settings.m_baudRate = 38400;
 	settings.m_dataBits = 8;
 	settings.m_stopBits = io::SerialStopBits_1;
-	settings.m_flowControl = io::SerialFlowControl_None;
-	settings.m_parity = io::SerialParity_Odd;
+	settings.m_flowControl = io::SerialFlowControl_RtsCts;
+	settings.m_parity = io::SerialParity_None;
 
 	io::Serial serial;
 	bool result =
@@ -3910,6 +3910,43 @@ testSerial() {
 		printf("failed: %s\n", err::getLastErrorDescription().sz());
 		return false;
 	}
+
+	printf("writing data...\n");
+	char data[] = "abcd";
+	size_t size = serial.write(data, sizeof(data));
+	printf("written: %d byte(s)\n", size);
+
+	printf("reading data...\n");
+
+	io::win::StdOverlapped overlapped;
+	char buffer[1024];
+	result = serial.m_serial.overlappedRead(buffer, sizeof(buffer), &overlapped);
+	printf("result: %d\n", result);
+
+	printf("waiting...\n");
+
+	result = overlapped.m_completionEvent.wait(5000);
+
+	printf("wait result: %d\n", result);
+
+	if (result) {
+		size = serial.m_serial.getOverlappedResult(&overlapped);
+		printf("overlapped result: %d\n", size);
+
+		if (size != -1) {
+			buffer[size] = 0;
+			printf("read: %s\n", buffer);
+		}
+	}
+
+	printf("purging port...\n");
+	serial.purge();
+
+	printf("closing port...\n");
+	serial.close();
+
+	printf("done!\n");
+	return true;
 
 #if (_AXL_OS_WIN)
 	serial.m_serial.setWaitMask(EV_ERR);
@@ -6604,8 +6641,7 @@ main(
 	uint_t baudRate = argc >= 2 ? atoi(argv[1]) : 38400;
 #endif
 
-	testRegex();
-	// testUsbRegex();
+	testSerial();
 	return 0;
 }
 

@@ -40,6 +40,12 @@ public:
 	}
 
 	bool
+	purge(dword_t flags = PURGE_TXABORT | PURGE_TXCLEAR | PURGE_RXABORT | PURGE_RXCLEAR) {
+		bool_t result = ::PurgeComm(m_h, flags);
+		return err::complete(result);
+	}
+
+	bool
 	getSettings(DCB* dcb) {
 		bool_t result = ::GetCommState(m_h, dcb);
 		return err::complete(result);

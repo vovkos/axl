@@ -53,6 +53,15 @@ public:
 	}
 
 	bool
+	purge() {
+#if (_AXL_OS_WIN)
+		return m_serial.purge();
+#else
+		return m_serial.flush();
+#endif
+	}
+
+	bool
 	setSettings(
 		const SerialSettings* settings,
 		uint_t mask = -1
