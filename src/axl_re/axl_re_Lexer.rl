@@ -98,7 +98,7 @@ utf8_2 utf8_c     { createUtf8CharToken_2(ts); };
 utf8_3 utf8_c{2}  { createUtf8CharToken_3(ts); };
 utf8_4 utf8_c{3}  { createUtf8CharToken_4(ts); };
 
-any               { createCharToken(ts[0]); };
+any               { createCharToken((uchar_t)ts[0]); };
 
 *|;
 
