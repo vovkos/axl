@@ -92,6 +92,7 @@ Regex::load(
 
 	m_nfaProgram.m_matchStartState = stateArray[hdr->m_matchStartStateId];
 	m_nfaProgram.m_searchStartState = hdr->m_searchStartStateId != 1 ? stateArray[hdr->m_searchStartStateId] : NULL;
+	m_nfaProgram.m_captureCount = hdr->m_captureCount;
 
 	bool result = m_switchCaseArray.setCount(hdr->m_switchCaseCount);
 	if (!result)
