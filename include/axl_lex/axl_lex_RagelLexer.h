@@ -164,8 +164,7 @@ public:
 
 	void
 	ensureSrcPosError() {
-		if (!lex::isLastSrcPosError())
-			lex::pushSrcPosError(m_filePath, this->m_lastTokenPos);
+		lex::ensureSrcPosError(m_filePath, this->m_lastTokenPos);
 	}
 
 	enum GotoStateKind {
