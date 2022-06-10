@@ -509,7 +509,7 @@ protected:
 			size_t length = pos.m_endOffset - pos.m_offset;
 
 			StateInit init;
-			init.m_prevCharFlags = prevCharFlags | CharFlag_Other; // ensure non-zero flags
+			init.m_prevCharFlags = prevCharFlags | ExecEngine::CharFlag_Other; // ensure non-zero flags
 			init.m_offset = pos.m_offset;
 
 			ExecNfaEngine* engine = createExecNfaVm(this->m_parent);
