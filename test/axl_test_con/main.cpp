@@ -3916,6 +3916,7 @@ testSerial() {
 	size_t size = serial.write(data, sizeof(data));
 	printf("written: %d byte(s)\n", size);
 
+#if (_AXL_OS_WIN)
 	printf("reading data...\n");
 
 	io::win::StdOverlapped overlapped;
@@ -3938,6 +3939,7 @@ testSerial() {
 			printf("read: %s\n", buffer);
 		}
 	}
+#endif
 
 	printf("purging port...\n");
 	serial.purge();
@@ -6641,7 +6643,7 @@ main(
 	uint_t baudRate = argc >= 2 ? atoi(argv[1]) : 38400;
 #endif
 
-	testSerial();
+	testEnumSerial();
 	return 0;
 }
 
