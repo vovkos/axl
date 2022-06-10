@@ -118,11 +118,15 @@ endif()
 
 #...............................................................................
 
-option(
-	BUILD_AXL_RE
-	"Build axl_re library (regular expressions)"
-	ON
-)
+if(RAGEL_FOUND)
+	option(
+		BUILD_AXL_RE
+		"Build axl_re library (regular expressions)"
+		ON
+	)
+else()
+	unset(BUILD_AXL_RE CACHE)
+endif()
 
 if(BUILD_AXL_RE)
 	add_subdirectory(axl_re)
