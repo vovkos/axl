@@ -21,6 +21,74 @@ namespace lnx {
 
 //..............................................................................
 
+class UdevIterator {
+protected:
+	udev_list_entry* m_p;
+
+public:
+	UdevIterator() {
+		m_p = NULL;
+	}
+
+	UdevIterator(udev_list_entry* p) {
+		m_p = p;
+	}
+
+	operator udev_list_entry* () const {
+		return m_p;
+	}
+
+	UdevIterator&
+	operator ++ () {
+		return next();
+	}
+
+	UdevIterator
+	operator ++ (int) { // post increment
+		UdevIterator old = *this;
+		next();
+		return old;
+	}
+
+	UdevIterator&
+	next() {
+		if (m_p)
+			m_p = ::udev_list_entry_get_next(m_p);
+
+		return *this;
+	}
+
+	UdevIterator
+	getNext() const {
+		return UdevIterator(*this).next();
+	}
+
+	UdevIterator&
+	gotoName(const sl::StringRef& name) {
+		if (m_p)
+			m_p = ::udev_list_entry_get_by_name(m_p, name.sz());
+
+		return *this;
+	}
+
+	UdevIterator
+	getByName(const sl::StringRef& name) const {
+		return UdevIterator(*this).gotoName(name);
+	}
+
+	sl::StringRef
+	getName() const {
+		return m_p ? ::udev_list_entry_get_name(m_p) : sl::StringRef();
+	}
+
+	sl::StringRef
+	getValue() const {
+		return m_p ? ::udev_list_entry_get_value(m_p) : sl::StringRef();
+	}
+};
+
+//..............................................................................
+
 template <typename T>
 class UnrefUdevDevice {
 public:
@@ -118,7 +186,6 @@ public:
 	getAction() {
 		return T::udev_device_get_action(this->m_h);
 	}
-
 
 	udev_list_entry*
 	getDevLinkList() {
