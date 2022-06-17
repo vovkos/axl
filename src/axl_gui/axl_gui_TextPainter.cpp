@@ -552,7 +552,10 @@ public:
 	}
 
 	void
-	emitReplacement(const char* p) {
+	emitReplacement(
+		const char* p,
+		utf32_t c
+	) {
 		*m_dst++ = m_unprintableChar;
 		m_src = p;
 	}

@@ -50,6 +50,9 @@ public:
 protected:
 	static const uchar_t m_dfa[StateCount * CcCount];
 	static const uchar_t m_pendingLengthTable[StateCount];
+
+public:
+
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -357,7 +360,12 @@ public:
 		return DfaTable::m_pendingLengthTable[DfaTable::extractState(storage) >> 2];
 	}
 
-	uint_t
+	size_t
+	getPendingLength() const {
+		return DfaTable::m_pendingLengthTable[m_state >> 2];
+	}
+
+	Utf16sDfaBase
 	decode(uchar_t c);
 
 	// skip codepoint calculations when simply counting codepoints
@@ -367,31 +375,40 @@ public:
 		uint_t cc = DfaTable::m_map[c];
 		return this->m_state = DfaTable::m_dfa[this->m_state + cc];
 	}
+
+protected:
+	Utf16sDfaBase(
+		uint_t state,
+		utf32_t cp
+	) {
+		init(state, cp);
+	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename DfaTable>
-uint_t
+Utf16sDfaBase<DfaTable>
 Utf16sDfaBase<DfaTable>::decode(uchar_t c) {
 	uint_t cc = DfaTable::m_map[c];
 	uint_t nextState = DfaTable::m_dfa[this->m_state + cc];
+	utf32_t cp = this->m_cp;
 
 	if (nextState <= DfaTable::State_LastHalf) { // half of the next code-unit
-		this->m_cp &= 0x0000ffff; // use this byte for storage: 0x00ff0000
-		this->m_cp |= c << 16;
+		cp &= 0x0000ffff; // use this byte for storage: 0x00ff0000
+		cp |= c << 16;
 	} else {
 		utf16_t cu = DfaTable::IsBigEndian ?
-			((this->m_cp >> 8) & 0xff00) | c :
-			(this->m_cp >> 16) | (c << 8);
+			((cp >> 8) & 0xff00) | c :
+			(cp >> 16) | (c << 8);
 
-		this->m_cp = nextState == DfaTable::State_ReadyPair ? DfaTable::IsReverse ?
-			0x10000 - (0xd800 << 10) - 0xdc00 + (cu << 10) + (this->m_cp & 0xffff) :
-			0x10000 - (0xd800 << 10) - 0xdc00 + ((this->m_cp & 0xffff) << 10) + cu :
+		cp = nextState == DfaTable::State_ReadyPair ? DfaTable::IsReverse ?
+			0x10000 - (0xd800 << 10) - 0xdc00 + (cu << 10) + (cp & 0xffff) :
+			0x10000 - (0xd800 << 10) - 0xdc00 + ((cp & 0xffff) << 10) + cu :
 			cu;
 	}
 
-	return this->m_state = nextState;
+	return Utf16sDfaBase<DfaTable>(nextState, cp);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

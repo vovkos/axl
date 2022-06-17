@@ -33,8 +33,7 @@ protected:
 
 public:
 	UtfDfa() {
-		m_cp = 0;
-		m_state = T::State_Start;
+		init(T::State_Start, 0);
 	}
 
 	static
@@ -89,6 +88,16 @@ public:
 	uint_t
 	extractState(DecoderState storage) {
 		return storage >> 24;
+	}
+
+protected:
+	void
+	init(
+		uint_t state,
+		utf32_t cp
+	) {
+		m_state = state;
+		m_cp = cp;
 	}
 };
 

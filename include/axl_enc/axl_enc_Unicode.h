@@ -157,7 +157,10 @@ public:
 	);
 
 	void
-	emitReplacement(const C* src);
+	emitReplacement(
+		const C* src,
+		utf32_t cu
+	);
 };
 
 // Unicode char decoder interface:
@@ -316,8 +319,11 @@ public:
 		}
 
 		void
-		emitReplacement(const SrcUnit* p) {
-			m_length += Encoder::getEncodeLength(m_replacement);
+		emitReplacement(
+			const SrcUnit* p,
+			utf32_t cu
+		) {
+			m_length += Encoder::getEncodeLength(Op()(cu), m_replacement);
 		}
 	};
 
@@ -354,8 +360,11 @@ public:
 		}
 
 		void
-		emitReplacement(const SrcUnit* p) {
-			m_p = Encoder::encode(m_p, m_replacement);
+		emitReplacement(
+			const SrcUnit* p,
+			utf32_t cu
+		) {
+			m_p = Encoder::encode(m_p, Op()(cu), m_replacement);
 		}
 	};
 

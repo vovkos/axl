@@ -44,9 +44,9 @@
 #include "axl_enc_Base32Encoding.h"
 #include "axl_enc_Base64Encoding.h"
 #include "axl_enc_HexEncoding.h"
-#include "axl_enc_Utf8Dfa.h"
-#include "axl_enc_Utf16Dfa.h"
-#include "axl_enc_Utf16sDfa.h"
+#include "axl_enc_Utf8.h"
+#include "axl_enc_Utf16.h"
+#include "axl_enc_Utf16s.h"
 
 #ifdef _AXL_RE
 #	include "axl_re_Regex.h"

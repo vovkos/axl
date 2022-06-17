@@ -126,18 +126,15 @@ public:
 
 // emits a replacement per each unpaired surrogate
 
-template <
-	typename C0,
-	typename Dfa0
->
+template <typename Impl>
 class Utf16DecoderBase {
 public:
 	enum {
 		MaxEmitLength = 2, // replacement + cp
 	};
 
-	typedef C0 C;
-	typedef Dfa0 Dfa;
+	typedef typename Impl::C C;
+	typedef typename Impl::Dfa Dfa;
 
 public:
 	static
@@ -152,13 +149,13 @@ public:
 	decode(
 		DecoderState* state,
 		Emitter& emitter,
-		const C* src,
-		const C* srcEnd
+		const C* p,
+		const C* end
 	) {
 		Dfa dfa(*state);
-		src = decode(dfa, emitter, src, srcEnd);
+		p = Impl::decode(dfa, emitter, p, end);
 		*state = dfa.save();
-		return src;
+		return p;
 	}
 
 	template <typename Emitter>
@@ -166,54 +163,77 @@ public:
 	const C*
 	decode(
 		Emitter& emitter,
-		const C* src,
-		const C* srcEnd
+		const C* p,
+		const C* end
 	) {
 		Dfa dfa;
-		return decode(dfa, emitter, src, srcEnd);
+		return Impl::decode(dfa, emitter, p, end);
 	}
+};
 
-protected:
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <typename Dfa0>
+class Utf16DecoderImpl {
+public:
+	typedef utf16_t C;
+	typedef Dfa0 Dfa;
+
+public:
 	template <typename Emitter>
 	static
 	const C*
 	decode(
 		Dfa& dfa,
 		Emitter& emitter,
-		const C* src,
-		const C* srcEnd
+		const C* p,
+		const C* end
 	) {
 		if (Dfa::IsReverse)
-			while (src > srcEnd && emitter.canEmit()) {
-				C c = *src--;
-				uint_t state = dfa.decode(c);
-				if (Dfa::isError(state))
-					emitter.emitReplacement(src);
+			for (; p > end && emitter.canEmit(); p--) {
+				uint16_t c = *p;
+				Dfa next = dfa.decode(c);
+				if (next.isError()) {
+					if (dfa.getPendingLength())
+						emitter.emitReplacement(p + 1, dfa.getCodePoint());
 
-				if (Dfa::isReady(state))
-					emitter.emitCodePoint(src, dfa.getCodePoint());
+					if (next.getState() == Dfa::State_Error)
+						emitter.emitReplacement(p - 1, next.getCodePoint());
+				}
+
+				if (next.isReady())
+					emitter.emitCodePoint(p - 1, next.getCodePoint());
+
+				dfa = next;
 			}
 		else
-			while (src < srcEnd && emitter.canEmit()) {
-				C c = *src++;
-				uint_t state = dfa.decode(c);
-				if (Dfa::isError(state))
-					emitter.emitReplacement(src);
+			for (; p < end && emitter.canEmit(); p++) {
+				uint16_t c = *p;
+				Dfa next = dfa.decode(c);
+				if (next.isError()) {
+					if (dfa.getPendingLength())
+						emitter.emitReplacement(p - 1, dfa.getCodePoint());
 
-				if (Dfa::isReady(state))
-					emitter.emitCodePoint(src, dfa.getCodePoint());
+					if (next.getState() == Dfa::State_Error)
+						emitter.emitReplacement(p + 1, next.getCodePoint());
+				}
+
+				if (next.isReady())
+					emitter.emitCodePoint(p + 1, next.getCodePoint());
+
+				dfa = next;
 			}
 
-		return src;
+		return p;
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef Utf16DecoderBase<utf16_t, Utf16Dfa>           Utf16Decoder;
-typedef Utf16DecoderBase<utf16_t, Utf16ReverseDfa>    Utf16ReverseDecoder;
-typedef Utf16DecoderBase<utf16_t, Utf16Dfa_be>        Utf16Decoder_be;
-typedef Utf16DecoderBase<utf16_t, Utf16ReverseDfa_be> Utf16ReverseDecoder_be;
+typedef Utf16DecoderBase<Utf16DecoderImpl<Utf16Dfa> >           Utf16Decoder;
+typedef Utf16DecoderBase<Utf16DecoderImpl<Utf16ReverseDfa> >    Utf16ReverseDecoder;
+typedef Utf16DecoderBase<Utf16DecoderImpl<Utf16Dfa_be> >        Utf16Decoder_be;
+typedef Utf16DecoderBase<Utf16DecoderImpl<Utf16ReverseDfa_be> > Utf16ReverseDecoder_be;
 
 //..............................................................................
 

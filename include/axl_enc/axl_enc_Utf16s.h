@@ -74,10 +74,67 @@ public:
 
 //..............................................................................
 
-typedef Utf16DecoderBase<char, Utf16sDfa>           Utf16sDecoder;
-typedef Utf16DecoderBase<char, Utf16sReverseDfa>    Utf16sReverseDecoder;
-typedef Utf16DecoderBase<char, Utf16sDfa_be>        Utf16sDecoder_be;
-typedef Utf16DecoderBase<char, Utf16sReverseDfa_be> Utf16sReverseDecoder_be;
+template <typename Dfa0>
+class Utf16sDecoderImpl {
+public:
+	typedef char C;
+	typedef Dfa0 Dfa;
+
+public:
+	template <typename Emitter>
+	static
+	const C*
+	decode(
+		Dfa& dfa,
+		Emitter& emitter,
+		const C* p,
+		const C* end
+	) {
+		if (Dfa::IsReverse)
+			for (; p > end && emitter.canEmit(); p--) {
+				uchar_t c = *p;
+				Dfa next = dfa.decode(c);
+				if (next.isError()) {
+					if (dfa.getPendingLength() >= 2)
+						emitter.emitReplacement(p + 1, dfa.getCodePoint() & 0xffff);
+
+					if (next.getState() == Dfa::State_Error)
+						emitter.emitReplacement(p - 1, next.getCodePoint() & 0xffff);
+				}
+
+				if (next.isReady())
+					emitter.emitCodePoint(p - 1, next.getCodePoint());
+
+				dfa = next;
+			}
+		else
+			for (; p < end && emitter.canEmit(); p++) {
+				uchar_t c = *p;
+				Dfa next = dfa.decode(c);
+				if (next.isError()) {
+					if (dfa.getPendingLength() >= 2)
+						emitter.emitReplacement(p - 1, dfa.getCodePoint() & 0xffff);
+
+					if (next.getState() == Dfa::State_Error)
+						emitter.emitReplacement(p + 1, next.getCodePoint() & 0xffff);
+				}
+
+				if (next.isReady())
+					emitter.emitCodePoint(p + 1, next.getCodePoint());
+
+				dfa = next;
+			}
+
+		return p;
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+typedef Utf16DecoderBase<Utf16sDecoderImpl<Utf16sDfa> >           Utf16sDecoder;
+typedef Utf16DecoderBase<Utf16sDecoderImpl<Utf16sReverseDfa> >    Utf16sReverseDecoder;
+typedef Utf16DecoderBase<Utf16sDecoderImpl<Utf16sDfa_be> >        Utf16sDecoder_be;
+typedef Utf16DecoderBase<Utf16sDecoderImpl<Utf16sReverseDfa_be> > Utf16sReverseDecoder_be;
 
 //..............................................................................
 

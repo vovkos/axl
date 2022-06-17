@@ -277,8 +277,11 @@ public:
 	}
 
 	void
-	emitReplacement(const char* p) {
-		static_cast<T*>(this)->emitCodePoint(p, enc::StdChar_Replacement);
+	emitReplacement(
+		const char* p,
+		utf32_t c
+	) {
+		static_cast<T*>(this)->emitCodePoint(p, c);
 	}
 };
 

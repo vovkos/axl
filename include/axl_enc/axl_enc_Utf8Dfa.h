@@ -16,7 +16,7 @@
 #include "axl_enc_UtfDfa.h"
 
 //
-// AXL UTF-8 DFA specifics:
+// AXL UTF-8 DFA features:
 //
 // - Never backtrack on errors;
 // - Provide both forward and backward DFAs;
@@ -92,29 +92,29 @@ AXL_SELECT_ANY const uchar_t Utf8CcMap::m_map[] = {
 	// (a) only emit valid codepoints
 
 	for (size_t i = 0; i < length; i++) {
-		uint_t state = dfa.decode(data[i]);
-		if (Utf8Dfa::isAccept(state))
+		dfa = dfa.decode(data[i]);
+		if (dfa.isReady())
 			; // emit codepoint
 	}
 
 	// (b) emit at least one replacement codepoint per invalid sequence
 
 	for (size_t i = 0; i < length; i++) {
-		uint_t state = dfa.decode(data[i]);
+		dfa = dfa.decode(data[i]);
 
-		if (Utf8Dfa::isError(state))
+		if (dfa.isError())
 			; // emit replacement codepoint
 
-		if (Utf8Dfa::isAccept(state))
+		if (dfa.isReady())
 			; // emit codepoint
 	}
 
 	// (c) emit one replacement codepoint per byte of an invalid sequence
 
 	for (size_t i = 0, j = 0; i < length; i++) {
-		uint_t state = dfa.decode(data[i]);
-		if (Utf8Dfa::isError(state))
-			if (state == Utf8Dfa::State_Error)
+		Utf8Dfa next = dfa.decode(data[i]);
+		if (next.isError())
+			if (next.getState() == Utf8Dfa::State_Error)
 				do {
 					; // emit replacement codepoint
 				} while (++j <= i);
@@ -123,8 +123,10 @@ AXL_SELECT_ANY const uchar_t Utf8CcMap::m_map[] = {
 					; // emit replacement codepoint
 				} while (++j < i);
 
-		if (Utf8Dfa::isReady(state))
+		if (next.isReady())
 			; // emit codepoint
+
+		dfa = next;
 	}
 */
 
@@ -175,27 +177,141 @@ public:
 		return m_pendingLengthTable[extractState(storage) >> 3];
 	}
 
-	static
 	size_t
-	getCombinedErrorCount(uint_t state) {
-		ASSERT(false); // shouldn't be called for the forward DFA
-		return 0;
+	getPendingLength() const {
+		return m_pendingLengthTable[m_state >> 3];
 	}
 
-	size_t
-	getCombinedErrorCount() {
-		ASSERT(false); // shouldn't be called for the forward DFA
-		return 0;
-	}
-
-	uint_t
+	Utf8Dfa
 	decode(uchar_t c);
 
-	// skip codepoint calculations when simply counting codepoints
+	// skip codepoint calculations when simply counting codepoints (return state)
 
 	uint_t
 	count(uchar_t c) {
 		return m_state = m_dfa[m_state + m_map[c]];
+	}
+
+	template <typename Emitter>
+	void
+	emitPendingCodeUnits(
+		Emitter& emitter,
+		const utf8_t* p
+	) {
+		typedef void EmitFn(
+			Emitter& emitter,
+			const utf8_t* p,
+			uint32_t cp
+		);
+
+		static EmitFn* emitTable[StateCount] = {
+			&emitNothing,                      // 0   - State_Start
+			&emitNothing,                      // 8   - unused
+			&emitPendingCodeUnits_State_1_2,  // 16  - State_1_2
+			&emitPendingCodeUnits_State_1_2,  // 24  - State_1_2_Error
+			&emitPendingCodeUnits_State_1_3,  // 32  - State_1_3
+			&emitPendingCodeUnits_State_1_3,  // 40  - State_1_3_Error
+			&emitPendingCodeUnits_State_2_3,  // 48  - State_2_3
+			&emitNothing,                      // 56  - unused
+			&emitPendingCodeUnits_State_1_4,  // 64  - State_1_4
+			&emitPendingCodeUnits_State_1_4,  // 72  - State_1_4_Error
+			&emitPendingCodeUnits_State_2_4,  // 80  - State_2_4
+			&emitNothing,                      // 88  - unused
+			&emitPendingCodeUnits_State_3_4,  // 96  - State_3_4
+			&emitNothing,                      // 104 - State_Error
+			&emitNothing,                      // 112 - State_Ready
+			&emitNothing,                      // 120 - State_Ready_Error
+		};
+
+		emitTable[m_state >> 3](emitter, p, m_cp);
+	}
+
+protected:
+	Utf8Dfa(
+		uint_t state,
+		utf32_t cp
+	) {
+		init(state, cp);
+	}
+
+	template <typename Emitter>
+	static
+	void
+	emitNothing(
+		Emitter& emitter,
+		const utf8_t* p,
+		uint32_t acc
+	) {
+	}
+
+	template <typename Emitter>
+	static
+	void
+	emitPendingCodeUnits_State_1_2(
+		Emitter& emitter,
+		const utf8_t* p,
+		uint32_t acc
+	) {
+		emitter.emitReplacement(p, 0xc0 | (acc & 0x3f));
+	}
+
+	template <typename Emitter>
+	static
+	void
+	emitPendingCodeUnits_State_1_3(
+		Emitter& emitter,
+		const utf8_t* p,
+		uint32_t acc
+	) {
+		emitter.emitReplacement(p, 0xe0 | (acc & 0x3f));
+	}
+
+	template <typename Emitter>
+	static
+	void
+	emitPendingCodeUnits_State_2_3(
+		Emitter& emitter,
+		const utf8_t* p,
+		uint32_t acc
+	) {
+		emitter.emitReplacement(p - 1, 0xe0 | ((acc >> 6) & 0x3f));
+		emitter.emitReplacement(p, 0x80 | (acc & 0x3f));
+	}
+
+	template <typename Emitter>
+	static
+	void
+	emitPendingCodeUnits_State_1_4(
+		Emitter& emitter,
+		const utf8_t* p,
+		uint32_t acc
+	) {
+		emitter.emitReplacement(p, 0xf0 | (acc & 0x3f));
+	}
+
+	template <typename Emitter>
+	static
+	void
+	emitPendingCodeUnits_State_2_4(
+		Emitter& emitter,
+		const utf8_t* p,
+		uint32_t acc
+	) {
+		emitter.emitReplacement(p - 1, 0xf0 | ((acc >> 6) & 0x3f));
+		emitter.emitReplacement(p, 0x80 | (acc & 0x3f));
+	}
+
+	template <typename Emitter>
+	static
+	void
+	emitPendingCodeUnits_State_3_4(
+		Emitter& emitter,
+		const utf8_t* p,
+		uint32_t acc
+	) {
+		emitter.emitReplacement(p - 2, 0xf0 | ((acc >> 12) & 0x3f));
+		emitter.emitReplacement(p - 1, 0x80 | ((acc >> 6) & 0x3f));
+		emitter.emitReplacement(p, 0x80 | (acc & 0x3f));
 	}
 };
 
@@ -243,15 +359,15 @@ AXL_SELECT_ANY const uchar_t Utf8Dfa::m_pendingLengthTable[] = {
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-uint_t
+Utf8Dfa
 Utf8Dfa::decode(uchar_t c) {
 	uint_t cc = m_map[c];
-
-	m_cp = cc == Cc_Cb ?
+	uint_t state = m_dfa[m_state + cc];
+	utf32_t cp = cc == Cc_Cb ?
 		(m_cp << 6) | (c & 0x3f) : // continuation byte
 		(0xff >> cc) & c;          // starter byte (ASCII or header)
 
-	return m_state = m_dfa[m_state + cc];
+	return Utf8Dfa(state, cp);
 }
 
 //..............................................................................
@@ -335,7 +451,6 @@ public:
 protected:
 	static const uchar_t m_dfa[StateCount * CcCount];
 	static const uchar_t m_pendingLengthTable[StateCount];
-	static const uchar_t m_combinedErrorCountTable[StateCount];
 	uint_t m_acc;
 
 public:
@@ -353,15 +468,9 @@ public:
 		return m_pendingLengthTable[extractState(storage)];
 	}
 
-	static
 	size_t
-	getCombinedErrorCount(uint_t state) {
-		return m_combinedErrorCountTable[state];
-	}
-
-	size_t
-	getCombinedErrorCount() const {
-		return getCombinedErrorCount(m_state);
+	getPendingLength() const {
+		return m_pendingLengthTable[m_state];
 	}
 
 	void
@@ -381,14 +490,104 @@ public:
 		return (m_state << 24) | (m_acc & 0x00ffffff);
 	}
 
-	uint_t
+	Utf8ReverseDfa
 	decode(uchar_t c);
 
-	// skip codepoint calculations when simply counting codepoints
+	// skip codepoint calculations when simply counting codepoints (return state)
 
 	uint_t
 	count(uchar_t c) {
 		return m_state = m_dfa[(m_state << 3) + m_map[c]];
+	}
+
+	template <typename Emitter>
+	void
+	emitPendingCodeUnits(
+		Emitter& emitter,
+		const utf8_t* p
+	) {
+		typedef void EmitFn(
+			Emitter& emitter,
+			const utf8_t* p,
+			uint32_t cp
+		);
+
+		static EmitFn* emitTable[StateCount] = {
+			&emitNothing,                       // 0  - State_Start
+			&emitNothing,                       // 1  - unused
+			&emitPendingCodeUnits_State_Cb_1,  // 2  - State_Cb_1
+			&emitNothing,                       // 3  - unused
+			&emitPendingCodeUnits_State_Cb_2,  // 4  - State_Cb_2
+			&emitNothing,                       // 5  - unused
+			&emitPendingCodeUnits_State_Cb_3,  // 6  - State_Cb_3
+			&emitPendingCodeUnits_State_Cb_3,  // 7  - State_Cb_3_Error
+			&emitNothing,                       // 8  - unused
+			&emitNothing,                       // 9  - State_Error
+			&emitNothing,                       // 10 - State_Ready
+			&emitNothing,                       // 11 - State_Ready_Error
+			&emitNothing,                       // 12 - unused
+			&emitNothing,                       // 13 - State_Ready_Error_2
+			&emitNothing,                       // 14 - unused
+			&emitNothing,                       // 15 - State_Ready_Error_3
+		};
+
+		emitTable[m_state](emitter, p, m_acc);
+	}
+
+protected:
+	Utf8ReverseDfa(
+		uint_t state,
+		utf32_t cp,
+		uint_t acc
+	) {
+		init(state, cp);
+		m_acc = acc;
+	}
+
+	template <typename Emitter>
+	static
+	void
+	emitNothing(
+		Emitter& emitter,
+		const utf8_t* p,
+		uint32_t acc
+	) {
+	}
+
+	template <typename Emitter>
+	static
+	void
+	emitPendingCodeUnits_State_Cb_1(
+		Emitter& emitter,
+		const utf8_t* p,
+		uint32_t acc
+	) {
+		emitter.emitReplacement(p, 0x80 | (acc & 0x3f));
+	}
+
+	template <typename Emitter>
+	static
+	void
+	emitPendingCodeUnits_State_Cb_2(
+		Emitter& emitter,
+		const utf8_t* p,
+		uint32_t acc
+	) {
+		emitter.emitReplacement(p, 0x80 | (acc & 0x3f));
+		emitter.emitReplacement(p, 0x80 | ((acc >> 6) & 0x3f));
+	}
+
+	template <typename Emitter>
+	static
+	void
+	emitPendingCodeUnits_State_Cb_3(
+		Emitter& emitter,
+		const utf8_t* p,
+		uint32_t acc
+	) {
+		emitter.emitReplacement(p, 0x80 | (acc & 0x3f));
+		emitter.emitReplacement(p, 0x80 | ((acc >> 6) & 0x3f));
+		emitter.emitReplacement(p, 0x80 | ((acc >> 12) & 0x3f));
 	}
 };
 
@@ -433,71 +632,35 @@ AXL_SELECT_ANY const uchar_t Utf8ReverseDfa::m_pendingLengthTable[] = {
 	0,  // 15 - State_Ready_Error_3
 };
 
-AXL_SELECT_ANY const uchar_t Utf8ReverseDfa::m_combinedErrorCountTable[] = {
-	0,  // 0  - State_Start
-	0,  // 1  - unused
-	0,  // 2  - State_Cb_1
-	0,  // 3  - unused
-	0,  // 4  - State_Cb_2
-	0,  // 5  - unused
-	0,  // 6  - State_Cb_3
-	1,  // 7  - State_Cb_3_Error
-	0,  // 8  - unused
-	0,  // 9  - State_Error
-	0,  // 10 - State_Ready
-	1,  // 11 - State_Ready_Error
-	0,  // 12 - unused
-	2,  // 13 - State_Ready_Error_2
-	0,  // 14 - unused
-	3,  // 15 - State_Ready_Error_3
-};
-
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-#define _AXL_ENC_UTF8_REVERSE_DFA_ARITHM_COMBINED_ERROR_COUNT 0
-#if (_AXL_ENC_UTF8_REVERSE_DFA_ARITHM_COMBINED_ERROR_COUNT)
-
-// can also use branchless arithmetics to calc combined error count
-
-inline
-size_t
-Utf8ReverseDfa::getCombinedErrorCount(uint_t state) {
-	ASSERT(
-		state == State_Cb_3_Error ||
-		state >= State_Ready_Error
-	);                         //  7, 11, 13, 15
-	state = (state >> 1) - 4;  // -1,  1,  2,  3
-	uint_t mask = state >> 31; //  1,  0,  0,  0
-	return (state + mask) ^ mask;
-}
-
-#endif
 
 // use branchless arithmetics as it's (most likely) faster on modern CPUs
 // TODO: still need some benchmarking against simpler and shorter branched impls
 
 inline
-uint_t
+Utf8ReverseDfa
 Utf8ReverseDfa::decode(uchar_t c) {
 	uint_t cc = m_map[c];
 	uint_t prevState = m_state;
 	uint_t nextState = m_dfa[(prevState << 3) + cc];
+	uint_t acc = m_acc;
+	uint_t cp = m_cp;
 
 	if (cc == Cc_Cb) {
 		ASSERT(nextState <= State_Cb_3_Error); // continuation bytes always get us here
 		uint_t shift = 6 * ((nextState >> 1) - 1);
-		m_acc >>= 6 & -(nextState & 1); // drop last continuation byte on error
-		m_acc |= (c & 0x3f) << shift;   // shift according to the new position
+		acc >>= 6 & -(nextState & 1); // drop last continuation byte on error
+		acc |= (c & 0x3f) << shift;   // shift according to the new position
 	} else {
 		ASSERT(nextState >= State_Error); // error or ready
 		uint_t shift = 6 * ((prevState >> 1) & (((prevState & 8) >> 3) - 1)); // zero if state >= 8
-		m_acc |= ((0xff >> cc) & c) << shift; // shift according to the previous position
-		m_acc >>= 6 * ((nextState - 9) >> 1); // drop continuation bytes on errors
-		m_cp = m_acc;
-		m_acc = 0;
+		acc |= ((0xff >> cc) & c) << shift; // shift according to the previous position
+		acc >>= 6 * ((nextState - 9) >> 1); // drop continuation bytes on errors
+		cp = acc;
+		acc = 0;
 	}
 
-	return m_state = nextState;
+	return Utf8ReverseDfa(nextState, cp, acc);
 }
 
 //..............................................................................

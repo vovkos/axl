@@ -228,7 +228,12 @@ public:
 		return DfaTable::m_pendingLengthTable[DfaTable::extractState(storage) >> 2];
 	}
 
-	uint_t
+	size_t
+	getPendingLength() const {
+		return DfaTable::m_pendingLengthTable[m_state >> 2];
+	}
+
+	Utf16DfaBase
 	decode(uint16_t c);
 
 	// skip codepoint calculations when simply counting codepoints
@@ -238,6 +243,14 @@ public:
 		uint_t cc = DfaTable::m_map[IsBigEndian()() ? c & 0xff : c >> 8];
 		return this->m_state = DfaTable::m_dfa[this->m_state + cc];
 	}
+
+protected:
+	Utf16DfaBase(
+		uint_t state,
+		utf32_t cp
+	) {
+		init(state, cp);
+	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -246,7 +259,7 @@ template <
 	typename DfaTable,
 	typename IsBigEndian
 >
-uint_t
+Utf16DfaBase<DfaTable, IsBigEndian>
 Utf16DfaBase<DfaTable, IsBigEndian>::decode(uint16_t c) {
 	uint_t cc = DfaTable::m_map[IsBigEndian()() ? c & 0xff : c >> 8];
 	uint_t nextState = DfaTable::m_dfa[this->m_state + cc];
@@ -254,12 +267,12 @@ Utf16DfaBase<DfaTable, IsBigEndian>::decode(uint16_t c) {
 	if (IsBigEndian()())
 		c = sl::swapByteOrder16(c);
 
-	this->m_cp = nextState == DfaTable::State_ReadyPair ? DfaTable::IsReverse ?
+	utf32_t cp = nextState == DfaTable::State_ReadyPair ? DfaTable::IsReverse ?
 		0x10000 - (0xd800 << 10) - 0xdc00 + (c << 10) + this->m_cp :
 		0x10000 - (0xd800 << 10) - 0xdc00 + (this->m_cp << 10) + c :
 		c;
 
-	return this->m_state = nextState;
+	return Utf16DfaBase(nextState, cp);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

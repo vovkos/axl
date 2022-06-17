@@ -667,6 +667,47 @@ testRegex() {
 	const char* end;
 
 	do {
+		result = regex.compile("\x91xyz");
+		if (!result) {
+			printf("error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		regex.buildFullDfa();
+		regex.buildFullReverseDfa();
+#if (_AXL_DEBUG)
+		printf("\nNFA:\n");
+		regex.printNfa();
+		printf("\nDFA:\n");
+		regex.printDfa();
+		printf("\nrDFA:\n");
+		regex.printReverseDfa();
+#endif
+
+		sl::String s("\xf0\x81\x82xyz");
+		sl::String_utf32 s2 = s;
+
+		size_t length = s2.getLength();
+		for (size_t i = 0; i < length; i++)
+			printf("%x; ", s2[i]);
+
+		printf("\n");
+
+		enc::CharCodec* utf8 = enc::getCharCodec(enc::CharCodecKind_Utf8);
+
+		utf32_t b[100] = { 0 };
+
+		enc::DecoderState state = 0;
+
+		enc::ConvertLengthResult result2 = utf8->decode_utf32_u(&state, b, "\xf0", 1);
+		result2 = utf8->decode_utf32_u(&state, b, "\x81", 1);
+		result2 = utf8->decode_utf32_u(&state, b, "\x82", 1);
+		result2 = utf8->decode_utf32_u(&state, b, "x", 1);
+
+		return;
+	} while (0);
+
+	do {
 		result = regex.compile("^abc");
 		if (!result) {
 			printf("error: %s\n", err::getLastErrorDescription().sz());
@@ -6211,28 +6252,67 @@ decode(uint32_t* state, uint32_t* codep, uint32_t byte) {
 
 const uchar_t g_data[] = {
 	'a',
-	0xf1, 0x80, 0x80,
+	0xf1, 0x81, 0x82,
 	'b',
-	0xe1, 0x80,
+	0xe1, 0x83,
 	'c',
 	0xc1,
 	'd',
-	0xf1, 0x80, 0x80,
-	0xe1, 0x80,
+	0xf1, 0x84, 0x85,
+	0xe1, 0x86,
 	0xc1,
-	0xe1, 0x80,
-	0xf1, 0x80, 0x80,
+	0xe1, 0x87,
+	0xf1, 0x88, 0x89,
 	'x',
-	0x80, 0x80, 0x80,
+	0x8a, 0x8b, 0x8c,
 	't', 'a', 'k', 'i', 'e',
-	0xf1, 0x80, 0x80,
+	0xf1, 0x8d, 0x8e,
 	0xd0, 0xb0, 0xd0, 0xb1, 0xd0, 0xb2, 0xd0, 0xb3, 0xd0, 0xb4,
 	'd', 'e', 'l', 'a', '.',
 };
 
 //..............................................................................
+
+template<typename C>
+class Emitter {
+public:
+	bool
+	canEmit() const {
+		return true;
+	}
+
+	void
+	emitCodePoint(
+		const C* p,
+		utf32_t cp
+	) {
+		printf("%x\n", cp);
+	}
+
+	void
+	emitReplacement(
+		const C* p,
+		utf32_t cp
+	) {
+		printf("%x *\n", cp);
+	}
+};
+
+typedef Emitter<utf8_t> Emitter_utf8;
+typedef Emitter<utf16_t> Emitter_utf16;
+
 void
 testUtf8() {
+	{
+		printf("forward...\n");
+		enc::Utf8::Decoder::decode(Emitter_utf8(), (utf8_t*)g_data, (utf8_t*)g_data + sizeof(g_data));
+
+		printf("backward...\n");
+		enc::Utf8::ReverseDecoder::decode(Emitter_utf8(), (utf8_t*)g_data + sizeof(g_data) - 1, (utf8_t*)g_data - 1);
+
+		return;
+	}
+
 	uint32_t prevState = UTF8_ACCEPT;
 	uint32_t state = UTF8_ACCEPT;
 	uint32_t cp;
@@ -6265,9 +6345,9 @@ testUtf8() {
 	enc::Utf8Dfa dfa;
 
 	for (size_t i = 0, j = i; i < length; i++) {
-		uint_t state = dfa.decode(data[i]);
-		if (enc::Utf8Dfa::isError(state))
-			if (state == enc::Utf8Dfa::State_Error) // standalone error
+		enc::Utf8Dfa next = dfa.decode(data[i]);
+		if (next.isError(state))
+			if (next.getState() == enc::Utf8Dfa::State_Error) // standalone error
 				do {
 					printf("@%04x:%04x: broken cp\n", j, j);
 				} while (++j <= i);
@@ -6276,10 +6356,12 @@ testUtf8() {
 					printf("@%04x:%04x: broken cp\n", j, j);
 				} while (++j < i);
 
-		if (enc::Utf8Dfa::isReady(state)) {
-			printf("@%04x:%04x: cp 0x%02x '%c'\n", j, i, dfa.getCodePoint(), dfa.getCodePoint());
+		if (next.isReady()) {
+			printf("@%04x:%04x: cp 0x%02x '%c'\n", j, i, next.getCodePoint(), next.getCodePoint());
 			j = i + 1;
 		}
+
+		dfa = next;
 	}
 
 	printf("\nAXL UTF-8 rDFA:\n");
@@ -6287,24 +6369,27 @@ testUtf8() {
 	enc::Utf8ReverseDfa dfa2;
 
 	for (intptr_t i = length - 1, j = i; i >= 0; i--) {
-		uint_t state = dfa2.decode(data[i]);
-		if (enc::Utf8ReverseDfa::isError(state))
-			if (state == enc::Utf8ReverseDfa::State_Error) // standalone error
+		enc::Utf8ReverseDfa next = dfa2.decode(data[i]);
+		if (next.isError())
+			if (next.getState() == enc::Utf8ReverseDfa::State_Error) // standalone error
 				do {
 					printf("@%04x:%04x: broken cp\n", j, j);
 				} while (--j >= i);
 			else { // combined error
-				size_t errorCount = enc::Utf8ReverseDfa::getCombinedErrorCount(state);
+					printf("@%04x:%04x: combined error\n", j, j);
+				/* size_t errorCount = enc::Utf8ReverseDfa::getCombinedErrorCount(state);
 				intptr_t k = j - errorCount;
 				do {
 					printf("@%04x:%04x: broken cp\n", j, j);
-				} while (--j > k);
+				} while (--j > k); */
 			}
 
-		if (enc::Utf8ReverseDfa::isReady(state)) {
-			printf("@%04x:%04x: cp 0x%02x '%c'\n", i, j, dfa2.getCodePoint(), dfa2.getCodePoint());
+		if (next.isReady()) {
+			printf("@%04x:%04x: cp 0x%02x '%c'\n", i, j, next.getCodePoint(), next.getCodePoint());
 			j = i - 1;
 		}
+
+		dfa2 = next;
 	}
 
 	printf("sequence end: @%04x\n", length);
@@ -6313,6 +6398,21 @@ testUtf8() {
 
 //..............................................................................
 
+const uint16_t g_data16[] = {
+	'a',
+	0xd83d,
+	0xde00,
+	'b',
+	0xd801,
+	0xdc00,
+	'c',
+	0xd802,
+	0xd803, // missing trail surrogate
+	'd',
+	0xd804, // unpaired trail surrogate
+	'x', 'y', 'z', '.',
+};
+
 void
 testUtf16() {
 	sl::String_utf16 data((char*)g_data, sizeof(g_data));
@@ -6320,19 +6420,35 @@ testUtf16() {
 
 	printf("\nUTF-16 DFA:\n");
 
+	printf("UTF16 forward...\n");
+	enc::Utf16::Decoder::decode(Emitter_utf16(), (utf16_t*)g_data16, (utf16_t*)g_data16 + countof(g_data16));
+
+	printf("rUTF16 backward...\n");
+	enc::Utf16::ReverseDecoder::decode(Emitter_utf16(), (utf16_t*)g_data16 + countof(g_data16) - 1, (utf16_t*)g_data16 - 1);
+
+	printf("UTF16s forward...\n");
+	enc::Utf16s::Decoder::decode(Emitter<char>(), (char*)g_data16, (char*)g_data16 + sizeof(g_data16));
+
+	printf("rUTF16s backward...\n");
+	enc::Utf16s::ReverseDecoder::decode(Emitter<char>(), (char*)g_data16 + sizeof(g_data16) - 1, (char*)g_data16 - 1);
+
+	return;
+
 	enc::Utf16Dfa dfa;
 
 	for (size_t i = 0, j = i; i < length; i++) {
-		uint_t state = dfa.decode(data[i]);
-		if (enc::Utf16Dfa::isError(state)) {
+		enc::Utf16Dfa next = dfa.decode(data[i]);
+		if (next.isError()) {
 			printf("@%04x:%04x: broken cp\n", j, j);
 			j--;
 		}
 
-		if (enc::Utf16Dfa::isReady(state)) {
-			printf("@%04x:%04x: cp 0x%02x '%c'\n", j, i, dfa.getCodePoint(), dfa.getCodePoint());
+		if (next.isReady()) {
+			printf("@%04x:%04x: cp 0x%02x '%c'\n", j, i, next.getCodePoint(), next.getCodePoint());
 			j = i + 1;
 		}
+
+		dfa = next;
 	}
 
 	printf("\nUTF-16 rDFA:\n");
@@ -6340,16 +6456,18 @@ testUtf16() {
 	enc::Utf16ReverseDfa dfa2;
 
 	for (intptr_t i = length - 1, j = i; i >= 0; i--) {
-		uint_t state = dfa2.decode(data[i]);
-		if (enc::Utf16ReverseDfa::isError(state)) {
+		enc::Utf16ReverseDfa next = dfa2.decode(data[i]);
+		if (next.isError()) {
 			printf("@%04x:%04x: broken cp\n", j, j);
 			j--;
 		}
 
-		if (enc::Utf16ReverseDfa::isReady(state)) {
-			printf("@%04x:%04x: cp 0x%02x '%c'\n", i, j, dfa2.getCodePoint(), dfa2.getCodePoint());
+		if (next.isReady()) {
+			printf("@%04x:%04x: cp 0x%02x '%c'\n", i, j, next.getCodePoint(), next.getCodePoint());
 			j = i - 1;
 		}
+
+		dfa2 = next;
 	}
 
 	char* data2 = (char*)data.cp();
@@ -6360,16 +6478,18 @@ testUtf16() {
 	enc::Utf16sDfa dfa3;
 
 	for (size_t i = 0, j = i; i < length2; i++) {
-		uint_t state = dfa3.decode(data2[i]);
-		if (enc::Utf16sDfa::isError(state)) {
+		enc::Utf16sDfa next = dfa3.decode(data2[i]);
+		if (next.isError()) {
 			printf("@%04x:%04x: broken cp\n", j, j);
 			j--;
 		}
 
-		if (enc::Utf16sDfa::isReady(state)) {
-			printf("@%04x:%04x: cp 0x%02x '%c'\n", j, i, dfa3.getCodePoint(), dfa3.getCodePoint());
+		if (next.isReady()) {
+			printf("@%04x:%04x: cp 0x%02x '%c'\n", j, i, next.getCodePoint(), next.getCodePoint());
 			j = i + 1;
 		}
+
+		dfa3 = next;
 	}
 
 	printf("\nUTF-16-S rDFA:\n");
@@ -6377,16 +6497,18 @@ testUtf16() {
 	enc::Utf16sReverseDfa dfa4;
 
 	for (intptr_t i = length2 - 1, j = i; i >= 0; i--) {
-		uint_t state = dfa4.decode(data2[i]);
-		if (enc::Utf16sReverseDfa::isError(state)) {
+		enc::Utf16sReverseDfa next = dfa4.decode(data2[i]);
+		if (next.isError()) {
 			printf("@%04x:%04x: broken cp\n", j, j);
 			j--;
 		}
 
-		if (enc::Utf16sReverseDfa::isReady(state)) {
-			printf("@%04x:%04x: cp 0x%02x '%c'\n", i, j, dfa4.getCodePoint(), dfa4.getCodePoint());
+		if (next.isReady()) {
+			printf("@%04x:%04x: cp 0x%02x '%c'\n", i, j, next.getCodePoint(), next.getCodePoint());
 			j = i - 1;
 		}
+
+		dfa4 = next;
 	}
 
 	printf("sequence end: @%04x\n", length2);
@@ -6409,12 +6531,14 @@ testUtf16() {
 
 	for (size_t i = 0; i < LoopCount; i++)
 		for (size_t j = 0; j < length; j++) {
-			uint_t state = dfa.decode(data[j]);
-			if (enc::Utf16Dfa::isError(state))
+			enc::Utf16Dfa next = dfa.decode(data[j]);
+			if (next.isError())
 				errorCount++;
 
-			if (enc::Utf16Dfa::isReady(state))
+			if (next.isReady())
 				cpCount++;
+
+			dfa = next;
 		}
 
 	time = sys::getPreciseTimestamp() - time;
@@ -6432,12 +6556,14 @@ testUtf16() {
 
 	for (size_t i = 0; i < LoopCount; i++)
 		for (intptr_t j = length - 1; j >= 0; j--) {
-			uint_t state = dfa2.decode(data[j]);
-			if (enc::Utf16ReverseDfa::isError(state))
+			enc::Utf16ReverseDfa next = dfa2.decode(data[j]);
+			if (next.isError())
 				errorCount++;
 
-			if (enc::Utf16ReverseDfa::isReady(state))
+			if (next.isReady())
 				cpCount++;
+
+			dfa2 = next;
 		}
 
 	time = sys::getPreciseTimestamp() - time;
@@ -6455,11 +6581,11 @@ testUtf16() {
 
 	for (size_t i = 0; i < LoopCount; i++)
 		for (size_t j = 0; j < length2; j++) {
-			uint_t state = dfa3.decode(data2[j]);
-			if (enc::Utf16sDfa::isError(state))
+			dfa3 = dfa3.decode(data2[j]);
+			if (dfa3.isError())
 				errorCount++;
 
-			if (enc::Utf16sDfa::isReady(state))
+			if (dfa3.isReady())
 				cpCount++;
 		}
 
@@ -6478,11 +6604,11 @@ testUtf16() {
 
 	for (size_t i = 0; i < LoopCount; i++)
 		for (intptr_t j = length2 - 1; j >= 0; j--) {
-			uint_t state = dfa4.decode(data2[j]);
-			if (enc::Utf16sReverseDfa::isError(state))
+			dfa4 = dfa4.decode(data2[j]);
+			if (dfa4.isError())
 				errorCount++;
 
-			if (enc::Utf16sReverseDfa::isReady(state))
+			if (dfa4.isReady())
 				cpCount++;
 		}
 
@@ -6643,7 +6769,7 @@ main(
 	uint_t baudRate = argc >= 2 ? atoi(argv[1]) : 38400;
 #endif
 
-	testEnumSerial();
+	utf::testUtf16();
 	return 0;
 }
 
