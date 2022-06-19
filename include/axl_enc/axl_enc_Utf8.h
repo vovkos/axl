@@ -141,13 +141,13 @@ protected:
 				uchar_t c = *p;
 				Dfa next = dfa.decode(c);
 				if (next.isError()) {
-					dfa.emitPendingCodeUnits(emitter, p);
+					dfa.emitPendingCus(emitter, p);
 					if (next.getState() == Dfa::State_Error)
-						emitter.emitReplacement(p - 1, c);
-				}
-
-				if (next.isReady())
-					emitter.emitCodePoint(p - 1, next.getCodePoint());
+						emitter.emitCu(p - 1, c);
+					else if (next.isReady())
+						emitter.emitCpAfterCu(p - 1, next.getCodePoint());
+				} else if (next.isReady())
+					emitter.emitCp(p - 1, next.getCodePoint());
 
 				dfa = next;
 			}
@@ -156,13 +156,13 @@ protected:
 				uchar_t c = *p;
 				Dfa next = dfa.decode(c);
 				if (next.isError()) {
-					dfa.emitPendingCodeUnits(emitter, p);
+					dfa.emitPendingCus(emitter, p);
 					if (next.getState() == Dfa::State_Error)
-						emitter.emitReplacement(p + 1, c);
-				}
-
-				if (next.isReady())
-					emitter.emitCodePoint(p + 1, next.getCodePoint());
+						emitter.emitCu(p + 1, c);
+					else if (next.isReady())
+						emitter.emitCpAfterCu(p + 1, next.getCodePoint());
+				} else if (next.isReady())
+					emitter.emitCp(p + 1, next.getCodePoint());
 
 				dfa = next;
 			}

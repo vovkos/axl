@@ -552,16 +552,7 @@ public:
 	}
 
 	void
-	emitReplacement(
-		const char* p,
-		utf32_t c
-	) {
-		*m_dst++ = m_unprintableChar;
-		m_src = p;
-	}
-
-	void
-	emitCodePoint(
+	emitCp(
 		const char* p,
 		utf32_t c
 	) {
@@ -571,6 +562,23 @@ public:
 			*m_dst++ = m_unprintableChar;
 
 		m_src = p;
+	}
+
+	void
+	emitCu(
+		const char* p,
+		utf32_t c
+	) {
+		*m_dst++ = m_unprintableChar;
+		m_src = p;
+	}
+
+	void
+	emitCpAfterCu(
+		const char* p,
+		utf32_t c
+	) {
+		emitCp(p, c);
 	}
 };
 

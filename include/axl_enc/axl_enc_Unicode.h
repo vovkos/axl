@@ -145,21 +145,33 @@ public:
 
 class Emitter {
 public:
+	// called before processing next code unit
+
 	bool
 	canEmit() const;
 
-	// invoked for each codepoint (return true to continue, false to halt)
+	// properly decoded code point
 
 	void
-	emitCodePoint(
+	emitCp(
 		const C* src,
 		utf32_t cp
 	);
 
+	// invalid code unit sequence (emitting each code unit in this sequence)
+
 	void
-	emitReplacement(
+	emitCu(
 		const C* src,
 		utf32_t cu
+	);
+
+	// a valid code point after an invalid code unit sequence (emitted together with invalid cu-s)
+
+	void
+	emitCpAfterCu(
+		const C* src,
+		utf32_t cp
 	);
 };
 
@@ -311,7 +323,7 @@ public:
 		}
 
 		void
-		emitCodePoint(
+		emitCp(
 			const SrcUnit* p,
 			utf32_t cp
 		) {
@@ -319,11 +331,19 @@ public:
 		}
 
 		void
-		emitReplacement(
+		emitCu(
 			const SrcUnit* p,
 			utf32_t cu
 		) {
-			m_length += Encoder::getEncodeLength(Op()(cu), m_replacement);
+			emitCp(p, cu);
+		}
+
+		void
+		emitCpAfterCu(
+			const SrcUnit* p,
+			utf32_t cp
+		) {
+			emitCp(p, cp);
 		}
 	};
 
@@ -352,7 +372,7 @@ public:
 		}
 
 		void
-		emitCodePoint(
+		emitCp(
 			const SrcUnit* p,
 			utf32_t cp
 		) {
@@ -360,11 +380,19 @@ public:
 		}
 
 		void
-		emitReplacement(
+		emitCu(
 			const SrcUnit* p,
 			utf32_t cu
 		) {
-			m_p = Encoder::encode(m_p, Op()(cu), m_replacement);
+			emitCp(p, cu);
+		}
+
+		void
+		emitCpAfterCu(
+			const SrcUnit* p,
+			utf32_t cp
+		) {
+			emitCp(p, cp);
 		}
 	};
 

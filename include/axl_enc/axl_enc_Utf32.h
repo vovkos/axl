@@ -116,12 +116,12 @@ public:
 		if (IsReverse()())
 			while (src > srcEnd && emitter.canEmit()) {
 				utf32_t c = *src--;
-				emitter.emitCodePoint(src, IsBigEndian()() ? sl::swapByteOrder32(c) : c);
+				emitter.emitCp(src, IsBigEndian()() ? sl::swapByteOrder32(c) : c);
 			}
 		else
 			while (src < srcEnd && emitter.canEmit()) {
 				utf32_t c = *src++;
-				emitter.emitCodePoint(src, IsBigEndian()() ? sl::swapByteOrder32(c) : c);
+				emitter.emitCp(src, IsBigEndian()() ? sl::swapByteOrder32(c) : c);
 			}
 
 		return src;

@@ -195,14 +195,13 @@ public:
 				Dfa next = dfa.decode(c);
 				if (next.isError()) {
 					if (dfa.getPendingLength())
-						emitter.emitReplacement(p + 1, dfa.getCodePoint());
-
+						emitter.emitCu(p + 1, dfa.getCodePoint());
 					if (next.getState() == Dfa::State_Error)
-						emitter.emitReplacement(p - 1, next.getCodePoint());
-				}
-
-				if (next.isReady())
-					emitter.emitCodePoint(p - 1, next.getCodePoint());
+						emitter.emitCu(p - 1, next.getCodePoint());
+					else if (next.isReady())
+						emitter.emitCpAfterCu(p - 1, next.getCodePoint());
+				} else if (next.isReady())
+					emitter.emitCp(p - 1, next.getCodePoint());
 
 				dfa = next;
 			}
@@ -212,14 +211,13 @@ public:
 				Dfa next = dfa.decode(c);
 				if (next.isError()) {
 					if (dfa.getPendingLength())
-						emitter.emitReplacement(p - 1, dfa.getCodePoint());
-
+						emitter.emitCu(p - 1, dfa.getCodePoint());
 					if (next.getState() == Dfa::State_Error)
-						emitter.emitReplacement(p + 1, next.getCodePoint());
-				}
-
-				if (next.isReady())
-					emitter.emitCodePoint(p + 1, next.getCodePoint());
+						emitter.emitCu(p + 1, next.getCodePoint());
+					else if (next.isReady())
+						emitter.emitCpAfterCu(p + 1, next.getCodePoint());
+				} else if (next.isReady())
+					emitter.emitCp(p + 1, next.getCodePoint());
 
 				dfa = next;
 			}

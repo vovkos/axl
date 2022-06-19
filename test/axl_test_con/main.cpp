@@ -667,7 +667,8 @@ testRegex() {
 	const char* end;
 
 	do {
-		result = regex.compile("\x91xyz");
+
+		result = regex.compile("\x91");
 		if (!result) {
 			printf("error: %s\n", err::getLastErrorDescription().sz());
 			return;
@@ -684,25 +685,19 @@ testRegex() {
 		regex.printReverseDfa();
 #endif
 
-		sl::String s("\xf0\x81\x82xyz");
-		sl::String_utf32 s2 = s;
+		sl::String s("abc\x91ijk\x93lmn");
 
-		size_t length = s2.getLength();
-		for (size_t i = 0; i < length; i++)
-			printf("%x; ", s2[i]);
+		re::State state;
+		re::ExecResult result = regex.exec(&state, s);
+		ASSERT(result == re::ExecResult_Match);
 
-		printf("\n");
-
-		enc::CharCodec* utf8 = enc::getCharCodec(enc::CharCodecKind_Utf8);
-
-		utf32_t b[100] = { 0 };
-
-		enc::DecoderState state = 0;
-
-		enc::ConvertLengthResult result2 = utf8->decode_utf32_u(&state, b, "\xf0", 1);
-		result2 = utf8->decode_utf32_u(&state, b, "\x81", 1);
-		result2 = utf8->decode_utf32_u(&state, b, "\x82", 1);
-		result2 = utf8->decode_utf32_u(&state, b, "x", 1);
+		printf(
+			"match(%d): %d..%d (%s)\n",
+			state.getMatchAcceptId(),
+			state.getMatch()->getOffset(),
+			state.getMatch()->getEndOffset(),
+			state.getMatch()->getText().sz()
+		);
 
 		return;
 	} while (0);
@@ -6282,7 +6277,7 @@ public:
 	}
 
 	void
-	emitCodePoint(
+	emitCp(
 		const C* p,
 		utf32_t cp
 	) {
@@ -6290,11 +6285,19 @@ public:
 	}
 
 	void
-	emitReplacement(
+	emitCu(
 		const C* p,
 		utf32_t cp
 	) {
 		printf("%x *\n", cp);
+	}
+
+	void
+	emitCpAfterCu(
+		const C* p,
+		utf32_t cp
+	) {
+		emitCp(p, cp);
 	}
 };
 
@@ -6769,7 +6772,7 @@ main(
 	uint_t baudRate = argc >= 2 ? atoi(argv[1]) : 38400;
 #endif
 
-	utf::testUtf16();
+	testRegex();
 	return 0;
 }
 

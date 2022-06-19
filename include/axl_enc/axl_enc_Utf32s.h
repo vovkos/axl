@@ -134,14 +134,14 @@ protected:
 				C c = *src--;
 				uint_t state = dfa.decode(c);
 				if (Dfa::isReady(state))
-					emitter.emitCodePoint(src, dfa.getCodePoint());
+					emitter.emitCp(src, dfa.getCodePoint());
 			}
 		else
 			while (src < srcEnd && emitter.canEmit()) {
 				C c = *src++;
 				uint_t state = dfa.decode(c);
 				if (Dfa::isReady(state))
-					emitter.emitCodePoint(src, dfa.getCodePoint());
+					emitter.emitCp(src, dfa.getCodePoint());
 			}
 
 		return src;

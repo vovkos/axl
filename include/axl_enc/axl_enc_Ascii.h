@@ -92,12 +92,12 @@ public:
 		if (IsReverse()())
 			while (src > srcEnd && emitter.canEmit()) {
 				utf32_t cp = (uchar_t)*src--;
-				emitter.emitCodePoint(src, cp);
+				emitter.emitCp(src, cp);
 			}
 		else
 			while (src < srcEnd && emitter.canEmit()) {
 				utf32_t cp = (uchar_t)*src++;
-				emitter.emitCodePoint(src, cp);
+				emitter.emitCp(src, cp);
 			}
 
 		return src;
