@@ -362,7 +362,7 @@ public:
 
 	size_t
 	getPendingLength() const {
-		return DfaTable::m_pendingLengthTable[m_state >> 2];
+		return DfaTable::m_pendingLengthTable[this->m_state >> 2];
 	}
 
 	Utf16sDfaBase
@@ -381,7 +381,7 @@ protected:
 		uint_t state,
 		utf32_t cp
 	) {
-		init(state, cp);
+		this->init(state, cp);
 	}
 };
 

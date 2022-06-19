@@ -6307,11 +6307,13 @@ typedef Emitter<utf16_t> Emitter_utf16;
 void
 testUtf8() {
 	{
+		Emitter_utf8 emitter;
+
 		printf("forward...\n");
-		enc::Utf8::Decoder::decode(Emitter_utf8(), (utf8_t*)g_data, (utf8_t*)g_data + sizeof(g_data));
+		enc::Utf8::Decoder::decode(emitter, (utf8_t*)g_data, (utf8_t*)g_data + sizeof(g_data));
 
 		printf("backward...\n");
-		enc::Utf8::ReverseDecoder::decode(Emitter_utf8(), (utf8_t*)g_data + sizeof(g_data) - 1, (utf8_t*)g_data - 1);
+		enc::Utf8::ReverseDecoder::decode(emitter, (utf8_t*)g_data + sizeof(g_data) - 1, (utf8_t*)g_data - 1);
 
 		return;
 	}
@@ -6424,16 +6426,21 @@ testUtf16() {
 	printf("\nUTF-16 DFA:\n");
 
 	printf("UTF16 forward...\n");
-	enc::Utf16::Decoder::decode(Emitter_utf16(), (utf16_t*)g_data16, (utf16_t*)g_data16 + countof(g_data16));
+
+	Emitter_utf16 emitter;
+
+	enc::Utf16::Decoder::decode(emitter, (utf16_t*)g_data16, (utf16_t*)g_data16 + countof(g_data16));
 
 	printf("rUTF16 backward...\n");
-	enc::Utf16::ReverseDecoder::decode(Emitter_utf16(), (utf16_t*)g_data16 + countof(g_data16) - 1, (utf16_t*)g_data16 - 1);
+	enc::Utf16::ReverseDecoder::decode(emitter, (utf16_t*)g_data16 + countof(g_data16) - 1, (utf16_t*)g_data16 - 1);
+
+	Emitter<char> emitter2;
 
 	printf("UTF16s forward...\n");
-	enc::Utf16s::Decoder::decode(Emitter<char>(), (char*)g_data16, (char*)g_data16 + sizeof(g_data16));
+	enc::Utf16s::Decoder::decode(emitter2, (char*)g_data16, (char*)g_data16 + sizeof(g_data16));
 
 	printf("rUTF16s backward...\n");
-	enc::Utf16s::ReverseDecoder::decode(Emitter<char>(), (char*)g_data16 + sizeof(g_data16) - 1, (char*)g_data16 - 1);
+	enc::Utf16s::ReverseDecoder::decode(emitter2, (char*)g_data16 + sizeof(g_data16) - 1, (char*)g_data16 - 1);
 
 	return;
 
