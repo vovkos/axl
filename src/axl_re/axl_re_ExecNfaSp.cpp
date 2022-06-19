@@ -228,7 +228,7 @@ public:
 		ExecImpl<ExecNfaSp, ExecNfaSpBase, Decoder>(parent) {}
 
 	void
-	emitCodePoint(
+	emitCp(
 		const char* p,
 		utf32_t c
 	) {

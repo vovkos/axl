@@ -247,7 +247,7 @@ public:
 		ExecImpl<ExecNfaVm, ExecNfaVmBase, Encoding>(parent) {}
 
 	void
-	emitCodePoint(
+	emitCp(
 		const char* p,
 		utf32_t c
 	) {

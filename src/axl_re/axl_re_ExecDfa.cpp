@@ -172,7 +172,7 @@ public:
 
 	inline
 	void
-	emitCodePoint(
+	emitCp(
 		const char* p,
 		utf32_t c
 	) {
@@ -311,7 +311,7 @@ public:
 
 	inline
 	void
-	emitCodePoint(
+	emitCp(
 		const char* p,
 		utf32_t c
 	) {

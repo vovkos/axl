@@ -277,11 +277,23 @@ public:
 	}
 
 	void
-	emitReplacement(
+	emitCu(
 		const char* p,
 		utf32_t c
 	) {
-		static_cast<T*>(this)->emitCodePoint(p, c);
+		T* self = static_cast<T*>(this);
+		if (self->canEmit()) // multi-emit possible
+			self->emitCp(p, c);
+	}
+
+	void
+	emitCpAfterCu(
+		const char* p,
+		utf32_t c
+	) {
+		T* self = static_cast<T*>(this);
+		if (self->canEmit()) // multi-emit possible
+			self->emitCp(p, c);
 	}
 };
 
