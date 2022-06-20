@@ -47,12 +47,20 @@ namespace io {
 
 //..............................................................................
 
+#if (_AXL_OS_WIN)
+sl::String_w
+getTempDir_w() {
+	wchar_t buffer_w[MAX_PATH + 1];
+	buffer_w[MAX_PATH] = 0;
+	::GetTempPathW(countof(buffer_w) - 1, buffer_w);
+	return buffer_w;
+}
+#endif
+
 sl::String
 getTempDir() {
 #if (_AXL_OS_WIN)
-	wchar_t dir[1024] = { 0 };
-	::GetTempPathW(countof(dir) - 1, dir);
-	return dir;
+	return getTempDir_w();
 #else
 	sl::String tmpDir = ::getenv("TMPDIR");
 	return !tmpDir.isEmpty() ? tmpDir : "/tmp";
@@ -62,7 +70,7 @@ getTempDir() {
 sl::String
 getHomeDir() {
 #if (_AXL_OS_WIN)
-	wchar_t buffer_w[MAX_PATH];
+	wchar_t buffer_w[MAX_PATH + 1];
 	HRESULT result = ::SHGetFolderPathW(NULL, CSIDL_PROFILE, NULL, 0, buffer_w);
 	return SUCCEEDED(result) ? sl::String(buffer_w) : NULL;
 #else
@@ -72,6 +80,42 @@ getHomeDir() {
 
 	struct passwd* pw = ::getpwuid(::getuid());
 	return pw->pw_dir;
+#endif
+}
+
+sl::String
+generateTempFilePath(
+	const sl::StringRef& dir,
+	const sl::StringRef& prefix
+) {
+#if (_AXL_OS_WIN)
+	wchar_t buffer_w[MAX_PATH + 1];
+	::GetTempFileNameW(
+		!dir.isEmpty() ? dir.s2().sz() : getTempDir_w().sz(),
+		prefix.s2().szn(),
+		0,
+		buffer_w
+	);
+
+	return buffer_w;
+#else
+	sl::String fileName = !dir.isEmpty() ? dir : getTempDir();
+	if (!fileName.isSuffix('/'))
+		fileName += '/';
+
+	if (!prefix.isEmpty()) {
+		fileName += prefix;
+		fileName += "XXXXXX";
+	} else {
+		fileName += "tmpXXXXXX";
+	}
+
+	int fd = ::mkstemp(fileName.p());
+	if (fd == -1)
+		return sl::String();
+
+	close(fd);
+	return fileName;
 #endif
 }
 

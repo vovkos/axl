@@ -33,6 +33,12 @@ bool
 setCurrentDir(const sl::StringRef& dir);
 
 sl::String
+generateTempFilePath(
+	const sl::StringRef& dir = NULL,
+	const sl::StringRef& prefix = NULL
+);
+
+sl::String
 getExeFilePath();
 
 sl::String

@@ -6779,6 +6779,12 @@ main(
 	uint_t baudRate = argc >= 2 ? atoi(argv[1]) : 38400;
 #endif
 
+	sl::String dir = io::getTempDir();
+	sl::String fileName = io::generateTempFilePath();
+
+	printf("tempdir:  %s\n", dir.sz());
+	printf("tempfile: %s\n", fileName.sz());
+
 	testRegex();
 	return 0;
 }
