@@ -84,7 +84,7 @@ getHomeDir() {
 }
 
 sl::String
-generateTempFilePath(
+createTempFile(
 	const sl::StringRef& dir,
 	const sl::StringRef& prefix
 ) {

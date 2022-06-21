@@ -33,7 +33,7 @@ bool
 setCurrentDir(const sl::StringRef& dir);
 
 sl::String
-generateTempFilePath(
+createTempFile(
 	const sl::StringRef& dir = NULL,
 	const sl::StringRef& prefix = NULL
 );

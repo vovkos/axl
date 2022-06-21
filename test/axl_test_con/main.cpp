@@ -6780,7 +6780,7 @@ main(
 #endif
 
 	sl::String dir = io::getTempDir();
-	sl::String fileName = io::generateTempFilePath();
+	sl::String fileName = io::createTempFile();
 
 	printf("tempdir:  %s\n", dir.sz());
 	printf("tempfile: %s\n", fileName.sz());
