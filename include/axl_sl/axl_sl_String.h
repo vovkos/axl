@@ -1492,7 +1492,16 @@ public:
 
 		size_t oldLength = this->m_length;
 		if (index >= oldLength)
-			return this->m_length;
+			return oldLength;
+		else if (index == 0)
+			if (count >= oldLength) {
+				clear();
+				return 0;
+			} else {
+				this->m_p += count;
+				this->m_length -= count;
+				return this->m_length;
+			}
 
 		if (count == -1 || index + count >= oldLength) {
 			result = overrideLength(index);
