@@ -34,6 +34,9 @@ bool
 isPrintableNonMark(utf32_t c);
 
 bool
+isMark(utf32_t c);
+
+bool
 isSpace(utf32_t c);
 
 bool

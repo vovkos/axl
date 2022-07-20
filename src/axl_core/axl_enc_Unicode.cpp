@@ -97,6 +97,13 @@ isPrintableNonMark(utf32_t c) {
 }
 
 bool
+isMark(utf32_t c) {
+	uint32_t props;
+	GET_PROPS(c, props);
+	return (UBool)((CAT_MASK(props)&(U_GC_M_MASK))!=0);
+}
+
+bool
 isSpace(utf32_t c) {
 	uint32_t props;
 	GET_PROPS(c, props);
