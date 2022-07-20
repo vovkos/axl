@@ -74,10 +74,11 @@ public:
 		return GetHexChar_u()(x);
 	}
 
+	template <typename T>
 	static
 	size_t
 	encode(
-		sl::String* string,
+		sl::StringBase<T>* string,
 		const void* p,
 		size_t size,
 		uint_t flags = 0
@@ -110,6 +111,154 @@ public:
 		return buffer;
 	}
 };
+
+namespace impl {
+
+//..............................................................................
+
+template <typename T>
+class InsertNoSpace {
+public:
+	size_t
+	operator () (
+		T* p,
+		size_t i
+	) {
+		return 0;
+	}
+};
+
+template <typename T>
+class InsertNoSpaceMultiline {
+public:
+	size_t
+	operator () (
+		T* p,
+		size_t i
+	) {
+		if (i & 0x0f)
+			return 0;
+
+		*p = '\n';
+		return 1;
+	}
+};
+
+template <typename T>
+class InsertSpace {
+public:
+	size_t
+	operator () (
+		T* p,
+		size_t i
+	) {
+		*p = ' ';
+		return 1;
+	}
+};
+
+template <typename T>
+class InsertSpaceMultiline {
+public:
+	size_t
+	operator () (
+		T* p,
+		size_t i
+	) {
+		*p = (i & 0x0f) ? ' ' : '\n';
+		return 1;
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <
+	typename T,
+	typename GetHexChar,
+	typename InsertSpace
+>
+void
+hexEncode(
+	T* dst,
+	const uchar_t* src,
+	size_t size
+) {
+	uchar_t x = src[0];
+	*dst++ = GetHexChar()(x >> 4);
+	*dst++ = GetHexChar()(x);
+
+	for (size_t i = 1; i < size; i++) {
+		uchar_t x = src[i];
+		dst += InsertSpace()(dst, i);
+		*dst++ = GetHexChar()(x >> 4);
+		*dst++ = GetHexChar()(x);
+	}
+}
+
+//..............................................................................
+
+} // namespace impl
+
+template <typename T>
+size_t
+HexEncoding::encode(
+	sl::StringBase<T>* string,
+	const void* p,
+	size_t size,
+	uint_t flags
+) {
+	if (!size) {
+		string->clear();
+		return 0;
+	}
+
+	const uchar_t* src = (const uchar_t*) p;
+
+	size_t length;
+	if (flags & HexEncodingFlag_NoSpace) {
+		length = size * 2;
+		if (flags & HexEncodingFlag_Multiline) {
+			size_t lineCount = length / 16;
+			if (lineCount & 0x0f)
+				lineCount++;
+
+			length += lineCount - 1;
+		}
+
+		T* dst = string->createBuffer(length);
+		if (!dst)
+			return -1;
+
+		if (flags & HexEncodingFlag_Multiline)
+			if (flags & HexEncodingFlag_UpperCase)
+				impl::hexEncode<T, GetHexChar_u, impl::InsertNoSpaceMultiline<T> >(dst, src, size);
+			else
+				impl::hexEncode<T, GetHexChar_l, impl::InsertNoSpaceMultiline<T> >(dst, src, size);
+		else
+			if (flags & HexEncodingFlag_UpperCase)
+				impl::hexEncode<T, GetHexChar_u, impl::InsertNoSpace<T> >(dst, src, size);
+			else
+				impl::hexEncode<T, GetHexChar_l, impl::InsertNoSpace<T> >(dst, src, size);
+	} else {
+		length = size * 3 - 1;
+		T* dst = string->createBuffer(length);
+		if (!dst)
+			return -1;
+
+		if (flags & HexEncodingFlag_Multiline)
+			if (flags & HexEncodingFlag_UpperCase)
+				impl::hexEncode<T, GetHexChar_u, impl::InsertSpaceMultiline<T> >(dst, src, size);
+			else
+				impl::hexEncode<T, GetHexChar_l, impl::InsertSpaceMultiline<T> >(dst, src, size);
+		else
+			if (flags & HexEncodingFlag_UpperCase)
+				impl::hexEncode<T, GetHexChar_u, impl::InsertSpace<T> >(dst, src, size);
+			else
+				impl::hexEncode<T, GetHexChar_l, impl::InsertSpace<T> >(dst, src, size);
+	}
+
+	return length;
+}
 
 //..............................................................................
 
