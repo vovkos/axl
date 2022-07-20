@@ -1,5 +1,4 @@
 #...............................................................................
-#...............................................................................
 #
 #  This file is part of the AXL library.
 #
@@ -36,36 +35,6 @@ add_subdirectory(axl_core)
 
 if (GCC_LINK_GLIBC_WRAPPERS)
 	add_subdirectory(axl_glibc)
-endif()
-
-#...............................................................................
-
-if(WIN32)
-	option(
-		BUILD_AXL_GUI_GDI
-		"Build GDI drivers for axl_gui library"
-		OFF
-	)
-endif()
-
-if(QT_FOUND)
-	option(
-		BUILD_AXL_GUI_QT
-		"Build QT drivers for axl_gui library"
-		ON
-	)
-else()
-	unset(BUILD_AXL_GUI_QT CACHE)
-endif()
-
-option(
-	BUILD_AXL_GUI
-	"Build axl_gui library"
-	ON
-)
-
-if(BUILD_AXL_GUI)
-	add_subdirectory(axl_gui)
 endif()
 
 #...............................................................................

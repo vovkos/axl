@@ -13,9 +13,6 @@
 #include "mainwindow.h"
 #include "moc_mainwindow.cpp"
 
-#include "axl_gui_TextPainter.h"
-#include "axl_gui_HyperText.h"
-
 //..............................................................................
 
 MyWidget::MyWidget(QWidget* parent):
@@ -23,7 +20,10 @@ MyWidget::MyWidget(QWidget* parent):
 
 void
 MyWidget::paintEvent(QPaintEvent* e) {
-	char str[] = "abcdefghijklmnopqrstuvwxyz";
+	QPainter painter(this);
+	painter.drawText(QPointF(100, 200), QString::fromUtf16((const ushort*)L"\x25cc\x0301."));
+
+/*	char str[] = "abcdefghijklmnopqrstuvwxyz";
 
 	gui::HyperText hyperText;
 	hyperText.setHyperText("\xd0\x91\xd0\xbe " "abc \x1b^pizda\x1b[4mdef\x1b[m suka");
@@ -51,7 +51,7 @@ MyWidget::paintEvent(QPaintEvent* e) {
 
 	painter.drawHyperText_utf32(attrArray, text);
 
-	canvas.m_qtPainter.end();
+	canvas.m_qtPainter.end(); */
 }
 
 //..............................................................................
@@ -140,7 +140,7 @@ MainWindow::MainWindow(QWidget* parent) :
 	m_editWidget(this)
 #endif
 {
-	QFont f("Monospace", 10);
+	QFont f("Consolas", 10);
 	f.setFixedPitch(true);
 	f.setStyleHint(
 		QFont::Monospace,
