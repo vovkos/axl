@@ -21,6 +21,7 @@ set(
 	${AXL_INC_DIR}/axl_lex/axl_lex_Ragel.h
 	${AXL_INC_DIR}/axl_lex/axl_lex_RagelLexer.h
 	${AXL_INC_DIR}/axl_lex/axl_lex_ParseError.h
+	${AXL_INC_DIR}/axl_lex/axl_lex_QtRagelSyntaxHighlighter.h
 )
 
 set(
