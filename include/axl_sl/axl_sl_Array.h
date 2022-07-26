@@ -28,6 +28,7 @@ class ArrayRef {
 public:
 	typedef Details0 Details;
 	typedef typename Details::Hdr Hdr;
+	typedef typename Details::Value Value;
 	typedef typename Details::ValueArg ValueArg;
 
 protected:

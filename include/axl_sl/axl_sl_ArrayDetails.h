@@ -24,6 +24,7 @@ namespace sl {
 template <typename T>
 class ReverseArray {
 public:
+	typedef T Value;
 	typedef typename ArgType<T>::Type ValueArg;
 
 public:
