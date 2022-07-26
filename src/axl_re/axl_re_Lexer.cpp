@@ -76,7 +76,7 @@ Lexer::create(const sl::StringRef& source) {
 
 void
 Lexer::reset() {
-	Ragel::clear();
+	lex::Ragel::clear();
 
 	m_readIdx = 0;
 	m_writeIdx = 0;
