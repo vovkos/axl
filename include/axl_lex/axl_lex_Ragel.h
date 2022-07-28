@@ -108,7 +108,8 @@ public:
 		const sl::StringRefBase<T>& source,
 		bool isBomNeeded = false
 	) {
-		setSourceRaw(source);
+		m_begin = p = (T*)source.cp();
+		pe = eof = (T*)source.getEnd();
 
 		if (!isBomNeeded) {
 			size_t bomLength = Encoding::getBomLength();
@@ -118,9 +119,10 @@ public:
 	}
 
 	void
-	setSourceRaw(const sl::StringRefBase<T>& source) {
+	setSourcePart(const sl::StringRefBase<T>& source) {
 		m_begin = p = (T*)source.cp();
-		pe = eof = (T*)source.getEnd();
+		pe = (T*)source.getEnd();
+		eof = (T*)UINTPTR_MAX;
 	}
 
 protected:
