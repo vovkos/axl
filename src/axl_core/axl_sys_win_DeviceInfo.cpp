@@ -30,34 +30,6 @@ DeviceInfo::getDeviceRegistryProperty(
 	return getDeviceRegistryProperty(propId, buffer->p(), requiredSize, NULL);
 }
 
-bool
-DeviceInfo::getDeviceRegistryProperty(
-	uint_t propId,
-	sl::String* string
-) {
-	sl::Array<char> buffer;
-	bool result = getDeviceRegistryProperty(propId, &buffer);
-	if (!result)
-		return false;
-
-	string->copy((const utf16_t*) buffer.cp(), buffer.getCount() / sizeof(utf16_t));
-	return true;
-}
-
-bool
-DeviceInfo::getDeviceRegistryProperty(
-	uint_t propId,
-	sl::String_w* string
-) {
-	sl::Array<char> buffer;
-	bool result = getDeviceRegistryProperty(propId, &buffer);
-	if (!result)
-		return false;
-
-	string->copy((const utf16_t*) buffer.cp(), buffer.getCount() / sizeof(utf16_t));
-	return true;
-}
-
 HKEY
 DeviceInfo::openDeviceRegistryKey(REGSAM keyAccess) {
 	HKEY key = ::SetupDiOpenDevRegKey(m_devInfoSet, &m_devInfoData, DICS_FLAG_GLOBAL, 0, DIREG_DEV, keyAccess);

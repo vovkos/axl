@@ -79,16 +79,11 @@ public:
 		sl::Array<char>* buffer
 	);
 
+	template <typename T>
 	bool
 	getDeviceRegistryProperty(
 		uint_t propId,
-		sl::String_w* string
-	);
-
-	bool
-	getDeviceRegistryProperty(
-		uint_t propId,
-		sl::String* string
+		sl::StringBase<T>* string
 	);
 
 	bool
@@ -147,6 +142,28 @@ public:
 	bool
 	restartDevice(bool* isRebootRequired);
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <typename T>
+bool
+DeviceInfo::getDeviceRegistryProperty(
+	uint_t propId,
+	sl::StringBase<T>* string
+) {
+	sl::Array<char> buffer;
+	bool result = getDeviceRegistryProperty(propId, &buffer);
+	if (!result)
+		return false;
+
+	size_t size = buffer.getCount();
+	if (size <= sizeof(wchar_t))
+		string->clear();
+	else
+		string->copy((const wchar_t*)buffer.cp(),  size / sizeof(wchar_t) - 1);
+
+	return true;
+}
 
 //..............................................................................
 
