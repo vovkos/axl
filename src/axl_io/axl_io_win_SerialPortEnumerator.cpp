@@ -144,7 +144,7 @@ SerialPortEnumerator::createPortDesc(
 			if (result == ERROR_SUCCESS) {
 				sl::String driverPath = readRegistryStringValue(serviceRegKey, L"ImagePath");
 				if (!driverPath.isEmpty())
-					portDesc->m_driver.appendFormat(" (%s)", driverPath.sz());
+					portDesc->m_driver = driverPath;
 			}
 		}
 	}
