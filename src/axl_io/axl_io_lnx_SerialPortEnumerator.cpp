@@ -25,13 +25,19 @@ class SerialPortEnumerator {
 public:
 	static
 	size_t
-	createPortList(sl::List<SerialPortDesc>* portList);
+	createPortList(
+		sl::List<SerialPortDesc>* portList,
+		uint_t mask
+	);
 };
 
-//..............................................................................
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 size_t
-SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList) {
+SerialPortEnumerator::createPortList(
+	sl::List<SerialPortDesc>* portList,
+	uint_t mask
+) {
 	portList->clear();
 
 #ifdef _AXL_SYS_LNX_LIBUDEV
@@ -75,16 +81,81 @@ SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList) {
 				continue;
 		}
 
-		sl::StringRef description = device.getPropertyValue("ID_MODEL_FROM_DATABASE");
-		if (description.isEmpty())
-			description = device.getPropertyValue("ID_MODEL");
-
-		if (description.isEmpty())
-			description = driver;
-
 		SerialPortDesc* portDesc = AXL_MEM_NEW(SerialPortDesc);
 		portDesc->m_deviceName = name;
-		portDesc->m_description = description;
+
+		if (mask & SerialPortDescMask_Description) {
+			sl::StringRef model = device.getPropertyValue("ID_MODEL");
+			sl::StringRef modelFromDb = device.getPropertyValue("ID_MODEL_FROM_DATABASE");
+
+			if (modelFromDb.isEmpty())
+				portDesc->m_description = model;
+			else {
+				portDesc->m_description = modelFromDb;
+				if (!model.isEmpty() && model != modelFromDb)
+					portDesc->m_description.appendFormat(" (%s)", model.sz());
+			}
+
+			if (portDesc->m_description.isEmpty())
+				portDesc->m_description = driver;
+		}
+
+		if (mask & SerialPortDescMask_Manufacturer) {
+			sl::StringRef vendor = device.getPropertyValue("ID_VENDOR");
+			sl::StringRef vendorFromDb = device.getPropertyValue("ID_VENDOR_FROM_DATABASE");
+
+			if (vendorFromDb.isEmpty())
+				portDesc->m_manufacturer = vendor;
+			else {
+				portDesc->m_manufacturer = vendorFromDb;
+				if (!vendor.isEmpty() && vendor != vendorFromDb)
+					portDesc->m_manufacturer.appendFormat(" (%s)", vendor.sz());
+			}
+		}
+
+		if (mask & SerialPortDescMask_HardwareIds) {
+			sl::StringRef vendorId = device.getPropertyValue("ID_VENDOR_ID");
+			sl::StringRef modelId = device.getPropertyValue("ID_MODEL_ID");
+
+			if (!vendorId.isEmpty() && !modelId.isEmpty())
+				portDesc->m_hardwareIds = vendorId + ':' + modelId;
+		}
+
+		if (mask & SerialPortDescMask_Driver)
+			portDesc->m_driver = driver;
+
+		if (mask & SerialPortDescMask_Location)
+			portDesc->m_location = device.getPropertyValue("ID_PATH");
+
+#if (0)
+		printf("----------------------\n");
+		printf("getSysPath: %s\n", device.getSysPath().sz());
+		printf("getSysName: %s\n", device.getSysName().sz());
+		printf("getSysNum: %s\n", device.getSysNum().sz());
+		printf("getDevPath: %s\n", device.getDevPath().sz());
+		printf("getDevNode: %s\n", device.getDevNode().sz());
+		printf("getDevType: %s\n", parentDevice.getDevType().sz());
+		printf("getSubsystem: %s\n", device.getSubsystem().sz());
+		printf("getDriver: %s\n", parentDevice.getDriver().sz());
+		printf("getAction: %s\n", parentDevice.getAction().sz());
+
+		sys::lnx::UdevIterator it = device.getPropertyList();
+		for (; it; it++)
+			printf("property[%s] = '%s'\n", it.getName().sz(), it.getValue().sz());
+
+		it = device.getTagList();
+		for (; it; it++)
+			printf("tag: %s\n", it.getName().sz());
+
+		it = device.getSysAttrList();
+		for (; it; it++)
+			printf("sysattr[%s] = '%s'\n", it.getName().sz(), udev_device_get_sysattr_value(device, it.getName().sz()));
+
+		it = device.getDevLinkList();
+		for (; it; it++)
+			printf("devlink: %s\n", it.getName().sz());
+#endif
+
 		portList->insertTail(portDesc);
 	}
 #else
@@ -109,8 +180,11 @@ SerialPortEnumerator::createPortList(sl::List<SerialPortDesc>* portList) {
 //..............................................................................
 
 size_t
-createSerialPortDescList(sl::List<SerialPortDesc>* portList) {
-	return SerialPortEnumerator::createPortList(portList);
+createSerialPortDescList(
+	sl::List<SerialPortDesc>* portList,
+	uint_t mask
+) {
+	return SerialPortEnumerator::createPortList(portList, mask);
 }
 
 //..............................................................................
