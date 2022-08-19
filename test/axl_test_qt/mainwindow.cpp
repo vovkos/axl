@@ -13,6 +13,8 @@
 #include "mainwindow.h"
 #include "moc_mainwindow.cpp"
 
+#if (_TEST_PAINT)
+
 //..............................................................................
 
 MyWidget::MyWidget(QWidget* parent):
@@ -53,6 +55,8 @@ MyWidget::paintEvent(QPaintEvent* e) {
 
 	canvas.m_qtPainter.end(); */
 }
+
+#endif
 
 //..............................................................................
 
@@ -134,9 +138,9 @@ protected:
 
 MainWindow::MainWindow(QWidget* parent) :
 	QMainWindow(parent),
-#if (1)
+#if (_TEST_PAINT)
 	m_myWidget(this)
-#else
+#elif (_TEST_EDIT)
 	m_editWidget(this)
 #endif
 {
@@ -153,11 +157,11 @@ MainWindow::MainWindow(QWidget* parent) :
 	QVBoxLayout* vlayout = new QVBoxLayout;
 	client->setLayout(vlayout);
 
-#if (1)
+#if (_TEST_PAINT)
 	m_myWidget.setFont(f);
 	m_myWidget.setGeometry(0, 0, 400, 40);
 	vlayout->addWidget(&m_myWidget);
-#else
+#elif (_TEST_EDIT)
 	m_editWidget.setFont(f);
 	m_editWidget.setFrameStyle(0);
 	m_editWidget.setGeometry(0, 40, 400, 100);
@@ -187,11 +191,15 @@ MainWindow::MainWindow(QWidget* parent) :
 	combo1->addItem("hui govno i muravei", "HUI GOVNO I MURAVEI");
 	combo1->addItem("hui govno i muravei (c) laertsky", "LAERTSKY");
 
+	combo1->setItemData(0, "This is a tooltip for item[0]", Qt::ToolTipRole);
+	combo1->setItemData(1, "This is a tooltip for item[1]", Qt::ToolTipRole);
+	combo1->setItemData(2, "This is a tooltip for item[2]", Qt::ToolTipRole);
+	combo1->setItemData(3, "This is a tooltip for item[3]", Qt::ToolTipRole);
+
 	combo1->setModel(new MyItemModel(qobject_cast<QStandardItemModel*> (combo1->model())));
 
 	combo1->view()->setMinimumWidth(combo1->QComboBox::sizeHint().width());
 	hlayout->addWidget(combo1);
-
 
 	QLabel* label2 = new QLabel(this);
 	label2->setText("Port:");

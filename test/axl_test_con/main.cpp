@@ -3134,11 +3134,25 @@ testZip() {
 void
 testEnumSerial() {
 	sl::List<io::SerialPortDesc> portList;
-	io::createSerialPortDescList(&portList);
+	io::createSerialPortDescList(&portList, io::SerialPortDescMask__All);
 
 	sl::Iterator<io::SerialPortDesc> it = portList.getHead();
 	for (; it; it++)
-		printf("device name: %s\ndescription: %s\n\n", it->getDeviceName ().sz(), it->getDescription().sz());
+		printf(
+			"device name:     %s\n"
+			"description:     %s\n"
+			"hardwared ID(s): %s\n"
+			"manufacturer:    %s\n"
+			"driver:          %s\n"
+			"location:        %s\n"
+			"\n",
+			it->getDeviceName ().sz(),
+			it->getDescription().sz(),
+			it->getHardwareIds().sz(),
+			it->getManufacturer().sz(),
+			it->getDriver().sz(),
+			it->getLocation().sz()
+		);
 
 	printf("%d ports total\n", portList.getCount());
 }
@@ -6773,19 +6787,7 @@ main(
 	WSAStartup(0x0202, &wsaData);
 #endif
 
-#if (_AXL_OS_WIN)
-	uint_t baudRate = argc >= 2 ? (uint_t)wcstoul(argv[1], NULL, 10) : 38400;
-#else
-	uint_t baudRate = argc >= 2 ? atoi(argv[1]) : 38400;
-#endif
-
-	sl::String dir = io::getTempDir();
-	sl::String fileName = io::createTempFile();
-
-	printf("tempdir:  %s\n", dir.sz());
-	printf("tempfile: %s\n", fileName.sz());
-
-	testRegex();
+	testEnumSerial();
 	return 0;
 }
 

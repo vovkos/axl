@@ -13,7 +13,12 @@
 
 #define MAINWINDOW_H
 
+#define _TEST_PAINT 0
+#define _TEST_EDIT  1
+
 //..............................................................................
+
+#if (_TEST_PAINT)
 
 class MyWidget: public QWidget {
 public:
@@ -23,6 +28,8 @@ public:
 	void
 	paintEvent(QPaintEvent* e);
 };
+
+#endif
 
 //..............................................................................
 
@@ -37,9 +44,9 @@ public:
 	}
 
 private:
-#if (1)
+#if (_TEST_PAINT)
 	MyWidget m_myWidget;
-#else
+#elif (_TEST_EDIT)
 	QTextEdit m_editWidget;
 #endif
 };
