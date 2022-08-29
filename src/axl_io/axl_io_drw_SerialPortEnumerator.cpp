@@ -148,11 +148,6 @@ SerialPortEnumerator::createPortList(
 					prop = device.getProperty(kUSBVendorString);
 					if (prop)
 						portDesc->m_manufacturer = prop.toString();
-					else {
-						prop = device.getProperty(kUSBVendorID);
-						if (prop)
-							portDesc->m_manufacturer.format("VID_%04x", prop.toInt());
-					}
 				}
 
 				if (mask & SerialPortDescMask_HardwareIds) {
@@ -166,12 +161,6 @@ SerialPortEnumerator::createPortList(
 				if (mask & SerialPortDescMask_Description) {
 					prop = port.getProperty(kIOTTYDeviceKey);
 					portDesc->m_description = prop ? prop.toString() : port.getName();
-				}
-
-				if (mask & SerialPortDescMask_Manufacturer) {
-					prop = parent.getProperty(kUSBVendorID);
-					if (prop)
-						portDesc->m_manufacturer.format("VID_%04x", prop.toInt());
 				}
 
 				if (mask & SerialPortDescMask_HardwareIds) {
