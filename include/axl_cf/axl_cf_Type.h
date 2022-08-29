@@ -29,6 +29,9 @@ cfTypeToString(
 	bool isVerbose = false
 );
 
+int
+cfTypeToInt(CFTypeRef cfType);
+
 sl::String
 getTypeIdDescription(CFTypeID typeId);
 
@@ -231,6 +234,12 @@ public:
 	toString() {
 		ASSERT(m_p);
 		return cfTypeToString(m_p);
+	}
+
+	int
+	toInt() {
+		ASSERT(m_p);
+		return cfTypeToInt(m_p);
 	}
 };
 

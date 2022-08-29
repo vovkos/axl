@@ -14,11 +14,23 @@
 #define _AXL_IOK_OBJECT_H
 
 #include "axl_g_Pch.h"
+#include "axl_cf_String.h"
 
 namespace axl {
 namespace iok {
 
 //..............................................................................
+
+static
+inline
+sl::String
+getSuperClass(const sl::StringRef& className) {
+	cf::String cfSuperClassName;
+	cfSuperClassName.attach(::IOObjectCopySuperclassForClass(cf::String(className)));
+	return !cfSuperClassName.isNull() ? cfSuperClassName.getString() : sl::String();
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
 class ObjectBase {
@@ -112,7 +124,33 @@ public:
 	release() {
 		::IOObjectRelease(m_p);
 	}
+
+	sl::String
+	getClass() const;
+
+	sl::String
+	getSuperClass() const {
+		return iok::getSuperClass(getClass());
+	}
+
+	bool
+	conformsTo(const char* className) const {
+		ASSERT(m_p);
+		return ::IOObjectConformsTo(m_p, className) != 0;
+	}
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <typename T>
+sl::String
+ObjectBase<T>::getClass() const {
+	ASSERT(m_p);
+	io_name_t buffer;
+	buffer[0] = 0;
+	::IOObjectGetClass(m_p, buffer);
+	return buffer;
+}
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
