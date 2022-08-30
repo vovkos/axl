@@ -3909,7 +3909,7 @@ testConn() {
 	thread.m_startEvent.wait();
 */
 	io::SockAddr addr;
-	addr.parse("127.0.0.1:1002");
+	addr.parse("192.168.1.67:1001");
 
 	printf("connecting to %s...\n", addr.getString().sz());
 
@@ -3923,10 +3923,15 @@ testConn() {
 		return false;
 	}
 
-	static char data[] = "hui govno i muravei";
+	for (;;) {
+		static char data[] = "hui govno i muravei";
 
-	printf("sending %d bytes...\n", sizeof(data));
-	socket.send(data, sizeof(data));
+		printf("sending %d bytes...", sizeof(data));
+		size_t result = socket.send(data, sizeof(data));
+		printf("%d bytes sent\n", result);
+
+		sys::sleep(1000);
+	}
 
 	printf("closing...\n");
 	socket.close();
@@ -6785,9 +6790,11 @@ main(
 #if (_AXL_OS_WIN)
 	WSADATA wsaData;
 	WSAStartup(0x0202, &wsaData);
+#elif (_AXL_OS_POSIX)
+	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	testEnumSerial();
+	testConn();
 	return 0;
 }
 
