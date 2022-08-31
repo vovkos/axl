@@ -3909,7 +3909,7 @@ testConn() {
 	thread.m_startEvent.wait();
 */
 	io::SockAddr addr;
-	addr.parse("192.168.1.67:1001");
+	addr.parse("192.168.1.73:1002");
 
 	printf("connecting to %s...\n", addr.getString().sz());
 
@@ -3926,11 +3926,11 @@ testConn() {
 	for (;;) {
 		static char data[] = "hui govno i muravei";
 
-		printf("sending %d bytes...", sizeof(data));
+		printf("%s: sending %d bytes...", sys::Time(sys::getTimestamp()).format("%h:%m:%s").sz(), sizeof(data));
 		size_t result = socket.send(data, sizeof(data));
 		printf("%d bytes sent\n", result);
 
-		sys::sleep(1000);
+		sys::sleep(5000);
 	}
 
 	printf("closing...\n");
