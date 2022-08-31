@@ -13,7 +13,7 @@
 
 #define MAINWINDOW_H
 
-#define _TEST_PAINT 0
+#define _TEST_PAINT 1
 #define _TEST_EDIT  1
 
 //..............................................................................
@@ -27,6 +27,10 @@ public:
 	virtual
 	void
 	paintEvent(QPaintEvent* e);
+
+	virtual
+	void
+	keyPressEvent(QKeyEvent *event);
 };
 
 #endif

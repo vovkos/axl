@@ -56,6 +56,17 @@ MyWidget::paintEvent(QPaintEvent* e) {
 	canvas.m_qtPainter.end(); */
 }
 
+void
+MyWidget::keyPressEvent(QKeyEvent *event) {
+	printf("MyWidget::keyPressEvent(mod: %x, key:%x, text: %s)\n", event->modifiers(), event->key(), event->text().toLatin1().data());
+
+	if (event->modifiers() & Qt::AltModifier)
+		printf("ALT mod\n");
+
+	if (event->key() == Qt::Key_I)
+		printf("I key\n");
+}
+
 #endif
 
 //..............................................................................
@@ -210,6 +221,9 @@ MainWindow::MainWindow(QWidget* parent) :
 	combo2->lineEdit()->setText("127.0.0.1:1001");
 	combo2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	hlayout->addWidget(combo2);
+
+	setFocusProxy(&m_myWidget);
+	m_myWidget.setFocus();
 }
 
 //..............................................................................
