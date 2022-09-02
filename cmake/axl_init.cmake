@@ -102,3 +102,5 @@ endif()
 #...............................................................................
 
 enable_testing()
+
+set(CMAKE_WARN_VS10 OFF CACHE BOOL "Turn off VS10 warning" FORCE)
