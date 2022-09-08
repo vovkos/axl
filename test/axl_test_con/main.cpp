@@ -6794,7 +6794,7 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	testConn();
+	testEnumSerial();
 	return 0;
 }
 

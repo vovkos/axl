@@ -95,9 +95,6 @@ SerialPortEnumerator::createPortList(
 				if (!model.isEmpty() && model != modelFromDb)
 					portDesc->m_description.appendFormat(" (%s)", model.sz());
 			}
-
-			if (portDesc->m_description.isEmpty())
-				portDesc->m_description = driver;
 		}
 
 		if (mask & SerialPortDescMask_Manufacturer) {
@@ -124,10 +121,12 @@ SerialPortEnumerator::createPortList(
 		if (mask & SerialPortDescMask_Driver)
 			portDesc->m_driver = driver;
 
-		if (mask & SerialPortDescMask_Location)
-			portDesc->m_location = device.getPropertyValue("ID_PATH");
+		if (mask & SerialPortDescMask_Location) {
+			sl::StringRef path = device.getPropertyValue("ID_PATH");
+			portDesc->m_location = !path.isEmpty() ? path : device.getDevPath();
+		}
 
-#if (0)
+#if (1)
 		printf("----------------------\n");
 		printf("getSysPath: %s\n", device.getSysPath().sz());
 		printf("getSysName: %s\n", device.getSysName().sz());
