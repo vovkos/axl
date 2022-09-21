@@ -24,3 +24,25 @@ else()
 endif()
 
 #...............................................................................
+
+macro(
+add_nasm_step
+	_OUTPUT_FILE
+	_INPUT_FILE
+)
+
+	if(NOT NASM_FOUND)
+		message(FATAL_ERROR "NASM is required for add_nasm_step() macro")
+	endif()
+
+	axl_make_path(_OUTPUT_PATH ${_OUTPUT_FILE} ${CMAKE_CURRENT_BINARY_DIR})
+	axl_make_path(_INPUT_PATH ${_INPUT_FILE} ${CMAKE_CURRENT_SOURCE_DIR})
+
+	add_custom_command(
+		OUTPUT ${_OUTPUT_PATH}
+		MAIN_DEPENDENCY ${_INPUT_PATH}
+		COMMAND ${NASM_EXE} -o${_OUTPUT_PATH} ${ARGN} ${_INPUT_PATH}
+	)
+endmacro()
+
+#...............................................................................
