@@ -13,7 +13,7 @@ AXL
 ===
 .. image:: https://github.com/vovkos/axl/actions/workflows/ci.yml/badge.svg
 	:target: https://github.com/vovkos/axl/actions/workflows/ci.yml
-.. image:: https://ci.appveyor.com/api/projects/status/sc9n68yli6ug7vuq?svg=true
+.. image:: https://ci.appveyor.com/api/projects/status/92366587kcyanhfa?svg=true
 	:target: https://ci.appveyor.com/project/vovkos/axl
 
 Abstract
