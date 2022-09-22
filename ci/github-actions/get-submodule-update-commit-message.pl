@@ -15,9 +15,9 @@ while ($summary =~ /(^\*|\n\*)\s+([^\s]+)\s/g) {
     $submoduleCount++;
 }
 
-# abort if no submodules were modified
+# abort with an empty string if no submodules were modified
 
-$submoduleCount > 0 || die("no submodule changes detected\n");
+$submoduleCount > 0 || die("\n");
 
 # concat and escape quotation marks
 
