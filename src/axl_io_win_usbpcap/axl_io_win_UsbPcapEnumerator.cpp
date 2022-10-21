@@ -11,7 +11,7 @@
 
 #include "pch.h"
 #include "axl_io_win_UsbPcapEnumerator.h"
-#include "USBPcap.h"
+#include "axl_io_win_UsbPcap.h"
 
 namespace axl {
 namespace io {
@@ -25,10 +25,10 @@ normalizeDeviceName(
 	const sl::StringRef_w& name
 ) {
 	static sl::StringRef_w symlinkPrefix = L"\\\\.\\";
-	static sl::StringRef_w njSymlinkPrefix = L"\\??\\";
+	static sl::StringRef_w ntSymlinkPrefix = L"\\??\\";
 
-	if (name.isPrefix(njSymlinkPrefix))
-		*deviceName = symlinkPrefix + name.getSubString(njSymlinkPrefix.getLength());
+	if (name.isPrefix(ntSymlinkPrefix))
+		*deviceName = symlinkPrefix + name.getSubString(ntSymlinkPrefix.getLength());
 	else if (name.isPrefix('\\'))
 		*deviceName = name;
 	else
@@ -189,14 +189,15 @@ UsbPcapDeviceEnumerator<T>::enumerate(const UsbPcapHub& hub) {
 	dword_t actualSize;
 	USB_NODE_INFORMATION nodeInfo;
 
-	bool result = hubDevice.create(
+	bool result =
+		hubDevice.create(
 			hub.m_hubDeviceName,
 			GENERIC_READ,
 			FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
 			NULL,
 			OPEN_EXISTING
-		);
-	result = result && hubDevice.ioctl(
+		) &&
+		hubDevice.ioctl(
 			IOCTL_USB_GET_NODE_INFORMATION,
 			NULL,
 			0,
@@ -521,8 +522,7 @@ enumerateUsbPcapRootHubs(sl::List<UsbPcapHub>* hubList) {
 	using namespace axl::sys::win;
 
 	enum {
-		DirBufferSize = 4 * 1024,
-		HubBufferSize = 1 * 1024  // 1K is enough for the hub symlink
+		DirBufferSize = 4 * 1024
 	};
 
 	long status;
@@ -547,10 +547,9 @@ enumerateUsbPcapRootHubs(sl::List<UsbPcapHub>* hubList) {
 		return -1;
 	}
 
+	sl::String_w hubSymlink;
 	sl::Array<char> dirBuffer;
-	sl::Array<char> hubBuffer;
 	dirBuffer.setCount(DirBufferSize);
-	hubBuffer.setCount(HubBufferSize);
 
 	BOOLEAN isFirstQuery = TRUE;
 	ULONG queryContext = 0;
@@ -589,40 +588,18 @@ enumerateUsbPcapRootHubs(sl::List<UsbPcapHub>* hubList) {
 				continue;
 
 			sl::String_w pcapDeviceName = symlinkPrefix + name;
-			io::win::File pcapDevice;
+			UsbPcap pcap;
 
 			bool result =
-				pcapDevice.create(
-					pcapDeviceName,
-					GENERIC_READ,
-					FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-					NULL,
-					OPEN_EXISTING
-				) &&
-				pcapDevice.ioctl(
-					IOCTL_USBPCAP_GET_HUB_SYMLINK,
-					NULL,
-					0,
-					hubBuffer,
-					HubBufferSize,
-					(dword_t*)&actualSize
-				);
+				pcap.open(pcapDeviceName, io::FileFlag_ReadOnly) &&
+				pcap.getHubSymlink(&hubSymlink);
 
 			if (!result)
 				return -1;
 
-			if (!actualSize) {
-				err::setError("missing hub symlink information");
-				return -1;
-			}
-
-			sl::StringRef_w hubName((wchar_t*)hubBuffer.cp(), actualSize / sizeof(wchar_t) - 1);
-			sl::StringRef_w hubDeviceName;
-			normalizeDeviceName(&hubDeviceName, hubName);
-
 			UsbPcapHub* hub = AXL_MEM_NEW(UsbPcapHub);
 			hub->m_pcapDeviceName = pcapDeviceName;
-			hub->m_hubDeviceName = hubDeviceName;
+			normalizeDeviceName(&hub->m_hubDeviceName, hubSymlink);
 			hubList->insertTail(hub);
 		}
 
