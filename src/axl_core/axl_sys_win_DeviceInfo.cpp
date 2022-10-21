@@ -11,12 +11,44 @@
 
 #include "pch.h"
 #include "axl_sys_win_DeviceInfo.h"
+#include "axl_sys_win_Registry.h"
 
 namespace axl {
 namespace sys {
 namespace win {
 
 //..............................................................................
+
+bool
+DeviceInfo::getDeviceInstanceId(sl::String_w* string) {
+	dword_t length = 0;
+	getDeviceInstanceId(NULL, 0, &length);
+
+	wchar_t* p = string->createBuffer(length);
+	bool result = getDeviceInstanceId(p, length, NULL);
+	if (!result)
+		return false;
+
+	ASSERT(length && (*string)[length - 1] == 0);
+	string->overrideLength(length - 1);
+	return true;
+}
+
+bool
+DeviceInfo::getDeviceDriverPath(sl::String_w* string) {
+	sl::String_w serviceName;
+	bool result = getDeviceRegistryProperty(SPDRP_SERVICE, &serviceName);
+	if (!result)
+		return false;
+
+	sl::String_w regPath = L"System\\CurrentControlSet\\Services\\";
+	regPath += serviceName;
+
+	sys::win::RegKey regKey;
+	return
+		regKey.open(HKEY_LOCAL_MACHINE, regPath, KEY_QUERY_VALUE) &&
+		regKey.queryValue(string, L"ImagePath");
+}
 
 bool
 DeviceInfo::getDeviceRegistryProperty(
@@ -28,15 +60,6 @@ DeviceInfo::getDeviceRegistryProperty(
 
 	buffer->setCount(requiredSize);
 	return getDeviceRegistryProperty(propId, buffer->p(), requiredSize, NULL);
-}
-
-HKEY
-DeviceInfo::openDeviceRegistryKey(REGSAM keyAccess) {
-	HKEY key = ::SetupDiOpenDevRegKey(m_devInfoSet, &m_devInfoData, DICS_FLAG_GLOBAL, 0, DIREG_DEV, keyAccess);
-	if (key == INVALID_HANDLE_VALUE)
-		err::setLastSystemError();
-
-	return key;
 }
 
 bool
@@ -86,63 +109,6 @@ DeviceInfo::restartDevice(bool* isRebootRequired) {
 		*isRebootRequired = (devInstallParams.Flags & DI_NEEDREBOOT) != 0;
 
 	return true;
-}
-
-//..............................................................................
-
-bool
-DeviceInfoSet::create(uint_t flags) {
-	close();
-
-	m_h = ::SetupDiGetClassDevsW(NULL, NULL, NULL, flags | DIGCF_ALLCLASSES);
-	return err::complete(m_h != INVALID_HANDLE_VALUE);
-}
-
-bool
-DeviceInfoSet::create(
-	const GUID& classGuid,
-	uint_t flags
-) {
-	close();
-
-	m_h = ::SetupDiGetClassDevsW(&classGuid, NULL, NULL, flags);
-	return err::complete(m_h != INVALID_HANDLE_VALUE);
-}
-
-bool
-DeviceInfoSet::create(
-	const sl::StringRef_w& enumerator,
-	uint_t flags
-) {
-	close();
-
-	m_h = ::SetupDiGetClassDevsW(NULL, enumerator.szn(), NULL, flags);
-	return err::complete(m_h != INVALID_HANDLE_VALUE);
-}
-
-bool
-DeviceInfoSet::getDeviceInfo(
-	size_t i,
-	DeviceInfo* deviceInfo
-) {
-	bool_t result = ::SetupDiEnumDeviceInfo(m_h, (DWORD)i, &deviceInfo->m_devInfoData);
-	if (!result)
-		return err::failWithLastSystemError();
-
-	deviceInfo->m_devInfoSet = m_h;
-	return true;
-}
-
-bool
-DeviceInfoSet::getDeviceClassGuids(
-	const sl::StringRef_w& name,
-	sl::Array<GUID>* buffer
-) {
-	dword_t requiredCount = 0;
-	getDeviceClassGuids(name, NULL, 0, &requiredCount);
-
-	buffer->setCount(requiredCount);
-	return getDeviceClassGuids(name, buffer->p(), requiredCount, &requiredCount);
 }
 
 //..............................................................................

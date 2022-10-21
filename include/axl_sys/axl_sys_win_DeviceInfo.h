@@ -13,10 +13,7 @@
 
 #define _AXL_SYS_WIN_DEVICEINFO_H
 
-#include "axl_sl_Handle.h"
-#include "axl_sl_Array.h"
-#include "axl_sl_String.h"
-#include "axl_sl_BoxList.h"
+#include "axl_sys_win_Registry.h"
 #include "axl_err_Error.h"
 
 namespace axl {
@@ -63,6 +60,36 @@ public:
 	}
 
 	bool
+	getDeviceInstanceId(
+		wchar_t* buffer,
+		size_t length,
+		dword_t* requiredLength
+	) {
+		bool_t result = ::SetupDiGetDeviceInstanceId(m_devInfoSet, &m_devInfoData, buffer, (dword_t)length, requiredLength);
+		return err::complete(result != 0);
+	}
+
+	bool
+	getDeviceInstanceId(sl::String_w* string);
+
+	template <typename T>
+	bool
+	getDeviceInstanceId(sl::StringBase<T>* string);
+
+	sl::String_w
+	getDeviceInstanceId();
+
+	bool
+	getDeviceDriverPath(sl::String_w* string);
+
+	template <typename T>
+	bool
+	getDeviceDriverPath(sl::StringBase<T>* string);
+
+	sl::String_w
+	getDeviceDriverPath();
+
+	bool
 	getDeviceRegistryProperty(
 		uint_t propId,
 		void* buffer,
@@ -86,6 +113,9 @@ public:
 		sl::StringBase<T>* string
 	);
 
+	sl::String_w
+	getDeviceRegistryProperty(uint_t propId);
+
 	bool
 	setDeviceRegistryProperty(
 		uint_t propId,
@@ -96,8 +126,14 @@ public:
 		return err::complete(result != 0);
 	}
 
+	bool
+	openDeviceRegistryKey(
+		RegKey* regKey,
+		REGSAM keyAccess = KEY_ALL_ACCESS
+	);
+
 	HKEY
-	openDeviceRegistryKey(REGSAM keyAccess); // KEY_ALL_ACCESS, KEY_QUERY_VALUE, KEY_SET_VALUE etc
+	openDeviceRegistryKey(REGSAM keyAccess = KEY_ALL_ACCESS);
 
 	bool
 	getDeviceInstallParams(SP_DEVINSTALL_PARAMS_W* params) {
@@ -147,6 +183,40 @@ public:
 
 template <typename T>
 bool
+DeviceInfo::getDeviceInstanceId(sl::StringBase<T>* string) {
+	sl::String_w instanceId;
+	getDeviceInstanceId(&instanceId);
+	*string = instanceId;
+	return true;
+}
+
+inline
+sl::String_w
+DeviceInfo::getDeviceInstanceId() {
+	sl::String_w string;
+	getDeviceInstanceId(&string);
+	return string;
+}
+
+template <typename T>
+bool
+DeviceInfo::getDeviceDriverPath(sl::StringBase<T>* string) {
+	sl::String_w driverPath;
+	getDeviceDriverPath(&driverPath);
+	*string = driverPath;
+	return true;
+}
+
+inline
+sl::String_w
+DeviceInfo::getDeviceDriverPath() {
+	sl::String_w string;
+	getDeviceDriverPath(&string);
+	return string;
+}
+
+template <typename T>
+bool
 DeviceInfo::getDeviceRegistryProperty(
 	uint_t propId,
 	sl::StringBase<T>* string
@@ -163,6 +233,35 @@ DeviceInfo::getDeviceRegistryProperty(
 		string->copy((const wchar_t*)buffer.cp(),  size / sizeof(wchar_t) - 1);
 
 	return true;
+}
+
+inline
+sl::String_w
+DeviceInfo::getDeviceRegistryProperty(uint_t propId) {
+	sl::String_w string;
+	getDeviceRegistryProperty(propId, &string);
+	return string;
+}
+
+inline
+HKEY
+DeviceInfo::openDeviceRegistryKey(REGSAM keyAccess) {
+	HKEY h = ::SetupDiOpenDevRegKey(m_devInfoSet, &m_devInfoData, DICS_FLAG_GLOBAL, 0, DIREG_DEV, keyAccess);
+	if (h == INVALID_HANDLE_VALUE)
+		err::setLastSystemError();
+
+	return h;
+}
+
+inline
+bool
+DeviceInfo::openDeviceRegistryKey(
+	RegKey* regKey,
+	REGSAM keyAccess
+) {
+	HKEY h = openDeviceRegistryKey(keyAccess);
+	regKey->attach(h);
+	return regKey->isOpen();
 }
 
 //..............................................................................
@@ -219,6 +318,68 @@ public:
 		sl::Array<GUID>* buffer
 	);
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+bool
+DeviceInfoSet::create(uint_t flags) {
+	close();
+
+	m_h = ::SetupDiGetClassDevsW(NULL, NULL, NULL, flags | DIGCF_ALLCLASSES);
+	return err::complete(m_h != INVALID_HANDLE_VALUE);
+}
+
+inline
+bool
+DeviceInfoSet::create(
+	const GUID& classGuid,
+	uint_t flags
+) {
+	close();
+
+	m_h = ::SetupDiGetClassDevsW(&classGuid, NULL, NULL, flags);
+	return err::complete(m_h != INVALID_HANDLE_VALUE);
+}
+
+inline
+bool
+DeviceInfoSet::create(
+	const sl::StringRef_w& enumerator,
+	uint_t flags
+) {
+	close();
+
+	m_h = ::SetupDiGetClassDevsW(NULL, enumerator.szn(), NULL, flags);
+	return err::complete(m_h != INVALID_HANDLE_VALUE);
+}
+
+inline
+bool
+DeviceInfoSet::getDeviceInfo(
+	size_t i,
+	DeviceInfo* deviceInfo
+) {
+	bool_t result = ::SetupDiEnumDeviceInfo(m_h, (DWORD)i, &deviceInfo->m_devInfoData);
+	if (!result)
+		return err::failWithLastSystemError();
+
+	deviceInfo->m_devInfoSet = m_h;
+	return true;
+}
+
+inline
+bool
+DeviceInfoSet::getDeviceClassGuids(
+	const sl::StringRef_w& name,
+	sl::Array<GUID>* buffer
+) {
+	dword_t requiredCount = 0;
+	getDeviceClassGuids(name, NULL, 0, &requiredCount);
+
+	buffer->setCount(requiredCount);
+	return getDeviceClassGuids(name, buffer->p(), requiredCount, &requiredCount);
+}
 
 //..............................................................................
 
