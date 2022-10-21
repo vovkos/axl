@@ -67,6 +67,11 @@
 #	include "axl_io_UsbTransfer.h"
 #endif
 
+#ifdef _AXL_IO_WIN_USBPCAP
+#	include "axl_io_win_UsbPcap.h"
+#	include "axl_io_win_UsbPcapEnumerator.h"
+#endif
+
 #ifdef _AXL_IO_PCAP
 #	include "axl_io_PcapPch.h"
 #	include "axl_io_Pcap.h"

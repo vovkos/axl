@@ -61,6 +61,11 @@ if(BUILD_AXL_IO_USB)
 	list(APPEND OPT_LIB_LIST axl_io_usb ${LIBUSB_LIB_NAME})
 endif()
 
+if(BUILD_AXL_IO_WIN_USBPCAP)
+	add_definitions(-D_AXL_IO_WIN_USBPCAP=1)
+	list(APPEND OPT_LIB_LIST axl_io_win_usbpcap)
+endif()
+
 if(BUILD_AXL_IO_PCAP)
 	include_directories(${PCAP_INC_DIR})
 	link_directories(${PCAP_LIB_DIR})

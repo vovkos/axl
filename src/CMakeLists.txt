@@ -147,6 +147,22 @@ endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+if(WIN32)
+	option(
+		BUILD_AXL_IO_WIN_USBPCAP
+		"Build axl_io_win_usbpcap library (USBPcap wrappers)"
+		ON
+	)
+else()
+	unset(BUILD_AXL_IO_WIN_USBPCAP CACHE)
+endif()
+
+if(BUILD_AXL_IO_WIN_USBPCAP)
+	add_subdirectory(axl_io_win_usbpcap)
+endif()
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 if(OPENSSL_FOUND)
 	option(
 		BUILD_AXL_IO_SSL

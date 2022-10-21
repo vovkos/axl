@@ -1295,9 +1295,6 @@ testNamedPipes() {
 
 	NTSTATUS status;
 
-	HMODULE ntdll = ::GetModuleHandleW(L"ntdll.dll");
-	ASSERT(ntdll);
-
 	io::win::File pipeDir;
 	bool result = pipeDir.create(
 		L"\\\\.\\pipe\\",
@@ -6766,6 +6763,50 @@ testUtf8Encode() {
 
 //..............................................................................
 
+int testUsbPcap() {
+	sl::List<io::win::UsbPcapHub> hubList;
+	size_t count = io::win::enumerateUsbPcapRootHubs(&hubList);
+	if (count == -1)
+		printf("error enumerating root hubs: %s\n", err::getLastErrorDescription().sz());
+
+	sl::ConstIterator<io::win::UsbPcapHub> it = hubList.getHead();
+	for (; it; it++) {
+		printf("\n");
+		printf("pcap: %S\n", it->m_pcapDeviceName.sz());
+		printf("hub:  %S\n", it->m_hubDeviceName.sz());
+
+		sl::List<io::win::UsbPcapDevice_w> deviceList;
+		size_t count = io::win::enumerateUsbPcapDevices(&deviceList, **it, -1);
+
+		sl::ConstIterator<io::win::UsbPcapDevice_w> it2 = deviceList.getHead();
+		for (; it2; it2++) {
+			printf("\n");
+			printf("  port:           %d\n", it2->m_hubPort);
+			printf("  address:        %d\n", it2->m_deviceAddress);
+			printf("  description:    %S\n", it2->m_description.sz());
+			printf("  manufacturer:   %S\n", it2->m_manufacturer.sz());
+			printf("  manufacturer*:  %S\n", it2->m_descriptorTable[io::win::UsbPcapDescriptor_Manufacturer].sz());
+			printf("  product*:       %S\n", it2->m_descriptorTable[io::win::UsbPcapDescriptor_Product].sz());
+			printf("  serial number*: %S\n", it2->m_descriptorTable[io::win::UsbPcapDescriptor_SerialNumber].sz());
+			printf("  driver key:     %S\n", it2->m_driverKeyName.sz());
+			printf("  driver path:    %S\n", it2->m_driverPath.sz());
+			printf("  hardware id:    %S\n", it2->m_hardwareId.sz());
+			printf("  instance id:    %S\n", it2->m_instanceId.sz());
+			printf("  location:       %S\n", it2->m_location.sz());
+			printf("  VID:            %04x\n", it2->m_vendorId);
+			printf("  PID:            %04x\n", it2->m_productId);
+			printf("  class:          %d\n", it2->m_deviceClass);
+			printf("  subclass:       %d\n", it2->m_deviceSubClass);
+			printf("  is hub:         %s\n", (it2->m_flags & io::win::UsbPcapDeviceFlag_Hub) ? "true" : "false");
+			printf("  is low-speed:   %s\n", (it2->m_flags & io::win::UsbPcapDeviceFlag_LowSpeed) ? "true" : "false");
+		}
+	}
+
+	return 0;
+}
+
+//..............................................................................
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -6794,7 +6835,7 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	testEnumSerial();
+	testUsbPcap();
 	return 0;
 }
 
