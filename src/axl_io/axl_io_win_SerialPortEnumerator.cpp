@@ -77,47 +77,18 @@ SerialPortEnumerator::createPortList(
 	return portList->getCount();
 }
 
-sl::String
-readRegistryStringValue(
-	HKEY hKey,
-	const wchar_t* valueName
-) {
-	dword_t type = 0;
-	dword_t size = 0;
-
-	long result = ::RegQueryValueExW(hKey, valueName, NULL, &type, NULL, &size);
-	if (result != ERROR_SUCCESS)
-		return sl::String();
-
-	wchar_t buffer[256];
-	sl::Array<byte_t> valueBuffer(rc::BufKind_Stack, buffer, sizeof(buffer));
-	valueBuffer.setCount(size);
-
-	result = ::RegQueryValueExW(
-		hKey,
-		valueName,
-		NULL,
-		&type,
-		valueBuffer,
-		&size
-	);
-
-	return result == ERROR_SUCCESS && size > sizeof(wchar_t) ?
-		sl::String((wchar_t*)valueBuffer.cp(), size / sizeof(wchar_t) - 1) :
-		sl::String();
-}
-
 SerialPortDesc*
 SerialPortEnumerator::createPortDesc(
 	sys::win::DeviceInfo* deviceInfo,
 	uint_t mask
 ) {
-	sys::win::RegKeyHandle devRegKey = deviceInfo->openDeviceRegistryKey(KEY_QUERY_VALUE);
-	if (devRegKey == INVALID_HANDLE_VALUE)
+	sys::win::RegKey devRegKey;
+	bool result = deviceInfo->openDeviceRegistryKey(&devRegKey, KEY_QUERY_VALUE);
+	if (!result)
 		return NULL;
 
 	SerialPortDesc* portDesc = AXL_MEM_NEW(SerialPortDesc);
-	portDesc->m_deviceName = readRegistryStringValue(devRegKey, L"PortName");
+	portDesc->m_deviceName = devRegKey.queryStringValue(L"PortName");
 
 	if (mask & SerialPortDescMask_Description) {
 		deviceInfo->getDeviceRegistryProperty(SPDRP_FRIENDLYNAME, &portDesc->m_description);
@@ -132,22 +103,8 @@ SerialPortEnumerator::createPortDesc(
 	if (mask & SerialPortDescMask_HardwareIds)
 		deviceInfo->getDeviceRegistryProperty(SPDRP_HARDWAREID, &portDesc->m_hardwareIds);
 
-	if (mask & SerialPortDescMask_Driver) {
-		deviceInfo->getDeviceRegistryProperty(SPDRP_SERVICE, &portDesc->m_driver);
-
-		if (!portDesc->m_driver.isEmpty()) {
-			sl::String_w regPath = L"System\\CurrentControlSet\\Services\\";
-			regPath += portDesc->m_driver;
-
-			sys::win::RegKeyHandle serviceRegKey;
-			long result = ::RegOpenKeyExW(HKEY_LOCAL_MACHINE, regPath, 0, KEY_QUERY_VALUE, serviceRegKey.p());
-			if (result == ERROR_SUCCESS) {
-				sl::String driverPath = readRegistryStringValue(serviceRegKey, L"ImagePath");
-				if (!driverPath.isEmpty())
-					portDesc->m_driver = driverPath;
-			}
-		}
-	}
+	if (mask & SerialPortDescMask_Driver)
+		deviceInfo->getDeviceDriverPath(&portDesc->m_driver);
 
 	if (mask & SerialPortDescMask_Location)
 		deviceInfo->getDeviceRegistryProperty(SPDRP_LOCATION_PATHS, &portDesc->m_location);
