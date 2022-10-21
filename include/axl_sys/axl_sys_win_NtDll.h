@@ -13,7 +13,7 @@
 
 #define _AXL_SYS_WIN_NTDLL_H
 
-#include "axl_g_Pch.h"
+#include "axl_sl_Handle.h"
 #include <winternl.h>
 
 // we'll add native NT funcs/structs here as needed
@@ -196,6 +196,11 @@ struct OBJECT_DIRECTORY_INFORMATION {
 typedef
 NTSTATUS
 NTAPI
+NtCloseFunc(IN HANDLE FileHandle);
+
+typedef
+NTSTATUS
+NTAPI
 NtQueryDirectoryFileFunc(
 	IN HANDLE FileHandle,
 	IN HANDLE Event,
@@ -285,6 +290,7 @@ NtQueryObjectFunc(
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+extern AXL_SELECT_ANY NtCloseFunc* ntClose = NULL;
 extern AXL_SELECT_ANY NtQueryDirectoryFileFunc* ntQueryDirectoryFile = NULL;
 extern AXL_SELECT_ANY NtOpenDirectoryObjectFunc* ntOpenDirectoryObject = NULL;
 extern AXL_SELECT_ANY NtQueryDirectoryObjectFunc* ntQueryDirectoryObject = NULL;
@@ -298,6 +304,21 @@ extern AXL_SELECT_ANY NtQueryObjectFunc* ntQueryObject = NULL;
 
 void
 initNtDllFunctions();
+
+//..............................................................................
+
+class CloseNtHandle {
+public:
+	void
+	operator () (HANDLE h) {
+		NTSTATUS status = ntClose(h);
+		ASSERT(status == 0);
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+typedef sl::Handle<HANDLE, CloseNtHandle> NtHandle;
 
 //..............................................................................
 

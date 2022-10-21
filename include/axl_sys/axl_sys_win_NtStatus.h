@@ -11,7 +11,7 @@
 
 #pragma once
 
-#define _AXL_ERR_NTSTATUS_H
+#define _AXL_SYS_WIN_NTSTATUS_H
 
 #include "axl_err_Error.h"
 

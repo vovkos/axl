@@ -23,6 +23,7 @@ initNtDllFunctions() {
 	HMODULE hNtDll = ::GetModuleHandleW(L"ntdll.dll");
 	ASSERT(hNtDll);
 
+	ntClose = (NtCloseFunc*)::GetProcAddress(hNtDll, "NtClose");
 	ntQueryDirectoryFile = (NtQueryDirectoryFileFunc*)::GetProcAddress(hNtDll, "NtQueryDirectoryFile");
 	ntOpenDirectoryObject = (NtOpenDirectoryObjectFunc*)::GetProcAddress(hNtDll, "NtOpenDirectoryObject");
 	ntQueryDirectoryObject = (NtQueryDirectoryObjectFunc*)::GetProcAddress(hNtDll, "NtQueryDirectoryObject");
@@ -32,6 +33,7 @@ initNtDllFunctions() {
 	ntQueryInformationProcess = (NtQueryInformationProcessFunc*)::GetProcAddress(hNtDll, "NtQueryInformationProcess");
 	ntQueryObject = (NtQueryObjectFunc*)::GetProcAddress(hNtDll, "NtQueryObject");
 
+	ASSERT(ntClose);
 	ASSERT(ntQueryDirectoryFile);
 	ASSERT(ntOpenDirectoryObject);
 	ASSERT(ntQueryDirectoryObject);

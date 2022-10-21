@@ -37,21 +37,6 @@ typedef sl::Handle<HANDLE, CloseHandle> Handle;
 
 //..............................................................................
 
-class CloseRegKey {
-public:
-	void
-	operator () (HKEY h) {
-		long result = ::RegCloseKey(h);
-		ASSERT(result == ERROR_SUCCESS);
-	}
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-typedef sl::Handle<HKEY, CloseRegKey, sl::MinusOne<HKEY> > RegKeyHandle;
-
-//..............................................................................
-
 } // namespace win
 } // namespace sys
 } // namespace axl
