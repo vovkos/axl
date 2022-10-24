@@ -17,6 +17,11 @@
 #include "axl_sys_Event.h"
 #include "axl_io_Mapping.h"
 
+#ifdef _DEBUG
+#	define _AXL_SYS_READWRITELOCK_DEBUG_THREADS       0 // on/off
+#	define _AXL_SYS_READWRITELOCK_DEBUG_THREAD_COUNT  4 // adjust if not enough
+#endif
+
 namespace axl {
 namespace sys {
 
@@ -37,6 +42,9 @@ protected:
 		uint32_t m_queuedReadCount;
 		uint32_t m_activeWriteCount; // one or zero
 		uint32_t m_queuedWriteCount;
+#if (_AXL_SYS_READWRITELOCK_DEBUG_THREADS)
+		uint64_t m_threadIdTable[_AXL_SYS_READWRITELOCK_DEBUG_THREAD_COUNT];
+#endif
 	};
 
 protected:
@@ -91,6 +99,21 @@ public:
 
 	void
 	downgradeWriteLockToReadLock();
+
+protected:
+#if (_AXL_SYS_READWRITELOCK_DEBUG_THREADS)
+	void
+	onAddReadThread();
+
+	void
+	onRemoveReadThread();
+
+	void
+	onAddWriteThread();
+
+	void
+	onRemoveWriteThread();
+#endif
 };
 
 //..............................................................................

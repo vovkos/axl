@@ -11,6 +11,7 @@
 
 #include "pch.h"
 #include "axl_sys_ReadWriteLock.h"
+#include "axl_sys_Thread.h"
 
 namespace axl {
 namespace sys {
@@ -97,6 +98,10 @@ ReadWriteLock::readLock() {
 	sys::atomicLock(&m_data->m_lock);
 	if (!m_data->m_activeWriteCount && !m_data->m_queuedWriteCount) {
 		m_data->m_activeReadCount++;
+
+#if (_AXL_SYS_READWRITELOCK_DEBUG_THREADS)
+		onAddReadThread();
+#endif
 		sys::atomicUnlock(&m_data->m_lock);
 		return;
 	}
@@ -122,6 +127,10 @@ ReadWriteLock::readLock() {
 
 	m_data->m_queuedReadCount--;
 	m_data->m_activeReadCount++;
+
+#if (_AXL_SYS_READWRITELOCK_DEBUG_THREADS)
+	onAddReadThread();
+#endif
 	sys::atomicUnlock(&m_data->m_lock);
 }
 
@@ -143,6 +152,9 @@ ReadWriteLock::readUnlock() {
 		}
 	}
 
+#if (_AXL_SYS_READWRITELOCK_DEBUG_THREADS)
+	onRemoveReadThread();
+#endif
 	sys::atomicUnlock(&m_data->m_lock);
 }
 
@@ -152,6 +164,9 @@ ReadWriteLock::writeLock() {
 	if (!m_data->m_activeReadCount && !m_data->m_activeWriteCount && !m_data->m_queuedReadCount) {
 		m_readEvent.reset();
 		m_data->m_activeWriteCount = 1;
+#if (_AXL_SYS_READWRITELOCK_DEBUG_THREADS)
+		onAddWriteThread();
+#endif
 		sys::atomicUnlock(&m_data->m_lock);
 		return;
 	}
@@ -178,6 +193,10 @@ ReadWriteLock::writeLock() {
 	m_readEvent.reset();
 	m_data->m_queuedWriteCount--;
 	m_data->m_activeWriteCount = 1;
+
+#if (_AXL_SYS_READWRITELOCK_DEBUG_THREADS)
+	onAddWriteThread();
+#endif
 	sys::atomicUnlock(&m_data->m_lock);
 }
 
@@ -195,6 +214,9 @@ ReadWriteLock::writeUnlock() {
 		ASSERT(result);
 	}
 
+#if (_AXL_SYS_READWRITELOCK_DEBUG_THREADS)
+	onRemoveWriteThread();
+#endif
 	sys::atomicUnlock(&m_data->m_lock);
 }
 
@@ -209,6 +231,11 @@ ReadWriteLock::upgradeReadLockToWriteLock() {
 		m_readEvent.reset();
 		m_data->m_activeWriteCount = 1;
 		m_data->m_activeReadCount = 0;
+
+#if (_AXL_SYS_READWRITELOCK_DEBUG_THREADS)
+		onRemoveReadThread();
+		onAddWriteThread();
+#endif
 		sys::atomicUnlock(&m_data->m_lock);
 		return;
 	}
@@ -236,6 +263,11 @@ ReadWriteLock::upgradeReadLockToWriteLock() {
 	m_data->m_queuedWriteCount--;
 	m_data->m_activeWriteCount = 1;
 	m_data->m_activeReadCount = 0;
+
+#if (_AXL_SYS_READWRITELOCK_DEBUG_THREADS)
+	onRemoveReadThread();
+	onAddWriteThread();
+#endif
 	sys::atomicUnlock(&m_data->m_lock);
 }
 
@@ -251,8 +283,59 @@ ReadWriteLock::downgradeWriteLockToReadLock() {
 		ASSERT(result);
 	}
 
+#if (_AXL_SYS_READWRITELOCK_DEBUG_THREADS)
+	onRemoveWriteThread();
+	onAddReadThread();
+#endif
 	sys::atomicUnlock(&m_data->m_lock);
 }
+
+#if (_AXL_SYS_READWRITELOCK_DEBUG_THREADS)
+
+void
+ReadWriteLock::onAddReadThread() {
+	ASSERT(m_data->m_activeReadCount && m_data->m_activeWriteCount == 0);
+	size_t i = m_data->m_activeReadCount - 1;
+	if (i < countof(m_data->m_threadIdTable))
+		m_data->m_threadIdTable[i] = sys::getCurrentThreadId();
+}
+
+void
+ReadWriteLock::onRemoveReadThread() {
+	if (!m_data->m_activeReadCount)
+		return;
+
+	size_t count = m_data->m_activeReadCount + 1;
+	if (count > countof(m_data->m_threadIdTable))
+		count = countof(m_data->m_threadIdTable);
+
+	uint64_t threadId = sys::getCurrentThreadId();
+	uint64_t* p = (uint64_t*)m_data->m_threadIdTable;
+	uint64_t* end = p + count;
+	for (; p < end; p++)
+		if (*p == threadId) {
+			memmove(p, p + 1, (end - p - 1) * sizeof(uint64_t));
+			m_data->m_threadIdTable[count - 1] = 0;
+			return;
+		}
+
+	ASSERT(false); // read thread not found
+}
+
+void
+ReadWriteLock::onAddWriteThread() {
+	ASSERT(m_data->m_activeReadCount == 0 && m_data->m_activeWriteCount == 1);
+	m_data->m_threadIdTable[0] = sys::getCurrentThreadId();
+}
+
+void
+ReadWriteLock::onRemoveWriteThread() {
+	ASSERT(m_data->m_activeWriteCount == 0);
+	ASSERT(m_data->m_threadIdTable[0] == sys::getCurrentThreadId());
+	m_data->m_threadIdTable[0] = 0;
+}
+
+#endif
 
 //..............................................................................
 
