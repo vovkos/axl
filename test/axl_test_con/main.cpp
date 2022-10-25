@@ -6763,6 +6763,8 @@ testUtf8Encode() {
 
 //..............................................................................
 
+#if (_AXL_IO_WIN_USBPCAP)
+
 int testUsbPcap() {
 	sl::List<io::win::UsbPcapHub> hubList;
 	size_t count = io::win::enumerateUsbPcapRootHubs(&hubList);
@@ -6805,6 +6807,8 @@ int testUsbPcap() {
 	return 0;
 }
 
+#endif
+
 //..............................................................................
 
 #if (_AXL_OS_WIN)
@@ -6835,7 +6839,9 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
+#if (_AXL_IO_WIN_USBPCAP)
 	testUsbPcap();
+#endif
 	return 0;
 }
 
