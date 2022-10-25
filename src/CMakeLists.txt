@@ -151,7 +151,7 @@ if(WIN32)
 	option(
 		BUILD_AXL_IO_WIN_USBPCAP
 		"Build axl_io_win_usbpcap library (USBPcap wrappers)"
-		OFF
+		ON
 	)
 else()
 	unset(BUILD_AXL_IO_WIN_USBPCAP CACHE)

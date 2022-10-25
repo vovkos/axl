@@ -55,11 +55,11 @@ source_group(
 
 #...............................................................................
 #
-# axl_io library
+# axl_io_win_usbpcap library
 #
 
 include_directories(
-	${LIBUSB_INC_DIR}
+	${USBSDK_INC_PATH}
 	${AXL_INC_DIR}
 )
 
