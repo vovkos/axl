@@ -63,6 +63,7 @@ endif()
 
 if(BUILD_AXL_IO_WIN_USBPCAP)
 	add_definitions(-D_AXL_IO_WIN_USBPCAP=1)
+	include_directories(${AXL_ROOT_DIR}/src/axl_io_win_usbpcap/include)
 	list(APPEND OPT_LIB_LIST axl_io_win_usbpcap)
 endif()
 

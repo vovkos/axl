@@ -61,6 +61,7 @@ source_group(
 include_directories(
 	${USBSDK_INC_PATH}
 	${AXL_INC_DIR}
+	${CMAKE_CURRENT_LIST_DIR}/include
 )
 
 add_library(

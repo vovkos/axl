@@ -22,9 +22,18 @@ namespace win {
 //..............................................................................
 
 class UsbPcap {
-protected:
+public:
 	enum {
-		IoctlOutpurBufferSize = 1024, // as suggested by USBPcapCMD
+		// as suggested by USBPcapCMD
+
+		IoctlOutputBufferSize   = 1024,             // 1K
+		DefaultKernelBufferSize = 1 * 1024 * 1024,  // 1M
+		DefaultSnapshotLength   = 65535,            // 64K - 1
+	};
+
+	enum Mode {
+		Mode_Capture,
+		Mode_Enumerate,
 	};
 
 protected:
@@ -39,7 +48,7 @@ public:
 	bool
 	open(
 		const sl::String_w& name,
-		uint_t flags = 0
+		Mode mode = Mode_Capture
 	);
 
 	void
@@ -52,6 +61,54 @@ public:
 
 	bool
 	getHubSymlink(sl::String_w* symlink);
+
+	bool
+	setSnapshotLength(size_t size);
+
+	bool
+	setKernelBufferSize(size_t size);
+
+	bool
+	setFilter(uint_t deviceAddress);
+
+	bool
+	setFilter(
+		const uint_t* deviceAddressTable,
+		size_t deviceCount
+	);
+
+	bool
+	clearFilter();
+
+	size_t
+	read(
+		void* p,
+		size_t size
+	) {
+		return m_device.overlappedRead(p, size);
+	}
+
+	bool
+	overlappedRead(
+		void* p,
+		dword_t size,
+		OVERLAPPED* overlapped
+	) {
+		return m_device.overlappedRead(p, size, overlapped);
+	}
+
+	bool
+	getOverlappedResult(
+		OVERLAPPED* overlapped,
+		dword_t* actualSize
+	) {
+		return m_device.getOverlappedResult(overlapped, actualSize);
+	}
+
+	size_t
+	getOverlappedResult(OVERLAPPED* overlapped) {
+		return m_device.getOverlappedResult(overlapped);
+	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

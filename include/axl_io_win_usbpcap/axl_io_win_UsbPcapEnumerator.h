@@ -77,6 +77,10 @@ struct UsbPcapDeviceBase: UsbPcapListEntry {
 	uint_t m_vendorId;
 	uint_t m_productId;
 	uint_t m_flags;
+
+	UsbPcapDeviceBase() {
+		memset(this, 0, sizeof(UsbPcapDeviceBase));
+	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

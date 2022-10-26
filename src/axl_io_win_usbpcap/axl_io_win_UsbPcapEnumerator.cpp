@@ -591,11 +591,11 @@ enumerateUsbPcapRootHubs(sl::List<UsbPcapHub>* hubList) {
 			UsbPcap pcap;
 
 			bool result =
-				pcap.open(pcapDeviceName, io::FileFlag_ReadOnly) &&
+				pcap.open(pcapDeviceName, UsbPcap::Mode_Enumerate) &&
 				pcap.getHubSymlink(&hubSymlink);
 
 			if (!result)
-				return -1;
+				continue; // ignore this hub
 
 			UsbPcapHub* hub = AXL_MEM_NEW(UsbPcapHub);
 			hub->m_pcapDeviceName = pcapDeviceName;

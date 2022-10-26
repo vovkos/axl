@@ -6765,11 +6765,60 @@ testUtf8Encode() {
 
 #if (_AXL_IO_WIN_USBPCAP)
 
-int testUsbPcap() {
+inline
+const char*
+getUsbPcapInfoString(uint_t info) {
+	return (info & USBPCAP_INFO_PDO_TO_FDO) ? "USBPCAP_INFO_PDO_TO_FDO" : "(none)";
+}
+
+inline
+const char*
+getUsbPcapTransferString(uint_t transfer) {
+	static const char* stringTable[] = {
+		"USBPCAP_TRANSFER_ISOCHRONOUS", // 0
+		"USBPCAP_TRANSFER_INTERRUPT",   // 1
+		"USBPCAP_TRANSFER_CONTROL",     // 2
+		"USBPCAP_TRANSFER_BULK",        // 3
+	};
+
+	if (transfer < countof(stringTable))
+		return stringTable[transfer];
+
+	switch (transfer) {
+	case USBPCAP_TRANSFER_IRP_INFO:
+		return "USBPCAP_TRANSFER_IRP_INFO";
+
+	case USBPCAP_TRANSFER_UNKNOWN:
+		return "USBPCAP_TRANSFER_UNKNOWN";
+
+	default:
+		return "?";
+	}
+}
+
+inline
+const char*
+getUsbPcapControlStageString(uint_t stage) {
+	static const char* stringTable[] = {
+		"USBPCAP_CONTROL_STAGE_SETUP",    // 0
+		"USBPCAP_CONTROL_STAGE_DATA",     // 1
+		"USBPCAP_CONTROL_STAGE_STATUS",   // 2
+		"USBPCAP_CONTROL_STAGE_COMPLETE", // 3
+	};
+
+	return stage < countof(stringTable) ? stringTable[stage] : "?";
+}
+
+bool
+testUsbPcap() {
 	sl::List<io::win::UsbPcapHub> hubList;
 	size_t count = io::win::enumerateUsbPcapRootHubs(&hubList);
-	if (count == -1)
+	if (count == -1) {
 		printf("error enumerating root hubs: %s\n", err::getLastErrorDescription().sz());
+		return false;
+	}
+
+	io::win::UsbPcapDevice_w serialTap;
 
 	sl::ConstIterator<io::win::UsbPcapHub> it = hubList.getHead();
 	for (; it; it++) {
@@ -6801,10 +6850,144 @@ int testUsbPcap() {
 			printf("  subclass:       %d\n", it2->m_deviceSubClass);
 			printf("  is hub:         %s\n", (it2->m_flags & io::win::UsbPcapDeviceFlag_Hub) ? "true" : "false");
 			printf("  is low-speed:   %s\n", (it2->m_flags & io::win::UsbPcapDeviceFlag_LowSpeed) ? "true" : "false");
+
+			if (it2->m_vendorId == 0x16d0 && it2->m_productId == 0x0e26)
+				serialTap = **it2;
 		}
 	}
 
-	return 0;
+	if (serialTap.m_pcapDeviceName.isEmpty()) {
+		printf("Serial Tap is not found\n");
+		return false;
+	}
+
+	printf("\nCapturing USB on the Serial Tap...\n\n");
+
+	enum {
+		SnapshotLength = io::win::UsbPcap::DefaultSnapshotLength,
+		BufferSize     = io::win::UsbPcap::DefaultKernelBufferSize,
+	};
+
+	io::win::UsbPcap pcap;
+	bool result =
+		pcap.open(serialTap.m_pcapDeviceName) &&
+		pcap.setSnapshotLength(SnapshotLength) &&
+		pcap.setKernelBufferSize(BufferSize) &&
+		pcap.setFilter(serialTap.m_deviceAddress);
+
+	if (!result) {
+		printf("error opening USB pcap: %s\n", err::getLastErrorDescription().sz());
+		return false;
+	}
+
+	sl::String string;
+	sl::Array<char> buffer;
+	buffer.setCount(BufferSize);
+
+	// read pcap header
+
+	size_t size = pcap.read(buffer, BufferSize);
+	if (size != sizeof(pcap_hdr_t)) {
+		printf("pcap_hdr_t is too small: %d bytes\n", size);
+		return false;
+	}
+
+	const pcap_hdr_t* pcapHdr = (pcap_hdr_t*)buffer.cp();
+	printf("pcap_hdr_t (%d bytes received)\n", size);
+    printf("  magic_number:  0x%08x\n", pcapHdr->magic_number);
+    printf("  version_major: %d\n", pcapHdr->version_major);
+    printf("  version_minor: %d\n", pcapHdr->version_minor);
+    printf("  thiszone:      %d\n", pcapHdr->thiszone);
+    printf("  sigfigs:       %d\n", pcapHdr->sigfigs);
+    printf("  snaplen:       %d\n", pcapHdr->snaplen);
+    printf("  network:       %d\n", pcapHdr->network);
+
+	if (pcapHdr->magic_number != 0xA1B2C3D4 || pcapHdr->network != DLT_USBPCAP) {
+		printf("invalid pcap_hdr_t\n");
+		return false;
+	}
+
+	for (;;) {
+		printf("\n");
+
+		size_t size = pcap.read(buffer, BufferSize);
+		if (size < sizeof(pcaprec_hdr_t)) {
+			printf("pcaprec_hdr_t is too small: %d bytes\n", size);
+			return false;
+		}
+
+		const pcaprec_hdr_t* recHdr = (pcaprec_hdr_t*)buffer.cp();
+		uint64_t timestamp = sys::getTimestampFromTimeval(recHdr->ts_sec, recHdr->ts_usec);
+		printf("%s (%d bytes)\n", sys::Time(timestamp).format().sz(), size);
+		printf("pcaprec_hdr_t\n");
+		printf("  ts_sec:      %d\n", recHdr->ts_sec);
+		printf("  ts_usec:     %d\n", recHdr->ts_usec);
+		printf("  incl_len:    %d\n", recHdr->incl_len);
+		printf("  orig_len:    %d\n", recHdr->orig_len);
+
+		if (recHdr->incl_len > size ||
+			recHdr->orig_len > size ||
+			recHdr->orig_len < sizeof(USBPCAP_BUFFER_PACKET_HEADER)
+		) {
+			printf("invalid pcaprec_hdr_t\n");
+			return false;
+		}
+
+		size = recHdr->orig_len;
+
+		USBPCAP_BUFFER_PACKET_HEADER* packetHdr = (USBPCAP_BUFFER_PACKET_HEADER*)(recHdr + 1);
+		printf("USBPCAP_BUFFER_PACKET_HEADER\n");
+		printf("  headerLen:  %d\n", packetHdr->headerLen);
+		printf("  irpId:      0x%016x\n", packetHdr->irpId);
+		printf("  status:     0x%08x\n", packetHdr->status);
+		printf("  function:   %d\n", packetHdr->function);
+		printf("  info:       0x%02x - %s\n", packetHdr->info, getUsbPcapInfoString(packetHdr->info));
+		printf("  bus:        %d\n", packetHdr->bus);
+		printf("  device:     %d\n", packetHdr->device);
+		printf("  endpoint:   0x%02x\n", packetHdr->endpoint);
+		printf("  transfer:   %d - %s\n", packetHdr->transfer, getUsbPcapTransferString(packetHdr->transfer));
+		printf("  dataLength: %d\n", packetHdr->dataLength);
+
+		if (size < packetHdr->headerLen || size < packetHdr->headerLen + packetHdr->dataLength) {
+			printf("invalid USBPCAP_BUFFER_PACKET_HEADER\n");
+			continue;
+		}
+
+		switch (packetHdr->transfer) {
+			const USBPCAP_BUFFER_CONTROL_HEADER* controlHdr;
+			const USBPCAP_BUFFER_ISOCH_HEADER* isochHdr;
+
+		case USBPCAP_TRANSFER_CONTROL:
+			controlHdr = (USBPCAP_BUFFER_CONTROL_HEADER*)packetHdr;
+			printf("USBPCAP_BUFFER_CONTROL_HEADER\n");
+			printf("  stage: %d - %s\n", controlHdr->stage, getUsbPcapControlStageString(controlHdr->stage));
+			break;
+
+		case USBPCAP_TRANSFER_BULK:
+		case USBPCAP_TRANSFER_INTERRUPT:
+			break;
+
+		case USBPCAP_TRANSFER_ISOCHRONOUS:
+			isochHdr = (USBPCAP_BUFFER_ISOCH_HEADER*)packetHdr;
+			printf("USBPCAP_BUFFER_ISOCH_HEADER\n");
+			printf("  startFrame: %d\n", isochHdr->startFrame);
+			printf("  numberOfPackets: %d\n", isochHdr->numberOfPackets);
+			printf("  errorCount:      %d\n", isochHdr->errorCount);
+			break;
+		}
+
+		if (packetHdr->dataLength) {
+			printf("PAYLOAD\n");
+			enc::HexEncoding::encode(
+				&string,
+				(char*)packetHdr + packetHdr->headerLen,
+				packetHdr->dataLength,
+				enc::HexEncodingFlag_Multiline
+			);
+
+			printf("%s\n", string.sz());
+		}
+	}
 }
 
 #endif
