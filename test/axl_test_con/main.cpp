@@ -6809,6 +6809,60 @@ getUsbPcapControlStageString(uint_t stage) {
 	return stage < countof(stringTable) ? stringTable[stage] : "?";
 }
 
+inline
+const char*
+getUsbDirectionString(uint_t endpoint) {
+	return (endpoint & 0x80) ? "IN" : "OUT";
+}
+
+inline
+const char*
+getUsbControlTypeString(uint_t type) {
+	static const char* stringTable[] = {
+		"Standard", // 0
+		"Class",    // 1
+		"Vendor",   // 2
+		"Reserved", // 3
+	};
+
+	return type < countof(stringTable) ? stringTable[type] : "?";
+}
+
+inline
+const char*
+getUsbControlRecipientString(uint_t recipient) {
+	static const char* stringTable[] = {
+		"Device",    // 0
+		"Interface", // 1
+		"Endpoint",  // 2
+		"Other",     // 3
+	};
+
+	return recipient < countof(stringTable) ? stringTable[recipient] : "?";
+}
+
+inline
+const char*
+getUsbControlRequestString(uint_t request) {
+	static const char* stringTable[] = {
+		"GET_STATUS",          // 0
+		"CLEAR_FEATURE",       // 1
+		"RESERVED",            // 2
+		"SET_FEATURE",         // 3
+		"RESERVED_2",          // 4
+		"SET_ADDRESS",         // 5
+		"GET_DESCRIPTOR",      // 6
+		"SET_DESCRIPTOR",      // 7
+		"GET_CONFIGURATION",   // 8
+		"SET_CONFIGURATION",   // 9
+		"GET_INTERFACE",       // 0
+		"SET_INTERFACE",       // 1
+		"SYNCH_FRAME",         // 2
+	};
+
+	return request < countof(stringTable) ? stringTable[request] : "?";
+}
+
 bool
 testUsbPcap() {
 	sl::List<io::win::UsbPcapHub> hubList;
@@ -6888,7 +6942,7 @@ testUsbPcap() {
 
 	size_t size = pcap.read(buffer, BufferSize);
 	if (size != sizeof(pcap_hdr_t)) {
-		printf("pcap_hdr_t is too small: %d bytes\n", size);
+		printf("pcap_hdr_t too small: %d bytes\n", size);
 		return false;
 	}
 
@@ -6912,7 +6966,7 @@ testUsbPcap() {
 
 		size_t size = pcap.read(buffer, BufferSize);
 		if (size < sizeof(pcaprec_hdr_t)) {
-			printf("pcaprec_hdr_t is too small: %d bytes\n", size);
+			printf("pcaprec_hdr_t too small: %d bytes\n", size);
 			return false;
 		}
 
@@ -6958,9 +7012,33 @@ testUsbPcap() {
 			const USBPCAP_BUFFER_ISOCH_HEADER* isochHdr;
 
 		case USBPCAP_TRANSFER_CONTROL:
+			if (packetHdr->headerLen < sizeof(USBPCAP_BUFFER_CONTROL_HEADER)) {
+				printf("USBPCAP_BUFFER_CONTROL_HEADER too small: %d\n", packetHdr->headerLen);
+				continue;
+			}
+
 			controlHdr = (USBPCAP_BUFFER_CONTROL_HEADER*)packetHdr;
 			printf("USBPCAP_BUFFER_CONTROL_HEADER\n");
 			printf("  stage: %d - %s\n", controlHdr->stage, getUsbPcapControlStageString(controlHdr->stage));
+
+			if (controlHdr->stage == USBPCAP_CONTROL_STAGE_SETUP) {
+				if (packetHdr->dataLength < sizeof(USB_DEFAULT_PIPE_SETUP_PACKET)) {
+					printf("invalid USBPCAP_TRANSFER_CONTROL\n");
+					continue;
+				}
+
+				const USB_DEFAULT_PIPE_SETUP_PACKET* setup = (USB_DEFAULT_PIPE_SETUP_PACKET*)(controlHdr + 1);
+				printf("USB_DEFAULT_PIPE_SETUP_PACKET\n");
+				printf("  bmRequestType: 0x%02x\n", setup->bmRequestType.B);
+				printf("    Direction:   %d - %s\n", setup->bmRequestType.s.Dir, getUsbDirectionString(setup->bmRequestType.B));
+				printf("    Type:        %d - %s\n", setup->bmRequestType.s.Type, getUsbControlTypeString(setup->bmRequestType.s.Type));
+				printf("    Recipient:   %d - %s\n", setup->bmRequestType.s.Recipient, getUsbControlRecipientString(setup->bmRequestType.s.Recipient));
+				printf("  bRequest:      0x%02x - %s\n", setup->bRequest, getUsbControlRequestString(setup->bRequest));
+				printf("  wValue:        0x%04x\n", setup->wValue);
+				printf("  wIndex:        0x%04x\n", setup->wIndex);
+				printf("  wLength:       0x%04x\n", setup->wLength);
+			}
+
 			break;
 
 		case USBPCAP_TRANSFER_BULK:
@@ -6968,6 +7046,11 @@ testUsbPcap() {
 			break;
 
 		case USBPCAP_TRANSFER_ISOCHRONOUS:
+			if (packetHdr->headerLen < sizeof(USBPCAP_BUFFER_ISOCH_HEADER)) {
+				printf("USBPCAP_BUFFER_ISOCH_HEADER too small: %d\n", packetHdr->headerLen);
+				continue;
+			}
+
 			isochHdr = (USBPCAP_BUFFER_ISOCH_HEADER*)packetHdr;
 			printf("USBPCAP_BUFFER_ISOCH_HEADER\n");
 			printf("  startFrame: %d\n", isochHdr->startFrame);
