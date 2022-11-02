@@ -18,7 +18,6 @@ set(
 	${AXL_INC_DIR}/axl_io/axl_io_File.h
 	${AXL_INC_DIR}/axl_io/axl_io_FilePathUtils.h
 	${AXL_INC_DIR}/axl_io/axl_io_FileEnumerator.h
-	${AXL_INC_DIR}/axl_io/axl_io_FileTransport.h
 	${AXL_INC_DIR}/axl_io/axl_io_Mapping.h
 	${AXL_INC_DIR}/axl_io/axl_io_MappedFile.h
 	${AXL_INC_DIR}/axl_io/axl_io_SharedMemoryTransport.h
@@ -26,8 +25,6 @@ set(
 	${AXL_INC_DIR}/axl_io/axl_io_SerialSettings.h
 	${AXL_INC_DIR}/axl_io/axl_io_SockAddr.h
 	${AXL_INC_DIR}/axl_io/axl_io_Socket.h
-	${AXL_INC_DIR}/axl_io/axl_io_SocketTransport.h
-	${AXL_INC_DIR}/axl_io/axl_io_Transport.h
 	${AXL_INC_DIR}/axl_io/axl_io_NetworkAdapter.h
 	axl_io_SockAddrParser.h
 )
@@ -46,16 +43,6 @@ set(
 	axl_io_SockAddr.cpp
 	axl_io_Socket.cpp
 	axl_io_NetworkAdapter.cpp
-)
-
-# temporarily exclude until i port axl_exe
-
-axl_exclude_from_build(
-	axl_io_ConnectionSock.cpp
-	axl_io_DgramSock.cpp
-	axl_io_ListenerSock.cpp
-	axl_io_Pipe.cpp
-	axl_io_Transport.cpp
 )
 
 source_group(
