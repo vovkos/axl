@@ -10,7 +10,8 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_io_Serial.h"
+#include "axl_io_SerialPortEnumerator.h"
+#include "axl_io_psx_File.h"
 
 #ifdef _AXL_SYS_LNX_LIBUDEV
 #	include "axl_sys_lnx_Udev.h"
@@ -179,7 +180,7 @@ SerialPortEnumerator::createPortList(
 //..............................................................................
 
 size_t
-createSerialPortDescList(
+enumerateSerialPorts(
 	sl::List<SerialPortDesc>* portList,
 	uint_t mask
 ) {

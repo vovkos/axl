@@ -23,6 +23,7 @@
 
 #include "axl_io_Socket.h"
 #include "axl_io_Serial.h"
+#include "axl_io_SerialPortEnumerator.h"
 #include "axl_io_File.h"
 #include "axl_io_MappedFile.h"
 #include "axl_io_FilePathUtils.h"

@@ -151,7 +151,7 @@ NetworkAdapterEnumerator::addAdapterAddress(
 //..............................................................................
 
 size_t
-createNetworkAdapterDescList(sl::List<NetworkAdapterDesc>* adapterList) {
+enumerateNetworkAdapters(sl::List<NetworkAdapterDesc>* adapterList) {
 	return NetworkAdapterEnumerator::createAdapterList(adapterList);
 }
 

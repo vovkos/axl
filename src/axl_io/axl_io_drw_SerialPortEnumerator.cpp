@@ -10,7 +10,7 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_io_Serial.h"
+#include "axl_io_SerialPortEnumerator.h"
 #include "axl_iok_RegistryEntry.h"
 
 #if (_AXL_DEBUG)
@@ -187,7 +187,7 @@ SerialPortEnumerator::createPortList(
 //..............................................................................
 
 size_t
-createSerialPortDescList(
+enumerateSerialPorts(
 	sl::List<SerialPortDesc>* portList,
 	uint_t mask
 ) {

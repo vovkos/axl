@@ -278,7 +278,7 @@ testNetworkAdapterList() {
 	printf("Enumerating adapters...\n");
 
 	sl::List<io::NetworkAdapterDesc> adapterList;
-	io::createNetworkAdapterDescList(&adapterList);
+	io::enumerateNetworkAdapters(&adapterList);
 
 	printf("%d adapters found.\n", adapterList.getCount());
 
@@ -3135,7 +3135,7 @@ testZip() {
 void
 testEnumSerial() {
 	sl::List<io::SerialPortDesc> portList;
-	io::createSerialPortDescList(&portList, io::SerialPortDescMask__All);
+	io::enumerateSerialPorts(&portList, io::SerialPortDescMask__All);
 
 	sl::Iterator<io::SerialPortDesc> it = portList.getHead();
 	for (; it; it++)

@@ -10,7 +10,7 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_io_Serial.h"
+#include "axl_io_SerialPortEnumerator.h"
 #include "axl_sys_win_DeviceInfo.h"
 
 #define _AXL_ENUMERATE_DEVICE_CLASS 1
@@ -165,7 +165,7 @@ SerialPortEnumerator::createPortDesc(
 //..............................................................................
 
 size_t
-createSerialPortDescList(
+enumerateSerialPorts(
 	sl::List<SerialPortDesc>* portList,
 	uint_t mask
 ) {
