@@ -115,6 +115,18 @@ endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+option(
+	BUILD_AXL_IO_SHMT
+	"Build axl_io_shmt library (high-performant shared memory transport)"
+	ON
+)
+
+if(BUILD_AXL_IO_SHMT)
+	add_subdirectory(axl_io_shmt)
+endif()
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 if(PCAP_FOUND)
 	option(
 		BUILD_AXL_IO_PCAP

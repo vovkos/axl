@@ -54,6 +54,11 @@ link_directories(${AXL_LIB_DIR})
 
 set(OPT_LIB_LIST)
 
+if(BUILD_AXL_IO_SHMT)
+	add_definitions(-D_AXL_IO_SHMT=1)
+	list(APPEND OPT_LIB_LIST axl_io_shmt)
+endif()
+
 if(BUILD_AXL_IO_USB)
 	include_directories(${LIBUSB_INC_DIR})
 	link_directories(${LIBUSB_LIB_DIR})

@@ -2593,6 +2593,8 @@ testProcess() {
 }
 #endif
 
+#if (_AXL_IO_SHMT)
+
 //..............................................................................
 
 namespace shm_test {
@@ -2772,8 +2774,8 @@ public:
 
 class ShmTransport: public Transport {
 public:
-	io::SharedMemoryReader m_reader;
-	io::SharedMemoryWriter m_writer;
+	io::ShmtReader m_reader;
+	io::ShmtWriter m_writer;
 
 public:
 	virtual
@@ -2935,21 +2937,21 @@ testSharedMemoryTransport() {
 			HOME_DIR "/shmt-test-cli-srv",
 			"shmt-test-cli-srv-r",
 			"shmt-test-cli-srv-w",
-			io::SharedMemoryTransportFlag_Message |
+			io::ShmtFlag_Message |
 			io::FileFlag_DeleteOnClose
 		) &&
 		serverTransport.m_writer.open(
 			HOME_DIR "/shmt-test-srv-cli",
 			"shmt-test-srv-cli-r",
 			"shmt-test-srv-cli-w",
-			io::SharedMemoryTransportFlag_Message |
+			io::ShmtFlag_Message |
 			io::FileFlag_DeleteOnClose
 		) &&
 		clientTransport.m_reader.open(
 			HOME_DIR "/shmt-test-srv-cli",
 			"shmt-test-srv-cli-r",
 			"shmt-test-srv-cli-w",
-			io::SharedMemoryTransportFlag_Message |
+			io::ShmtFlag_Message |
 			io::FileFlag_OpenExisting |
 			io::FileFlag_Unlink
 		) &&
@@ -2957,7 +2959,7 @@ testSharedMemoryTransport() {
 			HOME_DIR "/shmt-test-cli-srv",
 			"shmt-test-cli-srv-r",
 			"shmt-test-cli-srv-w",
-			io::SharedMemoryTransportFlag_Message |
+			io::ShmtFlag_Message |
 			io::FileFlag_OpenExisting |
 			io::FileFlag_Unlink
 		);
@@ -3066,6 +3068,8 @@ testPipeTransport() {
 }
 
 //..............................................................................
+
+#endif // _AXL_IO_SHMT
 
 #if (_AXL_ZIP)
 

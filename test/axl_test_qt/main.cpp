@@ -164,7 +164,7 @@ static char g_transmitData[] = "abcdefghijklmnopqrstuvwxyz";
 
 class ReaderThread: public mt::ThreadImpl<ReaderThread> {
 protected:
-	io::SharedMemoryReader m_reader;
+	io::ShmtReader m_reader;
 
 public:
 	void threadProc() {
@@ -172,7 +172,7 @@ public:
 			"/home/vladimir/test-transport",
 			"test-transport-read",
 			"test-transport-write",
-			io::SharedMemoryTransportFlag_Message | io::FileFlag_OpenExisting
+			io::ShmtFlag_Message | io::FileFlag_OpenExisting
 		);
 
 		if (!result) {
@@ -206,7 +206,7 @@ public:
 
 class WriterThread: public mt::ThreadImpl<WriterThread> {
 protected:
-	io::SharedMemoryWriter m_writer;
+	io::ShmtWriter m_writer;
 
 public:
 	void threadProc() {
@@ -216,7 +216,7 @@ public:
 			"/home/vladimir/test-transport",
 			"test-transport-read",
 			"test-transport-write",
-			io::SharedMemoryTransportFlag_Message
+			io::ShmtFlag_Message
 		);
 
 		if (!result) {

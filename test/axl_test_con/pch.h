@@ -27,7 +27,8 @@
 #include "axl_io_MappedFile.h"
 #include "axl_io_FilePathUtils.h"
 #include "axl_io_NetworkAdapter.h"
-#include "axl_io_SharedMemoryTransport.h"
+#include "axl_io_ShmtReader.h"
+#include "axl_io_ShmtWriter.h"
 #include "axl_io_FileEnumerator.h"
 
 #include "axl_sys_SjljTry.h"
