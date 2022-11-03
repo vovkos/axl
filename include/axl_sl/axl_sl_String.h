@@ -1723,17 +1723,18 @@ public:
 
 	C*
 	getBuffer(size_t* length) {
+		ASSERT(length);
+
 		C* p = getBuffer();
-		if (!p)
+		if (!p) {
+			*length = 0;
 			return NULL;
-
-		if (length) {
-			size_t bufferLength = this->m_hdr->getLeftoverBufferSize(this->m_p) / sizeof(C);
-			ASSERT(bufferLength);
-
-			*length = bufferLength - 1;
 		}
 
+		size_t bufferLength = this->m_hdr->getLeftoverBufferSize(this->m_p) / sizeof(C);
+		ASSERT(bufferLength);
+
+		*length = bufferLength - 1;
 		return p;
 	}
 

@@ -54,10 +54,6 @@ set(
 		7z
 	)
 
-if(UNIX AND NOT APPLE)
-	set(AXL_IMPORT_LIST ${AXL_IMPORT_LIST} OPTIONAL libudev)
-endif()
-
 set(
 	AXL_IMPORT_DIR_LIST
 
