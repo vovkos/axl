@@ -76,6 +76,26 @@ if(BUILD_AXL_IO_WIN_USBPCAP)
 	list(APPEND OPT_LIB_LIST axl_io_win_usbpcap)
 endif()
 
+if(BUILD_AXL_IO_USBMON)
+	include_directories(
+		${USBSDK_INC_PATH}
+		${PCAP_INC_PATH}
+		${AXL_ROOT_DIR}/src/axl_io_usbmon/include
+	)
+
+	add_definitions(-D_AXL_IO_USBMON=1)
+	list(APPEND OPT_LIB_LIST axl_io_usbmon)
+
+	if (LINUX)
+		list(
+			APPEND OPT_LIB_LIST
+			axl_io_pcap
+			${LIBUSB_LIB_NAME}
+			pcap
+		)
+	endif()
+endif()
+
 if(BUILD_AXL_IO_PCAP)
 	include_directories(${PCAP_INC_DIR})
 	link_directories(${PCAP_LIB_DIR})
@@ -190,7 +210,7 @@ if(UNIX)
 		dl
 	)
 
-	if(LINUX AND LIBUDEV_FOUND)
+	if(LINUX)
 		target_link_libraries(
 			axl_test_con
 			udev

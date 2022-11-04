@@ -137,18 +137,18 @@ endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-if(WIN32)
+if(WIN32 OR (LINUX AND LIBUSB_FOUND AND PCAP_FOUND))
 	option(
-		BUILD_AXL_IO_WIN_USBPCAP
-		"Build axl_io_win_usbpcap library (USBPcap wrappers)"
+		BUILD_AXL_IO_USBMON
+		"Build axl_io_usbmon library (USB monitoring library)"
 		ON
 	)
 else()
-	unset(BUILD_AXL_IO_WIN_USBPCAP CACHE)
+	unset(BUILD_AXL_IO_USBMON CACHE)
 endif()
 
-if(BUILD_AXL_IO_WIN_USBPCAP)
-	add_subdirectory(axl_io_win_usbpcap)
+if(BUILD_AXL_IO_USBMON)
+	add_subdirectory(axl_io_usbmon)
 endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

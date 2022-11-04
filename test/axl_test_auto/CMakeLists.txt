@@ -143,7 +143,7 @@ if(UNIX)
 		dl
 	)
 
-	if(LINUX AND LIBUDEV_FOUND)
+	if(LINUX)
 		target_link_libraries(
 			axl_test_auto
 			udev

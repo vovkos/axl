@@ -1660,17 +1660,14 @@ getUsbStringDescriptorText(
 	io::UsbDevice* device,
 	size_t index
 ) {
-	sl::String text;
+	if (!device->isOpen())
+		return "NOT OPENED";
 
-	if (!device->isOpen()) {
-		text = "NOT OPENED";
-	} else {
-		bool result = device->getStringDesrciptor(index, &text);
-		if (!result)
-			text.format("ERROR (%s)", err::getLastErrorDescription().sz());
-	}
-
-	return text;
+	sl::String_utf16 text;
+	bool result = device->getStringDescriptor(&text, index);
+	return result ?
+		text :
+		sl::formatString("ERROR (%s)", err::getLastErrorDescription().sz()).s2();
 }
 
 void
@@ -1758,7 +1755,7 @@ printUsbDevice(io::UsbDevice* device) {
 		printf("\n");
 
 		io::UsbConfigDescriptor configDesc;
-		bool result = device->getConfigDescriptor(i, &configDesc);
+		bool result = device->getConfigDescriptor(&configDesc, i);
 		if (!result)
 			printf("  Cannot get config descriptor #%d (%s)\n", i, err::getLastErrorDescription().sz());
 		else
@@ -6767,6 +6764,206 @@ testUtf8Encode() {
 
 //..............................................................................
 
+enum {
+	VidSerialTap = 0x16d0,
+	PidSerialTap = 0x0e26,
+	PidI2cSpiTap = 0x0e27,
+};
+
+#if (_AXL_IO_USBMON)
+
+// tmp (to avoid issues with the precompiled headers)
+
+#include "axl_io_lnx_UsbMonitor.h"
+#include "axl_io_UsbMonEnumerator.h"
+
+bool
+testUsbMon() {
+	io::registerUsbErrorProvider();
+	io::getUsbDefaultContext()->createDefault();
+
+	io::UsbMonDeviceDesc serialTap;
+
+	sl::List<io::UsbMonDeviceDesc> deviceList;
+	size_t count = io::enumerateUsbMonDevices(&deviceList, -1);
+
+	sl::ConstIterator<io::UsbMonDeviceDesc> it = deviceList.getHead();
+	for (size_t i = 0; it; it++, i++) {
+		printf("device#%d\n", i);
+		printf("  capture:        %s\n", it->m_captureDeviceName.sz());
+		printf("  address:        %d\n", it->m_address);
+
+		if (!(it->m_flags & io::UsbMonDeviceDescFlag_DeviceDescriptor)) {
+			printf("  [ error fetching device descriptor ]\n");
+			continue;
+		}
+
+		printf("  VID:            %04x\n", it->m_vendorId);
+		printf("  PID:            %04x\n", it->m_productId);
+		printf("  class:          %d\n", it->m_class);
+		printf("  subclass:       %d\n", it->m_subClass);
+		printf("  speed:          %s\n", io::getUsbSpeedString((libusb_speed)it->m_speed));
+
+		if (it->m_flags & io::UsbMonDeviceDescFlag_Description)
+			printf("  description:    %s\n", it->m_description.sz());
+
+		if (it->m_flags & io::UsbMonDeviceDescFlag_Manufacturer)
+			printf("  manufacturer:   %s\n", it->m_manufacturer.sz());
+
+		if (it->m_flags & io::UsbMonDeviceDescFlag_ManufacturerDescriptor)
+			printf("  manufacturer*:  %s\n", it->m_manufacturerDescriptor.sz());
+
+		if (it->m_flags & io::UsbMonDeviceDescFlag_ProductDescriptor)
+			printf("  product*:       %s\n", it->m_productDescriptor.sz());
+
+		if (it->m_flags & io::UsbMonDeviceDescFlag_SerialNumberDescriptor)
+			printf("  serial number*: %s\n", it->m_serialNumberDescriptor.sz());
+
+		if (it->m_vendorId == VidSerialTap && it->m_productId == PidSerialTap)
+			serialTap = **it;
+	}
+
+	if (serialTap.m_captureDeviceName.isEmpty()) {
+		printf("Serial Tap is not found\n");
+		return false;
+	}
+
+	printf("\nCapturing USB on the Serial Tap...\n\n");
+
+	enum {
+		SnapshotLength = io::lnx::UsbMonitor::DefaultSnapshotLength,
+		BufferSize     = io::lnx::UsbMonitor::DefaultKernelBufferSize,
+	};
+
+	/*
+
+	io::lnx::UsbMonitor usbMon;
+	bool result =
+		usbMon.open(serialTap.m_captureDeviceName) &&
+		usbMon.setSnapshotLength(SnapshotLength) &&
+		usbMon.setKernelBufferSize(BufferSize) &&
+		usbMon.setFilter(serialTap.m_address);
+
+	if (!result) {
+		printf("error opening USB pcap: %s\n", err::getLastErrorDescription().sz());
+		return false;
+	}
+
+	sl::String string;
+	sl::Array<char> buffer;
+	buffer.setCount(BufferSize);
+
+	// read pcap header
+
+	size_t size = usbMon.read(buffer, BufferSize);
+	if (size != sizeof(pcap_hdr_t)) {
+		printf("pcap_hdr_t is too small: %d bytes\n", size);
+		return false;
+	}
+
+	const pcap_hdr_t* pcapHdr = (pcap_hdr_t*)buffer.cp();
+	printf("pcap_hdr_t (%d bytes received)\n", size);
+    printf("  magic_number:  0x%08x\n", pcapHdr->magic_number);
+    printf("  version_major: %d\n", pcapHdr->version_major);
+    printf("  version_minor: %d\n", pcapHdr->version_minor);
+    printf("  thiszone:      %d\n", pcapHdr->thiszone);
+    printf("  sigfigs:       %d\n", pcapHdr->sigfigs);
+    printf("  snaplen:       %d\n", pcapHdr->snaplen);
+    printf("  network:       %d\n", pcapHdr->network);
+
+	if (pcapHdr->magic_number != 0xA1B2C3D4 || pcapHdr->network != DLT_USBPCAP) {
+		printf("invalid pcap_hdr_t\n");
+		return false;
+	}
+
+	for (;;) {
+		printf("\n");
+
+		size_t size = pcap.read(buffer, BufferSize);
+		if (size < sizeof(pcaprec_hdr_t)) {
+			printf("pcaprec_hdr_t is too small: %d bytes\n", size);
+			return false;
+		}
+
+		const pcaprec_hdr_t* recHdr = (pcaprec_hdr_t*)buffer.cp();
+		uint64_t timestamp = sys::getTimestampFromTimeval(recHdr->ts_sec, recHdr->ts_usec);
+		printf("%s (%d bytes)\n", sys::Time(timestamp).format().sz(), size);
+		printf("pcaprec_hdr_t\n");
+		printf("  ts_sec:      %d\n", recHdr->ts_sec);
+		printf("  ts_usec:     %d\n", recHdr->ts_usec);
+		printf("  incl_len:    %d\n", recHdr->incl_len);
+		printf("  orig_len:    %d\n", recHdr->orig_len);
+
+		if (recHdr->incl_len > size ||
+			recHdr->orig_len > size ||
+			recHdr->orig_len < sizeof(USBPCAP_BUFFER_PACKET_HEADER)
+		) {
+			printf("invalid pcaprec_hdr_t\n");
+			return false;
+		}
+
+		size = recHdr->orig_len;
+
+		USBPCAP_BUFFER_PACKET_HEADER* packetHdr = (USBPCAP_BUFFER_PACKET_HEADER*)(recHdr + 1);
+		printf("USBPCAP_BUFFER_PACKET_HEADER\n");
+		printf("  headerLen:  %d\n", packetHdr->headerLen);
+		printf("  irpId:      0x%016x\n", packetHdr->irpId);
+		printf("  status:     0x%08x\n", packetHdr->status);
+		printf("  function:   %d\n", packetHdr->function);
+		printf("  info:       0x%02x - %s\n", packetHdr->info, getUsbPcapInfoString(packetHdr->info));
+		printf("  bus:        %d\n", packetHdr->bus);
+		printf("  device:     %d\n", packetHdr->device);
+		printf("  endpoint:   0x%02x\n", packetHdr->endpoint);
+		printf("  transfer:   %d - %s\n", packetHdr->transfer, getUsbPcapTransferString(packetHdr->transfer));
+		printf("  dataLength: %d\n", packetHdr->dataLength);
+
+		if (size < packetHdr->headerLen || size < packetHdr->headerLen + packetHdr->dataLength) {
+			printf("invalid USBPCAP_BUFFER_PACKET_HEADER\n");
+			continue;
+		}
+
+		switch (packetHdr->transfer) {
+			const USBPCAP_BUFFER_CONTROL_HEADER* controlHdr;
+			const USBPCAP_BUFFER_ISOCH_HEADER* isochHdr;
+
+		case USBPCAP_TRANSFER_CONTROL:
+			controlHdr = (USBPCAP_BUFFER_CONTROL_HEADER*)packetHdr;
+			printf("USBPCAP_BUFFER_CONTROL_HEADER\n");
+			printf("  stage: %d - %s\n", controlHdr->stage, getUsbPcapControlStageString(controlHdr->stage));
+			break;
+
+		case USBPCAP_TRANSFER_BULK:
+		case USBPCAP_TRANSFER_INTERRUPT:
+			break;
+
+		case USBPCAP_TRANSFER_ISOCHRONOUS:
+			isochHdr = (USBPCAP_BUFFER_ISOCH_HEADER*)packetHdr;
+			printf("USBPCAP_BUFFER_ISOCH_HEADER\n");
+			printf("  startFrame: %d\n", isochHdr->startFrame);
+			printf("  numberOfPackets: %d\n", isochHdr->numberOfPackets);
+			printf("  errorCount:      %d\n", isochHdr->errorCount);
+			break;
+		}
+
+		if (packetHdr->dataLength) {
+			printf("PAYLOAD\n");
+			enc::HexEncoding::encode(
+				&string,
+				(char*)packetHdr + packetHdr->headerLen,
+				packetHdr->dataLength,
+				enc::HexEncodingFlag_Multiline
+			);
+
+			printf("%s\n", string.sz());
+		}
+	}
+	*/
+
+	return true;
+}
+
+#endif
+
 #if (_AXL_IO_WIN_USBPCAP)
 
 inline
@@ -7109,9 +7306,10 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-#if (_AXL_IO_WIN_USBPCAP)
-	testUsbPcap();
+#if (_AXL_IO_USBMON)
+	testUsbMon();
 #endif
+
 	return 0;
 }
 
