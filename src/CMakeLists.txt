@@ -9,28 +9,6 @@
 #
 #...............................................................................
 
-if(LINUX)
-	if(${LIBUDEV_FOUND})
-		option(
-			BUILD_AXL_SYS_LNX_LIBUDEV
-			"Build LibUdev wrappers for axl_core library"
-			ON
-		)
-
-		option(
-			BUILD_AXL_SYS_LNX_LIBUDEV_NEW_API
-			"Build wrappers for new functions in LibUdev(e.g. udev_device_get_sysattr_value)"
-			OFF
-		)
-
-		if(BUILD_AXL_SYS_LNX_LIBUDEV)
-			add_definitions(-D_AXL_SYS_LNX_LIBUDEV=1)
-		endif()
-	else()
-		unset(BUILD_AXL_SYS_LNX_LIBUDEV CACHE)
-	endif()
-endif()
-
 add_subdirectory(axl_core)
 
 if (GCC_LINK_GLIBC_WRAPPERS)

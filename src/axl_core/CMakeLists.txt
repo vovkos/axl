@@ -292,42 +292,6 @@ source_group(
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
-# sys_psx folder
-#
-
-set(
-	SYS_PSX_H_LIST
-	${AXL_INC_DIR}/axl_sys/axl_sys_psx_Cond.h
-	${AXL_INC_DIR}/axl_sys/axl_sys_psx_Mutex.h
-	${AXL_INC_DIR}/axl_sys/axl_sys_psx_Sem.h
-	${AXL_INC_DIR}/axl_sys/axl_sys_psx_Thread.h
-	${AXL_INC_DIR}/axl_sys/axl_sys_psx_Process.h
-	${AXL_INC_DIR}/axl_sys/axl_sys_psx_DynamicLib.h
-)
-
-set(
-	SYS_PSX_CPP_LIST
-	axl_sys_psx_Cond.cpp
-	axl_sys_psx_Mutex.cpp
-	axl_sys_psx_Sem.cpp
-	axl_sys_psx_Thread.cpp
-	axl_sys_psx_Process.cpp
-	axl_sys_psx_DynamicLib.cpp
-)
-
-source_group(
-	sys_psx
-	FILES
-	${SYS_PSX_H_LIST}
-	${SYS_PSX_CPP_LIST}
-)
-
-if(NOT UNIX)
-	axl_exclude_from_build(${SYS_PSX_CPP_LIST})
-endif()
-
-#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-#
 # sys_win folder
 #
 
@@ -400,34 +364,57 @@ endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
+# sys_psx folder
+#
+
+set(
+	SYS_PSX_H_LIST
+	${AXL_INC_DIR}/axl_sys/axl_sys_psx_Cond.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_psx_Mutex.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_psx_Sem.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_psx_Thread.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_psx_Process.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_psx_DynamicLib.h
+)
+
+set(
+	SYS_PSX_CPP_LIST
+	axl_sys_psx_Cond.cpp
+	axl_sys_psx_Mutex.cpp
+	axl_sys_psx_Sem.cpp
+	axl_sys_psx_Thread.cpp
+	axl_sys_psx_Process.cpp
+	axl_sys_psx_DynamicLib.cpp
+)
+
+source_group(
+	sys_psx
+	FILES
+	${SYS_PSX_H_LIST}
+	${SYS_PSX_CPP_LIST}
+)
+
+if(NOT UNIX)
+	axl_exclude_from_build(${SYS_PSX_CPP_LIST})
+endif()
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
 # sys_lnx folder
 #
 
 set(
 	SYS_LNX_H_LIST
-	${AXL_INC_DIR}/axl_sys/axl_sys_lnx_Udev.h
-	${AXL_INC_DIR}/axl_sys/axl_sys_lnx_UdevContext.h
-	${AXL_INC_DIR}/axl_sys/axl_sys_lnx_UdevDevice.h
-	${AXL_INC_DIR}/axl_sys/axl_sys_lnx_UdevMonitor.h
-	${AXL_INC_DIR}/axl_sys/axl_sys_lnx_UdevEnumerator.h
-	${AXL_INC_DIR}/axl_sys/axl_sys_lnx_Plt.h
+	${AXL_INC_DIR}/axl_sys_lnx_udev/axl_sys_lnx_Udev.h
+	${AXL_INC_DIR}/axl_sys_lnx_udev/axl_sys_lnx_UdevDevice.h
+	${AXL_INC_DIR}/axl_sys_lnx_udev/axl_sys_lnx_UdevListEntry.h
+	${AXL_INC_DIR}/axl_sys_lnx_udev/axl_sys_lnx_UdevEnumerate.h
+	${AXL_INC_DIR}/axl_sys_lnx_udev/axl_sys_lnx_UdevHwdb.h
 )
-
-set(
-	SYS_LNX_LIBUDEV_CPP_LIST
-	axl_sys_lnx_Udev.cpp
-)
-
-if(NOT BUILD_AXL_SYS_LNX_LIBUDEV)
-	axl_exclude_from_build(${SYS_LNX_LIBUDEV_CPP_LIST})
-elseif(BUILD_AXL_SYS_LNX_LIBUDEV_NEW_API)
-	add_definitions(-D_AXL_SYS_LNX_LIBUDEV_NEW_API=1)
-endif()
 
 set(
 	SYS_LNX_CPP_LIST
-	${SYS_LNX_LIBUDEV_CPP_LIST}
-	axl_sys_lnx_Plt.cpp
+	axl_sys_lnx_Udev.cpp
 )
 
 source_group(
