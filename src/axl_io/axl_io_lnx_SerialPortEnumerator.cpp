@@ -12,10 +12,11 @@
 #include "pch.h"
 #include "axl_io_SerialPortEnumerator.h"
 #include "axl_io_psx_File.h"
-
-#ifdef _AXL_SYS_LNX_LIBUDEV
-#	include "axl_sys_lnx_Udev.h"
-#endif
+#include <linux/serial.h>
+#include "axl_sys_lnx_Udev.h"
+#include "axl_sys_lnx_UdevEnumerate.h"
+#include "axl_sys_lnx_UdevListEntry.h"
+#include "axl_sys_lnx_UdevDevice.h"
 
 namespace axl {
 namespace io {
@@ -41,29 +42,44 @@ SerialPortEnumerator::createPortList(
 ) {
 	portList->clear();
 
-#ifdef _AXL_SYS_LNX_LIBUDEV
-	sys::lnx::DynamicUdevContext udev;
-	sys::lnx::DynamicUdevEnumerator enumerator = udev.createEnumerator();
+	sys::lnx::Udev udev;
+	sys::lnx::UdevEnumerate enumerator;
 
 	bool result =
+		udev.create() &&
+		enumerator.create(udev) &&
 		enumerator.addMatchSubsystem("tty") &&
 		enumerator.scanDevices();
 
-	if (!result)
-		return 0;
+	if (!result) {
+		static const char* deviceNameTable[][2] = {
+			{ "/dev/ttyS0",   "Serial device /dev/ttyS0" },
+			{ "/dev/ttyS1",   "Serial device /dev/ttyS1" },
+			{ "/dev/ttyUSB0", "USB serial device /dev/ttyUSB0" },
+			{ "/dev/ttyUSB1", "USB serial device /dev/ttyUSB1" },
+		};
 
-	sys::lnx::DynamicUdevListEntry it = enumerator.getListEntry();
+		for (size_t i = 0; i < countof(deviceNameTable); i++) {
+			SerialPortDesc* portDesc = AXL_MEM_NEW(SerialPortDesc);
+			portDesc->m_deviceName = deviceNameTable[i][0];
+			portDesc->m_description = deviceNameTable[i][1];
+			portList->insertTail(portDesc);
+		}
+
+		return portList->getCount();
+	}
+
+	sys::lnx::UdevListEntry it = enumerator.getListEntry();
 	for (; it; it++) {
 		sl::StringRef path = it.getName();
-		sys::lnx::DynamicUdevDevice device = udev.getDeviceFromSysPath(path);
-		if (!device)
+		sys::lnx::UdevDevice device;
+		result = device.createFromSysPath(udev, path);
+		if (!result)
 			continue;
 
-		sys::lnx::DynamicUdevDevice parentDevice = device.getParent();
+		sys::lnx::UdevDevice parentDevice = device.getParent();
 		if (!parentDevice) // no parent device, this is a virtual tty
 			continue;
-
-		parentDevice.addRef(); // getParent does not add ref
 
 		sl::StringRef name = device.getDevNode();
 		sl::StringRef driver = parentDevice.getDriver();
@@ -127,7 +143,7 @@ SerialPortEnumerator::createPortList(
 			portDesc->m_location = !path.isEmpty() ? path : device.getDevPath();
 		}
 
-#if (1)
+#	if (_AXL_OS_DEBUG)
 		printf("----------------------\n");
 		printf("getSysPath: %s\n", device.getSysPath().sz());
 		printf("getSysName: %s\n", device.getSysName().sz());
@@ -139,7 +155,7 @@ SerialPortEnumerator::createPortList(
 		printf("getDriver: %s\n", parentDevice.getDriver().sz());
 		printf("getAction: %s\n", parentDevice.getAction().sz());
 
-		sys::lnx::UdevIterator it = device.getPropertyList();
+		sys::lnx::UdevListEntry it = device.getPropertyList();
 		for (; it; it++)
 			printf("property[%s] = '%s'\n", it.getName().sz(), it.getValue().sz());
 
@@ -154,25 +170,10 @@ SerialPortEnumerator::createPortList(
 		it = device.getDevLinkList();
 		for (; it; it++)
 			printf("devlink: %s\n", it.getName().sz());
-#endif
+#	endif
 
 		portList->insertTail(portDesc);
 	}
-#else
-	static const char* deviceNameTable[][2] = {
-		{ "/dev/ttyS0",   "Serial device /dev/ttyS0" },
-		{ "/dev/ttyS1",   "Serial device /dev/ttyS1" },
-		{ "/dev/ttyUSB0", "USB Serial device /dev/ttyUSB0" },
-		{ "/dev/ttyUSB1", "USB Serial device /dev/ttyUSB1" },
-	};
-
-	for (size_t i = 0; i < countof(deviceNameTable); i++) {
-		SerialPortDesc* portDesc = AXL_MEM_NEW(SerialPortDesc);
-		portDesc->m_deviceName = deviceNameTable[i][0];
-		portDesc->m_description = deviceNameTable[i][1];
-		portList->insertTail(portDesc);
-	}
-#endif
 
 	return portList->getCount();
 }
