@@ -27,10 +27,6 @@
 #	include <pwd.h>
 #	if (_AXL_OS_LINUX)
 #		include <linux/if_packet.h>
-#		if (_AXL_SYS_LNX_LIBUDEV)
-#			include <libudev.h>
-#			include <linux/serial.h>
-#		endif
 #	elif (_AXL_OS_DARWIN)
 #		include <libproc.h>
 #		include <mach-o/dyld.h>

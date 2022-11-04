@@ -13,13 +13,17 @@
 
 #define _AXL_IO_USBDEVICE_H
 
-#include "axl_io_UsbPch.h"
+#include "axl_io_UsbError.h"
 
 namespace axl {
 namespace io {
 
-#if (LIBUSB_API_VERSION >= 0x01000105)
-#	define _AXL_IO_USBDEVICE_PORT 1
+#if (LIBUSB_API_VERSION >= 0x01000000)
+#	define _AXL_IO_USBDEVICE_GETPORTPATH    1
+#endif
+
+#if (LIBUSB_API_VERSION >= 0x01000103)
+#	define _AXL_IO_USBDEVICE_GETPORTNUMBERS 1
 #endif
 
 //..............................................................................
@@ -62,24 +66,6 @@ findUsbEndpointDescriptor(
 
 //..............................................................................
 
-class FreeUsbDeviceList {
-public:
-	void
-	operator () (libusb_device** h) {
-		libusb_free_device_list(h, true);
-	}
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class UsbDeviceList: public sl::Handle<libusb_device**, FreeUsbDeviceList> {
-public:
-	size_t
-	enumerateDevices(libusb_context* context = NULL);
-};
-
-//..............................................................................
-
 class FreeUsbConfigDescriptor {
 public:
 	void
@@ -96,8 +82,9 @@ typedef sl::Handle<libusb_config_descriptor*, FreeUsbConfigDescriptor> UsbConfig
 
 class UsbDevice {
 public:
-	enum Def {
-		Def_BufferSize = 256,
+	enum {
+		DefaultDescriptorBufferSize         = 256,
+		DefaultStringDescriptorBufferLength = DefaultDescriptorBufferSize / sizeof(utf16_t),
 	};
 
 protected:
@@ -110,62 +97,81 @@ public:
 		m_openHandle = NULL;
 	}
 
+	UsbDevice(libusb_device* device);
+
 	~UsbDevice() {
 		setDevice(NULL);
 	}
 
 	libusb_device*
-	getDevice() {
+	getDevice() const {
 		return m_device;
 	}
 
 	libusb_device_handle*
-	getOpenHandle() {
+	getOpenHandle() const {
 		return m_openHandle;
 	}
 
 	bool
-	isOpen() {
+	isOpen() const {
 		return m_openHandle != NULL;
 	}
 
 	uint8_t
-	getDeviceAddress() {
-		ASSERT(m_device);
-		return libusb_get_device_address(m_device);
-	}
-
-	uint8_t
-	getBusNumber() {
+	getBusNumber() const {
 		ASSERT(m_device);
 		return libusb_get_bus_number(m_device);
 	}
 
-#if (_AXL_IO_USBDEVICE_PORT)
 	uint8_t
-	getPortNumber() {
+	getDeviceAddress() const {
+		ASSERT(m_device);
+		return libusb_get_device_address(m_device);
+	}
+
+#if (_AXL_IO_USBDEVICE_GETPORTPATH)
+	uint8_t
+	getPortNumber() const {
 		ASSERT(m_device);
 		return libusb_get_port_number(m_device);
 	}
 
 	size_t
 	getPortPath(
+		libusb_context* context,
 		uint8_t* path,
 		size_t maxLength
-	);
+	) const;
+
+	size_t
+	getPortPath(
+		uint8_t* path,
+		size_t maxLength
+	) const {
+		return getPortPath(NULL, path, maxLength);
+	}
+#endif
+
+#if (_AXL_IO_USBDEVICE_GETPORTNUMBERS)
+	size_t
+	getPortNumbers(
+		uint8_t* path,
+		size_t maxLength
+	) const;
 #endif
 
 	libusb_speed
-	getDeviceSpeed() {
+	getDeviceSpeed() const {
 		ASSERT(m_device);
 		return (libusb_speed)libusb_get_device_speed(m_device);
 	}
 
 	size_t
-	getMaxPacketSize(uint_t endpointId);
+	getMaxPacketSize(uint_t endpointId) const;
 
 	size_t
-	getMaxIsoPacketSize(uint_t endpointId);
+	getMaxIsoPacketSize(uint_t endpointId) const;
 
 	// open-close
 
@@ -212,7 +218,7 @@ public:
 	);
 
 	uint_t
-	getConfiguration();
+	getConfiguration() const;
 
 	bool
 	setConfiguration(uint_t configurationId);
@@ -236,7 +242,7 @@ public:
 	resetDevice();
 
 	bool
-	isKernelDriverActive(uint_t ifaceId);
+	isKernelDriverActive(uint_t ifaceId) const;
 
 	bool
 	attachKernelDriver(uint_t ifaceId);
@@ -249,64 +255,60 @@ public:
 
 	// descriptors
 
+	bool
+	getDescriptor(
+		void* p,
+		size_t size,
+		libusb_descriptor_type descriptorType,
+		uint_t descriptorId
+	) const;
+
+	bool
+	getDescriptor(
+		sl::Array<char>* descriptor,
+		libusb_descriptor_type descriptorType,
+		uint_t descriptorId
+	) const;
+
 	sl::Array<char>
 	getDescriptor(
 		libusb_descriptor_type descriptorType,
 		uint_t descriptorId
-	) {
-		sl::Array<char> descriptor;
-		getDescriptor(descriptorType, descriptorId, &descriptor);
-		return descriptor;
-	}
+	) const;
 
 	bool
-	getDescriptor(
-		libusb_descriptor_type descriptorType,
-		uint_t descriptorId,
-		sl::Array<char>* descriptor
-	);
-
-	bool
-	getDeviceDescriptor(libusb_device_descriptor* descriptor);
+	getDeviceDescriptor(libusb_device_descriptor* descriptor) const;
 
 	bool
 	getConfigDescriptor(
-		uint_t configurationId,
-		UsbConfigDescriptor* desc
-	);
+		UsbConfigDescriptor* desc,
+		uint_t configurationId
+	) const;
 
 	bool
-	getActiveConfigDescriptor(UsbConfigDescriptor* desc);
+	getActiveConfigDescriptor(UsbConfigDescriptor* desc) const;
 
-	sl::String
-	getStringDesrciptor(
+	sl::String_utf16
+	getStringDescriptor(
 		uint_t stringId,
 		uint_t langId
-	) {
-		sl::String string;
-		getStringDesrciptor(stringId, langId, &string);
-		return string;
-	}
+	) const;
 
 	bool
-	getStringDesrciptor(
+	getStringDescriptor(
+		sl::String_utf16* string,
 		uint_t stringId,
-		uint_t langId,
-		sl::String* string
-	);
+		uint_t langId
+	) const;
 
-	sl::String
-	getStringDesrciptor(uint_t stringId) {
-		sl::String string;
-		getStringDesrciptor(stringId, &string);
-		return string;
-	}
+	sl::String_utf16
+	getStringDescriptor(uint_t stringId) const;
 
 	bool
-	getStringDesrciptor(
-		uint_t stringId,
-		sl::String* string
-	);
+	getStringDescriptor(
+		sl::String_utf16* string,
+		uint_t stringId
+	) const;
 
 	// synchronous transfers
 
@@ -336,7 +338,323 @@ public:
 		size_t size,
 		uint_t timeout = -1
 	);
+
+protected:
+	template <typename UseLangId>
+	bool
+	getStringDescriptorImpl(
+		sl::String_utf16* string,
+		uint_t stringId,
+		uint_t langId
+	) const;
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+UsbDevice::UsbDevice(libusb_device* device) {
+	m_device = NULL;
+	m_openHandle = NULL;
+	setDevice(device);
+}
+
+inline
+size_t
+UsbDevice::getMaxPacketSize(uint_t endpointId) const {
+	ASSERT(m_device);
+
+	int result = libusb_get_max_packet_size(m_device, (uchar_t)endpointId);
+	return result >= 0 ? result : err::fail<size_t> (-1, UsbError(result));
+}
+
+inline
+size_t
+UsbDevice::getMaxIsoPacketSize(uint_t endpointId) const {
+	ASSERT(m_device);
+	int result = libusb_get_max_iso_packet_size(m_device, (uchar_t)endpointId);
+	return result >= 0 ? result : err::fail<size_t> (-1, UsbError(result));
+}
+
+#if (_AXL_IO_USBDEVICE_GETPORTPATH)
+inline
+size_t
+UsbDevice::getPortPath(
+	libusb_context* context,
+	uint8_t* path,
+	size_t maxLength
+) const {
+	ASSERT(m_device);
+	int result = libusb_get_port_path(context, m_device, path, (uint8_t)maxLength);
+	return result >= 0 ? result : err::fail<size_t> (-1, UsbError(result));
+}
+#endif
+
+#if (_AXL_IO_USBDEVICE_GETPORTNUMBERS)
+inline
+size_t
+UsbDevice::getPortNumbers(
+	uint8_t* path,
+	size_t maxLength
+) const {
+	ASSERT(m_device);
+	int result = libusb_get_port_numbers(m_device, path, (int)maxLength);
+	return result >= 0 ? result : err::fail<size_t> (-1, UsbError(result));
+}
+#endif
+
+inline
+bool
+UsbDevice::getDescriptor(
+	void* p,
+	size_t size,
+	libusb_descriptor_type descriptorType,
+	uint_t descriptorId
+) const {
+	ASSERT(m_openHandle);
+
+	int result = libusb_get_descriptor(
+		m_openHandle,
+		(uint8_t)descriptorType,
+		(uint8_t)descriptorId,
+		(uint8_t*)p,
+		size
+	);
+
+	return result >= 0 ? result : err::fail<size_t> (-1, UsbError(result));
+}
+
+inline
+sl::Array<char>
+UsbDevice::getDescriptor(
+	libusb_descriptor_type descriptorType,
+	uint_t descriptorId
+) const {
+	sl::Array<char> descriptor;
+	getDescriptor(&descriptor, descriptorType, descriptorId);
+	return descriptor;
+}
+
+inline
+bool
+UsbDevice::getDeviceDescriptor(libusb_device_descriptor* descriptor) const {
+	ASSERT(m_device);
+
+	int result = libusb_get_device_descriptor(m_device, descriptor);
+	return result == 0 ? true : err::fail(UsbError(result));
+}
+
+inline
+sl::String_utf16
+UsbDevice::getStringDescriptor(
+	uint_t stringId,
+	uint_t langId
+) const {
+	sl::String_utf16 string;
+	getStringDescriptor(&string, stringId, langId);
+	return string;
+}
+
+inline
+sl::String_utf16
+UsbDevice::getStringDescriptor(uint_t stringId) const {
+	sl::String_utf16 string;
+	getStringDescriptor(&string, stringId);
+	return string;
+}
+
+inline
+uint_t
+UsbDevice::getConfiguration() const {
+	ASSERT(m_openHandle);
+	int configurationId;
+	int result = libusb_get_configuration(m_openHandle, &configurationId);
+	return result == 0 ? configurationId : err::fail<uint_t> (-1, UsbError(result));
+}
+
+inline
+bool
+UsbDevice::setConfiguration(uint_t configurationId) {
+	ASSERT(m_openHandle);
+	int result = libusb_set_configuration(m_openHandle, configurationId);
+	return result == 0 ? true : err::fail(UsbError(result));
+}
+
+inline
+bool
+UsbDevice::claimInterface(uint_t ifaceId) {
+	ASSERT(m_openHandle);
+	int result = libusb_claim_interface(m_openHandle, ifaceId);
+	return result == 0 ? true : err::fail(UsbError(result));
+}
+
+inline
+bool
+UsbDevice::releaseInterface(uint_t ifaceId) {
+	ASSERT(m_openHandle);
+	int result = libusb_release_interface(m_openHandle, ifaceId);
+	return result == 0 ? true : err::fail(UsbError(result));
+}
+
+inline
+bool
+UsbDevice::setInterfaceAltSetting(
+	uint_t ifaceId,
+	uint_t altSettingId
+) {
+	ASSERT(m_openHandle);
+	int result = libusb_set_interface_alt_setting(m_openHandle, ifaceId, altSettingId);
+	return result == 0 ? true : err::fail(UsbError(result));
+}
+
+inline
+bool
+UsbDevice::clearHalt(uint_t endpointId) {
+	ASSERT(m_openHandle);
+	int result = libusb_clear_halt(m_openHandle, (uchar_t)endpointId);
+	return result == 0 ? true : err::fail(UsbError(result));
+}
+
+inline
+bool
+UsbDevice::resetDevice() {
+	ASSERT(m_openHandle);
+	int result = libusb_reset_device(m_openHandle);
+	return result == 0 ? true : err::fail(UsbError(result));
+}
+
+inline
+bool
+UsbDevice::isKernelDriverActive(uint_t ifaceId) const {
+	ASSERT(m_openHandle);
+	int result = libusb_kernel_driver_active(m_openHandle, ifaceId);
+	return result == 1;
+}
+
+inline
+bool
+UsbDevice::attachKernelDriver(uint_t ifaceId) {
+	ASSERT(m_openHandle);
+	int result = libusb_attach_kernel_driver(m_openHandle, ifaceId);
+	return result == 0 ? true : err::fail(UsbError(result));
+}
+
+inline
+bool
+UsbDevice::detachKernelDriver(uint_t ifaceId) {
+	ASSERT(m_openHandle);
+	int result = libusb_detach_kernel_driver(m_openHandle, ifaceId);
+	return result == 0 ? true : err::fail(UsbError(result));
+}
+
+inline
+bool
+UsbDevice::setAutoDetachKernelDriver(bool isAutoDetach) {
+	ASSERT(m_openHandle);
+	int result = libusb_set_auto_detach_kernel_driver(m_openHandle, isAutoDetach);
+	return result == 0 ? true : err::fail(UsbError(result));
+}
+
+inline
+size_t
+UsbDevice::controlTransfer(
+	uint_t requestType,
+	uint_t requestCode,
+	uint_t value,
+	uint_t index,
+	void* p,
+	size_t size,
+	uint_t timeout
+) {
+	ASSERT(m_openHandle);
+
+	int result = libusb_control_transfer(
+		m_openHandle,
+		(uint8_t)requestType,
+		(uint8_t)requestCode,
+		(uint16_t)value,
+		(uint16_t)index,
+		(uchar_t*)p,
+		(uint16_t)size,
+		timeout != -1 ? timeout : 0
+	);
+
+	return result >= 0 ? result : err::fail<size_t> (-1, UsbError(result));
+}
+
+inline
+size_t
+UsbDevice::bulkTransfer(
+	uint_t endpointId,
+	void* p,
+	size_t size,
+	uint_t timeout
+) {
+	ASSERT(m_openHandle);
+
+	int actualSize;
+	int result = libusb_bulk_transfer(
+		m_openHandle,
+		(uchar_t)endpointId,
+		(uchar_t*)p,
+		(int)size,
+		&actualSize,
+		timeout != -1 ? timeout : 0
+	);
+
+	return result == 0 ? actualSize : err::fail<size_t> (-1, UsbError(result));
+}
+
+inline
+size_t
+UsbDevice::interruptTransfer(
+	uint_t endpointId,
+	void* p,
+	size_t size,
+	uint_t timeout
+) {
+	ASSERT(m_openHandle);
+
+	int actualSize;
+	int result = libusb_interrupt_transfer(
+		m_openHandle,
+		(uchar_t)endpointId,
+		(uchar_t*)p,
+		(int)size,
+		&actualSize,
+		timeout != -1 ? timeout : 0
+	);
+
+	return result == 0 ? actualSize : err::fail<size_t> (-1, UsbError(result));
+}
+
+//..............................................................................
+
+class FreeUsbDeviceList {
+public:
+	void
+	operator () (libusb_device** h) {
+		libusb_free_device_list(h, true);
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class UsbDeviceList: public sl::Handle<libusb_device**, FreeUsbDeviceList> {
+public:
+	size_t
+	enumerateDevices(libusb_context* context = NULL);
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+size_t
+UsbDeviceList::enumerateDevices(libusb_context* context) {
+	close();
+
+	ssize_t result = libusb_get_device_list(context, &m_h);
+	return result >= 0 ? result : err::fail<size_t> (-1, UsbError((int)result));
+}
 
 //..............................................................................
 
