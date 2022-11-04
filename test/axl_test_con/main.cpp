@@ -6767,7 +6767,6 @@ testUtf8Encode() {
 enum {
 	VidSerialTap = 0x16d0,
 	PidSerialTap = 0x0e26,
-	PidI2cSpiTap = 0x0e27,
 };
 
 #if (_AXL_IO_USBMON)
@@ -6821,6 +6820,8 @@ testUsbMon() {
 
 		if (it->m_vendorId == VidSerialTap && it->m_productId == PidSerialTap)
 			serialTap = **it;
+
+		printf("\n");
 	}
 
 	if (serialTap.m_captureDeviceName.isEmpty()) {
@@ -6828,136 +6829,61 @@ testUsbMon() {
 		return false;
 	}
 
-	printf("\nCapturing USB on the Serial Tap...\n\n");
-
-	enum {
-		SnapshotLength = io::lnx::UsbMonitor::DefaultSnapshotLength,
-		BufferSize     = io::lnx::UsbMonitor::DefaultKernelBufferSize,
-	};
-
-	/*
-
-	io::lnx::UsbMonitor usbMon;
-	bool result =
-		usbMon.open(serialTap.m_captureDeviceName) &&
-		usbMon.setSnapshotLength(SnapshotLength) &&
-		usbMon.setKernelBufferSize(BufferSize) &&
-		usbMon.setFilter(serialTap.m_address);
-
+	io::lnx::UsbMonitor monitor;
+	bool result = monitor.open(serialTap.m_captureDeviceName);
 	if (!result) {
-		printf("error opening USB pcap: %s\n", err::getLastErrorDescription().sz());
+		printf("error opening USB monitor: %s\n", err::getLastErrorDescription().sz());
 		return false;
 	}
+
+	enum {
+		BufferSize = 1 * 1024 * 1024, // 1M
+	};
 
 	sl::String string;
 	sl::Array<char> buffer;
 	buffer.setCount(BufferSize);
 
-	// read pcap header
+	result = monitor.setKernelBufferSize(BufferSize);
+	if (!result)
+		printf("warning: unable to set kernel buffer size: %s\n", err::getLastErrorDescription().sz());
 
-	size_t size = usbMon.read(buffer, BufferSize);
-	if (size != sizeof(pcap_hdr_t)) {
-		printf("pcap_hdr_t is too small: %d bytes\n", size);
-		return false;
-	}
-
-	const pcap_hdr_t* pcapHdr = (pcap_hdr_t*)buffer.cp();
-	printf("pcap_hdr_t (%d bytes received)\n", size);
-    printf("  magic_number:  0x%08x\n", pcapHdr->magic_number);
-    printf("  version_major: %d\n", pcapHdr->version_major);
-    printf("  version_minor: %d\n", pcapHdr->version_minor);
-    printf("  thiszone:      %d\n", pcapHdr->thiszone);
-    printf("  sigfigs:       %d\n", pcapHdr->sigfigs);
-    printf("  snaplen:       %d\n", pcapHdr->snaplen);
-    printf("  network:       %d\n", pcapHdr->network);
-
-	if (pcapHdr->magic_number != 0xA1B2C3D4 || pcapHdr->network != DLT_USBPCAP) {
-		printf("invalid pcap_hdr_t\n");
-		return false;
-	}
+	printf("Capturing USB on the Serial Tap...\n");
+	printf("  kernel buffer: %d B\n", monitor.getKernelBufferSize());
 
 	for (;;) {
 		printf("\n");
 
-		size_t size = pcap.read(buffer, BufferSize);
-		if (size < sizeof(pcaprec_hdr_t)) {
-			printf("pcaprec_hdr_t is too small: %d bytes\n", size);
+		size_t size = monitor.read(buffer, BufferSize);
+		if (size == -1) {
+			printf("read error: %s\n", err::getLastErrorDescription().sz());
 			return false;
 		}
 
-		const pcaprec_hdr_t* recHdr = (pcaprec_hdr_t*)buffer.cp();
-		uint64_t timestamp = sys::getTimestampFromTimeval(recHdr->ts_sec, recHdr->ts_usec);
-		printf("%s (%d bytes)\n", sys::Time(timestamp).format().sz(), size);
-		printf("pcaprec_hdr_t\n");
-		printf("  ts_sec:      %d\n", recHdr->ts_sec);
-		printf("  ts_usec:     %d\n", recHdr->ts_usec);
-		printf("  incl_len:    %d\n", recHdr->incl_len);
-		printf("  orig_len:    %d\n", recHdr->orig_len);
+		ASSERT(size >= sizeof(io::UsbMonTransferHdr));
+		const io::UsbMonTransferHdr* hdr = (io::UsbMonTransferHdr*)buffer.cp();
+		printf("UsbMonTransferHdr\n");
+		printf("  m_timestamp:    %s\n", sys::Time(hdr->m_timestamp).format("%Y-%M-%D %h:%m:%s.%l").sz());
+		printf("  m_status:       %d - %s\n", hdr->m_status, err::Errno(-hdr->m_status).getDescription().sz());
+		printf("  m_transferType: %d - %s\n", hdr->m_transferType, io::getUsbMonTransferTypeString((axl::io::UsbMonTransferType)hdr->m_transferType));
+		printf("  m_bus:          %d\n", hdr->m_bus);
+		printf("  m_address:      %d\n", hdr->m_address);
+		printf("  m_endpoint:     0x%02x\n", hdr->m_endpoint);
+		printf("  m_flags:        0x%02x\n", hdr->m_flags);
+		printf("  m_dataSize:     %d\n", hdr->m_dataSize);
 
-		if (recHdr->incl_len > size ||
-			recHdr->orig_len > size ||
-			recHdr->orig_len < sizeof(USBPCAP_BUFFER_PACKET_HEADER)
-		) {
-			printf("invalid pcaprec_hdr_t\n");
-			return false;
-		}
-
-		size = recHdr->orig_len;
-
-		USBPCAP_BUFFER_PACKET_HEADER* packetHdr = (USBPCAP_BUFFER_PACKET_HEADER*)(recHdr + 1);
-		printf("USBPCAP_BUFFER_PACKET_HEADER\n");
-		printf("  headerLen:  %d\n", packetHdr->headerLen);
-		printf("  irpId:      0x%016x\n", packetHdr->irpId);
-		printf("  status:     0x%08x\n", packetHdr->status);
-		printf("  function:   %d\n", packetHdr->function);
-		printf("  info:       0x%02x - %s\n", packetHdr->info, getUsbPcapInfoString(packetHdr->info));
-		printf("  bus:        %d\n", packetHdr->bus);
-		printf("  device:     %d\n", packetHdr->device);
-		printf("  endpoint:   0x%02x\n", packetHdr->endpoint);
-		printf("  transfer:   %d - %s\n", packetHdr->transfer, getUsbPcapTransferString(packetHdr->transfer));
-		printf("  dataLength: %d\n", packetHdr->dataLength);
-
-		if (size < packetHdr->headerLen || size < packetHdr->headerLen + packetHdr->dataLength) {
-			printf("invalid USBPCAP_BUFFER_PACKET_HEADER\n");
-			continue;
-		}
-
-		switch (packetHdr->transfer) {
-			const USBPCAP_BUFFER_CONTROL_HEADER* controlHdr;
-			const USBPCAP_BUFFER_ISOCH_HEADER* isochHdr;
-
-		case USBPCAP_TRANSFER_CONTROL:
-			controlHdr = (USBPCAP_BUFFER_CONTROL_HEADER*)packetHdr;
-			printf("USBPCAP_BUFFER_CONTROL_HEADER\n");
-			printf("  stage: %d - %s\n", controlHdr->stage, getUsbPcapControlStageString(controlHdr->stage));
-			break;
-
-		case USBPCAP_TRANSFER_BULK:
-		case USBPCAP_TRANSFER_INTERRUPT:
-			break;
-
-		case USBPCAP_TRANSFER_ISOCHRONOUS:
-			isochHdr = (USBPCAP_BUFFER_ISOCH_HEADER*)packetHdr;
-			printf("USBPCAP_BUFFER_ISOCH_HEADER\n");
-			printf("  startFrame: %d\n", isochHdr->startFrame);
-			printf("  numberOfPackets: %d\n", isochHdr->numberOfPackets);
-			printf("  errorCount:      %d\n", isochHdr->errorCount);
-			break;
-		}
-
-		if (packetHdr->dataLength) {
+		if (hdr->m_dataSize) {
 			printf("PAYLOAD\n");
 			enc::HexEncoding::encode(
 				&string,
-				(char*)packetHdr + packetHdr->headerLen,
-				packetHdr->dataLength,
+				hdr + 1,
+				hdr->m_dataSize,
 				enc::HexEncodingFlag_Multiline
 			);
 
 			printf("%s\n", string.sz());
 		}
 	}
-	*/
 
 	return true;
 }

@@ -78,10 +78,10 @@ getUsbClassCodeString(libusb_class_code classCode) {
 const char*
 getUsbTransferTypeString(libusb_transfer_type transferType) {
 	static const char* stringTable[] = {
-		"Control",     // LIBUSB_SPEED_LOW = 1,
-		"Isochronous", // LIBUSB_SPEED_FULL = 2,
-		"Bulk",        // LIBUSB_SPEED_HIGH = 3,
-		"Interrupt",   // LIBUSB_SPEED_SUPER = 4,
+		"Control",     // LIBUSB_TRANSFER_TYPE_CONTROL = 0,
+		"Isochronous", // LIBUSB_TRANSFER_TYPE_ISOCHRONOUS = 1,
+		"Bulk",        // LIBUSB_TRANSFER_TYPE_BULK = 2,
+		"Interrupt",   // LIBUSB_TRANSFER_TYPE_INTERRUPT = 3,
 		"Bulk stream", // LIBUSB_TRANSFER_TYPE_BULK_STREAM = 4,
 	};
 

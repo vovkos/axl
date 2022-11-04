@@ -15,12 +15,15 @@
 
 set(
 	LIB_H_LIST
+	${AXL_INC_DIR}/axl_io_usbmon/axl_io_UsbMonTransfer.h
 	${AXL_INC_DIR}/axl_io_usbmon/axl_io_UsbMonEnumerator.h
+	${AXL_INC_DIR}/axl_io_usbmon/axl_io_UsbMonitorBase.h
 	axl_io_UsbStringDescriptorLanguage.h
 )
 
 set(
 	LIB_CPP_LIST
+	axl_io_UsbMonTransfer.cpp
 	axl_io_UsbStringDescriptorLanguage.cpp
 )
 
@@ -35,11 +38,13 @@ source_group(
 
 set(
 	LIB_WIN_H_LIST
+	${AXL_INC_DIR}/axl_io_usbmon/axl_io_win_UsbPcap.h
 	${AXL_INC_DIR}/axl_io_usbmon/axl_io_win_UsbMonitor.h
 )
 
 set(
 	LIB_WIN_CPP_LIST
+	axl_io_win_UsbPcap.cpp
 	axl_io_win_UsbMonitor.cpp
 	axl_io_win_UsbMonEnumerator.cpp
 )
@@ -59,11 +64,13 @@ endif()
 
 set(
 	LIB_LNX_H_LIST
+	${AXL_INC_DIR}/axl_io_usbmon/axl_io_lnx_UsbMon.h
 	${AXL_INC_DIR}/axl_io_usbmon/axl_io_lnx_UsbMonitor.h
 )
 
 set(
 	LIB_LNX_CPP_LIST
+	axl_io_lnx_UsbMon.cpp
 	axl_io_lnx_UsbMonitor.cpp
 	axl_io_lnx_UsbMonEnumerator.cpp
 )
@@ -104,17 +111,13 @@ source_group(
 # axl_io_usbmon library
 #
 
+include_directories(
+	${AXL_INC_DIR}
+	${CMAKE_CURRENT_LIST_DIR}/include
+)
+
 if(WIN32)
-	include_directories(
-		${USBSDK_INC_PATH}
-		${AXL_INC_DIR}
-		${CMAKE_CURRENT_LIST_DIR}/include
-	)
-elseif(LINUX)
-	include_directories(
-		${PCAP_INC_DIR}
-		${AXL_INC_DIR}
-	)
+	include_directories(${USBSDK_INC_PATH})
 endif()
 
 add_library(

@@ -11,143 +11,73 @@
 
 #include "pch.h"
 #include "axl_io_lnx_UsbMonitor.h"
+#include "axl_sys_Time.h"
 
 namespace axl {
 namespace io {
 namespace lnx {
 
 //..............................................................................
-/*
-bool
-UsbMonitor::open(
-	const sl::String_w& name,
-	Mode mode
+
+size_t
+UsbMonitor::read(
+	void* p,
+	size_t size,
+	uint_t timeout
 ) {
-	static sl::StringRef_w symlinkPrefix = L"\\\\.\\";
+	if (size < sizeof(UsbMonTransferHdr))
+		return err::fail(err::SystemErrorCode_BufferTooSmall);
 
-	return m_device.create(
-		name.isPrefix(symlinkPrefix) ? name : symlinkPrefix + name,
-		mode == Mode_Enumerate ? 0 : GENERIC_READ | GENERIC_WRITE,
-		mode == Mode_Enumerate ? FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE : 0,
-		NULL,
-		OPEN_EXISTING,
-		FILE_FLAG_OVERLAPPED
-	);
-}
+	if (m_readBuffer.getCount() <= MinReadBufferSize)
+		m_readBuffer.setCount(DefaultReadBufferSize);
 
-bool
-UsbMonitor::getHubSymlink(sl::String_w* string) {
-	wchar_t* p = string->createBuffer(IoctlOutputBufferSize / sizeof(wchar_t));
+	const usbmon::mon_bin_hdr* srcHdr;
 
-	dword_t actualSize;
-	bool result = m_device.ioctl(
-		IOCTL_USBPCAP_GET_HUB_SYMLINK,
-		NULL,
-		0,
-		p,
-		IoctlOutputBufferSize,
-		(dword_t*)&actualSize
-	);
+	for (;;) {
+		size_t result = m_device.read(m_readBuffer, m_readBuffer.getCount());
+		if (result == -1)
+			return -1;
 
-	if (!result)
-		return false;
+		if (result < sizeof(usbmon::mon_bin_hdr)) {
+			err::setFormatStringError("unexpected usbmon read size: %d", result);
+			return -1;
+		}
 
-	if (!actualSize) {
-		err::setError("missing USB hub symlink information");
-		return false;
+		srcHdr = (usbmon::mon_bin_hdr*)m_readBuffer.cp();
+		if (!m_filterAddress || srcHdr->devnum == m_filterAddress)
+			break;
 	}
 
-	string->overrideLength(actualSize / sizeof(wchar_t) - 1);
-	return true;
-}
+	UsbMonTransferHdr* dstHdr = (UsbMonTransferHdr*)p;
+	dstHdr->m_timestamp = sys::getTimestampFromTimeval(srcHdr->ts_sec, srcHdr->ts_usec);
+	dstHdr->m_status = srcHdr->status;
+	dstHdr->m_dataSize = srcHdr->len_cap;
+	dstHdr->m_transferType = srcHdr->xfer_type;
+	dstHdr->m_bus = srcHdr->busnum;
+	dstHdr->m_address = srcHdr->devnum;
+	dstHdr->m_endpoint = srcHdr->epnum;
+	dstHdr->m_flags = srcHdr->type != 'S' ? UsbMonTransferFlag_Completed : 0;
 
-bool
-UsbMonitor::setSnapshotLength(size_t size) {
-	USBPCAP_IOCTL_SIZE params;
-	params.size = (uint32_t)size;
+	switch (dstHdr->m_transferType) {
+	case UsbMonTransferType_Control:
+		if (srcHdr->type == 'S')
+			memcpy(dstHdr->m_controlSetup, srcHdr->s.setup, sizeof(dstHdr->m_controlSetup));
+		break;
 
-	dword_t actualSize;
-	return m_device.ioctl(
-		IOCTL_USBPCAP_SET_SNAPLEN_SIZE,
-		&params,
-		sizeof(params),
-		NULL,
-		0,
-		(dword_t*)&actualSize
-	);
-}
-
-bool
-UsbMonitor::setKernelBufferSize(size_t size) {
-	USBPCAP_IOCTL_SIZE params;
-	params.size = (uint32_t)size;
-
-	dword_t actualSize;
-	return m_device.ioctl(
-		IOCTL_USBPCAP_SETUP_BUFFER,
-		&params,
-		sizeof(params),
-		NULL,
-		0,
-		(dword_t*)&actualSize
-	);
-}
-
-bool
-UsbMonitor::setFilter(uint_t deviceAddress) {
-	deviceAddress &= 0x7f; // 1 .. 127
-
-	USBPCAP_ADDRESS_FILTER filter = { 0 };
-	filter.addresses[deviceAddress / 32] = 1 << (deviceAddress % 32);
-
-	dword_t actualSize;
-	return m_device.ioctl(
-		IOCTL_USBPCAP_START_FILTERING,
-		&filter,
-		sizeof(filter),
-		NULL,
-		0,
-		(dword_t*)&actualSize
-	);
-}
-
-bool
-UsbMonitor::setFilter(
-	const uint_t* deviceAddressTable,
-	size_t deviceCount
-) {
-	USBPCAP_ADDRESS_FILTER filter = { 0 };
-
-	for (size_t i = 0; i < deviceCount; i++) {
-		uint_t deviceAddress = deviceAddressTable[i];
-		deviceAddress &= 0x7f; // 1 .. 127
-		filter.addresses[deviceAddress / 32] = 1 << (deviceAddress % 32);
+	case UsbMonTransferType_Isochronous:
+		memset(&dstHdr->m_iso, 0, sizeof(dstHdr->m_iso)); // not yet
+		break;
 	}
 
-	dword_t actualSize;
-	return m_device.ioctl(
-		IOCTL_USBPCAP_START_FILTERING,
-		&filter,
-		sizeof(filter),
-		NULL,
-		0,
-		(dword_t*)&actualSize
-	);
+	if (!srcHdr->len_cap)
+		return sizeof(UsbMonTransferHdr);
+
+	size_t leftoverSize = size - sizeof(UsbMonTransferHdr);
+	size_t copySize = AXL_MIN(srcHdr->len_cap, leftoverSize);
+	memcpy(dstHdr + 1, srcHdr + 1, copySize);
+	return sizeof(UsbMonTransferHdr) + copySize;
 }
 
-bool
-UsbMonitor::clearFilter() {
-	dword_t actualSize;
-	return m_device.ioctl(
-		IOCTL_USBPCAP_STOP_FILTERING,
-		NULL,
-		0,
-		NULL,
-		0,
-		(dword_t*)&actualSize
-	);
-}
-*/
 //..............................................................................
 
 } // namespace lnx

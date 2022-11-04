@@ -10,8 +10,7 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_io_UsbMonitor.h"
-#include "axl_io_File.h"
+#include "axl_io_UsbMonTransfer.h"
 
 namespace axl {
 namespace io {
@@ -30,40 +29,6 @@ getUsbMonTransferTypeString(UsbMonTransferType transferType) {
 	return (size_t)transferType < countof(stringTable) ?
 		stringTable[transferType] :
 		"Unknown";
-}
-
-//..............................................................................
-
-bool
-UsbMonitor::open(
-	const sl::String& captureDeviceName,
-	uint_t flags
-) {
-	int openFlags = (flags & io::FileFlag_Asynchronous) ?
-		O_RDWR | O_NONBLOCK :
-		O_RDWR;
-
-	return m_device.open(captureDeviceName, openFlags);
-}
-
-size_t
-UsbMonitor::read(
-	void* p,
-	size_t size
-) {
-	for (;;) {
-		size_t result = m_device.read(m_readBuffer, m_readBuffer.getCount());
-		if (result == -1)
-			return -1;
-
-		if (result < sizeof(lnx::usbmon::mon_bin_hdr)) {
-			err::setFormatStringError("unexpected usbmon read size: %d", result);
-			return -1;
-		}
-
-		const lnx::usbmon::mon_bin_hdr* hdr = (lnx::usbmon::mon_bin_hdr*) m_readBuffer.cp();
-		if (hdr->)
-	}
 }
 
 //..............................................................................

@@ -13,8 +13,14 @@
 
 #define _AXL_IO_LNX_USBMONITOR_H
 
+#include "axl_io_UsbMonitorBase.h"
 #include "axl_sl_String.h"
-#include "axl_io_psx_File.h"
+
+#if (_AXL_OS_WIN)
+#	include "axl_io_win_UsbPcap.h"
+#elif (_AXL_OS_LINUX)
+#	include "axl_io_lnx_UsbMon.h"
+#endif
 
 namespace axl {
 namespace io {
@@ -22,110 +28,60 @@ namespace lnx {
 
 //..............................................................................
 
-class UsbMonitor
-{
+class UsbMonitor: public UsbMonitorBase {
 public:
-	enum
-	{
-		// as suggested by USBPcapCMD
-
-		IoctlOutputBufferSize = 1024,             // 1K
-		DefaultKernelBufferSize = 1 * 1024 * 1024,  // 1M
-		DefaultSnapshotLength = 65535,            // 64K - 1
-	};
-
-	enum Mode
-	{
-		Mode_Capture,
-		Mode_Enumerate,
-	};
-
-protected:
-	axl::io::psx::File m_device;
+	axl::io::lnx::UsbMon m_device;  // for asynchronous access
+	uint_t m_filterAddress;         // freely adjustable
 
 public:
+	UsbMonitor() {
+		m_filterAddress = 0;
+	}
+
 	bool
-	isOpen()
-	{
+	isOpen() const {
 		return m_device.isOpen();
 	}
 
 	bool
 	open(
-		const sl::String_w& name,
-		Mode mode = Mode_Capture
+		const sl::String& captureDeviceName,
+		uint_t flags = 0
 	);
 
 	void
-	close()
-	{
+	close() {
 		m_device.close();
 	}
 
-	sl::String_w
-	getHubSymlink();
-
-	bool
-	getHubSymlink(sl::String_w* symlink);
-
-	bool
-	setSnapshotLength(size_t size);
-
-	bool
-	setKernelBufferSize(size_t size);
-
-	bool
-	setFilter(uint_t deviceAddress);
-
-	bool
-	setFilter(
-		const uint_t* deviceAddressTable,
-		size_t deviceCount
-	);
-
-	bool
-	clearFilter();
-
-/*	size_t
-	read(
-		void* p,
-		size_t size
-	) {
-		return m_device.overlappedRead(p, size);
+	size_t
+	getKernelBufferSize() {
+		return m_device.getKernelBufferSize();
 	}
 
 	bool
-	overlappedRead(
-		void* p,
-		dword_t size,
-		OVERLAPPED* overlapped
-	) {
-		return m_device.overlappedRead(p, size, overlapped);
-	}
-
-	bool
-	getOverlappedResult(
-		OVERLAPPED* overlapped,
-		dword_t* actualSize
-	) {
-		return m_device.getOverlappedResult(overlapped, actualSize);
+	setKernelBufferSize(size_t size) {
+		return m_device.setKernelBufferSize(size);
 	}
 
 	size_t
-	getOverlappedResult(OVERLAPPED* overlapped) {
-		return m_device.getOverlappedResult(overlapped);
-	} */
+	read(
+		void* p,
+		size_t size,
+		uint_t timeout = -1
+	);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-sl::String_w
-UsbMonitor::getHubSymlink()
-{
-	sl::String_w string;
-	getHubSymlink(&string);
-	return string;
+bool
+UsbMonitor::open(
+	const sl::String& captureDeviceName,
+	uint_t flags
+) {
+	int openFlags = (flags & io::FileFlag_Asynchronous) ? O_RDWR | O_NONBLOCK : O_RDWR;
+	return m_device.open(captureDeviceName, openFlags);
 }
 
 //..............................................................................

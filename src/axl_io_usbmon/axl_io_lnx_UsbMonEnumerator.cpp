@@ -133,7 +133,7 @@ enumerateUsbMonDevices(
 		uint_t busNumber = device.getBusNumber();
 		string.format("/dev/usbmon%d", busNumber);
 		if (!doesFileExist(string))
-			continue; // if usbmon device not found then we can't sniff
+			continue; // usbmon device not found, can't sniff
 
 		UsbMonDeviceDesc* deviceDesc = AXL_MEM_NEW(UsbMonDeviceDesc);
 		deviceDesc->m_captureDeviceName = string;

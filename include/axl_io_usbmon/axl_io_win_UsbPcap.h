@@ -11,10 +11,9 @@
 
 #pragma once
 
-#define _AXL_IO_WIN_USBMONITOR_H
+#define _AXL_IO_WIN_USBPCAP_H
 
-#include "axl_io_UsbMonitorBase.h"
-#include "axl_io_win_UsbPcap.h"
+#include "axl_io_win_UsbPcapPch.h"
 
 namespace axl {
 namespace io {
