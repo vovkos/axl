@@ -43,11 +43,16 @@ protected:
 		UsbMonTransferHdr {
 	};
 
-	sl::BoxList<Transfer> m_transferList;
+	sl::List<Transfer> m_transferList;
 	sl::SimpleHashTable<uint64_t, Transfer*> m_transferMap;
 	sl::Array<char> m_readBuffer;
+	uint_t m_openFlags;
 
 public:
+	UsbMonitorBase() {
+		m_openFlags = 0;
+	}
+
 	size_t
 	getReadBufferSize() {
 		return m_readBuffer.getCount();
@@ -56,6 +61,18 @@ public:
 	bool
 	setReadBufferSize(size_t size) {
 		return m_readBuffer.setCount(size);
+	}
+
+	size_t
+	getTransferCount() {
+		return m_transferList.getCount();
+	}
+
+protected:
+	void
+	clearTransfers() {
+		m_transferList.clear();
+		m_transferMap.clear();
 	}
 };
 

@@ -52,6 +52,7 @@ public:
 	void
 	close() {
 		m_device.close();
+		clearTransfers();
 	}
 
 	size_t
@@ -70,19 +71,20 @@ public:
 		size_t size,
 		uint_t timeout = -1
 	);
+
+protected:
+	size_t // returns combined size of the header and data
+	get(
+		usbmon::mon_bin_hdr_ex* hdr,
+		uint_t timeout
+	);
+
+	void
+	fillUsbMonTransferHdr(
+		UsbMonTransferHdr* dstHdr,
+		const usbmon::mon_bin_hdr_ex* srcHdr
+	);
 };
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-inline
-bool
-UsbMonitor::open(
-	const sl::String& captureDeviceName,
-	uint_t flags
-) {
-	int openFlags = (flags & io::FileFlag_Asynchronous) ? O_RDWR | O_NONBLOCK : O_RDWR;
-	return m_device.open(captureDeviceName, openFlags);
-}
 
 //..............................................................................
 

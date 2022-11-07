@@ -31,6 +31,73 @@ getUsbMonTransferTypeString(UsbMonTransferType transferType) {
 		"Unknown";
 }
 
+sl::StringRef
+getUsbMonTransferFlagsString(uint_t flags) {
+	return (flags & UsbMonTransferFlag_Completed) ?
+	   sl::StringRef("Completed") :
+	   sl::StringRef();
+}
+
+const char*
+getUsbMonControlRecipientString(UsbMonControlRecipient recipient) {
+	static const char* stringTable[] = {
+		"Device",     // 0
+		"Interface",  // 1
+		"Endpoint",   // 2
+		"Other",      // 3
+	};
+
+	return (size_t)recipient < countof(stringTable) ?
+		stringTable[recipient] :
+		"Unknown";
+}
+
+const char*
+getUsbMonControlTypeString(UsbMonControlType type) {
+	static const char* stringTable[] = {
+		"Standard", // 0
+		"Class",    // 1
+		"Vendor",   // 2
+	};
+
+	return (size_t)type < countof(stringTable) ?
+		stringTable[type] :
+		"Unknown";
+}
+
+const char*
+getUsbMonControlDirectionString(UsbMonControlDirection direction) {
+	static const char* stringTable[] = {
+		"Out", // 0
+		"In",  // 1
+	};
+
+	return (size_t)direction < countof(stringTable) ?
+		stringTable[direction] :
+		"Unknown";
+}
+
+const char*
+getUsbMonControlStdRequestString(UsbMonControlStdRequest request) {
+	static const char* stringTable[] = {
+		"GetStatus",         // 0
+		"ClearFeature",      // 1
+		"Reserved",          // 2
+		"SetFeature",        // 3
+		"Reserved2",         // 4
+		"SetAddress",        // 5
+		"GetDescriptor",     // 6
+		"SetDescriptor",     // 7
+		"GetConfiguration",  // 8
+		"SetConfiguration",  // 9
+		"GetInterface",      // 10
+		"SetInterface",      // 11
+		"SynchFrame",        // 12
+	};
+
+	return request < countof(stringTable) ? stringTable[request] : "Unknown";
+}
+
 //..............................................................................
 
 } // namespace io
