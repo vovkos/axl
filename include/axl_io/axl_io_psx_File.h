@@ -79,7 +79,7 @@ public:
 	}
 
 	size_t
-	getIncomingDataSize();
+	getIncomingDataSize() const;
 
 	bool
 	flush() {
@@ -137,6 +137,69 @@ public:
 		size_t size
 	);
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+bool
+File::open(
+	const sl::StringRef& fileName,
+	uint_t openFlags,
+	mode_t mode
+) {
+	close();
+
+	m_h = ::open(fileName.sz(), openFlags, mode);
+	return err::complete(m_h != -1);
+}
+
+inline
+bool
+File::duplicate(int fd) {
+	close();
+
+	m_h = ::dup(fd);
+	return err::complete(m_h != -1);
+}
+
+inline
+size_t
+File::getIncomingDataSize() const {
+	int value;
+	int result = ::ioctl(m_h, FIONREAD, &value);
+	if (result == -1) {
+		err::setLastSystemError();
+		return -1;
+	}
+
+	return value;
+}
+
+inline
+size_t
+File::read(
+	void* p,
+	size_t size
+) {
+	size_t actualSize = ::read(m_h, p, size);
+	if (actualSize == -1)
+		err::setLastSystemError();
+
+	return actualSize;
+}
+
+inline
+size_t
+File::write(
+	const void* p,
+	size_t size
+) {
+	size_t actualSize = ::write(m_h, p, size);
+	if (actualSize == -1)
+		err::setLastSystemError();
+
+	return actualSize;
+}
 
 //..............................................................................
 

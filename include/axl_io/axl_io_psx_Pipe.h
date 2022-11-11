@@ -40,7 +40,7 @@ public:
 	read(
 		void* p,
 		size_t size
-	) const {
+	) {
 		return m_readFile.read(p, size);
 	}
 

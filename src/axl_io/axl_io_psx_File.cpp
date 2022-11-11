@@ -20,26 +20,6 @@ namespace psx {
 //..............................................................................
 
 bool
-File::open(
-	const sl::StringRef& fileName,
-	uint_t openFlags,
-	mode_t mode
-) {
-	close();
-
-	m_h = ::open(fileName.sz(), openFlags, mode);
-	return err::complete(m_h != -1);
-}
-
-bool
-File::duplicate(int fd) {
-	close();
-
-	m_h = ::dup(fd);
-	return err::complete(m_h != -1);
-}
-
-bool
 File::setBlockingMode(bool isBlocking) {
 	int result = ::fcntl(m_h, F_GETFL, 0);
 	if (result == -1)
@@ -65,10 +45,8 @@ File::getSize() const {
 	int result = ::fstat64(m_h, &stat);
 #endif
 
-	if (result == -1) {
-		err::setLastSystemError();
-		return -1;
-	}
+	if (result == -1)
+		return err::failWithLastSystemError<uint64_t>(-1);
 
 	return stat.st_size;
 }
@@ -82,45 +60,9 @@ File::getPosition() const {
 #endif
 
 	if (offset == -1)
-		err::setLastSystemError();
+		return err::failWithLastSystemError<uint64_t>(-1);
 
 	return offset;
-}
-
-size_t
-File::getIncomingDataSize() {
-	int value;
-	int result = ::ioctl(m_h, FIONREAD, &value);
-	if (result == -1) {
-		err::setLastSystemError();
-		return -1;
-	}
-
-	return value;
-}
-
-size_t
-File::read(
-	void* p,
-	size_t size
-) const {
-	size_t actualSize = ::read(m_h, p, size);
-	if (actualSize == -1)
-		err::setLastSystemError();
-
-	return actualSize;
-}
-
-size_t
-File::write(
-	const void* p,
-	size_t size
-) {
-	size_t actualSize = ::write(m_h, p, size);
-	if (actualSize == -1)
-		err::setLastSystemError();
-
-	return actualSize;
 }
 
 //..............................................................................
