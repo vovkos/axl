@@ -72,7 +72,7 @@ UsbMonitor::overlappedRead(
 	size_t size,
 	Overlapped* overlapped
 ) {
-	if ((m_flags & UsbMonFlag_MessageMode) && size < sizeof(UsbMonTransferHdr))
+	if ((m_flags & Flag_MessageMode) && size < sizeof(UsbMonTransferHdr))
 		return err::fail(err::SystemErrorCode_BufferTooSmall);
 
 	if (!m_transferList.isEmpty()) {
@@ -296,7 +296,7 @@ UsbMonitor::copyTransfers(
 	ASSERT(size >= sizeof(UsbMonTransferHdr));
 	ASSERT(!m_transferList.isEmpty());
 
-	if (m_flags & UsbMonFlag_MessageMode) {
+	if (m_flags & Flag_MessageMode) {
 		Transfer* transfer = m_transferList.removeHead();
 		size_t copySize = sizeof(UsbMonTransferHdr) + transfer->m_hdr.m_captureSize;
 		if (copySize > size) {

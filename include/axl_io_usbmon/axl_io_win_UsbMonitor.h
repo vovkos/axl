@@ -28,6 +28,10 @@ public:
 		MinimumKernelBufferSize = 1 * 1024,
 	};
 
+	enum Flag {
+		Flag_MessageMode = 0x01, // read returns a single transfer
+	};
+
 	enum OverlappedState {
 		OverlappedState_Undefined,
 		OverlappedState_Completed,
@@ -88,14 +92,14 @@ public:
 		const sl::String& captureDeviceName,
 		size_t snapshotLength,
 		size_t kernelBufferSize,
-		uint_t filterAddress = 0,
+		uint_t filterAddress,
 		uint_t flags = 0
 	);
 
 	bool
 	open(
 		const sl::String& captureDeviceName,
-		uint_t filterAddress = 0,
+		uint_t filterAddress,
 		uint_t flags = 0
 	) {
 		return open(

@@ -13,7 +13,7 @@
 
 #define _AXL_IO_LNX_USBMONITOR_H
 
-#include "axl_io_UsbMonitorBase.h"
+#include "axl_io_UsbMonTransfer.h"
 #include "axl_io_lnx_UsbMon.h"
 
 namespace axl {
@@ -22,7 +22,16 @@ namespace lnx {
 
 //..............................................................................
 
-class UsbMonitor: public UsbMonitorBase {
+class UsbMonitor {
+public:
+	enum {
+		MinimumKernelBufferSize = 1 * 1024,
+		DefaultKernelBufferSize = 1 * 1024 * 1024,
+	};
+
+protected:
+	sl::Array<char> m_readBuffer;
+
 public:
 	axl::io::lnx::UsbMon m_device;  // for asynchronous access
 	uint_t m_filterAddress;         // freely adjustable
@@ -40,13 +49,19 @@ public:
 	bool
 	open(
 		const sl::String& captureDeviceName,
+		size_t kernelBufferSize,
+		uint_t filterAddress
+	);
+
+	bool
+	open(
+		const sl::String& captureDeviceName,
 		uint_t filterAddress
 	);
 
 	void
 	close() {
 		m_device.close();
-		clearTransfers();
 	}
 
 	size_t

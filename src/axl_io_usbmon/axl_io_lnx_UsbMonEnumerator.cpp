@@ -39,12 +39,6 @@ getHwdbString(
 	return sl::String();
 }
 
-#if (_AXL_IO_USBDEVICE_GETPORTPATH || _AXL_IO_USBDEVICE_GETPORTNUMBERS)
-#	define _AXL_IO_USBMON_USE_SYSFS 1
-#endif
-
-#if (_AXL_IO_USBMON_USE_SYSFS)
-
 enum {
 	MaxUsbDepth            = 8,
 	MaxSysFsPropertyLength = 256,
@@ -101,8 +95,6 @@ readSysFsProperty(
 	return true;
 }
 
-#endif // _AXL_IO_USBMON_USE_SYSFS
-
 size_t
 enumerateUsbMonDevices(
 	sl::List<UsbMonDeviceDesc>* resultList,
@@ -124,6 +116,7 @@ enumerateUsbMonDevices(
 		return -1;
 
 	sl::String string;
+	sl::String sysFsPrefix;
 	sl::String_utf16 string_utf16;
 
 	libusb_device** pp = list;
@@ -155,22 +148,19 @@ enumerateUsbMonDevices(
 		deviceDesc->m_serialNumberDescriptorId = deviceDescriptor.iSerialNumber;
 		deviceDesc->m_flags |= UsbMonDeviceDescFlag_DeviceDescriptor;
 
+		getUsbDeviceSysFsPrefix(&sysFsPrefix, device);
+
 		if (mask & UsbMonDeviceDescMask_Description) {
 			if (hwdb.isOpen()) {
 				string.format("usb:v%04Xp%04X*", deviceDescriptor.idVendor, deviceDescriptor.idProduct);
 				deviceDesc->m_description = getHwdbString(hwdb, string, "ID_MODEL_FROM_DATABASE");
 			}
 
-#if (_AXL_IO_USBMON_USE_SYSFS)
 			if (deviceDesc->m_description.isEmpty()) {
-				getUsbDeviceSysFsPrefix(&string, device);
+				string.forceCopy(sysFsPrefix);
 				string += "product";
 				readSysFsProperty(&deviceDesc->m_description, string);
 			}
-#endif
-
-			if (!deviceDesc->m_description.isEmpty())
-				deviceDesc->m_flags |= UsbMonDeviceDescFlag_Description;
 		}
 
 		if (mask & UsbMonDeviceDescMask_Manufacturer) {
@@ -179,49 +169,55 @@ enumerateUsbMonDevices(
 				deviceDesc->m_manufacturer = getHwdbString(hwdb, string, "ID_VENDOR_FROM_DATABASE");
 			}
 
-#if (_AXL_IO_USBMON_USE_SYSFS)
 			if (deviceDesc->m_manufacturer.isEmpty()) {
-				getUsbDeviceSysFsPrefix(&string, device);
+				string.forceCopy(sysFsPrefix);
 				string += "manufacturer";
 				readSysFsProperty(&deviceDesc->m_manufacturer, string);
 			}
-#endif
-
-			if (!deviceDesc->m_manufacturer.isEmpty())
-				deviceDesc->m_flags |= UsbMonDeviceDescFlag_Manufacturer;
 		}
 
 		if (!(mask & UsbMonDeviceDescMask_Descriptors))
 			continue;
 
 		result = device.open();
-		if (!result)
-			continue;
+		if (result) {
+			device.getStringDescriptor(&string_utf16, 0, 0);
+			ushort_t langId = chooseUsbStringDescriptorLanguage(string_utf16);
 
-		device.getStringDescriptor(&string_utf16, 0, 0);
-		ushort_t langId = chooseUsbStringDescriptorLanguage(string_utf16);
-
-		if ((mask & UsbMonDeviceDescMask_ManufacturerDescriptor) && deviceDescriptor.iManufacturer) {
-			result = device.getStringDescriptor(&string_utf16, deviceDescriptor.iManufacturer, langId);
-			if (result) {
-				deviceDesc->m_manufacturerDescriptor = string_utf16;
-				deviceDesc->m_flags |= UsbMonDeviceDescFlag_ManufacturerDescriptor;
+			if ((mask & UsbMonDeviceDescMask_ManufacturerDescriptor) && deviceDescriptor.iManufacturer) {
+				result = device.getStringDescriptor(&string_utf16, deviceDescriptor.iManufacturer, langId);
+				if (result)
+					deviceDesc->m_manufacturerDescriptor = string_utf16;
 			}
-		}
 
-		if ((mask & UsbMonDeviceDescMask_ProductDescriptor) && deviceDescriptor.iProduct) {
-			result = device.getStringDescriptor(&string_utf16, deviceDescriptor.iProduct, langId);
-			if (result) {
-				deviceDesc->m_productDescriptor = string_utf16;
-				deviceDesc->m_flags |= UsbMonDeviceDescFlag_ProductDescriptor;
+			if ((mask & UsbMonDeviceDescMask_ProductDescriptor) && deviceDescriptor.iProduct) {
+				result = device.getStringDescriptor(&string_utf16, deviceDescriptor.iProduct, langId);
+				if (result)
+					deviceDesc->m_productDescriptor = string_utf16;
 			}
-		}
 
-		if ((mask & UsbMonDeviceDescMask_SerialNumberDescriptor) && deviceDescriptor.iSerialNumber) {
-			result = device.getStringDescriptor(&string_utf16, deviceDescriptor.iSerialNumber, langId);
-			if (result) {
-				deviceDesc->m_serialNumberDescriptor = string_utf16;
-				deviceDesc->m_flags |= UsbMonDeviceDescFlag_SerialNumberDescriptor;
+			if ((mask & UsbMonDeviceDescMask_SerialNumberDescriptor) && deviceDescriptor.iSerialNumber) {
+				result = device.getStringDescriptor(&string_utf16, deviceDescriptor.iSerialNumber, langId);
+				if (result)
+					deviceDesc->m_serialNumberDescriptor = string_utf16;
+			}
+		} else {
+			if (mask & UsbMonDeviceDescMask_ManufacturerDescriptor) {
+				string.forceCopy(sysFsPrefix);
+				string += "manufacturer";
+				readSysFsProperty(&deviceDesc->m_manufacturerDescriptor, string);
+			}
+
+			if (mask & UsbMonDeviceDescMask_ProductDescriptor) {
+				string.forceCopy(sysFsPrefix);
+				string += "product";
+				readSysFsProperty(&deviceDesc->m_productDescriptor, string);
+			}
+
+			if (mask & UsbMonDeviceDescMask_SerialNumberDescriptor) {
+				string.forceCopy(sysFsPrefix);
+				string += "serial";
+				readSysFsProperty(&deviceDesc->m_serialNumberDescriptor, string);
 			}
 		}
 	}

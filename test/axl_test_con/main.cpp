@@ -6786,7 +6786,7 @@ testUsbMon() {
 
 	sl::ConstIterator<io::UsbMonDeviceDesc> it = deviceList.getHead();
 	for (size_t i = 0; it; it++, i++) {
-		printf("device#%d\n", i);
+		printf("device #%d\n", i);
 		printf("  capture:        %s\n", it->m_captureDeviceName.sz());
 		printf("  address:        %d\n", it->m_address);
 
@@ -6830,16 +6830,28 @@ testUsbMon() {
 		return false;
 	}
 
+	bool result;
+
 #if (_AXL_OS_WIN)
 	io::win::UsbMonitor monitor;
-#elif (_AXL_OS_LINUX)
-	io::lnx::UsbMonitor monitor;
-#endif
-	bool result = monitor.open(
+	result = monitor.open(
 		serialTap.m_captureDeviceName,
 		serialTap.m_address,
-		io::UsbMonFlag_MessageMode
+		io::win::UsbMonitor::Flag_MessageMode
 	);
+#elif (_AXL_OS_LINUX)
+	enum {
+		ReadTimeout = 3000,
+		KernelBufferSize = io::lnx::UsbMonitor::DefaultKernelBufferSize
+	};
+
+	io::lnx::UsbMonitor monitor;
+	result = monitor.open(
+		serialTap.m_captureDeviceName,
+		KernelBufferSize,
+		serialTap.m_address
+	);
+#endif
 
 	if (!result) {
 		printf("error opening USB monitor: %s\n", err::getLastErrorDescription().sz());

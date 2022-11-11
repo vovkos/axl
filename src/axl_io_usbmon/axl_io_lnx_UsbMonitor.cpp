@@ -24,8 +24,24 @@ using namespace usbmon;
 bool
 UsbMonitor::open(
 	const sl::String& captureDeviceName,
-	uint_t filterAddress,
-	uint_t flags
+	size_t kernelBufferSize,
+	uint_t filterAddress
+) {
+	if (kernelBufferSize < MinimumKernelBufferSize)
+		kernelBufferSize = MinimumKernelBufferSize;
+
+	close();
+
+	return
+		m_device.open(captureDeviceName, O_RDWR | O_NONBLOCK) &&
+		m_device.setKernelBufferSize(kernelBufferSize) &&
+		m_readBuffer.setCount(kernelBufferSize);
+}
+
+bool
+UsbMonitor::open(
+	const sl::String& captureDeviceName,
+	uint_t filterAddress
 ) {
 	close();
 
@@ -33,8 +49,8 @@ UsbMonitor::open(
 	if (!result)
 		return false;
 
-	m_openFlags = flags;
-	return true;
+	size_t kernelBufferSize = m_device.getKernelBufferSize();
+	return m_readBuffer.setCount(kernelBufferSize);
 }
 
 size_t
@@ -49,10 +65,6 @@ UsbMonitor::read(
 	if (!isOpen())
 		return err::fail<size_t>(-1, err::SystemErrorCode_InvalidDeviceState);
 
-	if (m_readBuffer.getCount() <= MinReadBufferSize)
-		m_readBuffer.setCount(DefaultReadBufferSize);
-
-	bool isCompletedTransfersOnly = (m_openFlags & UsbMonitorFlag_CompletedTransfersOnly) != 0;
 	usbmon::mon_bin_hdr_ex srcHdr;
 	size_t result;
 
@@ -61,22 +73,8 @@ UsbMonitor::read(
 		if (result == -1 || result == 0)
 			return result;
 
-		if (m_filterAddress && srcHdr.devnum != m_filterAddress)
-			continue;
-
-		if (srcHdr.type != 'S' || !isCompletedTransfersOnly)
+		if (!m_filterAddress || srcHdr.devnum == m_filterAddress)
 			break;
-
-		size_t dataSize = result - sizeof(srcHdr);
-		Transfer* transfer = AXL_MEM_NEW_EXTRA(Transfer, dataSize);
-		fillUsbMonTransferHdr(transfer, &srcHdr);
-		if (dataSize) {
-			transfer->m_dataSize = dataSize;
-			memcpy(transfer + 1, m_readBuffer, dataSize);
-		}
-
-		m_transferList.insertTail(transfer);
-		m_transferMap[srcHdr.id] = transfer;
 	}
 
 	UsbMonTransferHdr* dstHdr = (UsbMonTransferHdr*)p;
@@ -85,30 +83,13 @@ UsbMonitor::read(
 	const void* data = m_readBuffer;
 	size_t dataSize = result - sizeof(srcHdr);
 
-	if (isCompletedTransfersOnly) {
-		sl::HashTableIterator<uint64_t, Transfer*> it = m_transferMap.find(srcHdr.id);
-		if (it) {
-			Transfer* transfer = it->m_value;
-			if (!(transfer->m_endpoint & 0x80)) { // out endpoint, use capture data
-				data = transfer + 1;
-				dataSize = transfer->m_dataSize;
-			}
-
-			if (transfer->m_transferType == UsbMonTransferType_Control) // control, use setup
-				dstHdr->m_controlSetup = transfer->m_controlSetup;
-
-			m_transferList.erase(transfer);
-			m_transferMap.erase(it);
-		}
-	}
-
 	if (!dataSize)
 		return sizeof(UsbMonTransferHdr);
 
 	size_t leftoverSize = size - sizeof(UsbMonTransferHdr);
 	size_t copySize = AXL_MIN(dataSize, leftoverSize);
 	memcpy(dstHdr + 1, data, dataSize);
-	dstHdr->m_dataSize = copySize;
+	dstHdr->m_actualSize = copySize;
 	return sizeof(UsbMonTransferHdr) + copySize;
 }
 
@@ -161,9 +142,9 @@ UsbMonitor::fillUsbMonTransferHdr(
 ) {
 	dstHdr->m_timestamp = sys::getTimestampFromTimeval(srcHdr->ts_sec, srcHdr->ts_usec);
 	dstHdr->m_status = srcHdr->status;
-	dstHdr->m_bufferSize = srcHdr->len_urb;
+	dstHdr->m_originalSize = srcHdr->len_urb;
 	dstHdr->m_captureSize = srcHdr->len_cap;
-	dstHdr->m_dataSize = 0;
+	dstHdr->m_actualSize = 0;
 	dstHdr->m_transferType = srcHdr->xfer_type;
 	dstHdr->m_bus = srcHdr->busnum;
 	dstHdr->m_address = srcHdr->devnum;
