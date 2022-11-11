@@ -13,7 +13,7 @@
 
 #define _AXL_IO_WIN_USBMONITOR_H
 
-#include "axl_io_UsbMonitorBase.h"
+#include "axl_io_UsbMonTransfer.h"
 #include "axl_io_win_UsbPcap.h"
 
 namespace axl {
@@ -22,105 +22,250 @@ namespace win {
 
 //..............................................................................
 
-class UsbPcap {
+class UsbMonitor {
 public:
 	enum {
-		// as suggested by USBPcapCMD
-
-		IoctlOutputBufferSize   = 1024,             // 1K
-		DefaultKernelBufferSize = 1 * 1024 * 1024,  // 1M
-		DefaultSnapshotLength   = 65535,            // 64K - 1
+		MinimumKernelBufferSize = 1 * 1024,
 	};
 
-	enum Mode {
-		Mode_Capture,
-		Mode_Enumerate,
+	enum OverlappedState {
+		OverlappedState_Undefined,
+		OverlappedState_Completed,
+		OverlappedState_Pending,
+	};
+
+	class Overlapped: public sl::ListLink {
+		friend class UsbMonitor;
+
+	protected:
+		void* m_buffer;
+		size_t m_bufferSize;
+		size_t m_actualSize;
+		err::Error m_error;
+		win::StdOverlapped m_overlapped;
+		OverlappedState m_state;
+
+	public:
+		Overlapped();
+
+		OverlappedState
+		getState() const {
+			return m_state;
+		}
+
+		const sys::NotificationEvent&
+		getCompletionEvent() const {
+			return m_overlapped.m_completionEvent;
+		}
 	};
 
 protected:
-	axl::io::win::File m_device;
+	struct Transfer: sl::ListLink {
+		size_t m_readOffset;
+		UsbMonTransferHdr m_hdr;
+		char m_data[1];
+	};
+
+protected:
+	win::UsbPcap m_device;
+	sl::AuxList<Overlapped> m_readList;
+	sl::List<Transfer> m_transferList;
+	sl::Array<char> m_readBuffer;
+	size_t m_readBufferOffset;
+	size_t m_snapshotLength;
+	uint_t m_flags;
 
 public:
+	UsbMonitor();
+
 	bool
-	isOpen() {
+	isOpen() const {
 		return m_device.isOpen();
 	}
 
 	bool
 	open(
-		const sl::String_w& name,
-		Mode mode = Mode_Capture
+		const sl::String& captureDeviceName,
+		size_t snapshotLength,
+		size_t kernelBufferSize,
+		uint_t filterAddress = 0,
+		uint_t flags = 0
 	);
+
+	bool
+	open(
+		const sl::String& captureDeviceName,
+		uint_t filterAddress = 0,
+		uint_t flags = 0
+	) {
+		return open(
+			captureDeviceName,
+			win::UsbPcap::DefaultSnapshotLength,
+			win::UsbPcap::DefaultKernelBufferSize,
+			filterAddress,
+			flags
+		);
+	}
 
 	void
 	close() {
 		m_device.close();
+		m_transferList.clear();
 	}
 
-	sl::String_w
-	getHubSymlink();
+	size_t
+	getSnapshotLength() const {
+		return m_snapshotLength;
+	}
+
+	size_t
+	getKernelBufferSize() const {
+		return m_readBuffer.getCount();
+	}
 
 	bool
-	getHubSymlink(sl::String_w* symlink);
+	setKernelBufferSize(size_t size) {
+		return
+			m_readBuffer.setCount(size) &&
+			m_device.setKernelBufferSize(size);
+	}
 
 	bool
-	setSnapshotLength(size_t size);
-
-	bool
-	setKernelBufferSize(size_t size);
-
-	bool
-	setFilter(uint_t deviceAddress);
-
-	bool
-	setFilter(
-		const uint_t* deviceAddressTable,
-		size_t deviceCount
-	);
-
-	bool
-	clearFilter();
+	setFilter(uint_t address) {
+		return m_device.setFilter(address);
+	}
 
 	size_t
 	read(
 		void* p,
 		size_t size
-	) {
-		return m_device.overlappedRead(p, size);
-	}
+	);
 
 	bool
 	overlappedRead(
 		void* p,
-		dword_t size,
-		OVERLAPPED* overlapped
-	) {
-		return m_device.overlappedRead(p, size, overlapped);
-	}
+		size_t size,
+		Overlapped* overlapped
+	);
 
+	static
 	bool
-	getOverlappedResult(
-		OVERLAPPED* overlapped,
-		dword_t* actualSize
-	) {
-		return m_device.getOverlappedResult(overlapped, actualSize);
+	isOverlappedIoCompleted(Overlapped* overlapped) {
+		return UsbPcap::isOverlappedIoCompleted(&overlapped->m_overlapped);
 	}
 
 	size_t
-	getOverlappedResult(OVERLAPPED* overlapped) {
-		return m_device.getOverlappedResult(overlapped);
-	}
+	getOverlappedResult(Overlapped* overlapped);
+
+protected:
+	void
+	finalizePendingRead(
+		Overlapped* overlapped,
+		size_t actualSize
+	);
+
+	size_t
+	copyTransfers(
+		void* p,
+		size_t size
+	);
+
+	size_t
+	parseTransfer(
+		const void* p,
+		size_t size
+	);
+
+	void
+	removePendingRead(Overlapped* overlapped);
+
+	size_t
+	completePendingRead(
+		Overlapped* overlapped,
+		size_t actualSize
+	);
+
+	size_t
+	failPendingRead(Overlapped* overlapped);
+
+	size_t
+	failPendingRead(
+		Overlapped* overlapped,
+		const err::ErrorRef& error
+	);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-sl::String_w
-UsbPcap::getHubSymlink() {
-	sl::String_w string;
-	getHubSymlink(&string);
-	return string;
+UsbMonitor::Overlapped::Overlapped() {
+	m_buffer = NULL;
+	m_bufferSize = 0;
+	m_actualSize = 0;
+	m_state = OverlappedState_Undefined;
 }
+
+inline
+UsbMonitor::UsbMonitor() {
+	m_readBufferOffset = 0;
+	m_snapshotLength = 0;
+	m_flags = 0;
+}
+
+inline
+size_t
+UsbMonitor::read(
+	void* p,
+	size_t size
+) {
+	Overlapped overlapped;
+	bool result = overlappedRead(p, size, &overlapped);
+	return result ? getOverlappedResult(&overlapped) : - 1;
+}
+
+inline
+void
+UsbMonitor::removePendingRead(Overlapped* overlapped) {
+	ASSERT(overlapped->m_state == OverlappedState_Pending);
+	overlapped->m_state = OverlappedState_Completed;
+	m_readList.remove(overlapped);
+}
+
+inline
+size_t
+UsbMonitor::completePendingRead(
+	Overlapped* overlapped,
+	size_t actualSize
+) {
+	overlapped->m_actualSize = actualSize;
+	removePendingRead(overlapped);
+	return actualSize;
+}
+
+inline
+size_t
+UsbMonitor::failPendingRead(Overlapped* overlapped) {
+	overlapped->m_actualSize = -1;
+	overlapped->m_error = err::getLastError();
+	removePendingRead(overlapped);
+	m_readBufferOffset = 0;
+	return -1;
+}
+
+inline
+size_t
+UsbMonitor::failPendingRead(
+	Overlapped* overlapped,
+	const err::ErrorRef& error
+) {
+	overlapped->m_actualSize = -1;
+	overlapped->m_error = error;
+	removePendingRead(overlapped);
+	setError(error);
+	m_readBufferOffset = 0;
+	return -1;
+}
+
 
 //..............................................................................
 

@@ -145,15 +145,21 @@ struct UsbMonTransferHdr {
 	uint8_t m_bus;
 	uint8_t m_address;
 	uint8_t m_endpoint;
-	uint32_t m_bufferSize;  // passed in the original request
-	uint32_t m_captureSize; // returned by capture driver (usbmon/usbpcap)
-	uint32_t m_dataSize;    // actually copied to the user buffer
+	uint32_t m_originalSize; // original transfer data size
+	uint32_t m_captureSize;  // captured by the driver
+	uint32_t m_actualSize;   // returned to the caller (in the message mode, can be smaller than m_captureSize)
 
 	union {
 		UsbMonControlSetup m_controlSetup;
 		UsbMonIsochronousHdr m_isochronousHdr;
 		uint64_t m_padding[2]; // align on 16 bytes
 	};
+};
+
+//..............................................................................
+
+enum UsbMonFlag {
+	UsbMonFlag_MessageMode = 0x01,
 };
 
 //..............................................................................

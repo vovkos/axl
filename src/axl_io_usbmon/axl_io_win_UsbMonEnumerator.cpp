@@ -10,14 +10,14 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_io_win_UsbPcapEnumerator.h"
+#include "axl_io_UsbMonEnumerator.h"
+#include "axl_io_UsbStringDescriptorLanguage.h"
 #include "axl_io_win_UsbPcap.h"
-
-
-#	include "axl_sys_win_NtDll.h"
-#	include "axl_sys_win_NtStatus.h"
-#	include "axl_sys_win_DeviceInfo.h"
-
+#include "axl_sys_win_NtDll.h"
+#include "axl_sys_win_NtStatus.h"
+#include "axl_sys_win_DeviceInfo.h"
+#include <usbioctl.h>
+#include <usb.h>
 
 namespace axl {
 namespace io {
@@ -42,68 +42,40 @@ normalizeDeviceName(
 	return deviceName->getLength();
 }
 
-ushort_t
-chooseLanguageId(const sl::String_w& languageIds) {
-	size_t length = languageIds.getLength();
-	if (!length)
-		return 0;
-
-	ushort_t languageId = languageIds[0];
-	if (PRIMARYLANGID(languageId) == LANG_ENGLISH)
-		return languageId;
-
-	for (size_t i = 1; i < length; i++) {
-		ushort_t id = languageIds[i];
-		if (PRIMARYLANGID(id) == LANG_ENGLISH)
-			return id;
-	}
-
-	return languageId;
-}
-
 //..............................................................................
 
-template <typename T>
 class UsbPcapDeviceEnumerator {
 protected:
-	sl::List<UsbPcapDeviceBase<T> >* m_deviceList;
+	sl::List<UsbMonDeviceDesc>* m_deviceList;
 	sys::win::DeviceInfoSet m_deviceInfoSet;
 	sl::Array<char> m_buffer;
 	uint_t m_mask;
 
 public:
-	UsbPcapDeviceEnumerator();
-
-	bool
-	createDeviceSnapshot() {
-		return m_deviceInfoSet.create();
+	UsbPcapDeviceEnumerator() {
+		m_deviceList = NULL;
+		m_mask = 0;
 	}
 
 	size_t
 	enumerate(
-		sl::List<UsbPcapDeviceBase<T> >* deviceList,
-		uint_t mask = 0
-	);
-
-	size_t
-	enumerate(
-		sl::List<UsbPcapDeviceBase<T> >* deviceList,
-		const UsbPcapHub& hub,
+		sl::List<UsbMonDeviceDesc>* deviceList,
 		uint_t mask = 0
 	);
 
 protected:
 	size_t
-	enumerate();
+	enumerateHub(
+		const sl::String_w& pcapDeviceName,
+		const sl::String_w& hubDeviceName
+	);
 
-	size_t
-	enumerate(const UsbPcapHub& hub);
-
-	UsbPcapDeviceBase<T>*
+	UsbMonDeviceDesc*
 	createDevice(
-		const UsbPcapHub& hub,
 		io::win::File& hubDevice,
-		const USB_NODE_CONNECTION_INFORMATION& connectionInfo
+		const sl::String_w& pcapDeviceName,
+		const USB_NODE_CONNECTION_INFORMATION& connectionInfo,
+		UsbMonDeviceSpeed speed
 	);
 
 	bool
@@ -138,57 +110,113 @@ protected:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-template <typename T>
-UsbPcapDeviceEnumerator<T>::UsbPcapDeviceEnumerator() {
-	m_deviceList = NULL;
-	m_mask = 0;
-	createDeviceSnapshot();
-}
-
-template <typename T>
 size_t
-UsbPcapDeviceEnumerator<T>::enumerate(
-	sl::List<UsbPcapDeviceBase<T> >* deviceList,
+UsbPcapDeviceEnumerator::enumerate(
+	sl::List<UsbMonDeviceDesc>* deviceList,
 	uint_t mask
 ) {
-	m_deviceList = deviceList;
-	m_mask = mask;
-	return enumerate();
-}
+	deviceList->clear();
 
-template <typename T>
-size_t
-UsbPcapDeviceEnumerator<T>::enumerate(
-	sl::List<UsbPcapDeviceBase<T> >* deviceList,
-	const UsbPcapHub& hub,
-	uint_t mask
-) {
-	m_deviceList = deviceList;
-	m_mask = mask;
-	return enumerate(hub);
-}
-
-template <typename T>
-size_t
-UsbPcapDeviceEnumerator<T>::enumerate() {
-	sl::List<UsbPcapHub> hubList;
-	size_t count = enumerateUsbPcapRootHubs(&hubList);
-	if (count == -1)
+	bool result = m_deviceInfoSet.create();
+	if (!result)
 		return -1;
 
-	sl::ConstIterator<UsbPcapHub> it = hubList.getHead();
-	for (; it; it++) {
-		count = enumerate(**it);
-		if (count == -1)
-			return -1;
+	m_deviceList = deviceList;
+	m_mask = mask;
+
+	using namespace axl::sys::win;
+
+	enum {
+		DirBufferSize = 4 * 1024
+	};
+
+	long status;
+	static sl::StringRef_w deviceDirName = L"\\device";
+	static sl::StringRef_w deviceTypeName = L"device";
+	static sl::StringRef_w usbPcapPrefix = L"usbpcap";
+	static sl::StringRef_w symlinkPrefix = L"\\\\.\\";
+
+	UNICODE_STRING uniName;
+	uniName.Buffer = (PWSTR)deviceDirName.cp();
+	uniName.Length = deviceDirName.getLength() * sizeof(wchar_t);
+	uniName.MaximumLength = uniName.Length + sizeof(wchar_t);
+
+	OBJECT_ATTRIBUTES oa = { 0 };
+	oa.Length = sizeof(oa);
+	oa.ObjectName = &uniName;
+
+	NtHandle deviceDir;
+	status = ntOpenDirectoryObject(deviceDir.p(), DIRECTORY_QUERY | DIRECTORY_TRAVERSE, &oa);
+	if (status < 0) {
+		err::setError(NtStatus(status));
+		return -1;
 	}
 
-	return m_deviceList->getCount();
+	sl::String_w hubName;
+	sl::String_w hubDeviceName;
+
+	sl::Array<char> dirBuffer;
+	dirBuffer.setCount(DirBufferSize);
+
+	BOOLEAN isFirstQuery = TRUE;
+	ULONG queryContext = 0;
+
+	for (;;) {
+		ULONG actualSize;
+
+		status = ntQueryDirectoryObject(
+			deviceDir,
+			dirBuffer,
+			DirBufferSize,
+			FALSE,
+			isFirstQuery,
+			&queryContext,
+			&actualSize
+		);
+
+		if (status < 0) {
+			if (status == STATUS_NO_MORE_ENTRIES)
+				break;
+
+			err::setError(sys::win::NtStatus(status));
+			return -1;
+		}
+
+		const OBJECT_DIRECTORY_INFORMATION* dirInfo = (OBJECT_DIRECTORY_INFORMATION*)dirBuffer.cp();
+		for (; dirInfo->Name.Buffer; dirInfo++) {
+			sl::StringRef_w name(dirInfo->Name.Buffer, dirInfo->Name.Length / sizeof(wchar_t), true);
+			sl::StringRef_w typeName(dirInfo->TypeName.Buffer, dirInfo->TypeName.Length / sizeof(wchar_t), true);
+
+			if (!typeName.isEqualIgnoreCase(deviceTypeName) ||
+				!name.isPrefixIgnoreCase(usbPcapPrefix)
+			)
+				continue;
+
+			sl::String_w pcapDeviceName = symlinkPrefix + name;
+			win::UsbPcap pcap;
+
+			bool result =
+				pcap.open(pcapDeviceName, win::UsbPcap::Mode_Enumerate) &&
+				pcap.getHubSymlink(&hubName);
+
+			if (!result)
+				continue; // ignore this hub
+
+			normalizeDeviceName(&hubDeviceName, hubName);
+			enumerateHub(pcapDeviceName, hubDeviceName);
+		}
+
+		isFirstQuery = FALSE;
+	}
+
+	return deviceList->getCount();
 }
 
-template <typename T>
 size_t
-UsbPcapDeviceEnumerator<T>::enumerate(const UsbPcapHub& hub) {
+UsbPcapDeviceEnumerator::enumerateHub(
+	const sl::String_w& pcapDeviceName,
+	const sl::String_w& hubDeviceName
+) {
 	io::win::File hubDevice;
 
 	dword_t actualSize;
@@ -196,7 +224,7 @@ UsbPcapDeviceEnumerator<T>::enumerate(const UsbPcapHub& hub) {
 
 	bool result =
 		hubDevice.create(
-			hub.m_hubDeviceName,
+			hubDeviceName,
 			GENERIC_READ,
 			FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
 			NULL,
@@ -214,62 +242,79 @@ UsbPcapDeviceEnumerator<T>::enumerate(const UsbPcapHub& hub) {
 	if (!result)
 		return -1;
 
-	if (actualSize < sizeof(USB_NODE_INFORMATION)) {
-		err::setError(err::SystemErrorCode_BufferTooSmall);
-		return -1;
-	}
+	if (actualSize < sizeof(USB_NODE_INFORMATION))
+		return err::fail<size_t>(-1, err::SystemErrorCode_BufferTooSmall);
 
+	sl::String_w attachedHubName;
 	sl::String_w attachedHubDeviceName;
 
+	size_t deviceCount = 0;
 	size_t portCount = nodeInfo.u.HubInformation.HubDescriptor.bNumberOfPorts;
 	for (size_t i = 1; i <= portCount; i++) {
 		USB_NODE_CONNECTION_INFORMATION connectionInfo = { 0 };
 		connectionInfo.ConnectionIndex = i;
 
 		result = hubDevice.ioctl(
-			IOCTL_USB_GET_NODE_CONNECTION_INFORMATION,
+			IOCTL_USB_GET_NODE_CONNECTION_INFORMATION_EX,
 			&connectionInfo,
-			sizeof(USB_NODE_CONNECTION_INFORMATION),
+			sizeof(connectionInfo),
 			&connectionInfo,
-			sizeof(USB_NODE_CONNECTION_INFORMATION),
+			sizeof(connectionInfo),
 			&actualSize
 		);
 
-		if (!result)
-			return -1;
+		UsbMonDeviceSpeed speed;
+
+		if (result)
+			speed = (UsbMonDeviceSpeed)((uchar_t)connectionInfo.LowSpeed + 1);
+		else {
+			result = hubDevice.ioctl(
+				IOCTL_USB_GET_NODE_CONNECTION_INFORMATION,
+				&connectionInfo,
+				sizeof(connectionInfo),
+				&connectionInfo,
+				sizeof(connectionInfo),
+				&actualSize
+			);
+
+			if (!result)
+				continue;
+
+			speed = connectionInfo.LowSpeed ? UsbMonDeviceSpeed_Low : UsbMonDeviceSpeed_Full;
+		}
 
 		ASSERT(actualSize >= sizeof(USB_NODE_CONNECTION_INFORMATION));
 		if (connectionInfo.ConnectionStatus == NoDeviceConnected)
 			continue;
 
 		if (!connectionInfo.DeviceIsHub) {
-			createDevice(hub, hubDevice, connectionInfo);
+			createDevice(hubDevice, pcapDeviceName, connectionInfo, speed);
+			deviceCount++;
 		} else {
-			if (m_mask & UsbPcapEnumMask_Hubs)
-				createDevice(hub, hubDevice, connectionInfo);
+			if (m_mask & UsbMonDeviceDescMask_Hubs) {
+				createDevice(hubDevice, pcapDeviceName, connectionInfo, speed);
+				deviceCount++;
+			}
 
 			// recursively enumerate the attached hub
 
-			result = getConnectionName(&attachedHubDeviceName, hubDevice, connectionInfo.ConnectionIndex);
-			if (!result)
-				return -1;
-
-			UsbPcapHub attachedHub;
-			attachedHub.m_pcapDeviceName = hub.m_pcapDeviceName;
-			normalizeDeviceName(&attachedHub.m_hubDeviceName, attachedHubDeviceName);
-			enumerate(attachedHub);
+			result = getConnectionName(&attachedHubName, hubDevice, connectionInfo.ConnectionIndex);
+			if (result) {
+				normalizeDeviceName(&attachedHubDeviceName, attachedHubName);
+				deviceCount += enumerateHub(pcapDeviceName, attachedHubDeviceName);
+			}
 		}
 	}
 
-	return m_deviceList->getCount();
+	return deviceCount;
 }
 
-template <typename T>
-UsbPcapDeviceBase<T>*
-UsbPcapDeviceEnumerator<T>::createDevice(
-	const UsbPcapHub& hub,
+UsbMonDeviceDesc*
+UsbPcapDeviceEnumerator::createDevice(
 	io::win::File& hubDevice,
-	const USB_NODE_CONNECTION_INFORMATION& connectionInfo
+	const sl::String_w& pcapDeviceName,
+	const USB_NODE_CONNECTION_INFORMATION& connectionInfo,
+	UsbMonDeviceSpeed speed
 ) {
 	sys::win::DeviceInfo deviceInfo;
 	sl::String_w driverKeyName;
@@ -281,51 +326,40 @@ UsbPcapDeviceEnumerator<T>::createDevice(
 	if (!result)
 		return NULL;
 
-	UsbPcapDeviceBase<T>* device = AXL_MEM_NEW(UsbPcapDeviceBase<T>);
-	device->m_hubPort = connectionInfo.ConnectionIndex;
-	device->m_pcapDeviceName = hub.m_pcapDeviceName;
-	device->m_hubDeviceName = hub.m_hubDeviceName;
-	device->m_deviceAddress = connectionInfo.DeviceAddress;
-	device->m_deviceClass = connectionInfo.DeviceDescriptor.bDeviceClass;
-	device->m_deviceSubClass = connectionInfo.DeviceDescriptor.bDeviceSubClass;
+	UsbMonDeviceDesc* device = AXL_MEM_NEW(UsbMonDeviceDesc);
+	device->m_captureDeviceName = pcapDeviceName;
 	device->m_vendorId = connectionInfo.DeviceDescriptor.idVendor;
 	device->m_productId = connectionInfo.DeviceDescriptor.idProduct;
-	device->m_flags = 0;
+	device->m_address = connectionInfo.DeviceAddress;
+	device->m_class = connectionInfo.DeviceDescriptor.bDeviceClass;
+	device->m_subClass = connectionInfo.DeviceDescriptor.bDeviceSubClass;
+	device->m_manufacturerDescriptorId = connectionInfo.DeviceDescriptor.iManufacturer;
+	device->m_productDescriptorId = connectionInfo.DeviceDescriptor.iProduct;
+	device->m_serialNumberDescriptorId = connectionInfo.DeviceDescriptor.iSerialNumber;
+	device->m_speed = speed;
+	device->m_flags = UsbMonDeviceDescFlag_DeviceDescriptor; // on windows, descriptor is always available
 
 	if (connectionInfo.DeviceIsHub)
-		device->m_flags |= UsbPcapDeviceFlag_Hub;
+		device->m_flags |= UsbMonDeviceDescFlag_Hub;
 
-	if (connectionInfo.LowSpeed)
-		device->m_flags |= UsbPcapDeviceFlag_LowSpeed;
-
-	if (m_mask & UsbPcapEnumMask_Description) {
+	if (m_mask & UsbMonDeviceDescMask_Description) {
 		deviceInfo.getDeviceRegistryProperty(SPDRP_FRIENDLYNAME, &device->m_description);
 
 		if (device->m_description.isEmpty()) // try another property
 			deviceInfo.getDeviceRegistryProperty(SPDRP_DEVICEDESC, &device->m_description);
 	}
 
-	if (m_mask & UsbPcapEnumMask_Manufacturer)
+	if (m_mask & UsbMonDeviceDescMask_Manufacturer) {
 		deviceInfo.getDeviceRegistryProperty(SPDRP_MFG, &device->m_manufacturer);
-
-	if (m_mask & UsbPcapEnumMask_HardwareId)
-		deviceInfo.getDeviceRegistryProperty(SPDRP_HARDWAREID, &device->m_hardwareId);
-
-	if (m_mask & UsbPcapEnumMask_Driver) {
-		device->m_driverKeyName = driverKeyName;
-		deviceInfo.getDeviceDriverPath(&device->m_driverPath);
 	}
 
-	if (m_mask & UsbPcapEnumMask_Location)
-		deviceInfo.getDeviceRegistryProperty(SPDRP_LOCATION_PATHS, &device->m_location);
+	if (m_mask & UsbMonDeviceDescMask_Driver)
+		deviceInfo.getDeviceDriverPath(&device->m_driver);
 
-	if (m_mask & UsbPcapEnumMask_InstanceId)
-		deviceInfo.getDeviceInstanceId(&device->m_instanceId);
-
-	if (m_mask & UsbPcapEnumMask_Descriptors) {
+	if (m_mask & UsbMonDeviceDescMask_Descriptors) {
 		sl::String_w string;
 		getStringDescriptor(&string, hubDevice, connectionInfo.ConnectionIndex, 0, 0);
-		ushort_t languageId = chooseLanguageId(string);
+		ushort_t languageId = chooseUsbStringDescriptorLanguage(string);
 
 		if (connectionInfo.DeviceDescriptor.iManufacturer) {
 			getStringDescriptor(
@@ -336,7 +370,7 @@ UsbPcapDeviceEnumerator<T>::createDevice(
 				languageId
 			);
 
-			device->m_descriptorTable[UsbPcapDescriptor_Manufacturer] = string;
+			device->m_manufacturerDescriptor = string;
 		}
 
 		if (connectionInfo.DeviceDescriptor.iProduct) {
@@ -348,7 +382,7 @@ UsbPcapDeviceEnumerator<T>::createDevice(
 				languageId
 			);
 
-			device->m_descriptorTable[UsbPcapDescriptor_Product] = string;
+			device->m_productDescriptor = string;
 		}
 
 		if (connectionInfo.DeviceDescriptor.iSerialNumber) {
@@ -360,7 +394,7 @@ UsbPcapDeviceEnumerator<T>::createDevice(
 				languageId
 			);
 
-			device->m_descriptorTable[UsbPcapDescriptor_SerialNumber] = string;
+			device->m_serialNumberDescriptor = string;
 		}
 	}
 
@@ -368,9 +402,8 @@ UsbPcapDeviceEnumerator<T>::createDevice(
 	return device;
 }
 
-template <typename T>
 bool
-UsbPcapDeviceEnumerator<T>::findDeviceInfo(
+UsbPcapDeviceEnumerator::findDeviceInfo(
 	sys::win::DeviceInfo* deviceInfo,
 	const sl::String_w& driverKeyName
 ) {
@@ -390,9 +423,8 @@ UsbPcapDeviceEnumerator<T>::findDeviceInfo(
 	return false; // not found
 }
 
-template <typename T>
 bool
-UsbPcapDeviceEnumerator<T>::getConnectionName(
+UsbPcapDeviceEnumerator::getConnectionName(
 	sl::String_w* name,
 	io::win::File& hubDevice,
 	size_t index
@@ -431,9 +463,8 @@ UsbPcapDeviceEnumerator<T>::getConnectionName(
 	}
 };
 
-template <typename T>
 bool
-UsbPcapDeviceEnumerator<T>::getDriverKeyName(
+UsbPcapDeviceEnumerator::getDriverKeyName(
 	sl::String_w* name,
 	io::win::File& hubDevice,
 	size_t index
@@ -472,9 +503,8 @@ UsbPcapDeviceEnumerator<T>::getDriverKeyName(
 	}
 };
 
-template <typename T>
 bool
-UsbPcapDeviceEnumerator<T>::getStringDescriptor(
+UsbPcapDeviceEnumerator::getStringDescriptor(
 	sl::String_w* string,
 	io::win::File& hubDevice,
 	size_t index,
@@ -521,135 +551,12 @@ UsbPcapDeviceEnumerator<T>::getStringDescriptor(
 //..............................................................................
 
 size_t
-enumerateUsbPcapRootHubs(sl::List<UsbPcapHub>* hubList) {
-	hubList->clear();
-
-	using namespace axl::sys::win;
-
-	enum {
-		DirBufferSize = 4 * 1024
-	};
-
-	long status;
-	static sl::StringRef_w deviceDirName = L"\\device";
-	static sl::StringRef_w deviceType = L"device";
-	static sl::StringRef_w usbPcapPrefix = L"usbpcap";
-	static sl::StringRef_w symlinkPrefix = L"\\\\.\\";
-
-	UNICODE_STRING uniName;
-	uniName.Buffer = (PWSTR)deviceDirName.cp();
-	uniName.Length = deviceDirName.getLength() * sizeof(wchar_t);
-	uniName.MaximumLength = uniName.Length + sizeof(wchar_t);
-
-	OBJECT_ATTRIBUTES oa = { 0 };
-	oa.Length = sizeof(oa);
-	oa.ObjectName = &uniName;
-
-	NtHandle deviceDir;
-	status = ntOpenDirectoryObject(deviceDir.p(), DIRECTORY_QUERY | DIRECTORY_TRAVERSE, &oa);
-	if (status < 0) {
-		err::setError(NtStatus(status));
-		return -1;
-	}
-
-	sl::String_w hubSymlink;
-	sl::Array<char> dirBuffer;
-	dirBuffer.setCount(DirBufferSize);
-
-	BOOLEAN isFirstQuery = TRUE;
-	ULONG queryContext = 0;
-
-	sl::String_utf16 name;
-	sl::String_utf16 typeName;
-
-	for (;;) {
-		ULONG actualSize;
-
-		status = ntQueryDirectoryObject(
-			deviceDir,
-			dirBuffer,
-			DirBufferSize,
-			FALSE,
-			isFirstQuery,
-			&queryContext,
-			&actualSize
-		);
-
-		if (status < 0) {
-			if (status == STATUS_NO_MORE_ENTRIES)
-				break;
-
-			err::setError(sys::win::NtStatus(status));
-			return -1;
-		}
-
-		const OBJECT_DIRECTORY_INFORMATION* dirInfo = (OBJECT_DIRECTORY_INFORMATION*)dirBuffer.cp();
-		for (; dirInfo->Name.Buffer; dirInfo++) {
-			sl::StringRef_utf16 type(dirInfo->TypeName.Buffer, dirInfo->TypeName.Length / sizeof(wchar_t), true);
-			sl::StringRef_utf16 name(dirInfo->Name.Buffer, dirInfo->Name.Length / sizeof(wchar_t), true);
-
-			if (!type.isEqualIgnoreCase(deviceType) ||
-				!name.isPrefixIgnoreCase(usbPcapPrefix))
-				continue;
-
-			sl::String_w pcapDeviceName = symlinkPrefix + name;
-			UsbPcap pcap;
-
-			bool result =
-				pcap.open(pcapDeviceName, UsbPcap::Mode_Enumerate) &&
-				pcap.getHubSymlink(&hubSymlink);
-
-			if (!result)
-				continue; // ignore this hub
-
-			UsbPcapHub* hub = AXL_MEM_NEW(UsbPcapHub);
-			hub->m_pcapDeviceName = pcapDeviceName;
-			normalizeDeviceName(&hub->m_hubDeviceName, hubSymlink);
-			hubList->insertTail(hub);
-		}
-
-		isFirstQuery = FALSE;
-	}
-
-	return hubList->getCount();
-}
-
-size_t
-enumerateUsbPcapDevices(
-	sl::List<UsbPcapDevice>* deviceList,
-	const UsbPcapHub& hub,
-	uint_t flags
+enumerateUsbMonDevices(
+	sl::List<UsbMonDeviceDesc>* deviceList,
+	uint_t mask
 ) {
-	UsbPcapDeviceEnumerator<char> enumerator;
-	return enumerator.enumerate(deviceList, hub, flags);
-}
-
-size_t
-enumerateUsbPcapDevices(
-	sl::List<UsbPcapDevice>* deviceList,
-	uint_t flags
-) {
-	UsbPcapDeviceEnumerator<char> enumerator;
-	return enumerator.enumerate(deviceList, flags);
-}
-
-size_t
-enumerateUsbPcapDevices(
-	sl::List<UsbPcapDevice_w>* deviceList,
-	const UsbPcapHub& hub,
-	uint_t flags
-) {
-	UsbPcapDeviceEnumerator<wchar_t> enumerator;
-	return enumerator.enumerate(deviceList, hub, flags);
-}
-
-size_t
-enumerateUsbPcapDevices(
-	sl::List<UsbPcapDevice_w>* deviceList,
-	uint_t flags
-) {
-	UsbPcapDeviceEnumerator<wchar_t> enumerator;
-	return enumerator.enumerate(deviceList, flags);
+	UsbPcapDeviceEnumerator enumerator;
+	return enumerator.enumerate(deviceList, mask);
 }
 
 //..............................................................................

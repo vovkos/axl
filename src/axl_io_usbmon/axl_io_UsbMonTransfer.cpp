@@ -11,11 +11,27 @@
 
 #include "pch.h"
 #include "axl_io_UsbMonTransfer.h"
+#include "axl_io_UsbMonEnumerator.h"
 
 namespace axl {
 namespace io {
 
 //..............................................................................
+
+const char*
+getUsbMonSpeedString(UsbMonDeviceSpeed speed) {
+	static const char* stringTable[] = {
+		"Unknown",                  // UsbMonDeviceSpeed_Unknown
+		"Low Speed (1.5 Mbit/s)",   // UsbMonDeviceSpeed_Low,
+		"Full Speed (12 Mbit/s)",   // UsbMonDeviceSpeed_Full,
+		"Hi-Speed (480 Mbit/s)",    // UsbMonDeviceSpeed_High,
+		"SuperSpeed (5000 Mbit/s)", // UsbMonDeviceSpeed_Super,
+	};
+
+	return (size_t)speed < countof(stringTable) ?
+		stringTable[speed] :
+		stringTable[UsbMonDeviceSpeed_Unknown];
+}
 
 const char*
 getUsbMonTransferTypeString(UsbMonTransferType transferType) {

@@ -22,25 +22,23 @@ namespace io {
 //..............................................................................
 
 enum UsbMonDeviceDescMask {
-	UsbMonDeviceDescMask_Description            = 0x0001,
-	UsbMonDeviceDescMask_Manufacturer           = 0x0002,
-	UsbMonDeviceDescMask_ManufacturerDescriptor = 0x0004,
-	UsbMonDeviceDescMask_ProductDescriptor      = 0x0008,
-	UsbMonDeviceDescMask_SerialNumberDescriptor = 0x0010,
-	UsbMonDeviceDescMask_Descriptors            = 0x001c,
-	UsbMonDeviceDescMask_All                    = 0x001f,
+	UsbMonDeviceDescMask_Hubs                   = 0x0001,
+	UsbMonDeviceDescMask_Description            = 0x0002,
+	UsbMonDeviceDescMask_Manufacturer           = 0x0004,
+	UsbMonDeviceDescMask_Driver                 = 0x0008,
+	UsbMonDeviceDescMask_ManufacturerDescriptor = 0x0020,
+	UsbMonDeviceDescMask_ProductDescriptor      = 0x0040,
+	UsbMonDeviceDescMask_SerialNumberDescriptor = 0x0080,
+	UsbMonDeviceDescMask_Descriptors            = 0x00e0,
+	UsbMonDeviceDescMask_All                    = 0x00ff,
 	UsbMonDeviceDescMask_Default                =
 		UsbMonDeviceDescMask_Description |
 		UsbMonDeviceDescMask_Manufacturer,
 };
 
 enum UsbMonDeviceDescFlag {
-	UsbMonDeviceDescFlag_Description            = 0x0001,
-	UsbMonDeviceDescFlag_Manufacturer           = 0x0002,
-	UsbMonDeviceDescFlag_DeviceDescriptor       = 0x0004,
-	UsbMonDeviceDescFlag_ManufacturerDescriptor = 0x0008,
-	UsbMonDeviceDescFlag_ProductDescriptor      = 0x0010,
-	UsbMonDeviceDescFlag_SerialNumberDescriptor = 0x0020,
+	UsbMonDeviceDescFlag_Hub              = 0x01,
+	UsbMonDeviceDescFlag_DeviceDescriptor = 0x02,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -55,10 +53,16 @@ enum UsbMonDeviceSpeed {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+const char*
+getUsbMonSpeedString(UsbMonDeviceSpeed speed);
+
+//..............................................................................
+
 struct UsbMonDeviceDesc: sl::ListLink {
 	sl::String m_captureDeviceName;
 	sl::String m_description;  // from the system DB (fallback to descriptor)
 	sl::String m_manufacturer; // from the system DB (fallback to descriptor)
+	sl::String m_driver;
 	sl::String m_manufacturerDescriptor;
 	sl::String m_productDescriptor;
 	sl::String m_serialNumberDescriptor;
@@ -73,7 +77,6 @@ struct UsbMonDeviceDesc: sl::ListLink {
 	uint_t m_manufacturerDescriptorId;
 	uint_t m_productDescriptorId;
 	uint_t m_serialNumberDescriptorId;
-
 	uint_t m_flags;
 
 	UsbMonDeviceDesc() {
@@ -86,7 +89,7 @@ struct UsbMonDeviceDesc: sl::ListLink {
 size_t
 enumerateUsbMonDevices(
 	sl::List<UsbMonDeviceDesc>* deviceList,
-	uint_t mask = 0
+	uint_t mask = UsbMonDeviceDescMask_Default
 );
 
 //..............................................................................

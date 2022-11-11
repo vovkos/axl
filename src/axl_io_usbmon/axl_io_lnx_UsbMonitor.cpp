@@ -17,17 +17,19 @@ namespace axl {
 namespace io {
 namespace lnx {
 
+using namespace usbmon;
+
 //..............................................................................
 
 bool
 UsbMonitor::open(
 	const sl::String& captureDeviceName,
+	uint_t filterAddress,
 	uint_t flags
 ) {
 	close();
 
-	int fileFlags = (flags & io::FileFlag_Asynchronous) ? O_RDWR | O_NONBLOCK : O_RDWR;
-	bool result = m_device.open(captureDeviceName, fileFlags);
+	bool result = m_device.open(captureDeviceName, O_RDWR | O_NONBLOCK);
 	if (!result)
 		return false;
 

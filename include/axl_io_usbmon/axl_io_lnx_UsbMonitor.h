@@ -14,13 +14,7 @@
 #define _AXL_IO_LNX_USBMONITOR_H
 
 #include "axl_io_UsbMonitorBase.h"
-#include "axl_sl_String.h"
-
-#if (_AXL_OS_WIN)
-#	include "axl_io_win_UsbPcap.h"
-#elif (_AXL_OS_LINUX)
-#	include "axl_io_lnx_UsbMon.h"
-#endif
+#include "axl_io_lnx_UsbMon.h"
 
 namespace axl {
 namespace io {
@@ -46,7 +40,7 @@ public:
 	bool
 	open(
 		const sl::String& captureDeviceName,
-		uint_t flags = 0
+		uint_t filterAddress
 	);
 
 	void

@@ -1,4 +1,4 @@
- //..............................................................................
+//..............................................................................
 //
 //  This file is part of the AXL library.
 //
@@ -6764,17 +6764,12 @@ testUtf8Encode() {
 
 //..............................................................................
 
+#if (_AXL_IO_USBMON)
+
 enum {
 	VidSerialTap = 0x16d0,
 	PidSerialTap = 0x0e26,
 };
-
-#if (_AXL_IO_USBMON)
-
-// tmp (to avoid issues with the precompiled headers)
-
-#include "axl_io_lnx_UsbMonitor.h"
-#include "axl_io_UsbMonEnumerator.h"
 
 bool
 testUsbMon() {
@@ -6784,7 +6779,10 @@ testUsbMon() {
 	io::UsbMonDeviceDesc serialTap;
 
 	sl::List<io::UsbMonDeviceDesc> deviceList;
-	size_t count = io::enumerateUsbMonDevices(&deviceList, -1);
+	size_t count = io::enumerateUsbMonDevices(
+		&deviceList,
+		io::UsbMonDeviceDescMask_All & ~io::UsbMonDeviceDescMask_Hubs
+	);
 
 	sl::ConstIterator<io::UsbMonDeviceDesc> it = deviceList.getHead();
 	for (size_t i = 0; it; it++, i++) {
@@ -6801,21 +6799,24 @@ testUsbMon() {
 		printf("  PID:            %04x\n", it->m_productId);
 		printf("  class:          %d\n", it->m_class);
 		printf("  subclass:       %d\n", it->m_subClass);
-		printf("  speed:          %s\n", io::getUsbSpeedString((libusb_speed)it->m_speed));
+		printf("  speed:          %s\n", io::getUsbMonSpeedString(it->m_speed));
 
-		if (it->m_flags & io::UsbMonDeviceDescFlag_Description)
+		if (!it->m_description.isEmpty())
 			printf("  description:    %s\n", it->m_description.sz());
 
-		if (it->m_flags & io::UsbMonDeviceDescFlag_Manufacturer)
+		if (!it->m_manufacturer.isEmpty())
 			printf("  manufacturer:   %s\n", it->m_manufacturer.sz());
 
-		if (it->m_flags & io::UsbMonDeviceDescFlag_ManufacturerDescriptor)
+		if (!it->m_driver.isEmpty())
+			printf("  driver:         %s\n", it->m_driver.sz());
+
+		if (!it->m_manufacturerDescriptor.isEmpty())
 			printf("  manufacturer*:  %s\n", it->m_manufacturerDescriptor.sz());
 
-		if (it->m_flags & io::UsbMonDeviceDescFlag_ProductDescriptor)
+		if (!it->m_productDescriptor.isEmpty())
 			printf("  product*:       %s\n", it->m_productDescriptor.sz());
 
-		if (it->m_flags & io::UsbMonDeviceDescFlag_SerialNumberDescriptor)
+		if (!it->m_serialNumberDescriptor.isEmpty())
 			printf("  serial number*: %s\n", it->m_serialNumberDescriptor.sz());
 
 		if (it->m_vendorId == VidSerialTap && it->m_productId == PidSerialTap)
@@ -6829,11 +6830,15 @@ testUsbMon() {
 		return false;
 	}
 
+#if (_AXL_OS_WIN)
+	io::win::UsbMonitor monitor;
+#elif (_AXL_OS_LINUX)
 	io::lnx::UsbMonitor monitor;
+#endif
 	bool result = monitor.open(
 		serialTap.m_captureDeviceName,
-		io::UsbMonitorFlag_Asynchronous |
-		io::UsbMonitorFlag_CompletedTransfersOnly
+		serialTap.m_address,
+		io::UsbMonFlag_MessageMode
 	);
 
 	if (!result) {
@@ -6841,49 +6846,52 @@ testUsbMon() {
 		return false;
 	}
 
-	enum {
-		BufferSize  = 1 * 1024 * 1024, // 1M
-		ReadTimeout = 3000, // 1sec
-	};
+	size_t bufferSize = monitor.getKernelBufferSize();
 
 	sl::String string;
 	sl::Array<char> buffer;
-	buffer.setCount(BufferSize);
+	buffer.setCount(bufferSize);
 
-	result = monitor.setKernelBufferSize(BufferSize);
-	if (!result)
-		printf("warning: unable to set kernel buffer size: %s\n", err::getLastErrorDescription().sz());
-
-	printf("Capturing USB on the Serial Tap (kernel buffer: %d B)\n", monitor.getKernelBufferSize());
+	printf("Capturing USB on the Serial Tap (kernel buffer: %d B)\n", bufferSize);
 
 	for (;;) {
-		size_t size = monitor.read(buffer, BufferSize, ReadTimeout);
+#if (_AXL_OS_WIN)
+		size_t size = monitor.read(buffer, bufferSize);
+#elif (_AXL_OS_LINUX)
+		size_t size = monitor.read(buffer, bufferSize, ReadTimeout);
+		if (size == 0) {
+			printf("read timeout...\n");
+			continue;
+		}
+#endif
+
 		if (size == -1) {
 			printf("read error: %s\n", err::getLastErrorDescription().sz());
 			return false;
 		}
 
-		if (size == 0) {
-			printf("read timeout...\n");
-			continue;
-		}
+		const char* p = buffer;
+		const char* end = p + size;
 
 		ASSERT(size >= sizeof(io::UsbMonTransferHdr));
 		const io::UsbMonTransferHdr* hdr = (io::UsbMonTransferHdr*)buffer.cp();
-		printf("\nUsbMonTransferHdr\n");
+		printf("\nUsbMonTransferHdr:\n");
 		printf("  m_timestamp:    %s\n", sys::Time(hdr->m_timestamp).format("%Y-%M-%D %h:%m:%s.%l").sz());
 		printf("  m_status:       %d - %s\n", hdr->m_status, err::Errno(-hdr->m_status).getDescription().sz());
-		printf("  m_flags:        0x%02x\n", hdr->m_flags, io::getUsbMonTransferFlagsString(hdr->m_flags).sz());
+		printf("  m_flags:        0x%02x %s\n", hdr->m_flags, io::getUsbMonTransferFlagsString(hdr->m_flags).sz());
 		printf("  m_transferType: %d - %s\n", hdr->m_transferType, io::getUsbMonTransferTypeString((axl::io::UsbMonTransferType)hdr->m_transferType));
 		printf("  m_bus:          %d\n", hdr->m_bus);
 		printf("  m_address:      %d\n", hdr->m_address);
 		printf("  m_endpoint:     0x%02x\n", hdr->m_endpoint);
-		printf("  m_bufferSize:   %d\n", hdr->m_bufferSize);
+		printf("  m_originalSize: %d\n", hdr->m_originalSize);
 		printf("  m_captureSize:  %d\n", hdr->m_captureSize);
-		printf("  m_dataSize:     %d\n", hdr->m_dataSize);
+		printf("  m_actualSize:   %d\n", hdr->m_actualSize);
 
 		switch (hdr->m_transferType) {
 		case io::UsbMonTransferType_Control: {
+			if (hdr->m_flags & io::UsbMonTransferFlag_Completed)
+				break;
+
 			const io::UsbMonControlSetup& cs = hdr->m_controlSetup;
 			const io::UsbMonControlRequestType& crt = cs.m_requestType;
 			printf("Control transfer:\n");
@@ -6908,12 +6916,12 @@ testUsbMon() {
 			}
 		}
 
-		if (hdr->m_dataSize) {
-			printf("PAYLOAD\n");
+		if (hdr->m_actualSize) {
+			printf("Payload:\n");
 			enc::HexEncoding::encode(
 				&string,
 				hdr + 1,
-				hdr->m_dataSize,
+				hdr->m_actualSize,
 				enc::HexEncodingFlag_Multiline
 			);
 
@@ -6922,318 +6930,6 @@ testUsbMon() {
 	}
 
 	return true;
-}
-
-#endif
-
-#if (_AXL_IO_WIN_USBPCAP)
-
-inline
-const char*
-getUsbPcapInfoString(uint_t info) {
-	return (info & USBPCAP_INFO_PDO_TO_FDO) ? "USBPCAP_INFO_PDO_TO_FDO" : "(none)";
-}
-
-inline
-const char*
-getUsbPcapTransferString(uint_t transfer) {
-	static const char* stringTable[] = {
-		"USBPCAP_TRANSFER_ISOCHRONOUS", // 0
-		"USBPCAP_TRANSFER_INTERRUPT",   // 1
-		"USBPCAP_TRANSFER_CONTROL",     // 2
-		"USBPCAP_TRANSFER_BULK",        // 3
-	};
-
-	if (transfer < countof(stringTable))
-		return stringTable[transfer];
-
-	switch (transfer) {
-	case USBPCAP_TRANSFER_IRP_INFO:
-		return "USBPCAP_TRANSFER_IRP_INFO";
-
-	case USBPCAP_TRANSFER_UNKNOWN:
-		return "USBPCAP_TRANSFER_UNKNOWN";
-
-	default:
-		return "?";
-	}
-}
-
-inline
-const char*
-getUsbPcapControlStageString(uint_t stage) {
-	static const char* stringTable[] = {
-		"USBPCAP_CONTROL_STAGE_SETUP",    // 0
-		"USBPCAP_CONTROL_STAGE_DATA",     // 1
-		"USBPCAP_CONTROL_STAGE_STATUS",   // 2
-		"USBPCAP_CONTROL_STAGE_COMPLETE", // 3
-	};
-
-	return stage < countof(stringTable) ? stringTable[stage] : "?";
-}
-
-inline
-const char*
-getUsbDirectionString(uint_t endpoint) {
-	return (endpoint & 0x80) ? "IN" : "OUT";
-}
-
-inline
-const char*
-getUsbControlTypeString(uint_t type) {
-	static const char* stringTable[] = {
-		"Standard", // 0
-		"Class",    // 1
-		"Vendor",   // 2
-		"Reserved", // 3
-	};
-
-	return type < countof(stringTable) ? stringTable[type] : "?";
-}
-
-inline
-const char*
-getUsbControlRecipientString(uint_t recipient) {
-	static const char* stringTable[] = {
-		"Device",    // 0
-		"Interface", // 1
-		"Endpoint",  // 2
-		"Other",     // 3
-	};
-
-	return recipient < countof(stringTable) ? stringTable[recipient] : "?";
-}
-
-inline
-const char*
-getUsbControlRequestString(uint_t request) {
-	static const char* stringTable[] = {
-		"GET_STATUS",          // 0
-		"CLEAR_FEATURE",       // 1
-		"RESERVED",            // 2
-		"SET_FEATURE",         // 3
-		"RESERVED_2",          // 4
-		"SET_ADDRESS",         // 5
-		"GET_DESCRIPTOR",      // 6
-		"SET_DESCRIPTOR",      // 7
-		"GET_CONFIGURATION",   // 8
-		"SET_CONFIGURATION",   // 9
-		"GET_INTERFACE",       // 0
-		"SET_INTERFACE",       // 1
-		"SYNCH_FRAME",         // 2
-	};
-
-	return request < countof(stringTable) ? stringTable[request] : "?";
-}
-
-bool
-testUsbPcap() {
-	sl::List<io::win::UsbPcapHub> hubList;
-	size_t count = io::win::enumerateUsbPcapRootHubs(&hubList);
-	if (count == -1) {
-		printf("error enumerating root hubs: %s\n", err::getLastErrorDescription().sz());
-		return false;
-	}
-
-	io::win::UsbPcapDevice_w serialTap;
-
-	sl::ConstIterator<io::win::UsbPcapHub> it = hubList.getHead();
-	for (; it; it++) {
-		printf("\n");
-		printf("pcap: %S\n", it->m_pcapDeviceName.sz());
-		printf("hub:  %S\n", it->m_hubDeviceName.sz());
-
-		sl::List<io::win::UsbPcapDevice_w> deviceList;
-		size_t count = io::win::enumerateUsbPcapDevices(&deviceList, **it, -1);
-
-		sl::ConstIterator<io::win::UsbPcapDevice_w> it2 = deviceList.getHead();
-		for (; it2; it2++) {
-			printf("\n");
-			printf("  port:           %d\n", it2->m_hubPort);
-			printf("  address:        %d\n", it2->m_deviceAddress);
-			printf("  description:    %S\n", it2->m_description.sz());
-			printf("  manufacturer:   %S\n", it2->m_manufacturer.sz());
-			printf("  manufacturer*:  %S\n", it2->m_descriptorTable[io::win::UsbPcapDescriptor_Manufacturer].sz());
-			printf("  product*:       %S\n", it2->m_descriptorTable[io::win::UsbPcapDescriptor_Product].sz());
-			printf("  serial number*: %S\n", it2->m_descriptorTable[io::win::UsbPcapDescriptor_SerialNumber].sz());
-			printf("  driver key:     %S\n", it2->m_driverKeyName.sz());
-			printf("  driver path:    %S\n", it2->m_driverPath.sz());
-			printf("  hardware id:    %S\n", it2->m_hardwareId.sz());
-			printf("  instance id:    %S\n", it2->m_instanceId.sz());
-			printf("  location:       %S\n", it2->m_location.sz());
-			printf("  VID:            %04x\n", it2->m_vendorId);
-			printf("  PID:            %04x\n", it2->m_productId);
-			printf("  class:          %d\n", it2->m_deviceClass);
-			printf("  subclass:       %d\n", it2->m_deviceSubClass);
-			printf("  is hub:         %s\n", (it2->m_flags & io::win::UsbPcapDeviceFlag_Hub) ? "true" : "false");
-			printf("  is low-speed:   %s\n", (it2->m_flags & io::win::UsbPcapDeviceFlag_LowSpeed) ? "true" : "false");
-
-			if (it2->m_vendorId == 0x16d0 && it2->m_productId == 0x0e26)
-				serialTap = **it2;
-		}
-	}
-
-	if (serialTap.m_pcapDeviceName.isEmpty()) {
-		printf("Serial Tap is not found\n");
-		return false;
-	}
-
-	printf("\nCapturing USB on the Serial Tap...\n\n");
-
-	enum {
-		SnapshotLength = io::win::UsbPcap::DefaultSnapshotLength,
-		BufferSize     = io::win::UsbPcap::DefaultKernelBufferSize,
-	};
-
-	io::win::UsbPcap pcap;
-	bool result =
-		pcap.open(serialTap.m_pcapDeviceName) &&
-		pcap.setSnapshotLength(SnapshotLength) &&
-		pcap.setKernelBufferSize(BufferSize) &&
-		pcap.setFilter(serialTap.m_deviceAddress);
-
-	if (!result) {
-		printf("error opening USB pcap: %s\n", err::getLastErrorDescription().sz());
-		return false;
-	}
-
-	sl::String string;
-	sl::Array<char> buffer;
-	buffer.setCount(BufferSize);
-
-	// read pcap header
-
-	size_t size = pcap.read(buffer, BufferSize);
-	if (size != sizeof(pcap_hdr_t)) {
-		printf("pcap_hdr_t too small: %d bytes\n", size);
-		return false;
-	}
-
-	const pcap_hdr_t* pcapHdr = (pcap_hdr_t*)buffer.cp();
-	printf("pcap_hdr_t (%d bytes received)\n", size);
-    printf("  magic_number:  0x%08x\n", pcapHdr->magic_number);
-    printf("  version_major: %d\n", pcapHdr->version_major);
-    printf("  version_minor: %d\n", pcapHdr->version_minor);
-    printf("  thiszone:      %d\n", pcapHdr->thiszone);
-    printf("  sigfigs:       %d\n", pcapHdr->sigfigs);
-    printf("  snaplen:       %d\n", pcapHdr->snaplen);
-    printf("  network:       %d\n", pcapHdr->network);
-
-	if (pcapHdr->magic_number != 0xA1B2C3D4 || pcapHdr->network != DLT_USBPCAP) {
-		printf("invalid pcap_hdr_t\n");
-		return false;
-	}
-
-	for (;;) {
-		printf("\n");
-
-		size_t size = pcap.read(buffer, BufferSize);
-		if (size < sizeof(pcaprec_hdr_t)) {
-			printf("pcaprec_hdr_t too small: %d bytes\n", size);
-			return false;
-		}
-
-		const pcaprec_hdr_t* recHdr = (pcaprec_hdr_t*)buffer.cp();
-		uint64_t timestamp = sys::getTimestampFromTimeval(recHdr->ts_sec, recHdr->ts_usec);
-		printf("%s (%d bytes)\n", sys::Time(timestamp).format().sz(), size);
-		printf("pcaprec_hdr_t\n");
-		printf("  ts_sec:      %d\n", recHdr->ts_sec);
-		printf("  ts_usec:     %d\n", recHdr->ts_usec);
-		printf("  incl_len:    %d\n", recHdr->incl_len);
-		printf("  orig_len:    %d\n", recHdr->orig_len);
-
-		if (recHdr->incl_len > size ||
-			recHdr->orig_len > size ||
-			recHdr->orig_len < sizeof(USBPCAP_BUFFER_PACKET_HEADER)
-		) {
-			printf("invalid pcaprec_hdr_t\n");
-			return false;
-		}
-
-		size = recHdr->orig_len;
-
-		USBPCAP_BUFFER_PACKET_HEADER* packetHdr = (USBPCAP_BUFFER_PACKET_HEADER*)(recHdr + 1);
-		printf("USBPCAP_BUFFER_PACKET_HEADER\n");
-		printf("  headerLen:  %d\n", packetHdr->headerLen);
-		printf("  irpId:      0x%016x\n", packetHdr->irpId);
-		printf("  status:     0x%08x\n", packetHdr->status);
-		printf("  function:   %d\n", packetHdr->function);
-		printf("  info:       0x%02x - %s\n", packetHdr->info, getUsbPcapInfoString(packetHdr->info));
-		printf("  bus:        %d\n", packetHdr->bus);
-		printf("  device:     %d\n", packetHdr->device);
-		printf("  endpoint:   0x%02x\n", packetHdr->endpoint);
-		printf("  transfer:   %d - %s\n", packetHdr->transfer, getUsbPcapTransferString(packetHdr->transfer));
-		printf("  dataLength: %d\n", packetHdr->dataLength);
-
-		if (size < packetHdr->headerLen || size < packetHdr->headerLen + packetHdr->dataLength) {
-			printf("invalid USBPCAP_BUFFER_PACKET_HEADER\n");
-			continue;
-		}
-
-		switch (packetHdr->transfer) {
-			const USBPCAP_BUFFER_CONTROL_HEADER* controlHdr;
-			const USBPCAP_BUFFER_ISOCH_HEADER* isochHdr;
-
-		case USBPCAP_TRANSFER_CONTROL:
-			if (packetHdr->headerLen < sizeof(USBPCAP_BUFFER_CONTROL_HEADER)) {
-				printf("USBPCAP_BUFFER_CONTROL_HEADER too small: %d\n", packetHdr->headerLen);
-				continue;
-			}
-
-			controlHdr = (USBPCAP_BUFFER_CONTROL_HEADER*)packetHdr;
-			printf("USBPCAP_BUFFER_CONTROL_HEADER\n");
-			printf("  stage: %d - %s\n", controlHdr->stage, getUsbPcapControlStageString(controlHdr->stage));
-
-			if (controlHdr->stage == USBPCAP_CONTROL_STAGE_SETUP) {
-				if (packetHdr->dataLength < sizeof(USB_DEFAULT_PIPE_SETUP_PACKET)) {
-					printf("invalid USBPCAP_TRANSFER_CONTROL\n");
-					continue;
-				}
-
-				const USB_DEFAULT_PIPE_SETUP_PACKET* setup = (USB_DEFAULT_PIPE_SETUP_PACKET*)(controlHdr + 1);
-				printf("USB_DEFAULT_PIPE_SETUP_PACKET\n");
-				printf("  bmRequestType: 0x%02x\n", setup->bmRequestType.B);
-				printf("    Direction:   %d - %s\n", setup->bmRequestType.s.Dir, getUsbDirectionString(setup->bmRequestType.B));
-				printf("    Type:        %d - %s\n", setup->bmRequestType.s.Type, getUsbControlTypeString(setup->bmRequestType.s.Type));
-				printf("    Recipient:   %d - %s\n", setup->bmRequestType.s.Recipient, getUsbControlRecipientString(setup->bmRequestType.s.Recipient));
-				printf("  bRequest:      0x%02x - %s\n", setup->bRequest, getUsbControlRequestString(setup->bRequest));
-				printf("  wValue:        0x%04x\n", setup->wValue);
-				printf("  wIndex:        0x%04x\n", setup->wIndex);
-				printf("  wLength:       0x%04x\n", setup->wLength);
-			}
-
-			break;
-
-		case USBPCAP_TRANSFER_BULK:
-		case USBPCAP_TRANSFER_INTERRUPT:
-			break;
-
-		case USBPCAP_TRANSFER_ISOCHRONOUS:
-			if (packetHdr->headerLen < sizeof(USBPCAP_BUFFER_ISOCH_HEADER)) {
-				printf("USBPCAP_BUFFER_ISOCH_HEADER too small: %d\n", packetHdr->headerLen);
-				continue;
-			}
-
-			isochHdr = (USBPCAP_BUFFER_ISOCH_HEADER*)packetHdr;
-			printf("USBPCAP_BUFFER_ISOCH_HEADER\n");
-			printf("  startFrame: %d\n", isochHdr->startFrame);
-			printf("  numberOfPackets: %d\n", isochHdr->numberOfPackets);
-			printf("  errorCount:      %d\n", isochHdr->errorCount);
-			break;
-		}
-
-		if (packetHdr->dataLength) {
-			printf("PAYLOAD\n");
-			enc::HexEncoding::encode(
-				&string,
-				(char*)packetHdr + packetHdr->headerLen,
-				packetHdr->dataLength,
-				enc::HexEncodingFlag_Multiline
-			);
-
-			printf("%s\n", string.sz());
-		}
-	}
 }
 
 #endif

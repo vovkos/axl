@@ -16,6 +16,8 @@ namespace axl {
 namespace io {
 namespace win {
 
+using namespace usbpcap;
+
 //..............................................................................
 
 bool
@@ -40,7 +42,7 @@ UsbPcap::getHubSymlink(sl::String_w* string) {
 	wchar_t* p = string->createBuffer(IoctlOutputBufferSize / sizeof(wchar_t));
 
 	dword_t actualSize;
-	bool result = m_device.ioctl(
+	bool result = m_device.overlappedIoctl(
 		IOCTL_USBPCAP_GET_HUB_SYMLINK,
 		NULL,
 		0,
@@ -67,7 +69,7 @@ UsbPcap::setSnapshotLength(size_t size) {
 	params.size = (uint32_t)size;
 
 	dword_t actualSize;
-	return m_device.ioctl(
+	return m_device.overlappedIoctl(
 		IOCTL_USBPCAP_SET_SNAPLEN_SIZE,
 		&params,
 		sizeof(params),
@@ -83,7 +85,7 @@ UsbPcap::setKernelBufferSize(size_t size) {
 	params.size = (uint32_t)size;
 
 	dword_t actualSize;
-	return m_device.ioctl(
+	return m_device.overlappedIoctl(
 		IOCTL_USBPCAP_SETUP_BUFFER,
 		&params,
 		sizeof(params),
@@ -97,11 +99,14 @@ bool
 UsbPcap::setFilter(uint_t deviceAddress) {
 	deviceAddress &= 0x7f; // 1 .. 127
 
+	if (!deviceAddress)
+		return clearFilter();
+
 	USBPCAP_ADDRESS_FILTER filter = { 0 };
 	filter.addresses[deviceAddress / 32] = 1 << (deviceAddress % 32);
 
 	dword_t actualSize;
-	return m_device.ioctl(
+	return m_device.overlappedIoctl(
 		IOCTL_USBPCAP_START_FILTERING,
 		&filter,
 		sizeof(filter),
@@ -125,7 +130,7 @@ UsbPcap::setFilter(
 	}
 
 	dword_t actualSize;
-	return m_device.ioctl(
+	return m_device.overlappedIoctl(
 		IOCTL_USBPCAP_START_FILTERING,
 		&filter,
 		sizeof(filter),
@@ -138,7 +143,7 @@ UsbPcap::setFilter(
 bool
 UsbPcap::clearFilter() {
 	dword_t actualSize;
-	return m_device.ioctl(
+	return m_device.overlappedIoctl(
 		IOCTL_USBPCAP_STOP_FILTERING,
 		NULL,
 		0,

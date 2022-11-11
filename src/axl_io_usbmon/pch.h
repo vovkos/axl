@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include "axl_g_Pch.h"
+
 #if (_AXL_OS_WIN)
 #	include <winioctl.h>
 #	include <setupapi.h>

@@ -68,19 +68,14 @@
 #	include "axl_io_UsbDevice.h"
 #	include "axl_io_UsbTransfer.h"
 #endif
-/*
+
 #ifdef _AXL_IO_USBMON
-#	ifdef _AXL_OS_WIN
+#	include "axl_io_UsbMonEnumerator.h"
+#	if (_AXL_OS_WIN)
 #		include "axl_io_win_UsbMonitor.h"
-#	elif _AXL_OS_LINUX
+#	elif (_AXL_OS_LINUX)
 #		include "axl_io_lnx_UsbMonitor.h"
 #	endif
-#	include "axl_io_UsbMonEnumerator.h"
-#endif
-*/
-#ifdef _AXL_IO_WIN_USBPCAP
-#	include "axl_io_win_UsbPcap.h"
-#	include "axl_io_win_UsbPcapEnumerator.h"
 #endif
 
 #ifdef _AXL_IO_PCAP
