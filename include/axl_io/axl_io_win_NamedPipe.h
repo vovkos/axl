@@ -51,7 +51,7 @@ public:
 	bool
 	overlappedConnect(OVERLAPPED* overlapped) {
 		bool_t result = ::ConnectNamedPipe(m_h, overlapped);
-		return completeOverlappedRequest(result);
+		return completeOverlappedIo(result);
 	}
 
 	bool

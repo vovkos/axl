@@ -93,7 +93,7 @@ public:
 	read(
 		void* p,
 		size_t size
-	) const {
+	) {
 		return m_serial.overlappedRead(p, size);
 	}
 

@@ -120,7 +120,7 @@ public:
 	}
 
 	bool
-	setPosition(uint64_t offset) const {
+	setPosition(uint64_t offset) {
 		return m_file.setPosition(offset);
 	}
 
@@ -128,7 +128,7 @@ public:
 	read(
 		void* p,
 		size_t size
-	) const {
+	) {
 		return m_file.read(p, size);
 	}
 
@@ -145,7 +145,7 @@ public:
 		uint64_t offset,
 		void* p,
 		size_t size
-	) const {
+	) {
 		return setPosition(offset) ? read(p, size) : -1;
 	}
 

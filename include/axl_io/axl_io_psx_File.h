@@ -69,7 +69,7 @@ public:
 	getPosition() const;
 
 	bool
-	setPosition(uint64_t offset) const {
+	setPosition(uint64_t offset) {
 #if (_AXL_OS_DARWIN)
 		uint64_t actualOffset = ::lseek(m_h, offset, SEEK_SET);
 #else
@@ -129,7 +129,7 @@ public:
 	read(
 		void* p,
 		size_t size
-	) const;
+	);
 
 	size_t
 	write(

@@ -114,7 +114,7 @@ public:
 		OVERLAPPED* overlapped
 	) {
 		bool_t result = ::WaitCommEvent(m_h, events, overlapped);
-		return completeOverlappedRequest(result);
+		return completeOverlappedIo(result);
 	}
 
 	bool
