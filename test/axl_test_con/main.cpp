@@ -286,13 +286,13 @@ testNetworkAdapterList() {
 	for (; adapterIt; adapterIt++) {
 		io::NetworkAdapterDesc* adapter = *adapterIt;
 
-		printf("Name        = %s\n", adapter->getName().sz());
-		printf("Description = %s\n", adapter->getDescription().sz());
-		printf("Type        = %s\n", io::getNetworkAdapterTypeString(adapter->getType()));
-		printf("Flags       = %s\n", io::getNetworkAdapterFlagString(adapter->getFlags()).sz());
-		printf("Mac         = %s\n", io::getMacAddressString(adapter->getMacAddress()).sz());
+		printf("Name        = %s\n", adapter->m_name.sz());
+		printf("Description = %s\n", adapter->m_description.sz());
+		printf("Type        = %s\n", io::getNetworkAdapterTypeString(adapter->m_type));
+		printf("Flags       = %s\n", io::getNetworkAdapterFlagString(adapter->m_flags).sz());
+		printf("Mac         = %s\n", io::getMacAddressString(adapter->m_macAddress).sz());
 
-		sl::ConstList<io::NetworkAdapterAddress> addressList = adapter->getAddressList();
+		sl::ConstList<io::NetworkAdapterAddress> addressList = adapter->m_addressList;
 		sl::ConstIterator<io::NetworkAdapterAddress> addressIt = addressList.getHead();
 		for (size_t i = 1; addressIt; addressIt++, i++) {
 			const io::NetworkAdapterAddress* address = *addressIt;
@@ -3144,12 +3144,12 @@ testEnumSerial() {
 			"driver:          %s\n"
 			"location:        %s\n"
 			"\n",
-			it->getDeviceName ().sz(),
-			it->getDescription().sz(),
-			it->getHardwareIds().sz(),
-			it->getManufacturer().sz(),
-			it->getDriver().sz(),
-			it->getLocation().sz()
+			it->m_deviceName.sz(),
+			it->m_description.sz(),
+			it->m_hardwareIds.sz(),
+			it->m_manufacturer.sz(),
+			it->m_driver.sz(),
+			it->m_location.sz()
 		);
 
 	printf("%d ports total\n", portList.getCount());

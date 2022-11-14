@@ -93,10 +93,7 @@ struct NetworkAdapterAddress: sl::ListLink {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class NetworkAdapterDesc: public sl::ListLink {
-	friend class NetworkAdapterEnumerator;
-
-protected:
+struct NetworkAdapterDesc: sl::ListLink {
 	NetworkAdapterType m_type;
 	uint_t m_flags;
 	sl::String m_name;
@@ -104,43 +101,12 @@ protected:
 	uchar_t m_macAddress[6];
 	sl::List<NetworkAdapterAddress> m_addressList;
 
-public:
 	NetworkAdapterDesc();
-
-	NetworkAdapterType
-	getType() const {
-		return m_type;
-	}
-
-	uint_t
-	getFlags() const {
-		return m_flags;
-	}
-
-	const sl::String&
-	getName() const {
-		return m_name;
-	}
-
-	const sl::String&
-	getDescription() const {
-		return m_description;
-	}
 
 	bool
 	isNullMacAddress() const {
 		static uchar_t nullMacAddress[6] = { 0 };
 		return memcmp(m_macAddress, nullMacAddress, 6) == 0;
-	}
-
-	const uchar_t*
-	getMacAddress() const {
-		return m_macAddress;
-	}
-
-	sl::ConstList<NetworkAdapterAddress>
-	getAddressList() const {
-		return m_addressList;
 	}
 };
 

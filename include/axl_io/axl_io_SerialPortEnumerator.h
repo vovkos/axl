@@ -31,47 +31,13 @@ enum SerialPortDescMask {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class SerialPortDesc: public sl::ListLink {
-	friend class SerialPortEnumerator;
-
-protected:
+struct SerialPortDesc: sl::ListLink {
 	sl::String m_deviceName; // always queried; the rest depends on the mask
 	sl::String m_description;
 	sl::String m_manufacturer;
 	sl::String m_hardwareIds;
 	sl::String m_driver;
 	sl::String m_location;
-
-public:
-	const sl::String&
-	getDeviceName() const {
-		return m_deviceName;
-	}
-
-	const sl::String&
-	getDescription() const {
-		return m_description;
-	}
-
-	const sl::String&
-	getManufacturer() const {
-		return m_manufacturer;
-	}
-
-	const sl::String&
-	getHardwareIds() const {
-		return m_hardwareIds;
-	}
-
-	const sl::String&
-	getDriver() const {
-		return m_driver;
-	}
-
-	const sl::String&
-	getLocation() const {
-		return m_location;
-	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
