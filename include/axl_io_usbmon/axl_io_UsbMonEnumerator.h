@@ -26,14 +26,11 @@ enum UsbMonDeviceDescMask {
 	UsbMonDeviceDescMask_Description            = 0x0002,
 	UsbMonDeviceDescMask_Manufacturer           = 0x0004,
 	UsbMonDeviceDescMask_Driver                 = 0x0008,
-	UsbMonDeviceDescMask_ManufacturerDescriptor = 0x0020,
-	UsbMonDeviceDescMask_ProductDescriptor      = 0x0040,
-	UsbMonDeviceDescMask_SerialNumberDescriptor = 0x0080,
-	UsbMonDeviceDescMask_Descriptors            = 0x00e0,
+	UsbMonDeviceDescMask_ManufacturerDescriptor = 0x0010,
+	UsbMonDeviceDescMask_ProductDescriptor      = 0x0020,
+	UsbMonDeviceDescMask_SerialNumberDescriptor = 0x0040,
+	UsbMonDeviceDescMask_Descriptors            = 0x0070,
 	UsbMonDeviceDescMask_All                    = 0x00ff,
-	UsbMonDeviceDescMask_Default                =
-		UsbMonDeviceDescMask_Description |
-		UsbMonDeviceDescMask_Manufacturer,
 };
 
 enum UsbMonDeviceDescFlag {
@@ -89,7 +86,7 @@ struct UsbMonDeviceDesc: sl::ListLink {
 size_t
 enumerateUsbMonDevices(
 	sl::List<UsbMonDeviceDesc>* deviceList,
-	uint_t mask = UsbMonDeviceDescMask_Default
+	uint_t mask = 0
 );
 
 //..............................................................................

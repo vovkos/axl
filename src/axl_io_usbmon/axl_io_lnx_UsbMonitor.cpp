@@ -25,12 +25,14 @@ bool
 UsbMonitor::open(
 	const sl::String& captureDeviceName,
 	size_t kernelBufferSize,
-	uint_t filterAddress
+	uint_t addressFilter
 ) {
 	if (kernelBufferSize < MinimumKernelBufferSize)
 		kernelBufferSize = MinimumKernelBufferSize;
 
 	close();
+
+	m_addressFilter = addressFilter;
 
 	return
 		m_device.open(captureDeviceName, O_RDWR | O_NONBLOCK) &&
@@ -41,7 +43,7 @@ UsbMonitor::open(
 bool
 UsbMonitor::open(
 	const sl::String& captureDeviceName,
-	uint_t filterAddress
+	uint_t addressFilter
 ) {
 	close();
 
@@ -49,6 +51,7 @@ UsbMonitor::open(
 	if (!result)
 		return false;
 
+	m_addressFilter = addressFilter;
 	size_t kernelBufferSize = m_device.getKernelBufferSize();
 	return m_readBuffer.setCount(kernelBufferSize);
 }
@@ -73,7 +76,7 @@ UsbMonitor::read(
 		if (result == -1 || result == 0)
 			return result;
 
-		if (!m_filterAddress || srcHdr.devnum == m_filterAddress)
+		if (!m_addressFilter || srcHdr.devnum == m_addressFilter)
 			break;
 	}
 

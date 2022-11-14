@@ -34,11 +34,11 @@ protected:
 
 public:
 	axl::io::lnx::UsbMon m_device;  // for asynchronous access
-	uint_t m_filterAddress;         // freely adjustable
+	uint_t m_addressFilter;         // freely adjustable
 
 public:
 	UsbMonitor() {
-		m_filterAddress = 0;
+		m_addressFilter = 0;
 	}
 
 	bool
@@ -50,13 +50,13 @@ public:
 	open(
 		const sl::String& captureDeviceName,
 		size_t kernelBufferSize,
-		uint_t filterAddress
+		uint_t addressFilter
 	);
 
 	bool
 	open(
 		const sl::String& captureDeviceName,
-		uint_t filterAddress
+		uint_t addressFilter
 	);
 
 	void

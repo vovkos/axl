@@ -57,8 +57,8 @@ public:
 			return m_state;
 		}
 
-		const sys::NotificationEvent&
-		getCompletionEvent() const {
+		sys::NotificationEvent&
+		getCompletionEvent() {
 			return m_overlapped.m_completionEvent;
 		}
 	};
@@ -92,7 +92,7 @@ public:
 		const sl::String& captureDeviceName,
 		size_t snapshotLength,
 		size_t kernelBufferSize,
-		uint_t filterAddress,
+		uint_t addressFilter,
 		uint_t flags = 0
 	);
 

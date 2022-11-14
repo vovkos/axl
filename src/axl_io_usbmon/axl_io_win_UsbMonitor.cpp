@@ -26,7 +26,7 @@ UsbMonitor::open(
 	const sl::String& captureDeviceName,
 	size_t snapshotLength,
 	size_t kernelBufferSize,
-	uint_t filterAddress,
+	uint_t addressFilter,
 	uint_t flags
 ) {
 	close();
@@ -36,7 +36,7 @@ UsbMonitor::open(
 
 	bool result =
 		m_device.open(captureDeviceName) &&
-		m_device.setFilter(filterAddress) &&
+		m_device.setFilter(addressFilter) &&
 		m_device.setSnapshotLength(snapshotLength) &&
 		m_device.setKernelBufferSize(kernelBufferSize) &&
 		m_readBuffer.setCount(kernelBufferSize); // enough to read the whole kernel buffer
