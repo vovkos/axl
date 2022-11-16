@@ -38,8 +38,7 @@ UsbMonitor::open(
 		m_device.open(captureDeviceName) &&
 		m_device.setFilter(addressFilter) &&
 		m_device.setSnapshotLength(snapshotLength) &&
-		m_device.setKernelBufferSize(kernelBufferSize) &&
-		m_readBuffer.setCount(kernelBufferSize); // enough to read the whole kernel buffer
+		m_device.setKernelBufferSize(kernelBufferSize);
 
 	if (!result)
 		return false;
@@ -60,8 +59,9 @@ UsbMonitor::open(
 
 	m_readList.clear();
 	m_transferList.clear();
-	m_readBufferOffset = 0;
+	m_pcapBuffer.clear();
 	m_snapshotLength = pcapHdr.snaplen;
+	m_kernelBufferSize = kernelBufferSize;
 	m_flags = flags;
 	return true;
 }
@@ -72,40 +72,24 @@ UsbMonitor::overlappedRead(
 	size_t size,
 	Overlapped* overlapped
 ) {
-	if ((m_flags & Flag_MessageMode) && size < sizeof(UsbMonTransferHdr))
+	if (size < MinumumReadSize)
 		return err::fail(err::SystemErrorCode_BufferTooSmall);
 
 	if (!m_transferList.isEmpty()) {
 		overlapped->m_actualSize = copyTransfers(p, size);
 		overlapped->m_state = OverlappedState_Completed;
-		return true;
+		return overlapped->m_overlapped.m_completionEvent.signal();
 	}
 
-	if (!m_readList.isEmpty()) {
-		ASSERT(m_readBufferOffset < m_readBuffer.getCount());
-
-		bool result = m_device.overlappedRead(
-			m_readBuffer + m_readBufferOffset,
-			m_readBuffer.getCount() - m_readBufferOffset,
-			&overlapped->m_overlapped
-		);
-
-		if (!result)
-			return false;
-
-		if (m_device.isOverlappedIoCompleted(&overlapped->m_overlapped)) {
-			overlapped->m_state = OverlappedState_Completed;
-			overlapped->m_actualSize = m_device.getOverlappedResult(&overlapped->m_overlapped);
-			if (overlapped->m_actualSize == -1) {
-				overlapped->m_error = err::getLastError();
-				return false;
-			}
-
-			return true;
-		}
+	bool result = m_device.overlappedRead(p, size, &overlapped->m_overlapped);
+	if (!result) {
+		overlapped->m_state = OverlappedState_Completed;
+		overlapped->m_actualSize = -1;
+		overlapped->m_error = err::getLastError();
+		return false;
 	}
 
-	overlapped->m_state = OverlappedState_Pending;
+	overlapped->m_state = OverlappedState_Reading;
 	overlapped->m_buffer = p;
 	overlapped->m_bufferSize = size;
 	m_readList.insertTail(overlapped);
@@ -121,59 +105,105 @@ UsbMonitor::getOverlappedResult(Overlapped* overlapped) {
 		return overlapped->m_actualSize;
 	}
 
-	ASSERT(overlapped == m_readList.getHead()); // wrong use otherwise
+	ASSERT(
+		overlapped->m_bufferSize >= sizeof(pcaprec_hdr_t) + sizeof(USBPCAP_BUFFER_PACKET_HEADER) &&
+		overlapped == m_readList.getHead()
+	); // wrong use otherwise
+
+	if (overlapped->m_state == OverlappedState_Reading) {
+		size_t result = bufferRead(overlapped);
+		if (!result)
+			return failRead(overlapped);
+	}
 
 	if (!m_transferList.isEmpty()) {
 		size_t size = copyTransfers(overlapped->m_buffer, overlapped->m_bufferSize);
-		return completePendingRead(overlapped, size);
+		return completeRead(overlapped, size);
 	}
 
-	size_t size = m_device.getOverlappedResult(&overlapped->m_overlapped);
-	if (size == -1)
-		return failPendingRead(overlapped);
+	size_t size = m_pcapBuffer.getCount();
+	if (size < sizeof(pcaprec_hdr_t) + sizeof(USBPCAP_BUFFER_PACKET_HEADER))
+		return failRead(overlapped, "incomplete usbpcap packet");
 
-	size += m_readBufferOffset;
-	m_readBufferOffset = 0;
+	const char* p = m_pcapBuffer;
+	const char* end = p + size;
 
-	// the very first transfer gets a special hanlding -- we make sure it's fully fetched and parsed
-
-	while (size < sizeof(pcaprec_hdr_t) + sizeof(USBPCAP_BUFFER_PACKET_HEADER)) {
-		size_t extraSize = m_device.read(
-			m_readBuffer + size,
-			m_readBuffer.getCount() - size
-		);
-
-		if (extraSize == -1)
-			return failPendingRead(overlapped);
-
-		size += extraSize;
-	}
-
-	const char* end = m_readBuffer + size;
-	size_t transferSize = parseTransfer(m_readBuffer, size);
-	if (transferSize == -1)
-		return failPendingRead(overlapped);
-
-	// parse remaining transfers in the buffer (
-
-	const char* p = m_readBuffer + transferSize;
-	while (p < end) {
-		size = end - p;
-		if (size < sizeof(pcaprec_hdr_t) + sizeof(USBPCAP_BUFFER_PACKET_HEADER)) // not enough -- stop
-			break;
-
-		transferSize = parseTransfer(p, size);
+	do {
+		size_t transferSize = parseTransfer(p, size);
 		if (transferSize == -1)
-			break;
+			return failRead(overlapped);
 
 		p += transferSize;
-	}
+		size = end - p;
+	} while (size >= sizeof(pcaprec_hdr_t) + sizeof(USBPCAP_BUFFER_PACKET_HEADER));
 
-	m_readBufferOffset = end - p;
-	memmove(m_readBuffer, p, m_readBufferOffset);
+	memmove(m_pcapBuffer, p, size);
+	m_pcapBuffer.setCount(size);
 
  	size = copyTransfers(overlapped->m_buffer, overlapped->m_bufferSize);
-	return completePendingRead(overlapped, size);
+	return completeRead(overlapped, size);
+}
+
+size_t
+UsbMonitor::bufferRead(Overlapped* overlapped) {
+	ASSERT(overlapped->m_state == OverlappedState_Reading);
+
+	size_t result = m_device.getOverlappedResult(&overlapped->m_overlapped);
+	if (result == -1)
+		return -1;
+
+	result = m_pcapBuffer.append((char*)overlapped->m_buffer, result);
+	if (result == -1)
+		return -1;
+
+	overlapped->m_state = OverlappedState_Buffered;
+	return result;
+}
+
+bool
+UsbMonitor::fetchTransferData(
+	Transfer* transfer,
+	size_t offset
+) {
+	size_t captureSize = transfer->getHdr()->m_captureSize;
+	char* data = transfer->m_buffer + sizeof(UsbMonTransferHdr);
+	ASSERT(offset < captureSize);
+
+	sl::Iterator<Overlapped> it = m_readList.getHead();
+
+	// 1 - skip already buffered reads
+
+	while (it && it->m_state == OverlappedState_Buffered)
+		it++;
+
+	// 2 - buffer pending reads
+
+	m_pcapBuffer.clear();
+
+	while (it) {
+		size_t size = bufferRead(*it);
+		if (size == -1)
+			return false;
+
+		size_t leftover = captureSize - offset;
+		if (size >= leftover) { // done!
+			memcpy(data + offset, m_pcapBuffer, leftover);
+			m_pcapBuffer.remove(0, leftover);
+			return true;
+		}
+
+		memcpy(data + offset, m_pcapBuffer, size);
+		m_pcapBuffer.clear();
+		offset += size;
+		it++;
+	}
+
+	// 3 - still not enough -- issue one *exact* read to usbpcap
+
+	size_t leftover = captureSize - offset;
+	size_t result = m_device.read(data + offset, leftover);
+	ASSERT(result == -1 || result == leftover);
+	return result != -1;
 }
 
 size_t
@@ -193,24 +223,28 @@ UsbMonitor::parseTransfer(
 
 	const char* data = (char*)packetHdr + packetHdr->headerLen;
 	size_t dataSize = packetHdr->dataLength;
-	Transfer* transfer = AXL_MEM_NEW_EXTRA(Transfer, dataSize);
+	Transfer* transfer = m_transferPool.get();
 	if (!transfer)
 		return -1;
 
-	transfer->m_readOffset = 0;
-	transfer->m_hdr.m_timestamp = sys::getTimestampFromTimeval(pcapHdr->ts_sec, pcapHdr->ts_usec);
-	transfer->m_hdr.m_status = err::SystemErrorCode_Success;
-	transfer->m_hdr.m_originalSize = packetHdr->dataLength;
-	transfer->m_hdr.m_captureSize = dataSize;
-	transfer->m_hdr.m_actualSize = dataSize;
-	transfer->m_hdr.m_transferType = (UsbMonTransferType)packetHdr->transfer;
-	transfer->m_hdr.m_bus = (uint8_t)packetHdr->bus;
-	transfer->m_hdr.m_address = (uint8_t)packetHdr->device;
-	transfer->m_hdr.m_endpoint = packetHdr->endpoint;
-	transfer->m_hdr.m_flags = (packetHdr->info & USBPCAP_INFO_PDO_TO_FDO) ? UsbMonTransferFlag_Completed : 0;
-
 	sl::List<Transfer> transferList;
 	transferList.insertTail(transfer);
+	bool result = transfer->m_buffer.setCount(sizeof(UsbMonTransferHdr) + dataSize);
+	if (!result)
+		return -1;
+
+	UsbMonTransferHdr* hdr = transfer->getHdr();
+	transfer->m_readOffset = 0;
+	hdr->m_timestamp = sys::getTimestampFromTimeval(pcapHdr->ts_sec, pcapHdr->ts_usec);
+	hdr->m_status = err::SystemErrorCode_Success;
+	hdr->m_originalSize = packetHdr->dataLength;
+	hdr->m_captureSize = dataSize;
+	hdr->m_actualSize = dataSize;
+	hdr->m_transferType = (UsbMonTransferType)packetHdr->transfer;
+	hdr->m_bus = (uint8_t)packetHdr->bus;
+	hdr->m_address = (uint8_t)packetHdr->device;
+	hdr->m_endpoint = packetHdr->endpoint;
+	hdr->m_flags = (packetHdr->info & USBPCAP_INFO_PDO_TO_FDO) ? UsbMonTransferFlag_Completed : 0;
 
 	switch (packetHdr->transfer) {
 		const USBPCAP_BUFFER_CONTROL_HEADER* controlHdr;
@@ -229,13 +263,13 @@ UsbMonitor::parseTransfer(
 				return err::fail<size_t>(-1, "invalid usbpcap control setup packet");
 
 			ASSERT(sizeof(USB_DEFAULT_PIPE_SETUP_PACKET) == sizeof(UsbMonControlSetup));
-			memcpy(&transfer->m_hdr.m_controlSetup, data, sizeof(UsbMonControlSetup));
+			memcpy(&hdr->m_controlSetup, data, sizeof(UsbMonControlSetup));
 			data += sizeof(UsbMonControlSetup);
 			dataSize -= sizeof(UsbMonControlSetup);
 
-			transfer->m_hdr.m_originalSize = transfer->m_hdr.m_controlSetup.m_length;
-			transfer->m_hdr.m_captureSize = dataSize;
-			transfer->m_hdr.m_actualSize = dataSize;
+			hdr->m_originalSize = hdr->m_controlSetup.m_length;
+			hdr->m_captureSize = dataSize;
+			hdr->m_actualSize = dataSize;
 			break;
 
 		case USBPCAP_CONTROL_STAGE_DATA:
@@ -250,42 +284,33 @@ UsbMonitor::parseTransfer(
 			return err::fail<size_t>(-1, "incomplete usbpcap isochronous header");
 
 		isoHdr = (USBPCAP_BUFFER_ISOCH_HEADER*)packetHdr;
-		transfer->m_hdr.m_isochronousHdr.m_startFrame = isoHdr->startFrame;
-		transfer->m_hdr.m_isochronousHdr.m_packetCount = isoHdr->numberOfPackets;
-		transfer->m_hdr.m_isochronousHdr.m_errorCount = isoHdr->errorCount;
+		hdr->m_isochronousHdr.m_startFrame = isoHdr->startFrame;
+		hdr->m_isochronousHdr.m_packetCount = isoHdr->numberOfPackets;
+		hdr->m_isochronousHdr.m_errorCount = isoHdr->errorCount;
 		break;
 	}
 
-	const char* p = data;
+	const char* end;
 
-	if (dataSize) {
+	if (!dataSize)
+		end = data;
+	else {
 		size_t availableDataSize = size - sizeof(pcaprec_hdr_t) - packetHdr->headerLen;
 		if (availableDataSize >= dataSize) { // this transfer is buffered completely
-			memcpy(transfer->m_data, data, dataSize);
-			p += dataSize;
-		} else { // not buffered completely -- fetch this (and only this!) data from the driver
-			memcpy(transfer->m_data, data, availableDataSize);
-			p = (char*)p0 + size;
+			memcpy(hdr + 1, data, dataSize);
+			end = data + dataSize;
+		} else { // not buffered completely -- fetch this (and only this!) data from usbpcap
+			memcpy(hdr + 1, data, availableDataSize);
+			end = (char*)p0 + size;
 
-			size_t offset = dataSize;
-			while (offset < dataSize) {
-				size_t extraSize = m_device.read(
-					transfer->m_data + offset,
-					dataSize - offset
-				);
-
-				if (extraSize == -1)
-					return -1;
-
-				offset += extraSize;
-			}
+			bool result = fetchTransferData(transfer, availableDataSize);
+			if (!result)
+				return -1;
 		}
 	}
 
-	// move
-
 	m_transferList.insertListTail(&transferList);
-	return p - (char*)p0;
+	return end - (char*)p0;
 }
 
 size_t
@@ -296,39 +321,42 @@ UsbMonitor::copyTransfers(
 	ASSERT(size >= sizeof(UsbMonTransferHdr));
 	ASSERT(!m_transferList.isEmpty());
 
+	Transfer* transfer = *m_transferList.getHead();
+	UsbMonTransferHdr* hdr = transfer->getHdr();
+
 	if (m_flags & Flag_MessageMode) {
-		Transfer* transfer = m_transferList.removeHead();
-		size_t copySize = sizeof(UsbMonTransferHdr) + transfer->m_hdr.m_captureSize;
+		size_t copySize = sizeof(UsbMonTransferHdr) + hdr->m_captureSize;
 		if (copySize > size) {
-			transfer->m_hdr.m_actualSize = size - sizeof(UsbMonTransferHdr);
+			hdr->m_actualSize = size - sizeof(UsbMonTransferHdr);
 			copySize = size;
 		}
 
-		memcpy(p0, &transfer->m_hdr, copySize);
-		AXL_MEM_DELETE(transfer);
+		memcpy(p0, transfer->m_buffer, copySize);
+		m_transferList.remove(transfer);
+		m_transferPool.put(transfer);
 		return copySize;
 	}
 
 	// stream mode
 
-	Transfer* transfer = *m_transferList.getHead();
-	ASSERT(transfer->m_readOffset < sizeof(UsbMonTransferHdr) + transfer->m_hdr.m_captureSize);
+	ASSERT(transfer->m_readOffset < sizeof(UsbMonTransferHdr) + hdr->m_captureSize);
 
 	char* p = (char*)p0;
 	char* end = p + size;
 	while (p < end) {
 		size = end - p;
-		size_t leftover = sizeof(UsbMonTransferHdr) + transfer->m_hdr.m_captureSize - transfer->m_readOffset;
+		size_t leftover = sizeof(UsbMonTransferHdr) + hdr->m_captureSize - transfer->m_readOffset;
 		if (size < leftover) {
-			memcpy(p, (char*)&transfer->m_hdr + transfer->m_readOffset, size);
+			memcpy(p, transfer->m_buffer + transfer->m_readOffset, size);
 			transfer->m_readOffset += size;
 			return size;
 		}
 
-		memcpy(p, (char*)&transfer->m_hdr + transfer->m_readOffset, leftover);
+		memcpy(p, transfer->m_buffer + transfer->m_readOffset, leftover);
 		p += leftover;
 
-		m_transferList.erase(transfer);
+		m_transferList.remove(transfer);
+		m_transferPool.put(transfer);
 		if (m_transferList.isEmpty())
 			break;
 

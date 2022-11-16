@@ -114,6 +114,39 @@ struct USBPCAP_BUFFER_ISOCH_HEADER {
 	USBPCAP_BUFFER_ISO_PACKET packet[1];
 };
 
+union BM_REQUEST_TYPE {
+	struct BM {
+		UCHAR Recipient : 2;
+		UCHAR Reserved  : 3;
+		UCHAR Type      : 2;
+		UCHAR Dir       : 1;
+	} s;
+	UCHAR B;
+};
+
+struct USB_DEFAULT_PIPE_SETUP_PACKET {
+	BM_REQUEST_TYPE bmRequestType;
+	UCHAR bRequest;
+
+	union _wValue {
+		struct {
+			UCHAR LowByte;
+			UCHAR HiByte;
+		};
+		USHORT W;
+	} wValue;
+
+	union _wIndex {
+		struct {
+			UCHAR LowByte;
+			UCHAR HiByte;
+		};
+		USHORT W;
+	} wIndex;
+
+	USHORT wLength;
+};
+
 //..............................................................................
 
 #pragma pack(pop)
@@ -154,6 +187,9 @@ public:
 	close() {
 		m_device.close();
 	}
+
+	bool
+	readPcapHdr();
 
 	sl::String_w
 	getHubSymlink();

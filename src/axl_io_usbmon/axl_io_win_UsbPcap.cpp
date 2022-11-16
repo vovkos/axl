@@ -35,6 +35,24 @@ UsbPcap::open(
 		OPEN_EXISTING,
 		FILE_FLAG_OVERLAPPED
 	);
+
+	return true;
+}
+
+bool
+UsbPcap::readPcapHdr() {
+	pcap_hdr_t pcapHdr = { 0 };
+	size_t size = read(&pcapHdr, sizeof(pcapHdr));
+	if (size == -1)
+		return false;
+
+	if (size != sizeof(pcapHdr) ||
+		pcapHdr.magic_number != 0xa1b2c3d4 ||
+		pcapHdr.network != DLT_USBPCAP
+	)
+		return err::fail("invalid pcap file header");
+
+	return true;
 }
 
 bool

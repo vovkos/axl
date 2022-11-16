@@ -29,8 +29,21 @@ enum UsbMonDeviceDescMask {
 	UsbMonDeviceDescMask_ManufacturerDescriptor = 0x0010,
 	UsbMonDeviceDescMask_ProductDescriptor      = 0x0020,
 	UsbMonDeviceDescMask_SerialNumberDescriptor = 0x0040,
-	UsbMonDeviceDescMask_Descriptors            = 0x0070,
-	UsbMonDeviceDescMask_All                    = 0x00ff,
+
+	UsbMonDeviceDescMask_Descriptors =
+		UsbMonDeviceDescMask_ManufacturerDescriptor |
+		UsbMonDeviceDescMask_ProductDescriptor |
+		UsbMonDeviceDescMask_SerialNumberDescriptor,
+
+	UsbMonDeviceDescMask_AllButHubs =
+		UsbMonDeviceDescMask_Description |
+		UsbMonDeviceDescMask_Manufacturer |
+		UsbMonDeviceDescMask_Driver |
+		UsbMonDeviceDescMask_Descriptors,
+
+	UsbMonDeviceDescMask_All =
+		UsbMonDeviceDescMask_AllButHubs |
+		UsbMonDeviceDescMask_Hubs,
 };
 
 enum UsbMonDeviceDescFlag {

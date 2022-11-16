@@ -15,6 +15,7 @@
 
 #include "axl_io_UsbMonTransfer.h"
 #include "axl_io_win_UsbPcap.h"
+#include "axl_mem_Pool.h"
 
 namespace axl {
 namespace io {
@@ -25,6 +26,7 @@ namespace win {
 class UsbMonitor {
 public:
 	enum {
+		MinumumReadSize         = sizeof(usbpcap::pcaprec_hdr_t) + sizeof(usbpcap::USBPCAP_BUFFER_PACKET_HEADER),
 		MinimumKernelBufferSize = 1 * 1024,
 	};
 
@@ -34,8 +36,9 @@ public:
 
 	enum OverlappedState {
 		OverlappedState_Undefined,
+		OverlappedState_Reading,
+		OverlappedState_Buffered,
 		OverlappedState_Completed,
-		OverlappedState_Pending,
 	};
 
 	class Overlapped: public sl::ListLink {
@@ -66,17 +69,22 @@ public:
 protected:
 	struct Transfer: sl::ListLink {
 		size_t m_readOffset;
-		UsbMonTransferHdr m_hdr;
-		char m_data[1];
+		sl::Array<char> m_buffer;
+
+		UsbMonTransferHdr*
+		getHdr() const {
+			return (UsbMonTransferHdr*)m_buffer.cp();
+		}
 	};
 
 protected:
 	win::UsbPcap m_device;
 	sl::AuxList<Overlapped> m_readList;
 	sl::List<Transfer> m_transferList;
-	sl::Array<char> m_readBuffer;
-	size_t m_readBufferOffset;
+	mem::Pool<Transfer> m_transferPool;
+	sl::Array<char> m_pcapBuffer;
 	size_t m_snapshotLength;
+	size_t m_kernelBufferSize;
 	uint_t m_flags;
 
 public:
@@ -124,15 +132,11 @@ public:
 
 	size_t
 	getKernelBufferSize() const {
-		return m_readBuffer.getCount();
+		return m_kernelBufferSize;
 	}
 
 	bool
-	setKernelBufferSize(size_t size) {
-		return
-			m_readBuffer.setCount(size) &&
-			m_device.setKernelBufferSize(size);
-	}
+	setKernelBufferSize(size_t size);
 
 	bool
 	setFilter(uint_t address) {
@@ -162,12 +166,6 @@ public:
 	getOverlappedResult(Overlapped* overlapped);
 
 protected:
-	void
-	finalizePendingRead(
-		Overlapped* overlapped,
-		size_t actualSize
-	);
-
 	size_t
 	copyTransfers(
 		void* p,
@@ -180,20 +178,29 @@ protected:
 		size_t size
 	);
 
+	size_t
+	bufferRead(Overlapped* overlapped);
+
+	bool
+	fetchTransferData(
+		Transfer* transfer,
+		size_t offset
+	);
+
 	void
-	removePendingRead(Overlapped* overlapped);
+	removeRead(Overlapped* overlapped);
 
 	size_t
-	completePendingRead(
+	completeRead(
 		Overlapped* overlapped,
 		size_t actualSize
 	);
 
 	size_t
-	failPendingRead(Overlapped* overlapped);
+	failRead(Overlapped* overlapped);
 
 	size_t
-	failPendingRead(
+	failRead(
 		Overlapped* overlapped,
 		const err::ErrorRef& error
 	);
@@ -211,9 +218,19 @@ UsbMonitor::Overlapped::Overlapped() {
 
 inline
 UsbMonitor::UsbMonitor() {
-	m_readBufferOffset = 0;
 	m_snapshotLength = 0;
 	m_flags = 0;
+}
+
+inline
+bool
+UsbMonitor::setKernelBufferSize(size_t size) {
+	bool result = m_device.setKernelBufferSize(size);
+	if (!result)
+		return false;
+
+	m_kernelBufferSize = size;
+	return true;
 }
 
 inline
@@ -229,47 +246,44 @@ UsbMonitor::read(
 
 inline
 void
-UsbMonitor::removePendingRead(Overlapped* overlapped) {
-	ASSERT(overlapped->m_state == OverlappedState_Pending);
+UsbMonitor::removeRead(Overlapped* overlapped) {
+	ASSERT(overlapped->m_state == OverlappedState_Reading || overlapped->m_state == OverlappedState_Buffered);
 	overlapped->m_state = OverlappedState_Completed;
 	m_readList.remove(overlapped);
 }
 
 inline
 size_t
-UsbMonitor::completePendingRead(
+UsbMonitor::completeRead(
 	Overlapped* overlapped,
 	size_t actualSize
 ) {
 	overlapped->m_actualSize = actualSize;
-	removePendingRead(overlapped);
+	removeRead(overlapped);
 	return actualSize;
 }
 
 inline
 size_t
-UsbMonitor::failPendingRead(Overlapped* overlapped) {
+UsbMonitor::failRead(Overlapped* overlapped) {
 	overlapped->m_actualSize = -1;
 	overlapped->m_error = err::getLastError();
-	removePendingRead(overlapped);
-	m_readBufferOffset = 0;
+	removeRead(overlapped);
 	return -1;
 }
 
 inline
 size_t
-UsbMonitor::failPendingRead(
+UsbMonitor::failRead(
 	Overlapped* overlapped,
 	const err::ErrorRef& error
 ) {
 	overlapped->m_actualSize = -1;
 	overlapped->m_error = error;
-	removePendingRead(overlapped);
+	removeRead(overlapped);
 	setError(error);
-	m_readBufferOffset = 0;
 	return -1;
 }
-
 
 //..............................................................................
 

@@ -6776,14 +6776,9 @@ testUsbMon() {
 	io::registerUsbErrorProvider();
 	io::getUsbDefaultContext()->createDefault();
 
-	io::UsbMonDeviceDesc serialTap;
-
+	const io::UsbMonDeviceDesc* serialTap = NULL;
 	sl::List<io::UsbMonDeviceDesc> deviceList;
-	size_t count = io::enumerateUsbMonDevices(
-		&deviceList,
-		io::UsbMonDeviceDescMask_All & ~io::UsbMonDeviceDescMask_Hubs
-	);
-
+	io::enumerateUsbMonDevices(&deviceList, io::UsbMonDeviceDescMask_AllButHubs);
 	sl::ConstIterator<io::UsbMonDeviceDesc> it = deviceList.getHead();
 	for (size_t i = 0; it; it++, i++) {
 		printf("device #%d\n", i);
@@ -6820,37 +6815,42 @@ testUsbMon() {
 			printf("  serial number*: %s\n", it->m_serialNumberDescriptor.sz());
 
 		if (it->m_vendorId == VidSerialTap && it->m_productId == PidSerialTap)
-			serialTap = **it;
+			serialTap = *it;
 
 		printf("\n");
 	}
 
-	if (serialTap.m_captureDeviceName.isEmpty()) {
+	if (!serialTap) {
 		printf("Serial Tap is not found\n");
 		return false;
 	}
 
 	bool result;
 
-#if (_AXL_OS_WIN)
-	io::win::UsbMonitor monitor;
-	result = monitor.open(
-		serialTap.m_captureDeviceName,
-		serialTap.m_address,
-		io::win::UsbMonitor::Flag_MessageMode
-	);
-#elif (_AXL_OS_LINUX)
 	enum {
 		ReadTimeout = 3000,
-		KernelBufferSize = io::lnx::UsbMonitor::DefaultKernelBufferSize
+		BufferSize = 1 * 1024 * 1024,
 	};
 
-	io::lnx::UsbMonitor monitor;
-	result = monitor.open(
-		serialTap.m_captureDeviceName,
-		KernelBufferSize,
-		serialTap.m_address
-	);
+#if (_AXL_OS_WIN)
+	io::win::UsbPcapTransferParser parser;
+	io::win::StdOverlapped overlapped;
+
+	io::win::UsbPcap monitor;
+	result =
+		monitor.open(serialTap->m_captureDeviceName) &&
+		monitor.setSnapshotLength(io::win::UsbPcap::DefaultSnapshotLength) &&
+		monitor.setKernelBufferSize(BufferSize) &&
+		monitor.setFilter(serialTap->m_address) &&
+		monitor.readPcapHdr();
+
+#elif (_AXL_OS_LINUX)
+	io::lnx::UsbMonParser parser;
+
+	io::lnx::UsbMon monitor;
+	result =
+		monitor.open(serialTap.m_captureDeviceName) &&
+		monitor.setKernelBufferSize(BufferSize);
 #endif
 
 	if (!result) {
@@ -6858,17 +6858,22 @@ testUsbMon() {
 		return false;
 	}
 
-	size_t bufferSize = monitor.getKernelBufferSize();
-
 	sl::String string;
 	sl::Array<char> buffer;
-	buffer.setCount(bufferSize);
+	sl::Array<char> payload;
+	buffer.setCount(BufferSize);
 
-	printf("Capturing USB on the Serial Tap (kernel buffer: %d B)\n", bufferSize);
+	printf("Capturing USB on the Serial Tap (buffer %d B)...\n", BufferSize);
 
 	for (;;) {
 #if (_AXL_OS_WIN)
-		size_t size = monitor.read(buffer, bufferSize);
+		result = monitor.overlappedRead(buffer, BufferSize, &overlapped);
+		if (!result) {
+			printf("overlapped read error: %s\n", err::getLastErrorDescription().sz());
+			return false;
+		}
+
+		size_t size = monitor.getOverlappedResult(&overlapped);
 #elif (_AXL_OS_LINUX)
 		size_t size = monitor.read(buffer, bufferSize, ReadTimeout);
 		if (size == 0) {
@@ -6885,59 +6890,83 @@ testUsbMon() {
 		const char* p = buffer;
 		const char* end = p + size;
 
-		ASSERT(size >= sizeof(io::UsbMonTransferHdr));
-		const io::UsbMonTransferHdr* hdr = (io::UsbMonTransferHdr*)buffer.cp();
-		printf("\nUsbMonTransferHdr:\n");
-		printf("  m_timestamp:    %s\n", sys::Time(hdr->m_timestamp).format("%Y-%M-%D %h:%m:%s.%l").sz());
-		printf("  m_status:       %d - %s\n", hdr->m_status, err::Errno(-hdr->m_status).getDescription().sz());
-		printf("  m_flags:        0x%02x %s\n", hdr->m_flags, io::getUsbMonTransferFlagsString(hdr->m_flags).sz());
-		printf("  m_transferType: %d - %s\n", hdr->m_transferType, io::getUsbMonTransferTypeString((axl::io::UsbMonTransferType)hdr->m_transferType));
-		printf("  m_bus:          %d\n", hdr->m_bus);
-		printf("  m_address:      %d\n", hdr->m_address);
-		printf("  m_endpoint:     0x%02x\n", hdr->m_endpoint);
-		printf("  m_originalSize: %d\n", hdr->m_originalSize);
-		printf("  m_captureSize:  %d\n", hdr->m_captureSize);
-		printf("  m_actualSize:   %d\n", hdr->m_actualSize);
+		while (p < end) {
+			size = parser.parse(p, end - p);
+			if (size == -1) {
+				printf("parse error: %s\n", err::getLastErrorDescription().sz());
+				return false;
+			}
 
-		switch (hdr->m_transferType) {
-		case io::UsbMonTransferType_Control: {
-			if (hdr->m_flags & io::UsbMonTransferFlag_Completed)
+			io::UsbMonTransferParseState state = parser.getState();
+			switch (state) {
+			case io::UsbMonTransferParseState_CompleteHeader: {
+				const io::UsbMonTransferHdr* hdr = parser.getTransferHdr();
+				printf("\nUsbMonTransferHdr:\n");
+				printf("  m_timestamp:    %s\n", sys::Time(hdr->m_timestamp).format("%Y-%M-%D %h:%m:%s.%l").sz());
+				printf("  m_status:       %d - %s\n", hdr->m_status, err::Errno(-hdr->m_status).getDescription().sz());
+				printf("  m_flags:        0x%02x %s\n", hdr->m_flags, io::getUsbMonTransferFlagsString(hdr->m_flags).sz());
+				printf("  m_transferType: %d - %s\n", hdr->m_transferType, io::getUsbMonTransferTypeString((axl::io::UsbMonTransferType)hdr->m_transferType));
+				printf("  m_bus:          %d\n", hdr->m_bus);
+				printf("  m_address:      %d\n", hdr->m_address);
+				printf("  m_endpoint:     0x%02x\n", hdr->m_endpoint);
+				printf("  m_originalSize: %d\n", hdr->m_originalSize);
+				printf("  m_captureSize:  %d\n", hdr->m_captureSize);
+				printf("  m_actualSize:   %d\n", hdr->m_actualSize);
+
+				switch (hdr->m_transferType) {
+				case io::UsbMonTransferType_Control: {
+					if (hdr->m_flags & io::UsbMonTransferFlag_Completed)
+						break;
+
+					const io::UsbMonControlSetup& cs = hdr->m_controlSetup;
+					const io::UsbMonControlRequestType& crt = cs.m_requestType;
+					printf("Control transfer:\n");
+					printf("  m_requestType:  0x%02x\n", crt.m_value);
+					printf("    m_recipient:  %d - %s\n", crt.m_recipient, io::getUsbMonControlRecipientString((io::UsbMonControlRecipient)crt.m_recipient));
+					printf("    m_type:       %d - %s\n", crt.m_type, io::getUsbMonControlTypeString((io::UsbMonControlType)crt.m_type));
+					printf("    m_direction:  %d - %s\n", crt.m_direction, io::getUsbMonControlDirectionString((io::UsbMonControlDirection)crt.m_direction));
+					printf("  m_request:      %d - %s\n", cs.m_request, io::getUsbMonControlStdRequestString((io::UsbMonControlStdRequest)cs.m_request));
+					printf("  m_value:        0x%04x\n", cs.m_value);
+					printf("  m_index:        0x%04x\n", cs.m_index);
+					printf("  m_length:       %d\n", cs.m_length);
+					break;
+					}
+
+				case io::UsbMonTransferType_Isochronous: {
+					const io::UsbMonIsochronousHdr& iso = hdr->m_isochronousHdr;
+					printf("Isochronous:\n");
+					printf("  m_startFrame:  %d\n", iso.m_startFrame);
+					printf("  m_packetCount: %d\n", iso.m_packetCount);
+					printf("  m_errorCount:  %d\n", iso.m_errorCount);
+					break;
+					}
+				}
+
+				break;
+				}
+
+			case io::UsbMonTransferParseState_IncompleteData:
+				payload.append(p, size);
 				break;
 
-			const io::UsbMonControlSetup& cs = hdr->m_controlSetup;
-			const io::UsbMonControlRequestType& crt = cs.m_requestType;
-			printf("Control transfer:\n");
-			printf("  m_requestType:  0x%02x\n", crt.m_value);
-			printf("    m_recipient:  %d - %s\n", crt.m_recipient, io::getUsbMonControlRecipientString((io::UsbMonControlRecipient)crt.m_recipient));
-			printf("    m_type:       %d - %s\n", crt.m_type, io::getUsbMonControlTypeString((io::UsbMonControlType)crt.m_type));
-			printf("    m_direction:  %d - %s\n", crt.m_direction, io::getUsbMonControlDirectionString((io::UsbMonControlDirection)crt.m_direction));
-			printf("  m_request:      0x%02x - %s\n", cs.m_request, io::getUsbMonControlStdRequestString((io::UsbMonControlStdRequest)cs.m_request));
-			printf("  m_value:        0x%04x\n", cs.m_value);
-			printf("  m_index:        0x%04x\n", cs.m_index);
-			printf("  m_length:       0x%04x\n", cs.m_length);
-			break;
+			case io::UsbMonTransferParseState_CompleteData:
+				const io::UsbMonTransferHdr* hdr = parser.getTransferHdr();
+				payload.append(p, size);
+				ASSERT(payload.getCount() == hdr->m_captureSize);
+
+				printf("Payload:\n");
+				enc::HexEncoding::encode(
+					&string,
+					payload,
+					hdr->m_captureSize,
+					enc::HexEncodingFlag_Multiline
+				);
+
+				printf("%s\n", string.sz());
+				payload.clear();
 			}
 
-		case io::UsbMonTransferType_Isochronous: {
-			const io::UsbMonIsochronousHdr& iso = hdr->m_isochronousHdr;
-			printf("Isochronous:\n");
-			printf("  m_startFrame:  %d\n", iso.m_startFrame);
-			printf("  m_packetCount: %d\n", iso.m_packetCount);
-			printf("  m_errorCount:  %d\n", iso.m_errorCount);
-			break;
-			}
-		}
-
-		if (hdr->m_actualSize) {
-			printf("Payload:\n");
-			enc::HexEncoding::encode(
-				&string,
-				hdr + 1,
-				hdr->m_actualSize,
-				enc::HexEncodingFlag_Multiline
-			);
-
-			printf("%s\n", string.sz());
+			p += size;
 		}
 	}
 

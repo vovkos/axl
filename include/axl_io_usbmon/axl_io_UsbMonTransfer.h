@@ -145,15 +145,59 @@ struct UsbMonTransferHdr {
 	uint8_t m_bus;
 	uint8_t m_address;
 	uint8_t m_endpoint;
-	uint32_t m_originalSize; // original transfer data size
+	uint32_t m_originalSize; // original transfer payload size
 	uint32_t m_captureSize;  // captured by the driver
-	uint32_t m_actualSize;   // returned to the caller (in the message mode, can be smaller than m_captureSize)
+	uint32_t m_actualSize;   // returned to the caller (on linux, can be smaller than m_captureSize)
 
 	union {
 		UsbMonControlSetup m_controlSetup;
 		UsbMonIsochronousHdr m_isochronousHdr;
 		uint64_t m_padding[2]; // align on 16 bytes
 	};
+};
+
+//..............................................................................
+
+enum UsbMonTransferParseState {
+	UsbMonTransferParseState_IncompleteHeader = 0,
+	UsbMonTransferParseState_CompleteHeader,
+	UsbMonTransferParseState_IncompleteData,
+	UsbMonTransferParseState_CompleteData,
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class UsbMonTransferParserBase {
+protected:
+	UsbMonTransferParseState m_state;
+	UsbMonTransferHdr m_transferHdr;
+
+public:
+	UsbMonTransferParserBase() {
+		m_state = UsbMonTransferParseState_IncompleteHeader;
+		memset(&m_transferHdr, 0, sizeof(m_transferHdr));
+	}
+
+	UsbMonTransferParseState
+	getState() const {
+		return m_state;
+	}
+
+	const UsbMonTransferHdr* getTransferHdr() const {
+		ASSERT(m_state > UsbMonTransferParseState_IncompleteHeader);
+		return &m_transferHdr;
+	}
+
+	// implement in the actual parser class (no need to make these virtual)
+
+	void
+	reset();
+
+	size_t
+	parse(
+	 	const void* p,
+	 	size_t size
+	);
 };
 
 //..............................................................................
