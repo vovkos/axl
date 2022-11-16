@@ -16,6 +16,7 @@
 set(
 	LIB_H_LIST
 	${AXL_INC_DIR}/axl_io_usbmon/axl_io_UsbMonTransfer.h
+	${AXL_INC_DIR}/axl_io_usbmon/axl_io_UsbMonTransferParser.h
 	${AXL_INC_DIR}/axl_io_usbmon/axl_io_UsbMonEnumerator.h
 	axl_io_UsbStringDescriptorLanguage.h
 )

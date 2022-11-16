@@ -22,35 +22,6 @@ using namespace usbpcap;
 //..............................................................................
 
 size_t
-UsbPcapTransferParser::parse(
-	const void* p,
-	size_t size
-) {
-	switch (m_state) {
-	case UsbMonTransferParseState_IncompleteHeader:
-		return parseHeader(p, size);
-
-	case UsbMonTransferParseState_CompleteHeader:
-		if (m_transferHdr.m_captureSize)
-			return parseData(size);
-
-		reset();
-		return parseHeader(p, size);
-
-	case UsbMonTransferParseState_IncompleteData:
-		return parseData(size);
-
-	case UsbMonTransferParseState_CompleteData:
-		reset();
-		return parseHeader(p, size);
-
-	default:
-		ASSERT(false);
-		return err::fail<size_t>(-1, err::SystemErrorCode_InvalidDeviceState);
-	}
-}
-
-size_t
 UsbPcapTransferParser::parseHeader(
 	const void* p0,
 	size_t size
@@ -119,45 +90,9 @@ UsbPcapTransferParser::parseHeader(
 	}
 
 	m_transferHdr.m_actualSize = m_transferHdr.m_captureSize;
-	m_state = UsbMonTransferParseState_CompleteHeader;
+	m_state = UsbMonTransferParserState_CompleteHeader;
 	m_offset = 0;
 	return p - (char*)p0;
-}
-
-inline
-size_t
-UsbPcapTransferParser::parseData(size_t size) {
-	size_t leftover = m_transferHdr.m_captureSize - m_offset;
-	size_t taken;
-
-	if (size < leftover) {
-		m_state = UsbMonTransferParseState_IncompleteData;
-		taken = size;
-	} else {
-		m_state = UsbMonTransferParseState_CompleteData;
-		taken = leftover;
-	}
-
-	m_offset += taken;
-	return taken;
-}
-
-inline
-const char*
-UsbPcapTransferParser::buffer(
-	size_t targetSize,
-	const char* p,
-	const char* end
-) {
-	if (m_offset >= targetSize)
-		return p;
-
-	size_t available = end - p;
-	size_t leftover = targetSize - m_offset;
-	size_t taken = AXL_MIN(leftover, available);
-	memcpy(m_buffer + m_offset, p, taken);
-	m_offset += taken;
-	return p + taken;
 }
 
 //..............................................................................

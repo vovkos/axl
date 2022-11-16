@@ -158,49 +158,5 @@ struct UsbMonTransferHdr {
 
 //..............................................................................
 
-enum UsbMonTransferParseState {
-	UsbMonTransferParseState_IncompleteHeader = 0,
-	UsbMonTransferParseState_CompleteHeader,
-	UsbMonTransferParseState_IncompleteData,
-	UsbMonTransferParseState_CompleteData,
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class UsbMonTransferParserBase {
-protected:
-	UsbMonTransferParseState m_state;
-	UsbMonTransferHdr m_transferHdr;
-
-public:
-	UsbMonTransferParserBase() {
-		m_state = UsbMonTransferParseState_IncompleteHeader;
-		memset(&m_transferHdr, 0, sizeof(m_transferHdr));
-	}
-
-	UsbMonTransferParseState
-	getState() const {
-		return m_state;
-	}
-
-	const UsbMonTransferHdr* getTransferHdr() const {
-		ASSERT(m_state > UsbMonTransferParseState_IncompleteHeader);
-		return &m_transferHdr;
-	}
-
-	// implement in the actual parser class (no need to make these virtual)
-
-	void
-	reset();
-
-	size_t
-	parse(
-	 	const void* p,
-	 	size_t size
-	);
-};
-
-//..............................................................................
-
 } // namespace io
 } // namespace axl

@@ -6828,13 +6828,11 @@ testUsbMon() {
 	bool result;
 
 	enum {
-		ReadTimeout = 3000,
 		BufferSize = 1 * 1024 * 1024,
 	};
 
 #if (_AXL_OS_WIN)
 	io::win::UsbPcapTransferParser parser;
-	io::win::StdOverlapped overlapped;
 
 	io::win::UsbPcap monitor;
 	result =
@@ -6845,11 +6843,11 @@ testUsbMon() {
 		monitor.readPcapHdr();
 
 #elif (_AXL_OS_LINUX)
-	io::lnx::UsbMonParser parser;
+	io::lnx::UsbMonTransferParser parser;
 
 	io::lnx::UsbMon monitor;
 	result =
-		monitor.open(serialTap.m_captureDeviceName) &&
+		monitor.open(serialTap->m_captureDeviceName) &&
 		monitor.setKernelBufferSize(BufferSize);
 #endif
 
@@ -6866,19 +6864,29 @@ testUsbMon() {
 	printf("Capturing USB on the Serial Tap (buffer %d B)...\n", BufferSize);
 
 	for (;;) {
+		size_t size;
+
 #if (_AXL_OS_WIN)
-		result = monitor.overlappedRead(buffer, BufferSize, &overlapped);
+		size = monitor.read(buffer, BufferSize);
 		if (!result) {
 			printf("overlapped read error: %s\n", err::getLastErrorDescription().sz());
 			return false;
 		}
 
-		size_t size = monitor.getOverlappedResult(&overlapped);
+		monitor.getOverlappedResult(&overlapped);
 #elif (_AXL_OS_LINUX)
-		size_t size = monitor.read(buffer, bufferSize, ReadTimeout);
-		if (size == 0) {
-			printf("read timeout...\n");
-			continue;
+		fd_set readSet = { 0 };
+		FD_SET(monitor, &readSet);
+		int result = ::select(monitor + 1, &readSet, NULL, NULL, NULL);
+		if (result == -1) {
+			printf("select error: %s\n", err::Errno(errno).getDescription().sz());
+			return false;
+		}
+
+		size = monitor.read(buffer, BufferSize);
+		if (!size) {
+			printf("EOF (?)\n");
+			break;
 		}
 #endif
 
@@ -6897,9 +6905,9 @@ testUsbMon() {
 				return false;
 			}
 
-			io::UsbMonTransferParseState state = parser.getState();
+			io::UsbMonTransferParserState state = parser.getState();
 			switch (state) {
-			case io::UsbMonTransferParseState_CompleteHeader: {
+			case io::UsbMonTransferParserState_CompleteHeader: {
 				const io::UsbMonTransferHdr* hdr = parser.getTransferHdr();
 				printf("\nUsbMonTransferHdr:\n");
 				printf("  m_timestamp:    %s\n", sys::Time(hdr->m_timestamp).format("%Y-%M-%D %h:%m:%s.%l").sz());
@@ -6945,11 +6953,11 @@ testUsbMon() {
 				break;
 				}
 
-			case io::UsbMonTransferParseState_IncompleteData:
+			case io::UsbMonTransferParserState_IncompleteData:
 				payload.append(p, size);
 				break;
 
-			case io::UsbMonTransferParseState_CompleteData:
+			case io::UsbMonTransferParserState_CompleteData:
 				const io::UsbMonTransferHdr* hdr = parser.getTransferHdr();
 				payload.append(p, size);
 				ASSERT(payload.getCount() == hdr->m_captureSize);

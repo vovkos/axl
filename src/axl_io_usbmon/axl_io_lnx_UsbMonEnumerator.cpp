@@ -128,16 +128,20 @@ enumerateUsbMonDevices(
 		if (!doesFileExist(string))
 			continue; // usbmon device not found, can't sniff
 
+		libusb_device_descriptor deviceDescriptor;
+		result = device.getDeviceDescriptor(&deviceDescriptor);
+		if (!result)
+			continue;
+
+		bool isHub = deviceDescriptor.bDeviceClass == 0x09;
+		if (isHub && !(mask & UsbMonDeviceDescMask_Hubs))
+			continue;
+
 		UsbMonDeviceDesc* deviceDesc = AXL_MEM_NEW(UsbMonDeviceDesc);
 		deviceDesc->m_captureDeviceName = string;
 		deviceDesc->m_address = device.getDeviceAddress();
 		deviceDesc->m_speed = (UsbMonDeviceSpeed)device.getDeviceSpeed();
 		resultList->insertTail(deviceDesc);
-
-		libusb_device_descriptor deviceDescriptor;
-		result = device.getDeviceDescriptor(&deviceDescriptor);
-		if (!result)
-			continue;
 
 		deviceDesc->m_vendorId = deviceDescriptor.idVendor;
 		deviceDesc->m_productId = deviceDescriptor.idProduct;
@@ -147,6 +151,9 @@ enumerateUsbMonDevices(
 		deviceDesc->m_productDescriptorId = deviceDescriptor.iProduct;
 		deviceDesc->m_serialNumberDescriptorId = deviceDescriptor.iSerialNumber;
 		deviceDesc->m_flags |= UsbMonDeviceDescFlag_DeviceDescriptor;
+
+		if (isHub)
+			deviceDesc->m_flags |= UsbMonDeviceDescFlag_Hub;
 
 		getUsbDeviceSysFsPrefix(&sysFsPrefix, device);
 

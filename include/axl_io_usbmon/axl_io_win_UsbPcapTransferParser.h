@@ -53,8 +53,6 @@ protected:
 		UsbPcapIsoHdr m_isoHdr;
 	};
 
-	size_t m_offset; // offset in the original stream
-
 public:
 	UsbPcapTransferParser() {
 		reset();
@@ -65,12 +63,6 @@ public:
 	 	const void* p,
 	 	size_t size
 	);
-
-	void
-	reset() {
-		m_state = UsbMonTransferParseState_IncompleteHeader;
-		m_offset = 0;
-	}
 
 protected:
 	size_t
