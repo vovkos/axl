@@ -33,6 +33,7 @@ UsbPcapTransferParser::parseHeader(
 	if (m_offset < sizeof(UsbPcapPacketHdr))
 		return size;
 
+	m_hiHdr.m_id = m_loHdr.m_packetHdr.irpId;
 	m_hiHdr.m_timestamp = sys::getTimestampFromTimeval(m_loHdr.m_pcapHdr.ts_sec, m_loHdr.m_pcapHdr.ts_usec);
 	m_hiHdr.m_status = err::SystemErrorCode_Success;
 	m_hiHdr.m_originalSize = m_loHdr.m_packetHdr.dataLength;
@@ -89,7 +90,6 @@ UsbPcapTransferParser::parseHeader(
 		break;
 	}
 
-	m_hiHdr.m_actualSize = m_hiHdr.m_captureSize;
 	m_state = UsbMonTransferParserState_CompleteHeader;
 	m_offset = 0;
 	return p - (char*)p0;

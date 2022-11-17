@@ -138,6 +138,7 @@ struct UsbMonIsochronousHdr {
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 struct UsbMonTransferHdr {
+	uint64_t m_id;
 	uint64_t m_timestamp;
 	uint32_t m_status;
 	uint32_t m_flags;
@@ -145,16 +146,14 @@ struct UsbMonTransferHdr {
 	uint8_t m_bus;
 	uint8_t m_address;
 	uint8_t m_endpoint;
-	uint32_t m_originalSize; // original transfer payload size
-	uint32_t m_captureSize;  // captured by the driver
-	uint32_t m_actualSize;   // returned to the caller (on linux, can be smaller than m_captureSize)
+	uint32_t m_originalSize; // original payload size
+	uint32_t m_captureSize;  // payload captured by the driver
 
 	union {
 		UsbMonControlSetup m_controlSetup;
 		UsbMonIsochronousHdr m_isochronousHdr;
-		uint64_t m_padding[2]; // align on 16 bytes
 	};
-};
+}; // 48 bytes
 
 //..............................................................................
 

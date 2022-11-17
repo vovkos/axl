@@ -6904,6 +6904,7 @@ testUsbMon() {
 			case io::UsbMonTransferParserState_CompleteHeader: {
 				const io::UsbMonTransferHdr* hdr = parser.getTransferHdr();
 				printf("\nUsbMonTransferHdr:\n");
+				printf("  m_id:           0x%016llx\n", hdr->m_id);
 				printf("  m_timestamp:    %s\n", sys::Time(hdr->m_timestamp).format("%Y-%M-%D %h:%m:%s.%l").sz());
 				printf("  m_status:       %d - %s\n", hdr->m_status, err::Errno(-hdr->m_status).getDescription().sz());
 				printf("  m_flags:        0x%02x %s\n", hdr->m_flags, io::getUsbMonTransferFlagsString(hdr->m_flags).sz());
@@ -6913,7 +6914,6 @@ testUsbMon() {
 				printf("  m_endpoint:     0x%02x\n", hdr->m_endpoint);
 				printf("  m_originalSize: %d\n", hdr->m_originalSize);
 				printf("  m_captureSize:  %d\n", hdr->m_captureSize);
-				printf("  m_actualSize:   %d\n", hdr->m_actualSize);
 
 				switch (hdr->m_transferType) {
 				case io::UsbMonTransferType_Control: {

@@ -34,10 +34,10 @@ UsbMonTransferParser::parseHeader(
 		return size;
 
 	m_hiHdr.m_timestamp = sys::getTimestampFromTimeval(m_loHdr.ts_sec, m_loHdr.ts_usec);
+	m_hiHdr.m_status = m_loHdr.id;
 	m_hiHdr.m_status = m_loHdr.status;
 	m_hiHdr.m_originalSize = m_loHdr.len_urb;
 	m_hiHdr.m_captureSize = m_loHdr.len_cap;
-	m_hiHdr.m_actualSize = 0;
 	m_hiHdr.m_transferType = m_loHdr.xfer_type;
 	m_hiHdr.m_bus = m_loHdr.busnum;
 	m_hiHdr.m_address = m_loHdr.devnum;
@@ -57,7 +57,6 @@ UsbMonTransferParser::parseHeader(
 		break;
 	}
 
-	m_hiHdr.m_actualSize = m_hiHdr.m_captureSize;
 	m_state = UsbMonTransferParserState_CompleteHeader;
 	m_offset = 0;
 	return p - (char*)p0;

@@ -40,7 +40,6 @@ set(
 	LIB_WIN_H_LIST
 	${AXL_INC_DIR}/axl_io_usbmon/axl_io_win_UsbPcap.h
 	${AXL_INC_DIR}/axl_io_usbmon/axl_io_win_UsbPcapTransferParser.h
-	${AXL_INC_DIR}/axl_io_usbmon/axl_io_win_UsbMonitor.h
 )
 
 set(
@@ -48,7 +47,6 @@ set(
 	axl_io_win_UsbPcap.cpp
 	axl_io_win_UsbPcapTransferParser.cpp
 	axl_io_win_UsbMonEnumerator.cpp
-	axl_io_win_UsbMonitor.cpp  # got to go
 )
 
 source_group(
@@ -68,7 +66,6 @@ set(
 	LIB_LNX_H_LIST
 	${AXL_INC_DIR}/axl_io_usbmon/axl_io_lnx_UsbMon.h
 	${AXL_INC_DIR}/axl_io_usbmon/axl_io_lnx_UsbMonTransferParser.h
-	${AXL_INC_DIR}/axl_io_usbmon/axl_io_lnx_UsbMonitor.h
 )
 
 set(
@@ -76,7 +73,6 @@ set(
 	axl_io_lnx_UsbMon.cpp
 	axl_io_lnx_UsbMonTransferParser.cpp
 	axl_io_lnx_UsbMonEnumerator.cpp
-	axl_io_lnx_UsbMonitor.cpp  # got to go
 )
 
 source_group(
