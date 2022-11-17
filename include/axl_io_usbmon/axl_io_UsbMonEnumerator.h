@@ -77,16 +77,18 @@ struct UsbMonDeviceDesc: sl::ListLink {
 	sl::String m_productDescriptor;
 	sl::String m_serialNumberDescriptor;
 
-	UsbMonDeviceSpeed m_speed;
+	uint16_t m_vendorId;
+	uint16_t m_productId;
 
-	uint_t m_vendorId;
-	uint_t m_productId;
-	uint_t m_address;
-	uint_t m_class;
-	uint_t m_subClass;
-	uint_t m_manufacturerDescriptorId;
-	uint_t m_productDescriptorId;
-	uint_t m_serialNumberDescriptorId;
+	uint8_t m_captureDeviceId; // bus ID on Linux; USBPcap suffix on Windows
+	uint8_t m_address;
+	uint8_t m_class;
+	uint8_t m_subClass;
+	uint8_t m_manufacturerDescriptorId;
+	uint8_t m_productDescriptorId;
+	uint8_t m_serialNumberDescriptorId;
+
+	UsbMonDeviceSpeed m_speed;
 	uint_t m_flags;
 
 	UsbMonDeviceDesc() {

@@ -42,6 +42,15 @@ normalizeDeviceName(
 	return deviceName->getLength();
 }
 
+uint_t
+getCaptureDeviceId(const sl::StringRef& deviceName) {
+	intptr_t i = deviceName.getLength() - 1;
+	while (i >= 0 && isdigit(deviceName[i]))
+		i--;
+
+	return atoi(deviceName.sz() + i + 1);
+}
+
 //..............................................................................
 
 class UsbPcapDeviceEnumerator {
@@ -73,7 +82,7 @@ protected:
 	UsbMonDeviceDesc*
 	createDevice(
 		io::win::File& hubDevice,
-		const sl::String_w& pcapDeviceName,
+		const sl::String& pcapDeviceName,
 		const USB_NODE_CONNECTION_INFORMATION& connectionInfo,
 		UsbMonDeviceSpeed speed
 	);
@@ -288,11 +297,11 @@ UsbPcapDeviceEnumerator::enumerateHub(
 			continue;
 
 		if (!connectionInfo.DeviceIsHub) {
-			createDevice(hubDevice, pcapDeviceName, connectionInfo, speed);
+			createDevice(hubDevice, pcapDeviceName.s2(), connectionInfo, speed);
 			deviceCount++;
 		} else {
 			if (m_mask & UsbMonDeviceDescMask_Hubs) {
-				createDevice(hubDevice, pcapDeviceName, connectionInfo, speed);
+				createDevice(hubDevice, pcapDeviceName.s2(), connectionInfo, speed);
 				deviceCount++;
 			}
 
@@ -312,7 +321,7 @@ UsbPcapDeviceEnumerator::enumerateHub(
 UsbMonDeviceDesc*
 UsbPcapDeviceEnumerator::createDevice(
 	io::win::File& hubDevice,
-	const sl::String_w& pcapDeviceName,
+	const sl::String& pcapDeviceName,
 	const USB_NODE_CONNECTION_INFORMATION& connectionInfo,
 	UsbMonDeviceSpeed speed
 ) {
@@ -328,9 +337,10 @@ UsbPcapDeviceEnumerator::createDevice(
 
 	UsbMonDeviceDesc* device = AXL_MEM_NEW(UsbMonDeviceDesc);
 	device->m_captureDeviceName = pcapDeviceName;
+	device->m_captureDeviceId = getCaptureDeviceId(pcapDeviceName);
 	device->m_vendorId = connectionInfo.DeviceDescriptor.idVendor;
 	device->m_productId = connectionInfo.DeviceDescriptor.idProduct;
-	device->m_address = connectionInfo.DeviceAddress;
+	device->m_address = (uint8_t)connectionInfo.DeviceAddress;
 	device->m_class = connectionInfo.DeviceDescriptor.bDeviceClass;
 	device->m_subClass = connectionInfo.DeviceDescriptor.bDeviceSubClass;
 	device->m_manufacturerDescriptorId = connectionInfo.DeviceDescriptor.iManufacturer;

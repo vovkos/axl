@@ -143,6 +143,7 @@ enumerateUsbMonDevices(
 		deviceDesc->m_speed = (UsbMonDeviceSpeed)device.getDeviceSpeed();
 		resultList->insertTail(deviceDesc);
 
+		deviceDesc->m_captureDeviceId = busNumber;
 		deviceDesc->m_vendorId = deviceDescriptor.idVendor;
 		deviceDesc->m_productId = deviceDescriptor.idProduct;
 		deviceDesc->m_class = deviceDescriptor.bDeviceClass;
