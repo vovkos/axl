@@ -420,7 +420,7 @@ UsbDevice::getDescriptor(
 		size
 	);
 
-	return result >= 0 ? result : err::fail<size_t> (-1, UsbError(result));
+	return result >= 0 ? result : err::fail(UsbError(result));
 }
 
 inline
