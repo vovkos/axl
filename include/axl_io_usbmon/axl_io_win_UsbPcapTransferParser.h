@@ -14,7 +14,7 @@
 #define _AXL_IO_WIN_USBPCAPTRANSFERPARSER_H
 
 #include "axl_io_win_UsbPcap.h"
-#include "axl_io_UsbMonTransfer.h"
+#include "axl_io_UsbMonTransferParser.h"
 
 namespace axl {
 namespace io {
@@ -42,43 +42,30 @@ struct UsbPcapControlSetupHdr: UsbPcapControlHdr {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class UsbPcapTransferParser: public UsbMonTransferParserBase {
-protected:
-	union {
-		char m_buffer[1];
-		usbpcap::pcaprec_hdr_t m_pcapHdr;
-		UsbPcapPacketHdr m_packetHdr;
-		UsbPcapControlHdr m_controlHdr;
-		UsbPcapControlSetupHdr m_controlSetupHdr;
-		UsbPcapIsoHdr m_isoHdr;
-	};
+union UsbPcapTransferParserLoHdr {
+	usbpcap::pcaprec_hdr_t m_pcapHdr;
+	UsbPcapPacketHdr m_packetHdr;
+	UsbPcapControlHdr m_controlHdr;
+	UsbPcapControlSetupHdr m_controlSetupHdr;
+	UsbPcapIsoHdr m_isoHdr;
+};
 
-public:
-	UsbPcapTransferParser() {
-		reset();
-	}
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-	size_t
-	parse(
-	 	const void* p,
-	 	size_t size
-	);
+class UsbPcapTransferParser: public UsbMonTransferParserBase<
+	UsbPcapTransferParser,
+	UsbPcapTransferParserLoHdr
+> {
+	friend class UsbMonTransferParserBase<
+		UsbPcapTransferParser,
+		UsbPcapTransferParserLoHdr
+	>;
 
 protected:
 	size_t
 	parseHeader(
 	 	const void* p,
 	 	size_t size
-	);
-
-	size_t
-	parseData(size_t size);
-
-	const char*
-	buffer(
-		size_t targetSize,
-	 	const char* p,
-		const char* end
 	);
 };
 

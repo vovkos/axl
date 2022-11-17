@@ -33,28 +33,28 @@ UsbPcapTransferParser::parseHeader(
 	if (m_offset < sizeof(UsbPcapPacketHdr))
 		return size;
 
-	m_transferHdr.m_timestamp = sys::getTimestampFromTimeval(m_pcapHdr.ts_sec, m_pcapHdr.ts_usec);
-	m_transferHdr.m_status = err::SystemErrorCode_Success;
-	m_transferHdr.m_originalSize = m_packetHdr.dataLength;
-	m_transferHdr.m_captureSize = m_packetHdr.dataLength;
-	m_transferHdr.m_transferType = (UsbMonTransferType)m_packetHdr.transfer;
-	m_transferHdr.m_bus = (uint8_t)m_packetHdr.bus;
-	m_transferHdr.m_address = (uint8_t)m_packetHdr.device;
-	m_transferHdr.m_endpoint = m_packetHdr.endpoint;
-	m_transferHdr.m_flags = (m_packetHdr.info & USBPCAP_INFO_PDO_TO_FDO) ? UsbMonTransferFlag_Completed : 0;
+	m_hiHdr.m_timestamp = sys::getTimestampFromTimeval(m_loHdr.m_pcapHdr.ts_sec, m_loHdr.m_pcapHdr.ts_usec);
+	m_hiHdr.m_status = err::SystemErrorCode_Success;
+	m_hiHdr.m_originalSize = m_loHdr.m_packetHdr.dataLength;
+	m_hiHdr.m_captureSize = m_loHdr.m_packetHdr.dataLength;
+	m_hiHdr.m_transferType = (UsbMonTransferType)m_loHdr.m_packetHdr.transfer;
+	m_hiHdr.m_bus = (uint8_t)m_loHdr.m_packetHdr.bus;
+	m_hiHdr.m_address = (uint8_t)m_loHdr.m_packetHdr.device;
+	m_hiHdr.m_endpoint = m_loHdr.m_packetHdr.endpoint;
+	m_hiHdr.m_flags = (m_loHdr.m_packetHdr.info & USBPCAP_INFO_PDO_TO_FDO) ? UsbMonTransferFlag_Completed : 0;
 
-	switch (m_packetHdr.transfer) {
+	switch (m_loHdr.m_packetHdr.transfer) {
 	case USBPCAP_TRANSFER_CONTROL:
-		if (m_packetHdr.headerLen < sizeof(USBPCAP_BUFFER_CONTROL_HEADER))
+		if (m_loHdr.m_packetHdr.headerLen < sizeof(USBPCAP_BUFFER_CONTROL_HEADER))
 			return err::fail<size_t>(-1, "invalid usbpcap control header");
 
 		p = buffer(sizeof(UsbPcapControlHdr), p, end);
 		if (m_offset < sizeof(UsbPcapControlHdr))
 			return size;
 
-		switch (m_controlHdr.stage) {
+		switch (m_loHdr.m_controlHdr.stage) {
 		case USBPCAP_CONTROL_STAGE_SETUP:
-			if (m_packetHdr.dataLength < sizeof(USB_DEFAULT_PIPE_SETUP_PACKET))
+			if (m_loHdr.m_packetHdr.dataLength < sizeof(USB_DEFAULT_PIPE_SETUP_PACKET))
 				return err::fail<size_t>(-1, "invalid usbpcap control setup packet");
 
 			p = buffer(sizeof(UsbPcapControlSetupHdr), p, end);
@@ -62,10 +62,10 @@ UsbPcapTransferParser::parseHeader(
 				return size;
 
 			ASSERT(sizeof(USB_DEFAULT_PIPE_SETUP_PACKET) == sizeof(UsbMonControlSetup));
-			memcpy(&m_transferHdr.m_controlSetup, &m_controlSetupHdr.setup, sizeof(UsbMonControlSetup));
+			memcpy(&m_hiHdr.m_controlSetup, &m_loHdr.m_controlSetupHdr.setup, sizeof(UsbMonControlSetup));
 
-			m_transferHdr.m_originalSize = m_transferHdr.m_controlSetup.m_length;
-			m_transferHdr.m_captureSize -= sizeof(USB_DEFAULT_PIPE_SETUP_PACKET);
+			m_hiHdr.m_originalSize = m_hiHdr.m_controlSetup.m_length;
+			m_hiHdr.m_captureSize -= sizeof(USB_DEFAULT_PIPE_SETUP_PACKET);
 			break;
 
 		case USBPCAP_CONTROL_STAGE_DATA:
@@ -76,20 +76,20 @@ UsbPcapTransferParser::parseHeader(
 		break;
 
 	case USBPCAP_TRANSFER_ISOCHRONOUS:
-		if (m_packetHdr.headerLen < sizeof(USBPCAP_BUFFER_ISOCH_HEADER))
+		if (m_loHdr.m_packetHdr.headerLen < sizeof(USBPCAP_BUFFER_ISOCH_HEADER))
 			return err::fail<size_t>(-1, "invalid usbpcap isochronous header");
 
 		p = buffer(sizeof(UsbPcapIsoHdr), p, end);
 		if (m_offset < sizeof(UsbPcapIsoHdr))
 			return size;
 
-		m_transferHdr.m_isochronousHdr.m_startFrame = m_isoHdr.startFrame;
-		m_transferHdr.m_isochronousHdr.m_packetCount = m_isoHdr.numberOfPackets;
-		m_transferHdr.m_isochronousHdr.m_errorCount = m_isoHdr.errorCount;
+		m_hiHdr.m_isochronousHdr.m_startFrame = m_loHdr.m_isoHdr.startFrame;
+		m_hiHdr.m_isochronousHdr.m_packetCount = m_loHdr.m_isoHdr.numberOfPackets;
+		m_hiHdr.m_isochronousHdr.m_errorCount = m_loHdr.m_isoHdr.errorCount;
 		break;
 	}
 
-	m_transferHdr.m_actualSize = m_transferHdr.m_captureSize;
+	m_hiHdr.m_actualSize = m_hiHdr.m_captureSize;
 	m_state = UsbMonTransferParserState_CompleteHeader;
 	m_offset = 0;
 	return p - (char*)p0;

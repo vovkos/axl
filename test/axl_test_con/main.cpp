@@ -6868,12 +6868,6 @@ testUsbMon() {
 
 #if (_AXL_OS_WIN)
 		size = monitor.read(buffer, BufferSize);
-		if (!result) {
-			printf("overlapped read error: %s\n", err::getLastErrorDescription().sz());
-			return false;
-		}
-
-		monitor.getOverlappedResult(&overlapped);
 #elif (_AXL_OS_LINUX)
 		fd_set readSet = { 0 };
 		FD_SET(monitor, &readSet);
@@ -6885,7 +6879,7 @@ testUsbMon() {
 
 		size = monitor.read(buffer, BufferSize);
 		if (!size) {
-			printf("EOF (?)\n");
+			printf("EOF (??)\n");
 			break;
 		}
 #endif
