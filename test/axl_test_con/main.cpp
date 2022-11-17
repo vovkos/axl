@@ -1664,7 +1664,7 @@ getUsbStringDescriptorText(
 		return "NOT OPENED";
 
 	sl::String_utf16 text;
-	bool result = device->getStringDescriptor(&text, index);
+	bool result = device->getStringDescriptor(&text, index) != -1;
 	return result ?
 		text :
 		sl::formatString("ERROR (%s)", err::getLastErrorDescription().sz()).s2();

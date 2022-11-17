@@ -511,6 +511,8 @@ UsbPcapDeviceEnumerator::getStringDescriptor(
 	uchar_t descriptorId,
 	ushort_t languageId
 ) {
+	string->clear();
+
 	char buffer[
 		sizeof(USB_DESCRIPTOR_REQUEST) +
 		sizeof(USB_STRING_DESCRIPTOR) +

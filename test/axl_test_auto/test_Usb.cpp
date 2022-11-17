@@ -63,15 +63,15 @@ run() {
 		if (!result)
 			continue;
 
-		result = descriptor.iManufacturer && device.getStringDescriptor(&bufferString, descriptor.iManufacturer);
+		result = descriptor.iManufacturer && device.getStringDescriptor(&bufferString, descriptor.iManufacturer) != -1;
 		if (result)
 			printf("\tManufacturer:  %s\n", bufferString.s2().sz());
 
-		result = descriptor.iProduct && device.getStringDescriptor(&bufferString, descriptor.iProduct);
+		result = descriptor.iProduct && device.getStringDescriptor(&bufferString, descriptor.iProduct) != -1;
 		if (result)
 			printf("\tProduct name:  %s\n", bufferString.s2().sz());
 
-		result = descriptor.iSerialNumber && device.getStringDescriptor(&bufferString, descriptor.iSerialNumber);
+		result = descriptor.iSerialNumber && device.getStringDescriptor(&bufferString, descriptor.iSerialNumber) != -1;
 		if (result)
 			printf("\tSerial number: %s\n", bufferString.s2().sz());
 	}

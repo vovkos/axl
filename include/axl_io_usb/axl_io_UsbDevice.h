@@ -255,7 +255,7 @@ public:
 
 	// descriptors
 
-	bool
+	size_t
 	getDescriptor(
 		void* p,
 		size_t size,
@@ -263,7 +263,7 @@ public:
 		uint_t descriptorId
 	) const;
 
-	bool
+	size_t
 	getDescriptor(
 		sl::Array<char>* descriptor,
 		libusb_descriptor_type descriptorType,
@@ -294,7 +294,7 @@ public:
 		uint_t langId
 	) const;
 
-	bool
+	size_t
 	getStringDescriptor(
 		sl::String_utf16* string,
 		uint_t stringId,
@@ -304,7 +304,7 @@ public:
 	sl::String_utf16
 	getStringDescriptor(uint_t stringId) const;
 
-	bool
+	size_t
 	getStringDescriptor(
 		sl::String_utf16* string,
 		uint_t stringId
@@ -341,7 +341,7 @@ public:
 
 protected:
 	template <typename UseLangId>
-	bool
+	size_t
 	getStringDescriptorImpl(
 		sl::String_utf16* string,
 		uint_t stringId,
@@ -403,7 +403,7 @@ UsbDevice::getPortNumbers(
 #endif
 
 inline
-bool
+size_t
 UsbDevice::getDescriptor(
 	void* p,
 	size_t size,
@@ -420,7 +420,7 @@ UsbDevice::getDescriptor(
 		size
 	);
 
-	return result >= 0 ? result : err::fail(UsbError(result));
+	return result >= 0 ? result : err::fail<size_t> (-1, UsbError(result));
 }
 
 inline

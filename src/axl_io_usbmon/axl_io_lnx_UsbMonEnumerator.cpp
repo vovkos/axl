@@ -186,25 +186,27 @@ enumerateUsbMonDevices(
 		if (!(mask & UsbMonDeviceDescMask_Descriptors))
 			continue;
 
-		result = device.open();
+		result =
+			device.open() &&
+			device.getStringDescriptor(&string_utf16, 0, 0) != -1;
+
 		if (result) {
-			device.getStringDescriptor(&string_utf16, 0, 0);
 			ushort_t langId = chooseUsbStringDescriptorLanguage(string_utf16);
 
 			if ((mask & UsbMonDeviceDescMask_ManufacturerDescriptor) && deviceDescriptor.iManufacturer) {
-				result = device.getStringDescriptor(&string_utf16, deviceDescriptor.iManufacturer, langId);
+				result = device.getStringDescriptor(&string_utf16, deviceDescriptor.iManufacturer, langId) != -1;
 				if (result)
 					deviceDesc->m_manufacturerDescriptor = string_utf16;
 			}
 
 			if ((mask & UsbMonDeviceDescMask_ProductDescriptor) && deviceDescriptor.iProduct) {
-				result = device.getStringDescriptor(&string_utf16, deviceDescriptor.iProduct, langId);
+				result = device.getStringDescriptor(&string_utf16, deviceDescriptor.iProduct, langId) != -1;
 				if (result)
 					deviceDesc->m_productDescriptor = string_utf16;
 			}
 
 			if ((mask & UsbMonDeviceDescMask_SerialNumberDescriptor) && deviceDescriptor.iSerialNumber) {
-				result = device.getStringDescriptor(&string_utf16, deviceDescriptor.iSerialNumber, langId);
+				result = device.getStringDescriptor(&string_utf16, deviceDescriptor.iSerialNumber, langId) != -1;
 				if (result)
 					deviceDesc->m_serialNumberDescriptor = string_utf16;
 			}

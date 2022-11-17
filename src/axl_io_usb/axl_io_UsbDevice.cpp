@@ -177,8 +177,7 @@ UsbDevice::open(
 	return true;
 }
 
-
-bool
+size_t
 UsbDevice::getDescriptor(
 	sl::Array<char>* descriptor,
 	libusb_descriptor_type descriptorType,
@@ -254,7 +253,7 @@ struct UsbDescriptorHdr {
 };
 
 template <typename UseLangId>
-bool
+size_t
 UsbDevice::getStringDescriptorImpl(
 	sl::String_utf16* string,
 	uint_t stringId,
@@ -289,19 +288,19 @@ UsbDevice::getStringDescriptorImpl(
 		if (result >= 0) {
 			UsbDescriptorHdr* hdr = (UsbDescriptorHdr*)p;
 			if (hdr->m_type != LIBUSB_DT_STRING)
-				return err::fail("unexpected USB descriptor type");
+				return err::fail<size_t>(-1, "unexpected USB descriptor type");
 
 			if (hdr->m_size / sizeof(utf16_t) > length)
-				return err::fail("unexpected USB descriptor size");
+				return err::fail<size_t>(-1, "unexpected USB descriptor size");
 
 			string->overrideLength(hdr->m_size / sizeof(utf16_t));
 			string->remove(0);
-			return true;
+			return string->getLength();
 		}
 
 		if (result != LIBUSB_ERROR_OVERFLOW) {
 			string->clear();
-			return err::fail(UsbError(result));
+			return err::fail<size_t>(-1, UsbError(result));
 		}
 
 		length = length < DefaultStringDescriptorBufferLength ?
@@ -313,10 +312,10 @@ UsbDevice::getStringDescriptorImpl(
 
 	string->remove(0, 1);
 	string->overrideLength(length);
-	return true;
+	return string->getLength();
 }
 
-bool
+size_t
 UsbDevice::getStringDescriptor(
 	sl::String_utf16* string,
 	uint_t stringId,
@@ -325,7 +324,7 @@ UsbDevice::getStringDescriptor(
 	return getStringDescriptorImpl<sl::True>(string, stringId, langId);
 }
 
-bool
+size_t
 UsbDevice::getStringDescriptor(
 	sl::String_utf16* string,
 	uint_t stringId
