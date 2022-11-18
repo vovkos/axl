@@ -13,6 +13,7 @@
 
 #define _AXL_IO_USBDEVICE_H
 
+#include "axl_io_UsbPch.h"
 #include "axl_io_UsbError.h"
 
 namespace axl {

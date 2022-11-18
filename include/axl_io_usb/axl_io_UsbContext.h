@@ -13,6 +13,7 @@
 
 #define _AXL_IO_USBCONTEXT_H
 
+#include "axl_io_UsbPch.h"
 #include "axl_io_UsbError.h"
 #include "axl_sl_Singleton.h"
 
