@@ -297,7 +297,7 @@ public:
 	getDeviceInfo(
 		size_t i,
 		DeviceInfo* deviceInfo
-	);
+	) const;
 
 	static
 	bool
@@ -359,7 +359,7 @@ bool
 DeviceInfoSet::getDeviceInfo(
 	size_t i,
 	DeviceInfo* deviceInfo
-) {
+) const {
 	bool_t result = ::SetupDiEnumDeviceInfo(m_h, (DWORD)i, &deviceInfo->m_devInfoData);
 	if (!result)
 		return err::failWithLastSystemError();

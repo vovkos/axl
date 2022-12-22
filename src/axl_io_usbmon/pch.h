@@ -18,6 +18,4 @@
 #	include <setupapi.h>
 #	include <cfgmgr32.h>
 #	include <usbioctl.h>
-#elif (_AXL_OS_LINUX)
-#	include <libudev.h>
 #endif

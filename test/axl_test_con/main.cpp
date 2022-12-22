@@ -6773,8 +6773,10 @@ enum {
 
 bool
 testUsbMon() {
+#if (_AXL_OS_LINUX)
 	io::registerUsbErrorProvider();
 	io::getUsbDefaultContext()->createDefault();
+#endif
 
 	const io::UsbMonDeviceDesc* serialTap = NULL;
 	sl::List<io::UsbMonDeviceDesc> deviceList;
@@ -6979,6 +6981,212 @@ testUsbMon() {
 
 //..............................................................................
 
+#if (_AXL_OS_WIN && _AXL_IO_USB)
+
+#include "axl_sys_win_DeviceInfo.h"
+
+// excerpts from libusbi.h
+
+typedef CRITICAL_SECTION usbi_mutex_t;
+
+struct list_head {
+	struct list_head *prev, *next;
+};
+
+struct libusb_device {
+	/* lock protects refcnt, everything else is finalized at initialization
+	 * time */
+	usbi_mutex_t lock;
+	int refcnt;
+
+	struct libusb_context *ctx;
+	struct libusb_device *parent_dev;
+
+	uint8_t bus_number;
+	uint8_t port_number;
+	uint8_t device_address;
+	enum libusb_speed speed;
+
+	struct list_head list;
+	unsigned long session_data;
+
+	struct libusb_device_descriptor device_descriptor;
+	int attached;
+};
+
+
+bool
+findDeviceInfo(
+	const sys::win::DeviceInfoSet& deviceInfoSet,
+	sys::win::DeviceInfo* deviceInfo,
+	uint_t devInstId
+) {
+	bool result;
+	sl::String_w instanceId;
+
+	for (size_t i = 0;; i++) {
+		result = deviceInfoSet.getDeviceInfo(i, deviceInfo);
+		if (!result)
+			break;
+
+		if (deviceInfo->getDevInfoData()->DevInst == devInstId)
+			return true;
+	}
+
+	return false; // not found
+}
+
+#include <initguid.h>
+#include <devguid.h>
+
+void
+testUsbEnum2() {
+	io::registerUsbErrorProvider();
+	io::getUsbDefaultContext()->createDefault();
+
+	// usbmon
+
+	do {
+		const io::UsbMonDeviceDesc* serialTap = NULL;
+		sl::List<io::UsbMonDeviceDesc> deviceList;
+		io::enumerateUsbMonDevices(&deviceList, io::UsbMonDeviceDescMask_All);
+		sl::ConstIterator<io::UsbMonDeviceDesc> it = deviceList.getHead();
+		for (size_t i = 0; it; it++, i++) {
+			printf("device #%d\n", i);
+			printf("  capture:        %s\n", it->m_captureDeviceName.sz());
+			printf("  address:        %d\n", it->m_address);
+
+			if (!(it->m_flags & io::UsbMonDeviceDescFlag_DeviceDescriptor)) {
+				printf("  [ error fetching device descriptor ]\n");
+				continue;
+			}
+
+			printf("  VID:            %04x\n", it->m_vendorId);
+			printf("  PID:            %04x\n", it->m_productId);
+			printf("  class:          %d\n", it->m_class);
+			printf("  subclass:       %d\n", it->m_subClass);
+			printf("  speed:          %s\n", io::getUsbMonSpeedString(it->m_speed));
+
+			if (!it->m_description.isEmpty())
+				printf("  description:    %s\n", it->m_description.sz());
+
+			if (!it->m_manufacturer.isEmpty())
+				printf("  manufacturer:   %s\n", it->m_manufacturer.sz());
+
+			if (!it->m_driver.isEmpty())
+				printf("  driver:         %s\n", it->m_driver.sz());
+
+			if (!it->m_manufacturerDescriptor.isEmpty())
+				printf("  manufacturer*:  %s\n", it->m_manufacturerDescriptor.sz());
+
+			if (!it->m_productDescriptor.isEmpty())
+				printf("  product*:       %s\n", it->m_productDescriptor.sz());
+
+			if (!it->m_serialNumberDescriptor.isEmpty())
+				printf("  serial number*: %s\n", it->m_serialNumberDescriptor.sz());
+
+			if (it->m_vendorId == VidSerialTap && it->m_productId == PidSerialTap)
+				serialTap = *it;
+
+			printf("\n");
+		}
+	} while (0);
+
+	// libusb
+
+	sys::win::DeviceInfoSet deviceInfoSet;
+	deviceInfoSet.create();
+
+	do {
+		io::UsbDeviceList deviceList;
+		size_t count = deviceList.enumerateDevices();
+		if (count == -1) {
+			printf("Cannot enumerate USB devices (%s)\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		libusb_device** pp = deviceList;
+		for (size_t i = 0; *pp; pp++, i++) {
+			printf("----------------------\nDevice #%d\n", i);
+
+			io::UsbDevice device;
+			device.setDevice(*pp);
+
+			bool result;
+
+			libusb_device_descriptor deviceDesc;
+			result = device.getDeviceDescriptor(&deviceDesc);
+			if (!result) {
+				printf("Cannot get device descriptor (%s)\n", err::getLastErrorDescription().sz());
+				return;
+			}
+
+			sys::win::DeviceInfo deviceInfo;
+			result = findDeviceInfo(deviceInfoSet, &deviceInfo, device.getDevice()->session_data);
+			if (result) {
+				sl::String_w string;
+
+				deviceInfo.getDeviceRegistryProperty(SPDRP_FRIENDLYNAME, &string);
+				printf("Friendly name:  %S\n", string.sz());
+
+				deviceInfo.getDeviceRegistryProperty(SPDRP_DEVICEDESC, &string);
+				printf("Description:    %S\n", string.sz());
+
+				deviceInfo.getDeviceRegistryProperty(SPDRP_MFG, &string);
+				printf("Manufacturer:   %S\n", string.sz());
+
+				deviceInfo.getDeviceRegistryProperty(SPDRP_HARDWAREID, &string);
+				printf("Hardware ID:    %S\n", string.sz());
+
+				deviceInfo.getDeviceDriverPath(&string);
+				printf("Driver:         %S\n", string.sz());
+
+				deviceInfo.getDeviceRegistryProperty(SPDRP_LOCATION_PATHS, &string);
+				printf("Location:       %S\n", string.sz());
+			}
+
+			printf("HWID:           VID_%04x&PID_%04x\n", deviceDesc.idVendor, deviceDesc.idProduct);
+			printf("Class:          %s\n", io::getUsbClassCodeString((libusb_class_code) deviceDesc.bDeviceClass));
+			printf("Manufacturer:   %d\n", deviceDesc.iManufacturer);
+			printf("Product name:   %d\n", deviceDesc.iProduct);
+			printf("Serial number:  %d\n", deviceDesc.iSerialNumber);
+
+			printf("Address:        %d\n", device.getDeviceAddress ());
+			printf("Bus:            %d\n", device.getBusNumber ());
+			printf("Port:           %d\n", device.getPortNumber ());
+			printf("Speed:          %s\n", io::getUsbSpeedString(device.getDeviceSpeed ()));
+			printf("Port path:      ");
+
+			uint8_t path[8];
+			size_t pathLength = device.getPortPath(path, countof(path));
+			if (pathLength == -1) {
+				printf("ERROR (%s)\n", err::getLastErrorDescription().sz());
+			} else {
+				for (size_t i = 0; i < pathLength; i++)
+					printf("-> %d", path [i]);
+
+				printf("\n");
+			}
+
+			printf("Port numbers:   ");
+
+			pathLength = device.getPortNumbers(path, countof(path));
+			if (pathLength == -1) {
+				printf("ERROR (%s)\n", err::getLastErrorDescription().sz());
+			} else {
+				for (size_t i = 0; i < pathLength; i++)
+					printf("-> %d", path [i]);
+
+				printf("\n");
+			}
+		}
+	} while (0);
+}
+
+#endif
+
+//..............................................................................
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -7007,8 +7215,8 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-#if (_AXL_IO_USBMON)
-	testUsbMon();
+#if (_AXL_IO_USB)
+	testUsbEnum();
 #endif
 
 	return 0;
