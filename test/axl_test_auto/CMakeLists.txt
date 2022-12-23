@@ -143,7 +143,7 @@ if(UNIX)
 		dl
 	)
 
-	if(LINUX)
+	if(LINUX AND BUILD_AXL_IO_USB)
 		target_link_libraries(
 			axl_test_auto
 			udev
