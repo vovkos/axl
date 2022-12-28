@@ -132,6 +132,7 @@ if(UNIX)
 	if(NOT APPLE)
 		target_link_libraries(
 			axl_test_qt
+			dl
 			rt
 		)
 	endif()
