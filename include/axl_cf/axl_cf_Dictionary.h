@@ -185,6 +185,9 @@ public:
 	}
 
 	bool
+	create();
+
+	bool
 	clone(CFDictionaryRef src);
 
 	void

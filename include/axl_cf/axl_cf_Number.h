@@ -33,6 +33,13 @@ public:
 #endif
 
 	Number(
+		CFNumberType type,
+		const void* p
+	) {
+		create(type, p);
+	}
+
+	Number(
 		CFNumberRef p,
 		bool isAttach = false
 	):
