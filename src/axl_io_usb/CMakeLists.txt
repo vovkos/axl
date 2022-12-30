@@ -23,7 +23,6 @@ set(
 	${AXL_INC_DIR}/axl_io_usb/axl_io_UsbEnumerator.h
 	${AXL_INC_DIR}/axl_io_usb/axl_io_UsbTransfer.h
 	${AXL_INC_DIR}/axl_io_usb/axl_io_UsbError.h
-	${AXL_INC_DIR}/axl_io_usb/axl_io_win_UsbHub.h
 )
 
 set(
@@ -38,12 +37,40 @@ set(
 	axl_io_win_UsbHub.cpp
 )
 
+set(
+	LIB_WIN_H_LIST
+	${AXL_INC_DIR}/axl_io_usb/axl_io_win_UsbHub.h
+)
+
+set(
+	LIB_WIN_CPP_LIST
+	axl_io_win_UsbHub.cpp
+)
+
+set(
+	LIB_LNX_H_LIST
+)
+
+set(
+	LIB_LNX_CPP_LIST
+)
+
 source_group(
 	lib
 	FILES
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
+	${LIB_WIN_H_LIST}
+	${LIB_WIN_CPP_LIST}
 )
+
+if(NOT WIN32)
+	axl_exclude_from_build(${LIB_WIN_CPP_LIST})
+endif()
+
+if(NOT LINUX)
+	axl_exclude_from_build(${LIB_LNX_CPP_LIST})
+endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -82,6 +109,10 @@ add_library(
 	${PCH_CPP}
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
+	${LIB_WIN_H_LIST}
+	${LIB_WIN_CPP_LIST}
+	${LIB_LNX_H_LIST}
+	${LIB_LNX_CPP_LIST}
 )
 
 axl_set_pch(

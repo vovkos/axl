@@ -6875,7 +6875,7 @@ testUsbMon() {
 
 		size = monitor.read(buffer, BufferSize);
 		if (!size) {
-			printf("EOF (??)\n");
+			printf("EOF (?!)\n");
 			break;
 		}
 #endif

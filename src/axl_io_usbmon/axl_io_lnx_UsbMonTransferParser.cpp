@@ -45,12 +45,12 @@ UsbMonTransferParser::parseHeader(
 	m_hiHdr.m_flags = m_loHdr.type == 'S' ? 0 : UsbMonTransferFlag_Completed;
 
 	switch (m_hiHdr.m_transferType) {
-	case UsbMonTransferType_Control:
+	case LIBUSB_TRANSFER_TYPE_CONTROL:
 		if (m_loHdr.type == 'S')
 			memcpy(&m_hiHdr.m_controlSetup, m_loHdr.s.setup, sizeof(UsbMonControlSetup));
 		break;
 
-	case UsbMonTransferType_Isochronous:
+	case LIBUSB_TRANSFER_TYPE_ISOCHRONOUS:
 		m_hiHdr.m_isochronousHdr.m_startFrame = 0;
 		m_hiHdr.m_isochronousHdr.m_packetCount = m_loHdr.s.iso.numdesc;
 		m_hiHdr.m_isochronousHdr.m_errorCount = m_loHdr.s.iso.error_count;

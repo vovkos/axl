@@ -335,13 +335,22 @@ UsbPcapDeviceEnumerator::createDevice(
 	device->m_vendorId = connectionInfo.DeviceDescriptor.idVendor;
 	device->m_productId = connectionInfo.DeviceDescriptor.idProduct;
 	device->m_address = (uint8_t)connectionInfo.DeviceAddress;
+	device->m_port = (uint8_t)connectionInfo.ConnectionIndex;
 	device->m_class = connectionInfo.DeviceDescriptor.bDeviceClass;
 	device->m_subClass = connectionInfo.DeviceDescriptor.bDeviceSubClass;
+	device->m_speed = speed;
 	device->m_manufacturerDescriptorId = connectionInfo.DeviceDescriptor.iManufacturer;
 	device->m_productDescriptorId = connectionInfo.DeviceDescriptor.iProduct;
 	device->m_serialNumberDescriptorId = connectionInfo.DeviceDescriptor.iSerialNumber;
-	device->m_speed = speed;
-	device->fetch(&m_hubDb, &deviceInfo, connectionInfo.ConnectionIndex, &m_string, m_flags);
+
+	device->queryStrings(
+		&m_hubDb,
+		&deviceInfo,
+		connectionInfo.ConnectionIndex,
+		&m_string,
+		m_flags
+	);
+
 	m_deviceList->insertTail(device);
 	return device;
 }

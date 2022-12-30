@@ -35,6 +35,22 @@ class UsbHubDb;
 } // namespace win
 } // namespace io
 
+#elif (_AXL_OS_LINUX)
+
+namespace io {
+
+class UsbDevice;
+
+} // namespace io
+
+namespace sys {
+namespace lnx {
+
+class UdevHwdb;
+
+} // namespace lnx
+} // namespace sys
+
 #endif
 
 namespace io {
@@ -97,12 +113,23 @@ struct UsbDeviceDesc {
 
 #if (_AXL_OS_WIN)
 	bool
-	fetch(
+	queryStrings(
 		win::UsbHubDb* hubDb,
 		sys::win::DeviceInfo* deviceInfo,
 		uint_t port,
-		sl::String_w* buffer,
-		uint_t flags = UsbDeviceDescFlag_All
+		sl::String_w* string,
+		uint_t flags
+	);
+#elif (_AXL_OS_LINUX)
+	bool
+	queryStrings(
+		const sys::lnx::UdevHwdb& hwdb,
+		io::UsbDevice* device,
+		const libusb_device_descriptor& deviceDescriptor,
+		sl::String* sysFsPrefix,
+		sl::String* string,
+		sl::String_utf16* string_utf16,
+		uint_t flags
 	);
 #endif
 };
