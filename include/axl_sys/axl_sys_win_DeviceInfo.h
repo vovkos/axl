@@ -127,6 +127,32 @@ public:
 	}
 
 	bool
+	enumDeviceInterfaces(
+		const GUID& guid,
+		size_t index,
+		SP_DEVICE_INTERFACE_DATA* ifaceData
+	) {
+		bool_t result = ::SetupDiEnumDeviceInterfaces(m_devInfoSet, &m_devInfoData, &guid, (dword_t)index, ifaceData);
+		return err::complete(result != 0);
+	}
+
+	bool
+	getDeviceInterfacePath(
+		SP_DEVICE_INTERFACE_DATA* ifaceData,
+		sl::String_w* path
+	);
+
+	template <typename T>
+	bool
+	getDeviceInterfacePath(
+		SP_DEVICE_INTERFACE_DATA* ifaceData,
+		sl::StringBase<T>* path
+	);
+
+	sl::String_w
+	getDeviceInterfacePath(SP_DEVICE_INTERFACE_DATA* ifaceData);
+
+	bool
 	openDeviceRegistryKey(
 		RegKey* regKey,
 		REGSAM keyAccess = KEY_ALL_ACCESS
@@ -243,6 +269,26 @@ DeviceInfo::getDeviceRegistryProperty(uint_t propId) {
 	return string;
 }
 
+template <typename T>
+bool
+DeviceInfo::getDeviceInterfacePath(
+	SP_DEVICE_INTERFACE_DATA* ifaceData,
+	sl::StringBase<T>* path
+) {
+	sl::String_w driverPath;
+	getDeviceInterfacePath(&driverPath);
+	*string = driverPath;
+	return true;
+}
+
+inline
+sl::String_w
+DeviceInfo::getDeviceInterfacePath(SP_DEVICE_INTERFACE_DATA* ifaceData) {
+	sl::String_w string;
+	getDeviceInterfacePath(ifaceData, &string);
+	return string;
+}
+
 inline
 HKEY
 DeviceInfo::openDeviceRegistryKey(REGSAM keyAccess) {
@@ -296,6 +342,12 @@ public:
 	bool
 	getDeviceInfo(
 		size_t i,
+		DeviceInfo* deviceInfo
+	) const;
+
+	bool
+	findDeviceInfoByDevInst(
+		uint_t devInst,
 		DeviceInfo* deviceInfo
 	) const;
 

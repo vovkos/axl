@@ -18,35 +18,6 @@ namespace io {
 
 //..............................................................................
 
-const char*
-getUsbMonSpeedString(UsbMonDeviceSpeed speed) {
-	static const char* stringTable[] = {
-		"Unknown",                  // UsbMonDeviceSpeed_Unknown
-		"Low Speed (1.5 Mbit/s)",   // UsbMonDeviceSpeed_Low,
-		"Full Speed (12 Mbit/s)",   // UsbMonDeviceSpeed_Full,
-		"Hi-Speed (480 Mbit/s)",    // UsbMonDeviceSpeed_High,
-		"SuperSpeed (5000 Mbit/s)", // UsbMonDeviceSpeed_Super,
-	};
-
-	return (size_t)speed < countof(stringTable) ?
-		stringTable[speed] :
-		stringTable[UsbMonDeviceSpeed_Unknown];
-}
-
-const char*
-getUsbMonTransferTypeString(UsbMonTransferType transferType) {
-	static const char* stringTable[] = {
-		"Isochronous", // 0
-		"Interrupt",   // 1
-		"Control",     // 2
-		"Bulk",        // 3
-	};
-
-	return (size_t)transferType < countof(stringTable) ?
-		stringTable[transferType] :
-		"Unknown";
-}
-
 sl::StringRef
 getUsbMonTransferFlagsString(uint_t flags) {
 	return (flags & UsbMonTransferFlag_Completed) ?

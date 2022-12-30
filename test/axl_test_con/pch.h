@@ -66,6 +66,7 @@
 #	include "axl_io_UsbContext.h"
 #	include "axl_io_UsbEventThread.h"
 #	include "axl_io_UsbDevice.h"
+#	include "axl_io_UsbEnumerator.h"
 #	include "axl_io_UsbTransfer.h"
 #endif
 
@@ -122,6 +123,7 @@
 #	include "axl_sys_win_NtDll.h"
 #	include "axl_sys_win_NtStatus.h"
 #	include "axl_sys_win_Authenticode.h"
+#	include "axl_sys_win_DeviceInfo.h"
 #elif (_AXL_OS_POSIX)
 #	include "axl_io_psx_Mapping.h"
 #	include "axl_io_psx_Pty.h"

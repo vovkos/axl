@@ -12,3 +12,13 @@
 #pragma once
 
 #include "axl_io_UsbPch.h"
+
+#if (_AXL_OS_WIN)
+#	include "axl_sys_win_DeviceInfo.h"
+#	include "axl_io_win_File.h"
+
+#	include <cfgmgr32.h>
+#	include <winioctl.h>
+#	include <usbioctl.h>
+#	include <usb.h>
+#endif

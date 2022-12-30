@@ -16,9 +16,6 @@
 #include "axl_io_UsbPch.h"
 #include "axl_io_UsbError.h"
 
-namespace axl {
-namespace io {
-
 #if (LIBUSB_API_VERSION >= 0x01000000)
 #	define _AXL_IO_USBDEVICE_GETPORTPATH    1
 #endif
@@ -27,18 +24,14 @@ namespace io {
 #	define _AXL_IO_USBDEVICE_GETPORTNUMBERS 1
 #endif
 
+#if (LIBUSB_HAS_GET_SESSION_DATA)
+#	define _AXL_IO_USBDEVICE_GETSESSIONDATA 1
+#endif
+
+namespace axl {
+namespace io {
+
 //..............................................................................
-
-const char*
-getUsbSpeedString(libusb_speed speed);
-
-const char*
-getUsbClassCodeString(libusb_class_code classCode);
-
-const char*
-getUsbTransferTypeString(libusb_transfer_type transferType);
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 const libusb_interface_descriptor*
 findUsbInterfaceDescriptor(
@@ -118,6 +111,14 @@ public:
 	isOpen() const {
 		return m_openHandle != NULL;
 	}
+
+#if (_AXL_IO_USBDEVICE_GETSESSIONDATA)
+	ulong_t
+	getSessionData() const {
+		ASSERT(m_device);
+		return libusb_get_session_data(m_device);
+	}
+#endif
 
 	uint8_t
 	getBusNumber() const {
@@ -626,35 +627,6 @@ UsbDevice::interruptTransfer(
 	);
 
 	return result == 0 ? actualSize : err::fail<size_t> (-1, UsbError(result));
-}
-
-//..............................................................................
-
-class FreeUsbDeviceList {
-public:
-	void
-	operator () (libusb_device** h) {
-		libusb_free_device_list(h, true);
-	}
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class UsbDeviceList: public sl::Handle<libusb_device**, FreeUsbDeviceList> {
-public:
-	size_t
-	enumerateDevices(libusb_context* context = NULL);
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-inline
-size_t
-UsbDeviceList::enumerateDevices(libusb_context* context) {
-	close();
-
-	ssize_t result = libusb_get_device_list(context, &m_h);
-	return result >= 0 ? result : err::fail<size_t> (-1, UsbError((int)result));
 }
 
 //..............................................................................

@@ -113,7 +113,7 @@ source_group(
 
 include_directories(
 	${AXL_INC_DIR}
-	${CMAKE_CURRENT_LIST_DIR}/include
+	${LIBUSB_INC_DIR}
 )
 
 if(WIN32)

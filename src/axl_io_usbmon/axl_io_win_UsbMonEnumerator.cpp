@@ -13,11 +13,10 @@
 #include "axl_io_UsbMonEnumerator.h"
 #include "axl_io_UsbStringDescriptorLanguage.h"
 #include "axl_io_win_UsbPcap.h"
+#include "axl_io_win_UsbHub.h"
 #include "axl_sys_win_NtDll.h"
 #include "axl_sys_win_NtStatus.h"
 #include "axl_sys_win_DeviceInfo.h"
-#include <usbioctl.h>
-#include <usb.h>
 
 namespace axl {
 namespace io {
@@ -57,19 +56,21 @@ class UsbPcapDeviceEnumerator {
 protected:
 	sl::List<UsbMonDeviceDesc>* m_deviceList;
 	sys::win::DeviceInfoSet m_deviceInfoSet;
+	win::UsbHubDb m_hubDb;
+	sl::String_w m_string;
 	sl::Array<char> m_buffer;
-	uint_t m_mask;
+	uint_t m_flags;
 
 public:
 	UsbPcapDeviceEnumerator() {
 		m_deviceList = NULL;
-		m_mask = 0;
+		m_flags = 0;
 	}
 
 	size_t
 	enumerate(
 		sl::List<UsbMonDeviceDesc>* deviceList,
-		uint_t mask = 0
+		uint_t flags = 0
 	);
 
 protected:
@@ -84,7 +85,7 @@ protected:
 		io::win::File& hubDevice,
 		const sl::String& pcapDeviceName,
 		const USB_NODE_CONNECTION_INFORMATION& connectionInfo,
-		UsbMonDeviceSpeed speed
+		libusb_speed speed
 	);
 
 	bool
@@ -106,15 +107,6 @@ protected:
 		io::win::File& hubDevice,
 		size_t index
 	);
-
-	bool
-	getStringDescriptor(
-		sl::String_w* string,
-		io::win::File& hubDevice,
-		size_t index,
-		uchar_t descriptorId,
-		ushort_t languageId
-	);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -122,16 +114,16 @@ protected:
 size_t
 UsbPcapDeviceEnumerator::enumerate(
 	sl::List<UsbMonDeviceDesc>* deviceList,
-	uint_t mask
+	uint_t flags
 ) {
 	deviceList->clear();
 
-	bool result = m_deviceInfoSet.create();
+	bool result = m_deviceInfoSet.create(DIGCF_DEVICEINTERFACE);
 	if (!result)
 		return -1;
 
 	m_deviceList = deviceList;
-	m_mask = mask;
+	m_flags = flags;
 
 	using namespace axl::sys::win;
 
@@ -272,10 +264,10 @@ UsbPcapDeviceEnumerator::enumerateHub(
 			&actualSize
 		);
 
-		UsbMonDeviceSpeed speed;
+		libusb_speed speed;
 
 		if (result)
-			speed = (UsbMonDeviceSpeed)((uchar_t)connectionInfo.LowSpeed + 1);
+			speed = (libusb_speed)((uchar_t)connectionInfo.LowSpeed + 1);
 		else {
 			result = hubDevice.ioctl(
 				IOCTL_USB_GET_NODE_CONNECTION_INFORMATION,
@@ -289,7 +281,7 @@ UsbPcapDeviceEnumerator::enumerateHub(
 			if (!result)
 				continue;
 
-			speed = connectionInfo.LowSpeed ? UsbMonDeviceSpeed_Low : UsbMonDeviceSpeed_Full;
+			speed = connectionInfo.LowSpeed ? LIBUSB_SPEED_LOW : LIBUSB_SPEED_FULL;
 		}
 
 		ASSERT(actualSize >= sizeof(USB_NODE_CONNECTION_INFORMATION));
@@ -300,7 +292,7 @@ UsbPcapDeviceEnumerator::enumerateHub(
 			createDevice(hubDevice, pcapDeviceName.s2(), connectionInfo, speed);
 			deviceCount++;
 		} else {
-			if (m_mask & UsbMonDeviceDescMask_Hubs) {
+			if (m_flags & UsbMonEnumFlag_Hubs) {
 				createDevice(hubDevice, pcapDeviceName.s2(), connectionInfo, speed);
 				deviceCount++;
 			}
@@ -323,7 +315,7 @@ UsbPcapDeviceEnumerator::createDevice(
 	io::win::File& hubDevice,
 	const sl::String& pcapDeviceName,
 	const USB_NODE_CONNECTION_INFORMATION& connectionInfo,
-	UsbMonDeviceSpeed speed
+	libusb_speed speed
 ) {
 	sys::win::DeviceInfo deviceInfo;
 	sl::String_w driverKeyName;
@@ -334,6 +326,8 @@ UsbPcapDeviceEnumerator::createDevice(
 
 	if (!result)
 		return NULL;
+
+	ASSERT(!connectionInfo.DeviceIsHub || connectionInfo.DeviceDescriptor.bDeviceClass == 0x09);
 
 	UsbMonDeviceDesc* device = AXL_MEM_NEW(UsbMonDeviceDesc);
 	device->m_captureDeviceName = pcapDeviceName;
@@ -347,67 +341,7 @@ UsbPcapDeviceEnumerator::createDevice(
 	device->m_productDescriptorId = connectionInfo.DeviceDescriptor.iProduct;
 	device->m_serialNumberDescriptorId = connectionInfo.DeviceDescriptor.iSerialNumber;
 	device->m_speed = speed;
-	device->m_flags = UsbMonDeviceDescFlag_DeviceDescriptor; // on windows, descriptor is always available
-
-	if (connectionInfo.DeviceIsHub)
-		device->m_flags |= UsbMonDeviceDescFlag_Hub;
-
-	if (m_mask & UsbMonDeviceDescMask_Description) {
-		deviceInfo.getDeviceRegistryProperty(SPDRP_FRIENDLYNAME, &device->m_description);
-
-		if (device->m_description.isEmpty()) // try another property
-			deviceInfo.getDeviceRegistryProperty(SPDRP_DEVICEDESC, &device->m_description);
-	}
-
-	if (m_mask & UsbMonDeviceDescMask_Manufacturer) {
-		deviceInfo.getDeviceRegistryProperty(SPDRP_MFG, &device->m_manufacturer);
-	}
-
-	if (m_mask & UsbMonDeviceDescMask_Driver)
-		deviceInfo.getDeviceDriverPath(&device->m_driver);
-
-	if (m_mask & UsbMonDeviceDescMask_Descriptors) {
-		sl::String_w string;
-		getStringDescriptor(&string, hubDevice, connectionInfo.ConnectionIndex, 0, 0);
-		ushort_t languageId = chooseUsbStringDescriptorLanguage(string);
-
-		if (connectionInfo.DeviceDescriptor.iManufacturer) {
-			getStringDescriptor(
-				&string,
-				hubDevice,
-				connectionInfo.ConnectionIndex,
-				connectionInfo.DeviceDescriptor.iManufacturer,
-				languageId
-			);
-
-			device->m_manufacturerDescriptor = string;
-		}
-
-		if (connectionInfo.DeviceDescriptor.iProduct) {
-			getStringDescriptor(
-				&string,
-				hubDevice,
-				connectionInfo.ConnectionIndex,
-				connectionInfo.DeviceDescriptor.iProduct,
-				languageId
-			);
-
-			device->m_productDescriptor = string;
-		}
-
-		if (connectionInfo.DeviceDescriptor.iSerialNumber) {
-			getStringDescriptor(
-				&string,
-				hubDevice,
-				connectionInfo.ConnectionIndex,
-				connectionInfo.DeviceDescriptor.iSerialNumber,
-				languageId
-			);
-
-			device->m_serialNumberDescriptor = string;
-		}
-	}
-
+	device->fetch(&m_hubDb, &deviceInfo, connectionInfo.ConnectionIndex, &m_string, m_flags);
 	m_deviceList->insertTail(device);
 	return device;
 }
@@ -512,53 +446,6 @@ UsbPcapDeviceEnumerator::getDriverKeyName(
 			return false;
 	}
 };
-
-bool
-UsbPcapDeviceEnumerator::getStringDescriptor(
-	sl::String_w* string,
-	io::win::File& hubDevice,
-	size_t index,
-	uchar_t descriptorId,
-	ushort_t languageId
-) {
-	string->clear();
-
-	char buffer[
-		sizeof(USB_DESCRIPTOR_REQUEST) +
-		sizeof(USB_STRING_DESCRIPTOR) +
-		MAXIMUM_USB_STRING_LENGTH
-	] = { 0 };
-
-	USB_DESCRIPTOR_REQUEST* req = (USB_DESCRIPTOR_REQUEST*)buffer;
-	USB_STRING_DESCRIPTOR* desc = (USB_STRING_DESCRIPTOR*)req->Data;
-
-	req->SetupPacket.wValue = (USB_STRING_DESCRIPTOR_TYPE << 8) | descriptorId;
-	req->SetupPacket.wIndex = languageId;
-	req->SetupPacket.wLength = sizeof(buffer) - sizeof(USB_DESCRIPTOR_REQUEST);
-	req->ConnectionIndex = index;
-
-	dword_t actualSize;
-	bool result = hubDevice.ioctl(
-		IOCTL_USB_GET_DESCRIPTOR_FROM_NODE_CONNECTION,
-		buffer,
-		sizeof(buffer),
-		buffer,
-		sizeof(buffer),
-		&actualSize
-	);
-
-	if (!result)
-		return false;
-
-	if (desc->bDescriptorType != USB_STRING_DESCRIPTOR_TYPE ||
-		desc->bLength + sizeof(USB_DESCRIPTOR_REQUEST) > actualSize ||
-		(desc->bLength & 1)
-	)
-		return err::fail(err::SystemErrorCode_InvalidDeviceState);
-
-	string->copy(desc->bString, desc->bLength / sizeof(wchar_t));
-	return true;
-}
 
 //..............................................................................
 

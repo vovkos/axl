@@ -63,6 +63,38 @@ DeviceInfo::getDeviceRegistryProperty(
 }
 
 bool
+DeviceInfo::getDeviceInterfacePath(
+	SP_DEVICE_INTERFACE_DATA* ifaceData,
+	sl::String_w* path
+) {
+	dword_t size = 0;
+	::SetupDiGetDeviceInterfaceDetailW(m_devInfoSet, ifaceData, NULL, 0, &size, &m_devInfoData);
+
+	sl::Array<char> buffer;
+	bool_t result = buffer.setCount(size);
+	if (!result)
+		return false;
+
+	SP_DEVICE_INTERFACE_DETAIL_DATA_W* detailData = (SP_DEVICE_INTERFACE_DETAIL_DATA_W*)buffer.p();
+	detailData->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA_W);
+
+	result = ::SetupDiGetDeviceInterfaceDetailW(
+		m_devInfoSet,
+		ifaceData,
+		detailData,
+		size,
+		NULL,
+		&m_devInfoData
+	);
+
+	if (!result)
+		return err::failWithLastSystemError();
+
+	*path = detailData->DevicePath;
+	return true;
+}
+
+bool
 DeviceInfo::getClassInstallParams(sl::Array<char>* buffer) {
 	dword_t requiredSize = 0;
 	getClassInstallParams(NULL, 0, &requiredSize);
@@ -76,7 +108,6 @@ DeviceInfo::restartDevice(bool* isRebootRequired) {
 	bool result;
 
 	SP_PROPCHANGE_PARAMS propChangeParams = { 0 };
-
 	propChangeParams.ClassInstallHeader.cbSize = sizeof(SP_CLASSINSTALL_HEADER);
 	propChangeParams.ClassInstallHeader.InstallFunction = DIF_PROPERTYCHANGE;
 	propChangeParams.StateChange = DICS_STOP;
@@ -109,6 +140,28 @@ DeviceInfo::restartDevice(bool* isRebootRequired) {
 		*isRebootRequired = (devInstallParams.Flags & DI_NEEDREBOOT) != 0;
 
 	return true;
+}
+
+//..............................................................................
+
+bool
+DeviceInfoSet::findDeviceInfoByDevInst(
+	uint_t devInst,
+	DeviceInfo* resultDeviceInfo
+) const {
+	for (size_t i = 0;; i++) {
+		DeviceInfo deviceInfo;
+		bool result = getDeviceInfo(i, &deviceInfo);
+		if (!result)
+			break;
+
+		if (deviceInfo.getDevInfoData()->DevInst == devInst) {
+			*resultDeviceInfo = deviceInfo;
+			return true;
+		}
+	}
+
+	return false; // not found
 }
 
 //..............................................................................

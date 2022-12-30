@@ -19,6 +19,21 @@ namespace io {
 //..............................................................................
 
 const char*
+getUsbTransferTypeString(libusb_transfer_type transferType) {
+	static const char* stringTable[] = {
+		"Control",     // LIBUSB_TRANSFER_TYPE_CONTROL     = 0,
+		"Isochronous", // LIBUSB_TRANSFER_TYPE_ISOCHRONOUS = 1,
+		"Bulk",        // LIBUSB_TRANSFER_TYPE_BULK        = 2,
+		"Interrupt",   // LIBUSB_TRANSFER_TYPE_INTERRUPT   = 3,
+		"Bulk stream", // LIBUSB_TRANSFER_TYPE_BULK_STREAM = 4,
+	};
+
+	return (size_t)transferType < countof(stringTable) ?
+		stringTable[transferType] :
+		"Unknown";
+}
+
+const char*
 getUsbTransferStatusString(libusb_transfer_status status) {
 	const char* stringTable[] = {
 		"LIBUSB_TRANSFER_COMPLETED",

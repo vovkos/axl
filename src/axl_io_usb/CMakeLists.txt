@@ -18,8 +18,12 @@ set(
 	${AXL_INC_DIR}/axl_io_usb/axl_io_UsbContext.h
 	${AXL_INC_DIR}/axl_io_usb/axl_io_UsbEventThread.h
 	${AXL_INC_DIR}/axl_io_usb/axl_io_UsbDevice.h
+	${AXL_INC_DIR}/axl_io_usb/axl_io_UsbDeviceList.h
+	${AXL_INC_DIR}/axl_io_usb/axl_io_UsbDeviceDesc.h
+	${AXL_INC_DIR}/axl_io_usb/axl_io_UsbEnumerator.h
 	${AXL_INC_DIR}/axl_io_usb/axl_io_UsbTransfer.h
 	${AXL_INC_DIR}/axl_io_usb/axl_io_UsbError.h
+	${AXL_INC_DIR}/axl_io_usb/axl_io_win_UsbHub.h
 )
 
 set(
@@ -27,8 +31,11 @@ set(
 	axl_io_UsbContext.cpp
 	axl_io_UsbEventThread.cpp
 	axl_io_UsbDevice.cpp
+	axl_io_UsbDeviceDesc.cpp
+	axl_io_UsbEnumerator.cpp
 	axl_io_UsbTransfer.cpp
 	axl_io_UsbError.cpp
+	axl_io_win_UsbHub.cpp
 )
 
 source_group(

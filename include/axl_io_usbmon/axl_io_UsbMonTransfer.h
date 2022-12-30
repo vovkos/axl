@@ -20,20 +20,6 @@ namespace io {
 
 //..............................................................................
 
-enum UsbMonTransferType {
-	UsbMonTransferType_Isochronous, // 0
-	UsbMonTransferType_Interrupt,   // 1
-	UsbMonTransferType_Control,     // 2
-	UsbMonTransferType_Bulk,        // 3
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-const char*
-getUsbMonTransferTypeString(UsbMonTransferType transferType);
-
-//..............................................................................
-
 enum UsbMonTransferFlag {
 	UsbMonTransferFlag_Completed = 0x01
 };
@@ -142,7 +128,7 @@ struct UsbMonTransferHdr {
 	uint64_t m_timestamp;
 	uint32_t m_status;
 	uint32_t m_flags;
-	uint8_t m_transferType;
+	uint8_t m_transferType; // libusb_transfer_type
 	uint8_t m_bus;
 	uint8_t m_address;
 	uint8_t m_endpoint;

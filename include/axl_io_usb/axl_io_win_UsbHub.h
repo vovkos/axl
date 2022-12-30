@@ -11,37 +11,63 @@
 
 #pragma once
 
-#define _AXL_IO_USBMONNUMERATOR_H
+#define _AXL_IO_USBHUBDB_H
 
-#include "axl_io_UsbEnumerator.h"
+#include "axl_io_UsbPch.h"
+#include "axl_sl_HashTable.h"
 
 namespace axl {
+namespace sys {
+namespace win {
+
+class DeviceInfo;
+
+} // namespace win
+} // namespace io
+
 namespace io {
+namespace win {
 
 //..............................................................................
 
-enum UsbMonEnumFlag {
-	UsbMonEnumFlag_Hubs = UsbEnumFlag_Hubs
+class UsbHub:
+	public sl::ListLink,
+	public io::win::File {
+public:
+	bool
+	getStringDescriptor(
+		sl::String_w* string,
+		uint_t port,
+		uchar_t descriptorId,
+		ushort_t languageId
+	);
 };
 
 //..............................................................................
 
-struct UsbMonDeviceDesc:
-	sl::ListLink,
-	UsbDeviceDesc {
-	sl::String m_captureDeviceName;
-	uint_t m_captureDeviceId;
+class UsbHubDb {
+protected:
+	sl::List<UsbHub> m_hubList;
+	sl::SimpleHashTable<dword_t, UsbHub*> m_hubMap; // DEVINST -> HUB
+
+public:
+	bool
+	isEmpty() const {
+		return m_hubList.isEmpty();
+	}
+
+	void
+	clear() {
+		m_hubList.clear();
+		m_hubMap.clear();
+	}
+
+	UsbHub*
+	getUsbHub(sys::win::DeviceInfo* deviceInfo);
 };
 
 //..............................................................................
 
-size_t
-enumerateUsbMonDevices(
-	sl::List<UsbMonDeviceDesc>* deviceList,
-	uint_t flags = 0 //
-);
-
-//..............................................................................
-
+} // namespace win
 } // namespace io
 } // namespace axl

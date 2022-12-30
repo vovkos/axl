@@ -38,7 +38,7 @@ UsbPcapTransferParser::parseHeader(
 	m_hiHdr.m_status = err::SystemErrorCode_Success;
 	m_hiHdr.m_originalSize = m_loHdr.m_packetHdr.dataLength;
 	m_hiHdr.m_captureSize = m_loHdr.m_packetHdr.dataLength;
-	m_hiHdr.m_transferType = (UsbMonTransferType)m_loHdr.m_packetHdr.transfer;
+	m_hiHdr.m_transferType = m_loHdr.m_packetHdr.transfer;
 	m_hiHdr.m_bus = (uint8_t)m_loHdr.m_packetHdr.bus;
 	m_hiHdr.m_address = (uint8_t)m_loHdr.m_packetHdr.device;
 	m_hiHdr.m_endpoint = m_loHdr.m_packetHdr.endpoint;

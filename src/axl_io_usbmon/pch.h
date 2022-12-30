@@ -11,11 +11,12 @@
 
 #pragma once
 
-#include "axl_g_Pch.h"
+#include "axl_io_UsbPch.h"
 
 #if (_AXL_OS_WIN)
 #	include <winioctl.h>
 #	include <setupapi.h>
 #	include <cfgmgr32.h>
 #	include <usbioctl.h>
+#	include <usb.h>
 #endif

@@ -21,6 +21,9 @@ namespace io {
 //..............................................................................
 
 const char*
+getUsbTransferTypeString(libusb_transfer_type transferType);
+
+const char*
 getUsbTransferStatusString(libusb_transfer_status status);
 
 //..............................................................................
