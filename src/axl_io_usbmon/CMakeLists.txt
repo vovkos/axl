@@ -109,12 +109,13 @@ source_group(
 # axl_io_usbmon library
 #
 
-include_directories(${AXL_INC_DIR})
+include_directories(
+	${AXL_INC_DIR}
+	${LIBUSB_INC_DIR}
+)
 
 if(WIN32)
 	include_directories(${USBSDK_INC_PATH})
-elseif(LINUX)
-	include_directories(${LIBUSB_INC_DIR})
 endif()
 
 add_library(

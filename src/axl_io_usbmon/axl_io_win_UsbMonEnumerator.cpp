@@ -11,7 +11,6 @@
 
 #include "pch.h"
 #include "axl_io_UsbMonEnumerator.h"
-#include "axl_io_UsbStringDescriptorLanguage.h"
 #include "axl_io_win_UsbPcap.h"
 #include "axl_io_win_UsbHub.h"
 #include "axl_sys_win_NtDll.h"
