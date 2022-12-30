@@ -178,9 +178,8 @@ struct UsbDescriptorHdr {
 	uint8_t m_type;
 };
 
-template <typename UseLangId>
 size_t
-UsbDevice::getStringDescriptorImpl(
+UsbDevice::getStringDescriptor(
 	sl::String_utf16* string,
 	uint_t stringId,
 	uint_t langId
@@ -196,20 +195,13 @@ UsbDevice::getStringDescriptorImpl(
 	}
 
 	for (;;) {
-		int result = UseLangId()() ?
-			libusb_get_string_descriptor(
-				m_openHandle,
-				(uint8_t)stringId,
-				(uint16_t)langId,
-				(uchar_t*)p,
-				length * sizeof(utf16_t)
-			) :
-			libusb_get_string_descriptor_ascii(
-				m_openHandle,
-				(uint8_t)stringId,
-				(uchar_t*)p,
-				length * sizeof(utf16_t)
-			);
+		int result = libusb_get_string_descriptor(
+			m_openHandle,
+			(uint8_t)stringId,
+			(uint16_t)langId,
+			(uchar_t*)p,
+			length * sizeof(utf16_t)
+		);
 
 		if (result >= 0) {
 			UsbDescriptorHdr* hdr = (UsbDescriptorHdr*)p;
@@ -224,38 +216,56 @@ UsbDevice::getStringDescriptorImpl(
 			return string->getLength();
 		}
 
-		if (result != LIBUSB_ERROR_OVERFLOW) {
-			string->clear();
+		if (result != LIBUSB_ERROR_OVERFLOW)
 			return err::fail<size_t>(-1, UsbError(result));
-		}
 
 		length = length < DefaultStringDescriptorBufferLength ?
 			DefaultStringDescriptorBufferLength :
 			length * 2;
 
 		p = string->createBuffer(length);
+		if (!p)
+			return -1;
 	}
-
-	string->remove(0, 1);
-	string->overrideLength(length);
-	return string->getLength();
 }
 
 size_t
-UsbDevice::getStringDescriptor(
-	sl::String_utf16* string,
-	uint_t stringId,
-	uint_t langId
-) const {
-	return getStringDescriptorImpl<sl::True>(string, stringId, langId);
-}
-
-size_t
-UsbDevice::getStringDescriptor(
-	sl::String_utf16* string,
+UsbDevice::getStringDescriptorAscii(
+	sl::String* string,
 	uint_t stringId
 ) const {
-	return getStringDescriptorImpl<sl::False>(string, stringId, 0);
+		ASSERT(m_openHandle);
+
+		size_t length;
+		char* p = string->getBuffer(&length);
+
+		if (!length) {
+			length = DefaultStringDescriptorBufferLength;
+			p = string->createBuffer(DefaultStringDescriptorBufferLength);
+		}
+
+		for (;;) {
+			int result = libusb_get_string_descriptor_ascii(
+				m_openHandle,
+				(uint8_t)stringId,
+				(uchar_t*)p,
+				length
+			);
+
+			if (result >= 0) {
+				string->overrideLength(result);
+				return result;
+			}
+
+			if (result != LIBUSB_ERROR_OVERFLOW)
+				return err::fail<size_t>(-1, UsbError(result));
+
+			length = length < DefaultStringDescriptorBufferLength ?
+				DefaultStringDescriptorBufferLength :
+				length * 2;
+
+			p = string->createBuffer(length);
+		}
 }
 
 //..............................................................................

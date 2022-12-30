@@ -290,12 +290,6 @@ public:
 	bool
 	getActiveConfigDescriptor(UsbConfigDescriptor* desc) const;
 
-	sl::String_utf16
-	getStringDescriptor(
-		uint_t stringId,
-		uint_t langId
-	) const;
-
 	size_t
 	getStringDescriptor(
 		sl::String_utf16* string,
@@ -304,13 +298,19 @@ public:
 	) const;
 
 	sl::String_utf16
-	getStringDescriptor(uint_t stringId) const;
+	getStringDescriptor(
+		uint_t stringId,
+		uint_t langId
+	) const;
 
 	size_t
-	getStringDescriptor(
-		sl::String_utf16* string,
+	getStringDescriptorAscii(
+		sl::String* string,
 		uint_t stringId
 	) const;
+
+	sl::String
+	getStringDescriptorAscii(uint_t stringId) const;
 
 	// synchronous transfers
 
@@ -340,15 +340,6 @@ public:
 		size_t size,
 		uint_t timeout = -1
 	);
-
-protected:
-	template <typename UseLangId>
-	size_t
-	getStringDescriptorImpl(
-		sl::String_utf16* string,
-		uint_t stringId,
-		uint_t langId
-	) const;
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -440,7 +431,6 @@ inline
 bool
 UsbDevice::getDeviceDescriptor(libusb_device_descriptor* descriptor) const {
 	ASSERT(m_device);
-
 	int result = libusb_get_device_descriptor(m_device, descriptor);
 	return result == 0 ? true : err::fail(UsbError(result));
 }
@@ -457,10 +447,10 @@ UsbDevice::getStringDescriptor(
 }
 
 inline
-sl::String_utf16
-UsbDevice::getStringDescriptor(uint_t stringId) const {
-	sl::String_utf16 string;
-	getStringDescriptor(&string, stringId);
+sl::String
+UsbDevice::getStringDescriptorAscii(uint_t stringId) const {
+	sl::String string;
+	getStringDescriptorAscii(&string, stringId);
 	return string;
 }
 

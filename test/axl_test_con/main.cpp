@@ -1660,14 +1660,17 @@ getUsbStringDescriptorText(
 	io::UsbDevice* device,
 	size_t index
 ) {
+	if (!index)
+		return "NONE";
+
 	if (!device->isOpen())
 		return "NOT OPENED";
 
-	sl::String_utf16 text;
-	bool result = device->getStringDescriptor(&text, index) != -1;
+	sl::String text;
+	bool result = device->getStringDescriptorAscii(&text, index) != -1;
 	return result ?
 		text :
-		sl::formatString("ERROR (%s)", err::getLastErrorDescription().sz()).s2();
+		sl::formatString("ERROR (%s)", err::getLastErrorDescription().sz());
 }
 
 void
@@ -1769,7 +1772,7 @@ testUsbEnum() {
 
 	io::registerUsbErrorProvider();
 	io::getUsbDefaultContext()->createDefault();
-	io::getUsbDefaultContext()->setDebugLevel(LIBUSB_LOG_LEVEL_DEBUG);
+	// io::getUsbDefaultContext()->setDebugLevel(LIBUSB_LOG_LEVEL_DEBUG);
 
 	io::UsbDeviceList deviceList;
 	size_t count = deviceList.enumerateDevices();
@@ -7020,6 +7023,7 @@ testUsbEnum2() {
 		}
 	} while (0);
 
+#if (_AXL_IO_USBMON)
 	printf("ENUMERATING WITH AXL_IO_USBMON\n");
 	printf("==============================\n");
 
@@ -7058,9 +7062,10 @@ testUsbEnum2() {
 			printf("\n");
 		}
 	} while (0);
+#endif // _AXL_IO_USBMON
 }
 
-#endif
+#endif // _AXL_IO_USB
 
 //..............................................................................
 
@@ -7092,7 +7097,8 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-#if (_AXL_IO_USB && _AXL_IO_USBMON)
+#if (_AXL_IO_USB)
+	testUsbEnum();
 	testUsbEnum2();
 #endif
 
