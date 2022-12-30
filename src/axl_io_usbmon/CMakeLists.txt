@@ -18,13 +18,11 @@ set(
 	${AXL_INC_DIR}/axl_io_usbmon/axl_io_UsbMonTransfer.h
 	${AXL_INC_DIR}/axl_io_usbmon/axl_io_UsbMonTransferParser.h
 	${AXL_INC_DIR}/axl_io_usbmon/axl_io_UsbMonEnumerator.h
-	axl_io_UsbStringDescriptorLanguage.h
 )
 
 set(
 	LIB_CPP_LIST
 	axl_io_UsbMonTransfer.cpp
-	axl_io_UsbStringDescriptorLanguage.cpp
 )
 
 source_group(
@@ -111,13 +109,12 @@ source_group(
 # axl_io_usbmon library
 #
 
-include_directories(
-	${AXL_INC_DIR}
-	${LIBUSB_INC_DIR}
-)
+include_directories(${AXL_INC_DIR})
 
 if(WIN32)
 	include_directories(${USBSDK_INC_PATH})
+elseif(LINUX)
+	include_directories(${LIBUSB_INC_DIR})
 endif()
 
 add_library(
