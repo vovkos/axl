@@ -37,12 +37,6 @@ class UsbHubDb;
 
 #elif (_AXL_OS_LINUX)
 
-namespace io {
-
-class UsbDevice;
-
-} // namespace io
-
 namespace sys {
 namespace lnx {
 
@@ -51,9 +45,19 @@ class UdevHwdb;
 } // namespace lnx
 } // namespace sys
 
+#elif (_AXL_OS_DARWIN)
+
+namespace cf {
+
+class MutableDictionary;
+
+} // namespace cf
+
 #endif
 
 namespace io {
+
+class UsbDevice;
 
 //..............................................................................
 
@@ -127,6 +131,17 @@ struct UsbDeviceDesc {
 		io::UsbDevice* device,
 		const libusb_device_descriptor& deviceDescriptor,
 		sl::String* sysFsPrefix,
+		sl::String* string,
+		sl::String_utf16* string_utf16,
+		uint_t flags
+	);
+#elif (_AXL_OS_DARWIN)
+	bool
+	queryStrings(
+		const cf::MutableDictionary& usbDeviceDict,
+		cf::MutableDictionary* propertyMatchDict,
+		io::UsbDevice* device,
+		const libusb_device_descriptor& deviceDescriptor,
 		sl::String* string,
 		sl::String_utf16* string_utf16,
 		uint_t flags

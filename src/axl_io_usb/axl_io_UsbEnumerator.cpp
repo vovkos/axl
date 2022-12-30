@@ -17,6 +17,10 @@
 #	include "axl_io_win_UsbHub.h"
 #elif (_AXL_OS_LINUX)
 #	include "axl_sys_lnx_UdevHwdb.h"
+#elif (_AXL_OS_DARWIN)
+#	include "axl_iok_RegistryEntry.h"
+#	include <IOKit/usb/IOUSBLib.h>
+
 #endif
 
 namespace axl {
@@ -57,6 +61,14 @@ enumerateUsbDevices(
 
 	if (!result)
 		AXL_TRACE("WARNING: can't open libudev hwdb: %s\n", err::getLastErrorDescription().sz());
+#elif (_AXL_OS_DARWIN)
+	sl::String string;
+	sl::String_utf16 string_utf16;
+
+	cf::MutableDictionary usbDeviceDict = iok::createServiceMatchingDictionary(kIOUSBDeviceClassName);
+	cf::MutableDictionary propertyMatchDict;
+	propertyMatchDict.create();
+	usbDeviceDict.setValue(CFSTR(kIOPropertyMatchKey), propertyMatchDict);
 #endif
 
 	libusb_device** pp = *loDeviceList;
@@ -82,7 +94,8 @@ enumerateUsbDevices(
 		deviceEntry->m_productDescriptorId = deviceDescriptor.iProduct;
 		deviceEntry->m_serialNumberDescriptorId = deviceDescriptor.iSerialNumber;
 
-#if (_AXL_OS_WIN && _AXL_IO_USBDEVICE_GETSESSIONDATA)
+#if (_AXL_OS_WIN)
+#	if (_AXL_IO_USBDEVICE_GETSESSIONDATA)
 		sys::win::DeviceInfo deviceInfo;
 		result = deviceInfoSet.findDeviceInfoByDevInst(device.getSessionData(), &deviceInfo);
 		if (result)
@@ -93,12 +106,23 @@ enumerateUsbDevices(
 				&string,
 				flags
 			);
+#	endif
 #elif (_AXL_OS_LINUX)
 		deviceEntry->queryStrings(
 			hwdb,
 			&device,
 			deviceDescriptor,
 			&sysFsPrefix,
+			&string,
+			&string_utf16,
+			flags
+		);
+#elif (_AXL_OS_DARWIN)
+		deviceEntry->queryStrings(
+			usbDeviceDict,
+			&propertyMatchDict,
+			&device,
+			deviceDescriptor,
 			&string,
 			&string_utf16,
 			flags

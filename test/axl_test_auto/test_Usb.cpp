@@ -41,7 +41,7 @@ run() {
 		return;
 	}
 
-	sl::String_utf16 bufferString;
+	sl::String bufferString;
 	bufferString.createBuffer(4096);
 
 	libusb_device** pp = deviceList;
@@ -64,17 +64,17 @@ run() {
 		if (!result)
 			continue;
 
-		result = descriptor.iManufacturer && device.getStringDescriptor(&bufferString, descriptor.iManufacturer) != -1;
+		result = descriptor.iManufacturer && device.getStringDescriptorAscii(&bufferString, descriptor.iManufacturer) != -1;
 		if (result)
-			printf("\tManufacturer:  %s\n", bufferString.s2().sz());
+			printf("\tManufacturer:  %s\n", bufferString.sz());
 
-		result = descriptor.iProduct && device.getStringDescriptor(&bufferString, descriptor.iProduct) != -1;
+		result = descriptor.iProduct && device.getStringDescriptorAscii(&bufferString, descriptor.iProduct) != -1;
 		if (result)
-			printf("\tProduct name:  %s\n", bufferString.s2().sz());
+			printf("\tProduct name:  %s\n", bufferString.sz());
 
-		result = descriptor.iSerialNumber && device.getStringDescriptor(&bufferString, descriptor.iSerialNumber) != -1;
+		result = descriptor.iSerialNumber && device.getStringDescriptorAscii(&bufferString, descriptor.iSerialNumber) != -1;
 		if (result)
-			printf("\tSerial number: %s\n", bufferString.s2().sz());
+			printf("\tSerial number: %s\n", bufferString.sz());
 	}
 }
 

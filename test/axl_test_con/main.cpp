@@ -6978,7 +6978,7 @@ testUsbMon() {
 
 //..............................................................................
 
-#if (_AXL_IO_USB && _AXL_IO_USBMON)
+#if (_AXL_IO_USB)
 
 void
 testUsbEnum2() {

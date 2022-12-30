@@ -11,14 +11,17 @@
 
 #include "pch.h"
 #include "axl_io_UsbDeviceDesc.h"
+#include "axl_io_UsbDevice.h"
 
 #if (_AXL_OS_WIN)
 #	include "axl_io_win_UsbHub.h"
 #elif (_AXL_OS_LINUX)
-#	include "axl_io_UsbDevice.h"
 #	include "axl_io_psx_File.h"
 #	include "axl_sys_lnx_UdevHwdb.h"
 #	include "axl_sys_lnx_UdevListEntry.h"
+#elif (_AXL_OS_DARWIN)
+#	include "axl_iok_RegistryEntry.h"
+#	include "axl_cf_Number.h"
 #endif
 
 namespace axl {
@@ -300,6 +303,7 @@ UsbDeviceDesc::queryStrings(
 			string->forceCopy(*sysFsPrefix);
 			string->append("product");
 			readSysFsProperty(&m_description, *string);
+			m_productDescriptor = m_description;
 		}
 	}
 
@@ -313,54 +317,110 @@ UsbDeviceDesc::queryStrings(
 			string->forceCopy(*sysFsPrefix);
 			string->append("manufacturer");
 			readSysFsProperty(&m_manufacturer, *string);
+			m_manufacturerDescriptor = m_manufacturer;
 		}
 	}
 
+	if ((flags & UsbDeviceDescFlag_ManufacturerDescriptor) && m_manufacturerDescriptor.isEmpty()) {
+		string->forceCopy(*sysFsPrefix);
+		string->append("manufacturer");
+		readSysFsProperty(&m_manufacturerDescriptor, *string);
+	}
+
+	if ((flags & UsbDeviceDescFlag_ProductDescriptor) && m_productDescriptor.isEmpty()) {
+		string->forceCopy(*sysFsPrefix);
+		string->append("product");
+		readSysFsProperty(&m_productDescriptor, *string);
+	}
+
+	if (flags & UsbDeviceDescFlag_SerialNumberDescriptor) {
+		string->forceCopy(*sysFsPrefix);
+		string->append("serial");
+		readSysFsProperty(&m_serialNumberDescriptor, *string);
+	}
+
+	return true;
+}
+
+#elif (_AXL_OS_DARWIN)
+
+bool
+UsbDeviceDesc::queryStrings(
+	const cf::MutableDictionary& usbDeviceDict,
+	cf::MutableDictionary* propertyMatchDict,
+	io::UsbDevice* device,
+	const libusb_device_descriptor& deviceDescriptor,
+	sl::String* string,
+	sl::String_utf16* string_utf16,
+	uint_t flags
+) {
+	iok::RegistryEntry registryEntry;
+
+#if (_AXL_IO_USBDEVICE_GETSESSIONDATA)
+	int64_t sessionId = device->getSessionData();
+	propertyMatchDict->setValue(CFSTR("sessionID"), cf::Number(kCFNumberSInt64Type, &sessionId));
+
+	cf::Type prop;
+	iok::Iterator it = iok::findMatchingServices(usbDeviceDict);
+	registryEntry = it.next().p();
+	if (registryEntry) {
+		if (flags & (UsbDeviceDescFlag_Description | UsbDeviceDescFlag_ProductDescriptor)) {
+			prop = registryEntry.getProperty(kUSBProductString);
+			m_description = m_productDescriptor = prop ? prop.toString() : registryEntry.getName();
+		}
+
+		if (flags & (UsbDeviceDescFlag_Manufacturer | UsbDeviceDescFlag_ManufacturerDescriptor)) {
+			prop = registryEntry.getProperty(kUSBVendorString);
+			if (prop)
+				m_manufacturer = m_manufacturerDescriptor = prop.toString();
+		}
+
+		if (flags & UsbDeviceDescFlag_Driver) {
+			prop = registryEntry.getProperty("CFBundleIdentifier");
+			if (prop)
+				m_driver = prop.toString();
+		}
+
+		if (flags & UsbDeviceDescFlag_SerialNumberDescriptor) {
+			prop = registryEntry.getProperty(kUSBSerialNumberString);
+			if (prop)
+				m_serialNumberDescriptor = prop.toString();
+		}
+
+		return true;
+	}
+#endif
+
 	if (!(flags & UsbDeviceDescFlag_Descriptors))
 		return true;
+
+	// fallback to fetching descriptors directly from the device
 
 	bool result =
 		(device->isOpen() || device->open()) &&
 		device->getStringDescriptor(string_utf16, 0, 0) != -1;
 
-	if (result) {
-		ushort_t langId = chooseUsbStringDescriptorLanguage(*string_utf16);
+	if (!result)
+		return false;
 
-		if ((flags & UsbDeviceDescFlag_ManufacturerDescriptor) && deviceDescriptor.iManufacturer) {
-			result = device->getStringDescriptor(string_utf16, deviceDescriptor.iManufacturer, langId) != -1;
-			if (result)
-				m_manufacturerDescriptor = *string_utf16;
-		}
+	ushort_t langId = chooseUsbStringDescriptorLanguage(*string_utf16);
 
-		if ((flags & UsbDeviceDescFlag_ProductDescriptor) && deviceDescriptor.iProduct) {
-			result = device->getStringDescriptor(string_utf16, deviceDescriptor.iProduct, langId) != -1;
-			if (result)
-				m_productDescriptor = *string_utf16;
-		}
+	if ((flags & UsbDeviceDescFlag_ManufacturerDescriptor) && deviceDescriptor.iManufacturer) {
+		result = device->getStringDescriptor(string_utf16, deviceDescriptor.iManufacturer, langId) != -1;
+		if (result)
+			m_manufacturerDescriptor = *string_utf16;
+	}
 
-		if ((flags & UsbDeviceDescFlag_SerialNumberDescriptor) && deviceDescriptor.iSerialNumber) {
-			result = device->getStringDescriptor(string_utf16, deviceDescriptor.iSerialNumber, langId) != -1;
-			if (result)
-				m_serialNumberDescriptor = *string_utf16;
-		}
-	} else {
-		if (flags & UsbDeviceDescFlag_ManufacturerDescriptor) {
-			string->forceCopy(*sysFsPrefix);
-			string->append("manufacturer");
-			readSysFsProperty(&m_manufacturerDescriptor, *string);
-		}
+	if ((flags & UsbDeviceDescFlag_ProductDescriptor) && deviceDescriptor.iProduct) {
+		result = device->getStringDescriptor(string_utf16, deviceDescriptor.iProduct, langId) != -1;
+		if (result)
+			m_productDescriptor = *string_utf16;
+	}
 
-		if (flags & UsbDeviceDescFlag_ProductDescriptor) {
-			string->forceCopy(*sysFsPrefix);
-			string->append("product");
-			readSysFsProperty(&m_productDescriptor, *string);
-		}
-
-		if (flags & UsbDeviceDescFlag_SerialNumberDescriptor) {
-			string->forceCopy(*sysFsPrefix);
-			string->append("serial");
-			readSysFsProperty(&m_serialNumberDescriptor, *string);
-		}
+	if ((flags & UsbDeviceDescFlag_SerialNumberDescriptor) && deviceDescriptor.iSerialNumber) {
+		result = device->getStringDescriptor(string_utf16, deviceDescriptor.iSerialNumber, langId) != -1;
+		if (result)
+			m_serialNumberDescriptor = *string_utf16;
 	}
 
 	return true;
