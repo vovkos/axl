@@ -633,7 +633,8 @@ public:
 	Udev() {}
 
 	Udev(udev* ctx) {
-		if (m_h = ctx)
+		m_h = ctx;
+		if (m_h)
 			ref();
 	}
 
