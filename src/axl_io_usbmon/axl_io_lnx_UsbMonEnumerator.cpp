@@ -11,7 +11,6 @@
 
 #include "pch.h"
 #include "axl_io_UsbMonEnumerator.h"
-#include "axl_io_UsbStringDescriptorLanguage.h"
 #include "axl_io_UsbDevice.h"
 #include "axl_io_FilePathUtils.h"
 #include "axl_sys_lnx_UdevHwdb.h"
