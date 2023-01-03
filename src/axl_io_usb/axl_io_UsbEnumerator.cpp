@@ -129,6 +129,7 @@ enumerateUsbDevices(
 		);
 #endif
 
+		deviceEntry->m_device = device.getDevice();
 		deviceList->insertTail(deviceEntry);
 	}
 

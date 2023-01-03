@@ -13,7 +13,7 @@
 
 #define _AXL_IO_USBDEVICEDESC_H
 
-#include "axl_sl_String.h"
+#include "axl_io_UsbPch.h"
 
 namespace axl {
 

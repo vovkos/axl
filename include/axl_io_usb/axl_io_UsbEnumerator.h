@@ -51,7 +51,6 @@ enumerateUsbDevices(
 	uint_t flags = 0
 ) {
 	return enumerateUsbDevices(NULL, loDeviceList, deviceList, flags);
-
 }
 
 inline
