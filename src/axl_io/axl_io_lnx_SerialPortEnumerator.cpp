@@ -29,7 +29,7 @@ public:
 	size_t
 	createPortList(
 		sl::List<SerialPortDesc>* portList,
-		uint_t mask
+		uint_t flags
 	);
 };
 
@@ -38,7 +38,7 @@ public:
 size_t
 SerialPortEnumerator::createPortList(
 	sl::List<SerialPortDesc>* portList,
-	uint_t mask
+	uint_t flags
 ) {
 	portList->clear();
 
@@ -101,7 +101,7 @@ SerialPortEnumerator::createPortList(
 		SerialPortDesc* portDesc = AXL_MEM_NEW(SerialPortDesc);
 		portDesc->m_deviceName = name;
 
-		if (mask & SerialPortDescMask_Description) {
+		if (flags & SerialPortDescFlag_Description) {
 			sl::StringRef model = device.getPropertyValue("ID_MODEL");
 			sl::StringRef modelFromDb = device.getPropertyValue("ID_MODEL_FROM_DATABASE");
 
@@ -114,7 +114,7 @@ SerialPortEnumerator::createPortList(
 			}
 		}
 
-		if (mask & SerialPortDescMask_Manufacturer) {
+		if (flags & SerialPortDescFlag_Manufacturer) {
 			sl::StringRef vendor = device.getPropertyValue("ID_VENDOR");
 			sl::StringRef vendorFromDb = device.getPropertyValue("ID_VENDOR_FROM_DATABASE");
 
@@ -127,7 +127,7 @@ SerialPortEnumerator::createPortList(
 			}
 		}
 
-		if (mask & SerialPortDescMask_HardwareIds) {
+		if (flags & SerialPortDescFlag_HardwareIds) {
 			sl::StringRef vendorId = device.getPropertyValue("ID_VENDOR_ID");
 			sl::StringRef modelId = device.getPropertyValue("ID_MODEL_ID");
 
@@ -135,10 +135,10 @@ SerialPortEnumerator::createPortList(
 				portDesc->m_hardwareIds = vendorId + ':' + modelId;
 		}
 
-		if (mask & SerialPortDescMask_Driver)
+		if (flags & SerialPortDescFlag_Driver)
 			portDesc->m_driver = driver;
 
-		if (mask & SerialPortDescMask_Location) {
+		if (flags & SerialPortDescFlag_Location) {
 			sl::StringRef path = device.getPropertyValue("ID_PATH");
 			portDesc->m_location = !path.isEmpty() ? path : device.getDevPath();
 		}
@@ -183,9 +183,9 @@ SerialPortEnumerator::createPortList(
 size_t
 enumerateSerialPorts(
 	sl::List<SerialPortDesc>* portList,
-	uint_t mask
+	uint_t flags
 ) {
-	return SerialPortEnumerator::createPortList(portList, mask);
+	return SerialPortEnumerator::createPortList(portList, flags);
 }
 
 //..............................................................................

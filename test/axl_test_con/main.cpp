@@ -3135,7 +3135,7 @@ testZip() {
 void
 testEnumSerial() {
 	sl::List<io::SerialPortDesc> portList;
-	io::enumerateSerialPorts(&portList, io::SerialPortDescMask__All);
+	io::enumerateSerialPorts(&portList, io::SerialPortDescFlag_All);
 
 	sl::Iterator<io::SerialPortDesc> it = portList.getHead();
 	for (; it; it++)

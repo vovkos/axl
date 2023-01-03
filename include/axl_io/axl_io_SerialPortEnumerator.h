@@ -20,13 +20,19 @@ class SerialPortEnumerator;
 
 //..............................................................................
 
-enum SerialPortDescMask {
-	SerialPortDescMask_Description  = 0x01,
-	SerialPortDescMask_Manufacturer = 0x02,
-	SerialPortDescMask_HardwareIds  = 0x04,
-	SerialPortDescMask_Driver       = 0x08,
-	SerialPortDescMask_Location     = 0x10,
-	SerialPortDescMask__All         = 0x1f,
+enum SerialPortDescFlag {
+	SerialPortDescFlag_Description  = 0x01,
+	SerialPortDescFlag_Manufacturer = 0x02,
+	SerialPortDescFlag_HardwareIds  = 0x04,
+	SerialPortDescFlag_Driver       = 0x08,
+	SerialPortDescFlag_Location     = 0x10,
+
+	SerialPortDescFlag_All =
+		SerialPortDescFlag_Description |
+		SerialPortDescFlag_Manufacturer |
+		SerialPortDescFlag_HardwareIds |
+		SerialPortDescFlag_Driver |
+		SerialPortDescFlag_Location,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -45,7 +51,7 @@ struct SerialPortDesc: sl::ListLink {
 size_t
 enumerateSerialPorts(
 	sl::List<SerialPortDesc>* portList,
-	uint_t mask = 0
+	uint_t flags = 0
 );
 
 //..............................................................................

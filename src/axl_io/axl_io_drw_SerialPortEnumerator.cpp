@@ -28,7 +28,7 @@ public:
 	size_t
 	createPortList(
 		sl::List<SerialPortDesc>* portList,
-		uint_t mask
+		uint_t flags
 	);
 };
 
@@ -100,7 +100,7 @@ printDeviceProperties(const iok::RegistryEntry& device) {
 size_t
 SerialPortEnumerator::createPortList(
 	sl::List<SerialPortDesc>* portList,
-	uint_t mask
+	uint_t flags
 ) {
 	portList->clear();
 
@@ -124,14 +124,14 @@ SerialPortEnumerator::createPortList(
 		SerialPortDesc* portDesc = AXL_MEM_NEW(SerialPortDesc);
 		portDesc->m_deviceName = prop.toString();
 
-		if (mask & SerialPortDescMask_Location)
+		if (flags & SerialPortDescFlag_Location)
 			portDesc->m_location = port.getPath();
 
 		// special handling for USB serial ports
 
 		iok::RegistryEntry parent = port.getParentEntry();
 		if (parent && parent.conformsTo("AppleUSBSerial")) {
-			if (mask & SerialPortDescMask_Driver) {
+			if (flags & SerialPortDescFlag_Driver) {
 				prop = parent.getProperty("CFBundleIdentifier");
 				if (prop)
 					portDesc->m_driver = prop.toString();
@@ -139,18 +139,18 @@ SerialPortEnumerator::createPortList(
 
 			iok::RegistryEntry device = parent.findConformingEntry("IOUSBDevice");
 			if (device) {
-				if (mask & SerialPortDescMask_Description) {
+				if (flags & SerialPortDescFlag_Description) {
 					prop = device.getProperty(kUSBProductString);
 					portDesc->m_description = prop ? prop.toString() : device.getName();
 				}
 
-				if ((mask & SerialPortDescMask_Manufacturer)) {
+				if ((flags & SerialPortDescFlag_Manufacturer)) {
 					prop = device.getProperty(kUSBVendorString);
 					if (prop)
 						portDesc->m_manufacturer = prop.toString();
 				}
 
-				if (mask & SerialPortDescMask_HardwareIds) {
+				if (flags & SerialPortDescFlag_HardwareIds) {
 					prop = device.getProperty(kUSBVendorID);
 					uint_t vendorId = prop ? prop.toInt() : 0;
 					prop = device.getProperty(kUSBProductID);
@@ -158,12 +158,12 @@ SerialPortEnumerator::createPortList(
 					portDesc->m_hardwareIds.format("%04x:%04x", vendorId, productId);
 				}
 			} else {
-				if (mask & SerialPortDescMask_Description) {
+				if (flags & SerialPortDescFlag_Description) {
 					prop = port.getProperty(kIOTTYDeviceKey);
 					portDesc->m_description = prop ? prop.toString() : port.getName();
 				}
 
-				if (mask & SerialPortDescMask_HardwareIds) {
+				if (flags & SerialPortDescFlag_HardwareIds) {
 					prop = parent.getProperty(kUSBVendorID);
 					uint_t vendorId = prop ? prop.toInt() : 0;
 					prop = parent.getProperty(kUSBProductID);
@@ -172,7 +172,7 @@ SerialPortEnumerator::createPortList(
 				}
 			}
 		} else { // for non-USB-to-serial ports, there's not much we can extract...
-			if (mask & SerialPortDescMask_Description) {
+			if (flags & SerialPortDescFlag_Description) {
 				prop = port.getProperty(kIOTTYDeviceKey);
 				portDesc->m_description = prop ? prop.toString() : port.getName();
 			}
@@ -189,9 +189,9 @@ SerialPortEnumerator::createPortList(
 size_t
 enumerateSerialPorts(
 	sl::List<SerialPortDesc>* portList,
-	uint_t mask
+	uint_t flags
 ) {
-	return SerialPortEnumerator::createPortList(portList, mask);
+	return SerialPortEnumerator::createPortList(portList, flags);
 }
 
 //..............................................................................

@@ -29,7 +29,7 @@ public:
 	size_t
 	createPortList(
 		sl::List<SerialPortDesc>* portList,
-		uint_t mask
+		uint_t flags
 	);
 
 protected:
@@ -37,7 +37,7 @@ protected:
 	SerialPortDesc*
 	createPortDesc(
 		sys::win::DeviceInfo* deviceInfo,
-		uint_t mask
+		uint_t flags
 	);
 };
 
@@ -46,7 +46,7 @@ protected:
 size_t
 SerialPortEnumerator::createPortList(
 	sl::List<SerialPortDesc>* portList,
-	uint_t mask
+	uint_t flags
 ) {
 	bool result;
 
@@ -69,7 +69,7 @@ SerialPortEnumerator::createPortList(
 		if (!result)
 			break;
 
-		SerialPortDesc* portDesc = createPortDesc(&deviceInfo, mask);
+		SerialPortDesc* portDesc = createPortDesc(&deviceInfo, flags);
 		if (portDesc)
 			portList->insertTail(portDesc);
 	}
@@ -80,7 +80,7 @@ SerialPortEnumerator::createPortList(
 SerialPortDesc*
 SerialPortEnumerator::createPortDesc(
 	sys::win::DeviceInfo* deviceInfo,
-	uint_t mask
+	uint_t flags
 ) {
 	sys::win::RegKey devRegKey;
 	bool result = deviceInfo->openDeviceRegistryKey(&devRegKey, KEY_QUERY_VALUE);
@@ -90,23 +90,23 @@ SerialPortEnumerator::createPortDesc(
 	SerialPortDesc* portDesc = AXL_MEM_NEW(SerialPortDesc);
 	portDesc->m_deviceName = devRegKey.queryStringValue(L"PortName");
 
-	if (mask & SerialPortDescMask_Description) {
+	if (flags & SerialPortDescFlag_Description) {
 		deviceInfo->getDeviceRegistryProperty(SPDRP_FRIENDLYNAME, &portDesc->m_description);
 
 		if (portDesc->m_description.isEmpty()) // try another property
 			deviceInfo->getDeviceRegistryProperty(SPDRP_DEVICEDESC, &portDesc->m_description);
 	}
 
-	if (mask & SerialPortDescMask_Manufacturer)
+	if (flags & SerialPortDescFlag_Manufacturer)
 		deviceInfo->getDeviceRegistryProperty(SPDRP_MFG, &portDesc->m_manufacturer);
 
-	if (mask & SerialPortDescMask_HardwareIds)
+	if (flags & SerialPortDescFlag_HardwareIds)
 		deviceInfo->getDeviceRegistryProperty(SPDRP_HARDWAREID, &portDesc->m_hardwareIds);
 
-	if (mask & SerialPortDescMask_Driver)
+	if (flags & SerialPortDescFlag_Driver)
 		deviceInfo->getDeviceDriverPath(&portDesc->m_driver);
 
-	if (mask & SerialPortDescMask_Location)
+	if (flags & SerialPortDescFlag_Location)
 		deviceInfo->getDeviceRegistryProperty(SPDRP_LOCATION_PATHS, &portDesc->m_location);
 
 #if (0)
@@ -167,9 +167,9 @@ SerialPortEnumerator::createPortDesc(
 size_t
 enumerateSerialPorts(
 	sl::List<SerialPortDesc>* portList,
-	uint_t mask
+	uint_t flags
 ) {
-	return SerialPortEnumerator::createPortList(portList, mask);
+	return SerialPortEnumerator::createPortList(portList, flags);
 }
 
 //..............................................................................
