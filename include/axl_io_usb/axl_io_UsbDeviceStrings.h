@@ -11,7 +11,7 @@
 
 #pragma once
 
-#define _AXL_IO_USBDEVICEDESC_H
+#define _AXL_IO_USBDEVICESTRINGS_H
 
 #include "axl_io_UsbPch.h"
 
@@ -69,29 +69,32 @@ getUsbSpeedString(libusb_speed speed);
 
 //..............................................................................
 
-enum UsbDeviceDescFlag {
-	UsbDeviceDescFlag_Description            = 0x01,
-	UsbDeviceDescFlag_Manufacturer           = 0x02,
-	UsbDeviceDescFlag_Driver                 = 0x04,
-	UsbDeviceDescFlag_ManufacturerDescriptor = 0x10,
-	UsbDeviceDescFlag_ProductDescriptor      = 0x20,
-	UsbDeviceDescFlag_SerialNumberDescriptor = 0x40,
+enum UsbDeviceStringId {
+	UsbDeviceStringId_Description            = 0x01,
+	UsbDeviceStringId_Manufacturer           = 0x02,
+	UsbDeviceStringId_Driver                 = 0x04,
+	UsbDeviceStringId_ManufacturerDescriptor = 0x08,
+	UsbDeviceStringId_ProductDescriptor      = 0x10,
+	UsbDeviceStringId_SerialNumberDescriptor = 0x20,
 
-	UsbDeviceDescFlag_Descriptors =
-		UsbDeviceDescFlag_ManufacturerDescriptor |
-		UsbDeviceDescFlag_ProductDescriptor |
-		UsbDeviceDescFlag_SerialNumberDescriptor,
+	UsbDeviceStringId_Database =
+		UsbDeviceStringId_Description |
+		UsbDeviceStringId_Manufacturer |
+		UsbDeviceStringId_Driver,
 
-	UsbDeviceDescFlag_All =
-		UsbDeviceDescFlag_Description |
-		UsbDeviceDescFlag_Manufacturer |
-		UsbDeviceDescFlag_Driver |
-		UsbDeviceDescFlag_Descriptors,
+	UsbDeviceStringId_Descriptors =
+		UsbDeviceStringId_ManufacturerDescriptor |
+		UsbDeviceStringId_ProductDescriptor |
+		UsbDeviceStringId_SerialNumberDescriptor,
+
+	UsbDeviceStringId_All =
+		UsbDeviceStringId_Database |
+		UsbDeviceStringId_Descriptors,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct UsbDeviceDesc {
+struct UsbDeviceStrings {
 	sl::String m_description;  // from the system DB (fallback to descriptor)
 	sl::String m_manufacturer; // from the system DB (fallback to descriptor)
 	sl::String m_driver;
@@ -99,30 +102,17 @@ struct UsbDeviceDesc {
 	sl::String m_productDescriptor;
 	sl::String m_serialNumberDescriptor;
 
-	uint16_t m_vendorId;
-	uint16_t m_productId;
-
-	uint8_t m_address;
-	uint8_t m_port;
-	uint8_t m_class;
-	uint8_t m_subClass;
-	uint8_t m_speed; // libusb_speed
-	uint8_t m_manufacturerDescriptorId;
-	uint8_t m_productDescriptorId;
-	uint8_t m_serialNumberDescriptorId;
-
-	UsbDeviceDesc() {
-		memset(&m_vendorId, 0, sizeof(UsbDeviceDesc) - offsetof(UsbDeviceDesc, m_vendorId));
-	}
-
 #if (_AXL_OS_WIN)
 	bool
 	queryStrings(
 		win::UsbHubDb* hubDb,
 		sys::win::DeviceInfo* deviceInfo,
 		uint_t port,
+		uint_t manufacturerDescriptorId,
+		uint_t productDescriptorId,
+		uint_t serialNumberDescriptorId,
 		sl::String_w* string,
-		uint_t flags
+		uint_t mask // UsbDeviceStringId-s
 	);
 #elif (_AXL_OS_LINUX)
 	bool
@@ -133,7 +123,7 @@ struct UsbDeviceDesc {
 		sl::String* sysFsPrefix,
 		sl::String* string,
 		sl::String_utf16* string_utf16,
-		uint_t flags
+		uint_t mask // UsbDeviceStringId-s
 	);
 #elif (_AXL_OS_DARWIN)
 	bool
@@ -144,7 +134,7 @@ struct UsbDeviceDesc {
 		const libusb_device_descriptor& deviceDescriptor,
 		sl::String* string,
 		sl::String_utf16* string_utf16,
-		uint_t flags
+		uint_t mask // UsbDeviceStringId-s
 	);
 #endif
 };

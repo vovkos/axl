@@ -13,7 +13,7 @@
 
 #define _AXL_IO_USBENUMERATOR_H
 
-#include "axl_io_UsbDeviceDesc.h"
+#include "axl_io_UsbDeviceStrings.h"
 #include "axl_io_UsbDeviceList.h"
 
 namespace axl {
@@ -23,13 +23,15 @@ namespace io {
 
 enum UsbEnumFlag {
 	UsbEnumFlag_Hubs = 0x0100,
+
+	// can be or-ed with UsbDeviceStringId
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 struct UsbDeviceEntry:
 	sl::ListLink,
-	UsbDeviceDesc {
+	UsbDeviceStrings {
 	libusb_device* m_device;
 };
 

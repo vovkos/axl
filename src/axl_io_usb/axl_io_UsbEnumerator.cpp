@@ -77,16 +77,6 @@ enumerateUsbDevices(
 			continue;
 
 		UsbDeviceEntry* deviceEntry = AXL_MEM_NEW(UsbDeviceEntry);
-		deviceEntry->m_vendorId = deviceDescriptor.idVendor;
-		deviceEntry->m_productId = deviceDescriptor.idProduct;
-		deviceEntry->m_address = device.getDeviceAddress();
-		deviceEntry->m_port = device.getPortNumber();
-		deviceEntry->m_class = deviceDescriptor.bDeviceClass;
-		deviceEntry->m_subClass = deviceDescriptor.bDeviceSubClass;
-		deviceEntry->m_speed = device.getDeviceSpeed();
-		deviceEntry->m_manufacturerDescriptorId = deviceDescriptor.iManufacturer;
-		deviceEntry->m_productDescriptorId = deviceDescriptor.iProduct;
-		deviceEntry->m_serialNumberDescriptorId = deviceDescriptor.iSerialNumber;
 
 #if (_AXL_OS_WIN)
 #	if (_AXL_IO_USBDEVICE_GETSESSIONDATA)
@@ -96,7 +86,10 @@ enumerateUsbDevices(
 			deviceEntry->queryStrings(
 				&hubDb,
 				&deviceInfo,
-				deviceEntry->m_port,
+				device.getPortNumber(),
+				deviceDescriptor.iManufacturer,
+				deviceDescriptor.iProduct,
+				deviceDescriptor.iSerialNumber,
 				&string,
 				flags
 			);

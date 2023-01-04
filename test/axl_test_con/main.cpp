@@ -6783,7 +6783,7 @@ testUsbMon() {
 
 	const io::UsbMonDeviceDesc* serialTap = NULL;
 	sl::List<io::UsbMonDeviceDesc> deviceList;
-	io::enumerateUsbMonDevices(&deviceList, io::UsbDeviceDescFlag_All);
+	io::enumerateUsbMonDevices(&deviceList, io::UsbDeviceStringId_All);
 	sl::ConstIterator<io::UsbMonDeviceDesc> it = deviceList.getHead();
 	for (size_t i = 0; it; it++, i++) {
 		printf("device #%d\n", i);
@@ -6990,16 +6990,22 @@ testUsbEnum2() {
 
 	do {
 		sl::List<io::UsbDeviceEntry> deviceList;
-		io::enumerateUsbDevices(&deviceList, io::UsbDeviceDescFlag_All);
+		io::enumerateUsbDevices(&deviceList, io::UsbDeviceStringId_All);
 		sl::ConstIterator<io::UsbDeviceEntry> it = deviceList.getHead();
 		for (size_t i = 0; it; it++, i++) {
+			io::UsbDevice device(it->m_device);
+			libusb_device_descriptor deviceDescriptor;
+			device.getDeviceDescriptor(&deviceDescriptor);
+
 			printf("device #%d\n", i);
-			printf("  address:        %d\n", it->m_address);
-			printf("  VID:            %04x\n", it->m_vendorId);
-			printf("  PID:            %04x\n", it->m_productId);
-			printf("  class:          %d\n", it->m_class);
-			printf("  subclass:       %d\n", it->m_subClass);
-			printf("  speed:          %s\n", io::getUsbSpeedString((libusb_speed)it->m_speed));
+			printf("  bus:            %d\n", device.getBusNumber());
+			printf("  address:        %d\n", device.getDeviceAddress());
+			printf("  port:           %d\n", device.getPortNumber());
+			printf("  VID:            0x%04x\n", deviceDescriptor.idVendor);
+			printf("  PID:            0x%04x\n", deviceDescriptor.idProduct);
+			printf("  class:          0x%02x - %s\n", deviceDescriptor.bDeviceClass, io::getUsbClassString(deviceDescriptor.bDeviceClass));
+			printf("  subclass:       0x%02x\n", deviceDescriptor.bDeviceSubClass);
+			printf("  speed:          %s\n", io::getUsbSpeedString(device.getDeviceSpeed()));
 
 			if (!it->m_description.isEmpty())
 				printf("  description:    %s\n", it->m_description.sz());
@@ -7029,16 +7035,17 @@ testUsbEnum2() {
 
 	do {
 		sl::List<io::UsbMonDeviceDesc> deviceList;
-		io::enumerateUsbMonDevices(&deviceList, io::UsbDeviceDescFlag_All);
+		io::enumerateUsbMonDevices(&deviceList, io::UsbDeviceStringId_All);
 		sl::ConstIterator<io::UsbMonDeviceDesc> it = deviceList.getHead();
 		for (size_t i = 0; it; it++, i++) {
 			printf("device #%d\n", i);
 			printf("  capture:        %s\n", it->m_captureDeviceName.sz());
+			printf("  VID:            0x%04x\n", it->m_vendorId);
+			printf("  PID:            0x%04x\n", it->m_productId);
 			printf("  address:        %d\n", it->m_address);
-			printf("  VID:            %04x\n", it->m_vendorId);
-			printf("  PID:            %04x\n", it->m_productId);
-			printf("  class:          %d\n", it->m_class);
-			printf("  subclass:       %d\n", it->m_subClass);
+			printf("  port:           %d\n", it->m_port);
+			printf("  class:          0x%02x - %s\n", it->m_class, io::getUsbClassString(it->m_class));
+			printf("  subclass:       0x%02x\n", it->m_subClass);
 			printf("  speed:          %s\n", io::getUsbSpeedString((libusb_speed)it->m_speed));
 
 			if (!it->m_description.isEmpty())

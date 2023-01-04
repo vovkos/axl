@@ -22,15 +22,30 @@ namespace io {
 
 enum UsbMonEnumFlag {
 	UsbMonEnumFlag_Hubs = UsbEnumFlag_Hubs
+
+	// can be or-ed with UsbDeviceStringId
 };
 
 //..............................................................................
 
 struct UsbMonDeviceDesc:
 	sl::ListLink,
-	UsbDeviceDesc {
+	UsbDeviceStrings {
+
 	sl::String m_captureDeviceName;
 	uint_t m_captureDeviceId;
+
+	uint16_t m_vendorId;
+	uint16_t m_productId;
+
+	uint8_t m_address;
+	uint8_t m_port;
+	uint8_t m_class;
+	uint8_t m_subClass;
+	uint8_t m_speed; // libusb_speed
+	uint8_t m_manufacturerDescriptorId;
+	uint8_t m_productDescriptorId;
+	uint8_t m_serialNumberDescriptorId;
 };
 
 //..............................................................................
@@ -38,7 +53,7 @@ struct UsbMonDeviceDesc:
 size_t
 enumerateUsbMonDevices(
 	sl::List<UsbMonDeviceDesc>* deviceList,
-	uint_t flags = 0 //
+	uint_t flags = 0
 );
 
 //..............................................................................
