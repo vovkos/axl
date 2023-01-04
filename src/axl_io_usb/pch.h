@@ -21,4 +21,9 @@
 #	include <winioctl.h>
 #	include <usbioctl.h>
 #	include <usb.h>
+#elif (_AXL_OS_LINUX)
+#	include "axl_sys_lnx_UdevHwdb.h"
+#elif (_AXL_OS_DARWIN)
+#	include "axl_iok_RegistryEntry.h"
+#	include <IOKit/usb/IOUSBLib.h>
 #endif

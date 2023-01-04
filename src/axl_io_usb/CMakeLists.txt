@@ -103,6 +103,10 @@ include_directories(
 	${AXL_INC_DIR}
 )
 
+if(WIN32)
+	include_directories(${USBSDK_INC_PATH})
+endif()
+
 add_library(
 	axl_io_usb
 	${PCH_H_LIST}
