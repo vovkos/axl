@@ -345,10 +345,10 @@ UsbPcapDeviceEnumerator::createDevice(
 	device->queryStrings(
 		&m_hubDb,
 		&deviceInfo,
+		connectionInfo.ConnectionIndex,
 		connectionInfo.DeviceDescriptor.iManufacturer,
 		connectionInfo.DeviceDescriptor.iProduct,
 		connectionInfo.DeviceDescriptor.iSerialNumber,
-		connectionInfo.ConnectionIndex,
 		&m_string,
 		m_flags
 	);

@@ -6989,8 +6989,9 @@ testUsbEnum2() {
 	printf("===========================\n");
 
 	do {
+		io::UsbDeviceList loDeviceList;
 		sl::List<io::UsbDeviceEntry> deviceList;
-		io::enumerateUsbDevices(&deviceList, io::UsbDeviceStringId_All);
+		io::enumerateUsbDevices(&loDeviceList, &deviceList, io::UsbDeviceStringId_All);
 		sl::ConstIterator<io::UsbDeviceEntry> it = deviceList.getHead();
 		for (size_t i = 0; it; it++, i++) {
 			io::UsbDevice device(it->m_device);

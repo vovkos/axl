@@ -55,15 +55,6 @@ enumerateUsbDevices(
 	return enumerateUsbDevices(NULL, loDeviceList, deviceList, flags);
 }
 
-inline
-size_t
-enumerateUsbDevices(
-	sl::List<UsbDeviceEntry>* deviceList,
-	uint_t flags = 0
-) {
-	return enumerateUsbDevices(NULL, deviceList, flags);
-}
-
 //..............................................................................
 
 } // namespace io

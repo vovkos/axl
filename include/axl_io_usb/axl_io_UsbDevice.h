@@ -570,7 +570,7 @@ UsbDevice::controlTransfer(
 		timeout != -1 ? timeout : 0
 	);
 
-	return result >= 0 ? result : err::fail<size_t> (-1, UsbError(result));
+	return result >= 0 ? result : err::fail<size_t>(-1, UsbError(result));
 }
 
 inline
@@ -593,7 +593,7 @@ UsbDevice::bulkTransfer(
 		timeout != -1 ? timeout : 0
 	);
 
-	return result == 0 ? actualSize : err::fail<size_t> (-1, UsbError(result));
+	return result == 0 ? actualSize : err::fail<size_t>(-1, UsbError(result));
 }
 
 inline

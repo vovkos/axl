@@ -102,8 +102,8 @@ getUsbSpeedString(libusb_speed speed) {
 
 static
 ushort_t
-chooseUsbStringDescriptorLanguage(
-	const sl::String_utf16& string,
+chooseUsbStringDescriptorLangId(
+	const sl::StringRef_utf16& string,
 	uint_t preferredLangId = 0x09 // English (pass 0 to pick the very first)
 ) {
 	size_t length = string.getLength();
@@ -165,41 +165,41 @@ UsbDeviceStrings::queryStrings(
 			return false; // can't fetch descriptors without a hub
 
 		result = hub->getStringDescriptor(string, port, 0, 0);
-		ushort_t languageId = result ?
-			chooseUsbStringDescriptorLanguage(
-				sl::String_utf16((utf16_t*)string->cp(), string->getLength())
+		ushort_t langId = result ?
+			chooseUsbStringDescriptorLangId(
+				sl::StringRef_utf16((utf16_t*)string->cp(), string->getLength())
 			) : 0;
 
-		if (manufacturerDescriptorId) {
+		if ((mask & UsbDeviceStringId_ManufacturerDescriptor) && manufacturerDescriptorId) {
 			result = hub->getStringDescriptor(
 				string,
 				port,
 				manufacturerDescriptorId,
-				languageId
+				langId
 			);
 
 			if (result)
 				m_manufacturerDescriptor = *string;
 		}
 
-		if (productDescriptorId) {
+		if ((mask & UsbDeviceStringId_ProductDescriptor) && productDescriptorId) {
 			result = hub->getStringDescriptor(
 				string,
 				port,
 				productDescriptorId,
-				languageId
+				langId
 			);
 
 			if (result)
 				m_productDescriptor = *string;
 		}
 
-		if (serialNumberDescriptorId) {
+		if ((mask & UsbDeviceStringId_SerialNumberDescriptor) && serialNumberDescriptorId) {
 			result = hub->getStringDescriptor(
 				string,
 				port,
 				serialNumberDescriptorId,
-				languageId
+				langId
 			);
 
 			if (result)
@@ -406,7 +406,7 @@ UsbDeviceStrings::queryStrings(
 	if (!result)
 		return false;
 
-	ushort_t langId = chooseUsbStringDescriptorLanguage(*string_utf16);
+	ushort_t langId = chooseUsbStringDescriptorLangId(*string_utf16);
 
 	if ((mask & UsbDeviceStringId_ManufacturerDescriptor) && deviceDescriptor.iManufacturer) {
 		result = device->getStringDescriptor(string_utf16, deviceDescriptor.iManufacturer, langId) != -1;

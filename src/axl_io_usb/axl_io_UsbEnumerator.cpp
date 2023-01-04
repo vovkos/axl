@@ -29,10 +29,6 @@ enumerateUsbDevices(
 	sl::List<UsbDeviceEntry>* deviceList,
 	uint_t flags
 ) {
-	UsbDeviceList tmpDeviceList;
-	if (!loDeviceList)
-		loDeviceList = &tmpDeviceList;
-
 	deviceList->clear();
 	loDeviceList->enumerateDevices(context);
 
