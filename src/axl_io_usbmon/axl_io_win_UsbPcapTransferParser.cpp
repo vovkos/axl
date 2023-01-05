@@ -26,6 +26,13 @@ UsbPcapTransferParser::parseHeader(
 	const void* p0,
 	size_t size
 ) {
+	static libusb_transfer_type transferTypeTable[] = {
+		LIBUSB_TRANSFER_TYPE_ISOCHRONOUS, // USBPCAP_TRANSFER_ISOCHRONOUS = 0,
+		LIBUSB_TRANSFER_TYPE_INTERRUPT,   // USBPCAP_TRANSFER_INTERRUPT   = 1,
+		LIBUSB_TRANSFER_TYPE_CONTROL,     // USBPCAP_TRANSFER_CONTROL     = 2,
+		LIBUSB_TRANSFER_TYPE_BULK,        // USBPCAP_TRANSFER_BULK        = 3,
+	};
+
 	const char* p = (char*)p0;
 	const char* end = p + size;
 
@@ -33,19 +40,23 @@ UsbPcapTransferParser::parseHeader(
 	if (m_offset < sizeof(UsbPcapPacketHdr))
 		return size;
 
+	libusb_transfer_type transferType = m_loHdr.m_packetHdr.transfer < countof(transferTypeTable) ?
+		transferTypeTable[m_loHdr.m_packetHdr.transfer] :
+		LIBUSB_TRANSFER_TYPE_BULK;
+
 	m_hiHdr.m_id = m_loHdr.m_packetHdr.irpId;
 	m_hiHdr.m_timestamp = sys::getTimestampFromTimeval(m_loHdr.m_pcapHdr.ts_sec, m_loHdr.m_pcapHdr.ts_usec);
 	m_hiHdr.m_status = err::SystemErrorCode_Success;
 	m_hiHdr.m_originalSize = m_loHdr.m_packetHdr.dataLength;
 	m_hiHdr.m_captureSize = m_loHdr.m_packetHdr.dataLength;
-	m_hiHdr.m_transferType = m_loHdr.m_packetHdr.transfer;
+	m_hiHdr.m_transferType = transferType;
 	m_hiHdr.m_bus = (uint8_t)m_loHdr.m_packetHdr.bus;
 	m_hiHdr.m_address = (uint8_t)m_loHdr.m_packetHdr.device;
 	m_hiHdr.m_endpoint = m_loHdr.m_packetHdr.endpoint;
 	m_hiHdr.m_flags = (m_loHdr.m_packetHdr.info & USBPCAP_INFO_PDO_TO_FDO) ? UsbMonTransferFlag_Completed : 0;
 
-	switch (m_loHdr.m_packetHdr.transfer) {
-	case USBPCAP_TRANSFER_CONTROL:
+	switch (transferType) {
+	case LIBUSB_TRANSFER_TYPE_CONTROL:
 		if (m_loHdr.m_packetHdr.headerLen < sizeof(USBPCAP_BUFFER_CONTROL_HEADER))
 			return err::fail<size_t>(-1, "invalid usbpcap control header");
 
@@ -76,7 +87,7 @@ UsbPcapTransferParser::parseHeader(
 
 		break;
 
-	case USBPCAP_TRANSFER_ISOCHRONOUS:
+	case LIBUSB_TRANSFER_TYPE_ISOCHRONOUS:
 		if (m_loHdr.m_packetHdr.headerLen < sizeof(USBPCAP_BUFFER_ISOCH_HEADER))
 			return err::fail<size_t>(-1, "invalid usbpcap isochronous header");
 
