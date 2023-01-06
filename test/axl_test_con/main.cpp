@@ -1664,23 +1664,28 @@ getUsbStringDescriptorText(
 		return "NONE";
 
 	if (!device->isOpen())
-		return "NOT OPENED";
+		return sl::formatString("%d - (device not opened)", index);
 
 	sl::String text;
 	bool result = device->getStringDescriptorAscii(&text, index) != -1;
 	return result ?
-		text :
-		sl::formatString("ERROR (%s)", err::getLastErrorDescription().sz());
+		sl::formatString("%d - %s", index, text.sz()) :
+		sl::formatString("%d - error: %s", index, err::getLastErrorDescription().sz());
 }
 
 void
-printUsbIfaceDesc(const libusb_interface_descriptor* ifaceDesc) {
+printUsbIfaceDesc(
+	io::UsbDevice* device,
+	const libusb_interface_descriptor* ifaceDesc
+) {
 	printf("    Interface:   %d\n", ifaceDesc->bInterfaceNumber);
 	printf("    Alt setting: %d\n", ifaceDesc->bAlternateSetting);
 	printf("    Class:       %s\n", io::getUsbClassString(ifaceDesc->bInterfaceClass));
 	printf("    Subclass:    %d\n", ifaceDesc->bInterfaceSubClass);
 	printf("    Protocol:    %d\n", ifaceDesc->bInterfaceProtocol);
 	printf("    Endpoints:   %d\n", ifaceDesc->bNumEndpoints);
+	printf("    Description: %s\n", getUsbStringDescriptorText(device, ifaceDesc->iInterface).sz());
+
 
 	for (size_t i = 0; i < ifaceDesc->bNumEndpoints; i++) {
 		const libusb_endpoint_descriptor* endpointDesc = &ifaceDesc->endpoint[i];
@@ -1695,7 +1700,10 @@ printUsbIfaceDesc(const libusb_interface_descriptor* ifaceDesc) {
 }
 
 void
-printUsbConfigDesc(const libusb_config_descriptor* configDesc) {
+printUsbConfigDesc(
+	io::UsbDevice* device,
+	const libusb_config_descriptor* configDesc
+) {
 	printf("  Configuration: %d\n", configDesc->bConfigurationValue);
 	printf("  Max power:     %d mA\n", configDesc->MaxPower * 2);
 	printf("  Interfaces:    %d\n", configDesc->bNumInterfaces);
@@ -1707,7 +1715,7 @@ printUsbConfigDesc(const libusb_config_descriptor* configDesc) {
 			printf("\n    Interface #%d is not configured\n", i);
 		} else for (size_t j = 0; j < (size_t)iface->num_altsetting; j++) {
 			printf("\n");
-			printUsbIfaceDesc(&iface->altsetting[j]);
+			printUsbIfaceDesc(device, &iface->altsetting[j]);
 		}
 	}
 }
@@ -1762,7 +1770,7 @@ printUsbDevice(io::UsbDevice* device) {
 		if (!result)
 			printf("  Cannot get config descriptor #%d (%s)\n", i, err::getLastErrorDescription().sz());
 		else
-			printUsbConfigDesc(configDesc);
+			printUsbConfigDesc(device, configDesc);
 	}
 }
 
