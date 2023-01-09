@@ -272,7 +272,7 @@ struct ProtoMsg_4: ProtoMsg {
 	sender ( \
 		T1 arg1, \
 		T2 arg2, \
-		T2 arg3 \
+		T3 arg3 \
 	) { \
 		axl::sl::ProtoMsg_3<T1, T2, T3> msg; \
 		msg.m_code = code; \
