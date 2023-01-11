@@ -46,7 +46,7 @@ UsbPcapTransferParser::parseHeader(
 
 	m_hiHdr.m_id = m_loHdr.m_packetHdr.irpId;
 	m_hiHdr.m_timestamp = sys::getTimestampFromTimeval(m_loHdr.m_pcapHdr.ts_sec, m_loHdr.m_pcapHdr.ts_usec);
-	m_hiHdr.m_status = err::SystemErrorCode_Success;
+	m_hiHdr.m_status = m_loHdr.m_packetHdr.status;
 	m_hiHdr.m_originalSize = m_loHdr.m_packetHdr.dataLength;
 	m_hiHdr.m_captureSize = m_loHdr.m_packetHdr.dataLength;
 	m_hiHdr.m_transferType = transferType;

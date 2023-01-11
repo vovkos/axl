@@ -6913,7 +6913,11 @@ testUsbMon() {
 				printf("\nUsbMonTransferHdr:\n");
 				printf("  m_id:           0x%016llx\n", hdr->m_id);
 				printf("  m_timestamp:    %s\n", sys::Time(hdr->m_timestamp).format("%Y-%M-%D %h:%m:%s.%l").sz());
+#if (_AXL_OS_WIN)
+				printf("  m_status:       0x%08x\n", hdr->m_status);
+#elif (_AXL_OS_LINUX)
 				printf("  m_status:       %d - %s\n", hdr->m_status, err::Errno(-hdr->m_status).getDescription().sz());
+#endif
 				printf("  m_flags:        0x%02x %s\n", hdr->m_flags, io::getUsbMonTransferFlagsString(hdr->m_flags).sz());
 				printf("  m_transferType: %d - %s\n", hdr->m_transferType, io::getUsbTransferTypeString((libusb_transfer_type)hdr->m_transferType));
 				printf("  m_bus:          %d\n", hdr->m_bus);
@@ -7113,9 +7117,8 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-#if (_AXL_IO_USB)
-	testUsbEnum();
-	testUsbEnum2();
+#if (_AXL_IO_USBMON)
+	testUsbMon();
 #endif
 
 	return 0;

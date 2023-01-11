@@ -45,7 +45,7 @@ UsbMonTransferParser::parseHeader(
 		LIBUSB_TRANSFER_TYPE_BULK;
 
 	m_hiHdr.m_timestamp = sys::getTimestampFromTimeval(m_loHdr.ts_sec, m_loHdr.ts_usec);
-	m_hiHdr.m_status = m_loHdr.id;
+	m_hiHdr.m_id = m_loHdr.id;
 	m_hiHdr.m_status = m_loHdr.status;
 	m_hiHdr.m_originalSize = m_loHdr.len_urb;
 	m_hiHdr.m_captureSize = m_loHdr.len_cap;
