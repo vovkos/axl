@@ -42,7 +42,7 @@ UsbMonTransferParser::parseHeader(
 
 	libusb_transfer_type transferType = m_loHdr.xfer_type < countof(transferTypeTable) ?
 		transferTypeTable[m_loHdr.xfer_type] :
-		LIBUSB_TRANSFER_TYPE_BULK;
+		(libusb_transfer_type)-1;
 
 	m_hiHdr.m_timestamp = sys::getTimestampFromTimeval(m_loHdr.ts_sec, m_loHdr.ts_usec);
 	m_hiHdr.m_id = m_loHdr.id;
@@ -54,6 +54,7 @@ UsbMonTransferParser::parseHeader(
 	m_hiHdr.m_address = m_loHdr.devnum;
 	m_hiHdr.m_endpoint = m_loHdr.epnum;
 	m_hiHdr.m_flags = m_loHdr.type == 'S' ? 0 : UsbMonTransferFlag_Completed;
+	m_hiHdr.m_urbFunction = 0;
 
 	switch (transferType) {
 	case LIBUSB_TRANSFER_TYPE_CONTROL:

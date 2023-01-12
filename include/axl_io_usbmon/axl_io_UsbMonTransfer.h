@@ -17,11 +17,20 @@
 
 namespace axl {
 namespace io {
+namespace win {
+
+const char*
+getUrbFunctionString(uint_t function);
+
+const char*
+getUsbdStatusString(uint_t status);
+
+} // namespace win
 
 //..............................................................................
 
 enum UsbMonTransferFlag {
-	UsbMonTransferFlag_Completed = 0x01
+	UsbMonTransferFlag_Completed = 0x01,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -126,9 +135,10 @@ struct UsbMonIsochronousHdr {
 struct UsbMonTransferHdr {
 	uint64_t m_id;
 	uint64_t m_timestamp;
-	uint32_t m_status; // USBD_STATUS on Windows, errno on Linux
-	uint32_t m_flags;
-	uint8_t m_transferType; // libusb_transfer_type
+	uint32_t m_status;       // USBD_STATUS on Windows, errno on Linux
+	uint16_t m_urbFunction;  // URB_FUNCTION_XXX on Windows
+	uint16_t m_flags;        // UsbMonTransferFlag
+	uint8_t m_transferType;  // libusb_transfer_type or -1
 	uint8_t m_bus;
 	uint8_t m_address;
 	uint8_t m_endpoint;

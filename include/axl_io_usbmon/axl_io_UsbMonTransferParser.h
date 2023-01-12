@@ -56,7 +56,7 @@ public:
 	}
 
 	const UsbMonTransferHdr* getTransferHdr() const {
-		ASSERT(m_state > UsbMonTransferParserState_IncompleteHeader);
+		ASSERT(m_state >= UsbMonTransferParserState_CompleteHeader);
 		return &m_hiHdr;
 	}
 

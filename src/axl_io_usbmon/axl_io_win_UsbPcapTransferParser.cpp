@@ -42,7 +42,7 @@ UsbPcapTransferParser::parseHeader(
 
 	libusb_transfer_type transferType = m_loHdr.m_packetHdr.transfer < countof(transferTypeTable) ?
 		transferTypeTable[m_loHdr.m_packetHdr.transfer] :
-		LIBUSB_TRANSFER_TYPE_BULK;
+		(libusb_transfer_type)-1;
 
 	m_hiHdr.m_id = m_loHdr.m_packetHdr.irpId;
 	m_hiHdr.m_timestamp = sys::getTimestampFromTimeval(m_loHdr.m_pcapHdr.ts_sec, m_loHdr.m_pcapHdr.ts_usec);
@@ -54,6 +54,7 @@ UsbPcapTransferParser::parseHeader(
 	m_hiHdr.m_address = (uint8_t)m_loHdr.m_packetHdr.device;
 	m_hiHdr.m_endpoint = m_loHdr.m_packetHdr.endpoint;
 	m_hiHdr.m_flags = (m_loHdr.m_packetHdr.info & USBPCAP_INFO_PDO_TO_FDO) ? UsbMonTransferFlag_Completed : 0;
+	m_hiHdr.m_urbFunction = m_loHdr.m_packetHdr.function;
 
 	switch (transferType) {
 	case LIBUSB_TRANSFER_TYPE_CONTROL:

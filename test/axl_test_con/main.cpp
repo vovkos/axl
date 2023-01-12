@@ -6914,7 +6914,8 @@ testUsbMon() {
 				printf("  m_id:           0x%016llx\n", hdr->m_id);
 				printf("  m_timestamp:    %s\n", sys::Time(hdr->m_timestamp).format("%Y-%M-%D %h:%m:%s.%l").sz());
 #if (_AXL_OS_WIN)
-				printf("  m_status:       0x%08x\n", hdr->m_status);
+				printf("  m_urbFunction:  0x%02x - %s\n", hdr->m_urbFunction, io::win::getUrbFunctionString(hdr->m_urbFunction));
+				printf("  m_status:       0x%08x - %s\n", hdr->m_status, io::win::getUsbdStatusString(hdr->m_status));
 #elif (_AXL_OS_LINUX)
 				printf("  m_status:       %d - %s\n", hdr->m_status, err::Errno(-hdr->m_status).getDescription().sz());
 #endif
@@ -6966,6 +6967,8 @@ testUsbMon() {
 				const io::UsbMonTransferHdr* hdr = parser.getTransferHdr();
 				payload.append(p, size);
 				ASSERT(payload.getCount() == hdr->m_captureSize);
+				if (payload.isEmpty())
+					break;
 
 				printf("Payload:\n");
 				enc::HexEncoding::encode(
@@ -6977,6 +6980,7 @@ testUsbMon() {
 
 				printf("%s\n", string.sz());
 				payload.clear();
+				break;
 			}
 
 			p += size;
