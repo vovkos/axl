@@ -6780,6 +6780,8 @@ testUtf8Encode() {
 enum {
 	VidSerialTap = 0x16d0,
 	PidSerialTap = 0x0e26,
+	VidCamera    = 0x046d,
+	PidCamera    = 0x092e,
 };
 
 bool
@@ -6789,7 +6791,7 @@ testUsbMon() {
 	io::getUsbDefaultContext()->createDefault();
 #endif
 
-	const io::UsbMonDeviceDesc* serialTap = NULL;
+	const io::UsbMonDeviceDesc* captureDevice = NULL;
 	sl::List<io::UsbMonDeviceDesc> deviceList;
 	io::enumerateUsbMonDevices(&deviceList, io::UsbDeviceStringId_All);
 	sl::ConstIterator<io::UsbMonDeviceDesc> it = deviceList.getHead();
@@ -6821,14 +6823,15 @@ testUsbMon() {
 		if (!it->m_serialNumberDescriptor.isEmpty())
 			printf("  serial number*: %s\n", it->m_serialNumberDescriptor.sz());
 
-		if (it->m_vendorId == VidSerialTap && it->m_productId == PidSerialTap)
-			serialTap = *it;
+		if (it->m_vendorId == VidSerialTap && it->m_productId == PidSerialTap ||
+			it->m_vendorId == VidCamera && it->m_productId == PidCamera)
+			captureDevice = *it;
 
 		printf("\n");
 	}
 
-	if (!serialTap) {
-		printf("Serial Tap is not found\n");
+	if (!captureDevice) {
+		printf("Serial Tap or Logitech camera not found\n");
 		return false;
 	}
 
@@ -6843,10 +6846,10 @@ testUsbMon() {
 
 	io::win::UsbPcap monitor;
 	result =
-		monitor.open(serialTap->m_captureDeviceName) &&
+		monitor.open(captureDevice->m_captureDeviceName) &&
 		monitor.setSnapshotLength(io::win::UsbPcap::DefaultSnapshotLength) &&
 		monitor.setKernelBufferSize(BufferSize) &&
-		monitor.setFilter(serialTap->m_address) &&
+		monitor.setFilter(captureDevice->m_address) &&
 		monitor.readPcapHdr();
 
 #elif (_AXL_OS_LINUX)
@@ -6854,7 +6857,7 @@ testUsbMon() {
 
 	io::lnx::UsbMon monitor;
 	result =
-		monitor.open(serialTap->m_captureDeviceName) &&
+		monitor.open(captureDevice->m_captureDeviceName) &&
 		monitor.setKernelBufferSize(BufferSize);
 #endif
 
@@ -6868,7 +6871,7 @@ testUsbMon() {
 	sl::Array<char> payload;
 	buffer.setCount(BufferSize);
 
-	printf("Capturing USB on the Serial Tap (buffer %d B)...\n", BufferSize);
+	printf("Capturing USB on %s (buffer %d bytes)...\n", captureDevice->m_description.sz(), BufferSize);
 
 	for (;;) {
 		size_t size;
@@ -6947,9 +6950,8 @@ testUsbMon() {
 					}
 
 				case LIBUSB_TRANSFER_TYPE_ISOCHRONOUS: {
-					const io::UsbMonIsochronousHdr& iso = hdr->m_isochronousHdr;
+					const io::UsbMonIsoHdr& iso = hdr->m_isoHdr;
 					printf("Isochronous:\n");
-					printf("  m_startFrame:  %d\n", iso.m_startFrame);
 					printf("  m_packetCount: %d\n", iso.m_packetCount);
 					printf("  m_errorCount:  %d\n", iso.m_errorCount);
 					break;

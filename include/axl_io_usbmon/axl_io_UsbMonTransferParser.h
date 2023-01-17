@@ -22,6 +22,7 @@ namespace io {
 
 enum UsbMonTransferParserState {
 	UsbMonTransferParserState_IncompleteHeader = 0,
+	UsbMonTransferParserState_IncompleteIsoPacketTable,
 	UsbMonTransferParserState_CompleteHeader,
 	UsbMonTransferParserState_IncompleteData,
 	UsbMonTransferParserState_CompleteData,
@@ -30,25 +31,21 @@ enum UsbMonTransferParserState {
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-    typename T,
-	typename H
+	typename T,
+	typename B
 >
 class UsbMonTransferParserBase {
 protected:
 	UsbMonTransferParserState m_state;
-	UsbMonTransferHdr m_hiHdr;
-
-	union {
-		H m_loHdr;
-		char m_buffer[1];
-	};
-
-	size_t m_offset; // offset in the original stream
+	UsbMonTransferHdr m_hdr;
+	sl::Array<UsbMonIsoPacket> m_isoPacketTable;
+	size_t m_isoPacketIdx;
+	size_t m_isoDataSize;
+	size_t m_offset;
+	B m_buffer;
 
 public:
-	UsbMonTransferParserBase() {
-		memset(this, 0, sizeof(UsbMonTransferParserBase));
-	}
+	UsbMonTransferParserBase();
 
 	UsbMonTransferParserState
 	getState() const {
@@ -56,8 +53,14 @@ public:
 	}
 
 	const UsbMonTransferHdr* getTransferHdr() const {
-		ASSERT(m_state >= UsbMonTransferParserState_CompleteHeader);
-		return &m_hiHdr;
+		ASSERT(m_state > UsbMonTransferParserState_IncompleteHeader);
+		return &m_hdr;
+	}
+
+	const sl::Array<UsbMonIsoPacket>&
+	getIsoPacketTable() const {
+		ASSERT(m_state > UsbMonTransferParserState_IncompleteIsoPacketTable);
+		return m_isoPacketTable;
 	}
 
 	void
@@ -87,7 +90,17 @@ protected:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-    typename T,
+	typename T,
+	typename B
+>
+UsbMonTransferParserBase<T, B>::UsbMonTransferParserBase() {
+	m_state = UsbMonTransferParserState_IncompleteHeader;
+	m_isoPacketIdx = 0;
+	m_offset = 0;
+}
+
+template <
+	typename T,
 	typename B
 >
 size_t
@@ -99,8 +112,11 @@ UsbMonTransferParserBase<T, B>::parse(
 	case UsbMonTransferParserState_IncompleteHeader:
 		return static_cast<T*>(this)->parseHeader(p, size);
 
+	case UsbMonTransferParserState_IncompleteIsoPacketTable:
+		return static_cast<T*>(this)->parseIsoPacketTable(p, size);
+
 	case UsbMonTransferParserState_CompleteHeader:
-		if (m_hiHdr.m_captureSize)
+		if (m_hdr.m_captureSize)
 			return parseData(size);
 
 		reset();
@@ -120,12 +136,12 @@ UsbMonTransferParserBase<T, B>::parse(
 }
 
 template <
-    typename T,
+	typename T,
 	typename B
 >
 size_t
 UsbMonTransferParserBase<T, B>::parseData(size_t size) {
-	size_t leftover = m_hiHdr.m_captureSize - m_offset;
+	size_t leftover = m_hdr.m_captureSize - m_offset;
 	size_t taken;
 
 	if (size < leftover) {
@@ -141,7 +157,7 @@ UsbMonTransferParserBase<T, B>::parseData(size_t size) {
 }
 
 template <
-    typename T,
+	typename T,
 	typename B
 >
 const char*
@@ -156,7 +172,7 @@ UsbMonTransferParserBase<T, B>::buffer(
 	size_t available = end - p;
 	size_t leftover = targetSize - m_offset;
 	size_t taken = AXL_MIN(leftover, available);
-	memcpy(m_buffer + m_offset, p, taken);
+	memcpy((char*)&m_buffer + m_offset, p, taken);
 	m_offset += taken;
 	return p + taken;
 }

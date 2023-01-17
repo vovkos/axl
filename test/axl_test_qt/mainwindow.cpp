@@ -144,7 +144,6 @@ protected:
 
 		return QStandardItemModel::data(index, role);
 	}
-
 };
 
 MainWindow::MainWindow(QWidget* parent) :

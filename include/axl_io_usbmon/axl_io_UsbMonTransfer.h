@@ -124,10 +124,18 @@ struct UsbMonControlSetup {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct UsbMonIsochronousHdr {
-	uint32_t m_startFrame;
+struct UsbMonIsoHdr {
 	uint32_t m_packetCount;
 	uint32_t m_errorCount;
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+struct UsbMonIsoPacket {
+	uint32_t m_status;       // USBD_STATUS on Windows, errno on Linux
+	uint32_t m_offset;
+	uint32_t m_length;
+	uint32_t _m_padding;
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -144,12 +152,15 @@ struct UsbMonTransferHdr {
 	uint8_t m_endpoint;
 	uint32_t m_originalSize; // original payload size
 	uint32_t m_captureSize;  // payload captured by the driver
+	uint32_t _m_padding;
 
 	union {
 		UsbMonControlSetup m_controlSetup;
-		UsbMonIsochronousHdr m_isochronousHdr;
+		UsbMonIsoHdr m_isoHdr;
 	};
-}; // 48 bytes
+};
+
+// for isochornous transfers, followed by UsbMonIsoPacket[m_isoHdr.m_packetCount]
 
 //..............................................................................
 

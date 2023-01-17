@@ -111,7 +111,8 @@ struct USBPCAP_BUFFER_ISOCH_HEADER {
 	ULONG startFrame;
 	ULONG numberOfPackets;
 	ULONG errorCount;
-	USBPCAP_BUFFER_ISO_PACKET packet[1];
+
+	// followed by USBPCAP_BUFFER_ISO_PACKET[numberOfPackets];
 };
 
 union BM_REQUEST_TYPE {

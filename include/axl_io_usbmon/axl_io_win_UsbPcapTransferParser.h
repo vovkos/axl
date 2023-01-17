@@ -42,28 +42,32 @@ struct UsbPcapControlSetupHdr: UsbPcapControlHdr {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-union UsbPcapTransferParserLoHdr {
+union UsbPcapTransferParserBuffer {
 	usbpcap::pcaprec_hdr_t m_pcapHdr;
 	UsbPcapPacketHdr m_packetHdr;
 	UsbPcapControlHdr m_controlHdr;
 	UsbPcapControlSetupHdr m_controlSetupHdr;
 	UsbPcapIsoHdr m_isoHdr;
+	usbpcap::USBPCAP_BUFFER_ISO_PACKET m_isoPacket;
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class UsbPcapTransferParser: public UsbMonTransferParserBase<
 	UsbPcapTransferParser,
-	UsbPcapTransferParserLoHdr
+	UsbPcapTransferParserBuffer
 > {
-	friend class UsbMonTransferParserBase<
-		UsbPcapTransferParser,
-		UsbPcapTransferParserLoHdr
-	>;
+	friend class UsbMonTransferParserBase<UsbPcapTransferParser, UsbPcapTransferParserBuffer>;
 
 protected:
 	size_t
 	parseHeader(
+	 	const void* p,
+	 	size_t size
+	);
+
+	size_t
+	parseIsoPacketTable(
 	 	const void* p,
 	 	size_t size
 	);
