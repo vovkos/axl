@@ -41,7 +41,7 @@ enum ShmtFlag { // should be combined with FileFlag
 
 struct ShmtFileHdr {
 	uint32_t m_signature;
-	uint32_t m_padding;
+	uint32_t _m_padding;
 	int32_t m_lock;
 	uint32_t m_state;
 	uint32_t m_readSemaphoreWaitCount;  // to prevent semaphore overflow

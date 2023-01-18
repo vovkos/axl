@@ -72,7 +72,6 @@ ShmtBase::attach(
 		m_hdr->m_dataSize = 0;
 		m_hdr->m_readSemaphoreWaitCount = 0;
 		m_hdr->m_writeSemaphoreWaitCount = 0;
-		m_hdr->m_padding = 0;
 
 		result =
 			m_readSemaphore.create(readSemaphoreName) &&
