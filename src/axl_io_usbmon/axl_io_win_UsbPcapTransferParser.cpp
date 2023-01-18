@@ -111,11 +111,11 @@ UsbPcapTransferParser::parseHeader(
 		m_hdr.m_isoHdr.m_packetCount = m_buffer.m_isoHdr.numberOfPackets;
 		m_hdr.m_isoHdr.m_errorCount = m_buffer.m_isoHdr.errorCount;
 
-		bool result = m_isoPacketTable.setCountZeroConstruct(m_hdr.m_isoHdr.m_packetCount);
+		bool result = m_isoPacketArray.setCountZeroConstruct(m_hdr.m_isoHdr.m_packetCount);
 		if (!result)
 			return -1;
 
-		m_state = UsbMonTransferParserState_IncompleteIsoPacketTable;
+		m_state = UsbMonTransferParserState_IncompleteIsoPacketArray;
 		m_isoPacketIdx = 0;
 		m_isoDataSize = 0;
 		m_offset = 0;
@@ -133,21 +133,21 @@ UsbPcapTransferParser::parseIsoPacketTable(
 	size_t size
 ) {
 	ASSERT(
-		m_state == UsbMonTransferParserState_IncompleteIsoPacketTable &&
+		m_state == UsbMonTransferParserState_IncompleteIsoPacketArray &&
 		m_hdr.m_transferType == LIBUSB_TRANSFER_TYPE_ISOCHRONOUS &&
 		m_isoPacketIdx < m_hdr.m_isoHdr.m_packetCount
 	);
 
 	const char* p = (char*)p0;
 	const char* end = p + size;
-	UsbMonIsoPacket* packet = m_isoPacketTable + m_isoPacketIdx;
-	UsbMonIsoPacket* packetEnd = m_isoPacketTable + m_hdr.m_isoHdr.m_packetCount;
-	ASSERT(packetEnd == m_isoPacketTable.getEnd());
+	UsbMonIsoPacket* packet = m_isoPacketArray + m_isoPacketIdx;
+	UsbMonIsoPacket* packetEnd = m_isoPacketArray + m_hdr.m_isoHdr.m_packetCount;
+	ASSERT(packetEnd == m_isoPacketArray.getEnd());
 
 	while (packet < packetEnd) {
 		p = buffer(sizeof(USBPCAP_BUFFER_ISO_PACKET), p, end);
 		if (m_offset < sizeof(USBPCAP_BUFFER_ISO_PACKET)) {
-			m_isoPacketIdx = packet - m_isoPacketTable;
+			m_isoPacketIdx = packet - m_isoPacketArray;
 			return size;
 		}
 

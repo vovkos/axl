@@ -22,7 +22,7 @@ namespace io {
 
 enum UsbMonTransferParserState {
 	UsbMonTransferParserState_IncompleteHeader = 0,
-	UsbMonTransferParserState_IncompleteIsoPacketTable,
+	UsbMonTransferParserState_IncompleteIsoPacketArray,
 	UsbMonTransferParserState_CompleteHeader,
 	UsbMonTransferParserState_IncompleteData,
 	UsbMonTransferParserState_CompleteData,
@@ -38,7 +38,7 @@ class UsbMonTransferParserBase {
 protected:
 	UsbMonTransferParserState m_state;
 	UsbMonTransferHdr m_hdr;
-	sl::Array<UsbMonIsoPacket> m_isoPacketTable;
+	sl::Array<UsbMonIsoPacket> m_isoPacketArray;
 	size_t m_isoPacketIdx;
 	size_t m_isoDataSize;
 	size_t m_offset;
@@ -58,9 +58,9 @@ public:
 	}
 
 	const sl::Array<UsbMonIsoPacket>&
-	getIsoPacketTable() const {
-		ASSERT(m_state > UsbMonTransferParserState_IncompleteIsoPacketTable);
-		return m_isoPacketTable;
+	getIsoPacketArray() const {
+		ASSERT(m_state > UsbMonTransferParserState_IncompleteIsoPacketArray);
+		return m_isoPacketArray;
 	}
 
 	void
@@ -112,7 +112,7 @@ UsbMonTransferParserBase<T, B>::parse(
 	case UsbMonTransferParserState_IncompleteHeader:
 		return static_cast<T*>(this)->parseHeader(p, size);
 
-	case UsbMonTransferParserState_IncompleteIsoPacketTable:
+	case UsbMonTransferParserState_IncompleteIsoPacketArray:
 		return static_cast<T*>(this)->parseIsoPacketTable(p, size);
 
 	case UsbMonTransferParserState_CompleteHeader:
