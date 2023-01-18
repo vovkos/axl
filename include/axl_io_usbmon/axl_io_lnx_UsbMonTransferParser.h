@@ -22,15 +22,28 @@ namespace lnx {
 
 //..............................................................................
 
+union UsbMonTransferParserBuffer {
+	usbmon::mon_bin_hdr m_monHdr;
+	usbmon::mon_bin_isodesc m_isoDesc;
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 class UsbMonTransferParser: public UsbMonTransferParserBase<
 	UsbMonTransferParser,
-	usbmon::mon_bin_hdr
+	UsbMonTransferParserBuffer
 > {
-	friend class UsbMonTransferParserBase<UsbMonTransferParser, usbmon::mon_bin_hdr>;
+	friend class UsbMonTransferParserBase<UsbMonTransferParser, UsbMonTransferParserBuffer>;
 
 protected:
 	size_t
 	parseHeader(
+	 	const void* p,
+	 	size_t size
+	);
+
+	size_t
+	parseIsoPacketTable(
 	 	const void* p,
 	 	size_t size
 	);
