@@ -281,6 +281,8 @@ if("${TARGET_CPU}" MATCHES "x86|amd64")
 		"Build axl_spy library (API spying engine)"
 		ON
 	)
+else()
+	unset(BUILD_AXL_SPY CACHE)
 endif()
 
 if(BUILD_AXL_SPY)
