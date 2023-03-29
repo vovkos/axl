@@ -772,6 +772,35 @@ axl_append_compile_flag_list
 endmacro()
 
 macro(
+axl_add_import_include_dirs
+	_RESULT
+	# ...
+)
+	set(_LIB_LIST ${ARGN})
+
+	foreach(_LIB ${_LIB_LIST})
+		if(NOT TARGET ${_LIB})
+			continue()
+		endif()
+
+		get_target_property(_IS_IMPORTED ${_LIB} IMPORTED)
+		if (NOT _IS_IMPORTED)
+			continue()
+		endif()
+
+		get_target_property(_DIRS ${_LIB} INTERFACE_INCLUDE_DIRECTORIES)
+		if(_DIRS)
+			list(APPEND ${_RESULT} ${_DIRS})
+		endif()
+
+		get_target_property(_DEPS ${_LIB} INTERFACE_LINK_LIBRARIES)
+		if(_DEPS)
+			axl_add_import_include_dirs(${_RESULT} ${_DEPS})
+		endif()
+	endforeach()
+endmacro()
+
+macro(
 axl_set_pch_gcc
 	_TARGET
 	_PCH_H
@@ -852,16 +881,31 @@ axl_set_pch_gcc
 		)
 	endif()
 
-	# get and append INCLUDE_DIRECTORIES property
+	set(_INCLUDE_DIRS)
 
-	get_directory_property(_DIR_FLAGS INCLUDE_DIRECTORIES)
-	get_target_property(_TARGET_FLAGS ${_TARGET} INCLUDE_DIRECTORIES)
+	# collect includes of the current directory...
+
+	get_directory_property(_DIRS INCLUDE_DIRECTORIES)
+	list(APPEND _INCLUDE_DIRS ${_DIRS})
+
+	# ... then includes of the target
+
+	get_target_property(_DIRS ${_TARGET} INCLUDE_DIRECTORIES)
+	list(APPEND _INCLUDE_DIRS ${_DIRS})
+
+	# ... then includes of imported targets
+
+	get_target_property(_LIBS ${_TARGET} LINK_LIBRARIES)
+	if(_LIBS)
+		axl_add_import_include_dirs(_INCLUDE_DIRS ${_LIBS})
+	endif()
+
+	# finalize the include path
 
 	axl_append_compile_flag_list(
 		_COMPILE_FLAGS
 		"-I"
-		${_DIR_FLAGS}
-		${_TARGET_FLAGS}
+		${_INCLUDE_DIRS}
 	)
 
 	# append extra flags passed in vararg and finalize list
