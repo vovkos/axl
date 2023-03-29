@@ -23,6 +23,12 @@ __asm__(".symver exp2, exp2@GLIBC_2.1");
 __asm__(".symver log,  log@GLIBC_2.0");
 __asm__(".symver log2, log2@GLIBC_2.1");
 __asm__(".symver pow,  pow@GLIBC_2.0");
+#elif (defined __aarch64__)
+__asm__(".symver exp,  exp@GLIBC_2.17");
+__asm__(".symver exp2, exp2@GLIBC_2.17");
+__asm__(".symver log,  log@GLIBC_2.17");
+__asm__(".symver log2, log2@GLIBC_2.17");
+__asm__(".symver pow,  pow@GLIBC_2.17");
 #else
 #	error unsupported CPU architecture
 #endif
