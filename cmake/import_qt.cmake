@@ -139,9 +139,18 @@ qt5_use_modules_alt
 	# ...
 )
 
-	get_target_property(_PREV_PIC ${_TARGET} POSITION_INDEPENDENT_CODE)
-	qt5_use_modules(${_TARGET} ${ARGN})
-	set_target_properties(${_TARGET} PROPERTIES POSITION_INDEPENDENT_CODE ${_PREV_PIC})
+	if(Qt5Core_VERSION_STRING VERSION_LESS 5.4.0)
+		get_target_property(_PREV_PIC ${_TARGET} POSITION_INDEPENDENT_CODE)
+		qt5_use_modules(${_TARGET} ${ARGN})
+		set_target_properties(${_TARGET} PROPERTIES POSITION_INDEPENDENT_CODE ${_PREV_PIC})
+	else() # on newer QTs, use imported targets
+		set(_MODULES ${ARGN})
+		set(_IMPORTS)
+		foreach(_MODULE ${_MODULES})
+			list(APPEND _IMPORTS "Qt5::${_MODULE}")
+		endforeach()
+		target_link_libraries(${_TARGET} ${_IMPORTS})
+	endif()
 endmacro()
 
 #...............................................................................
