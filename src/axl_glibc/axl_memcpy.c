@@ -15,6 +15,8 @@
 __asm__(".symver memcpy, memcpy@GLIBC_2.2.5");
 #elif (defined __i386__)
 __asm__(".symver memcpy, memcpy@GLIBC_2.0");
+#elif (defined __aarch64__)
+__asm__(".symver memcpy, memcpy@GLIBC_2.17");
 #else
 #	error unsupported CPU architecture
 #endif

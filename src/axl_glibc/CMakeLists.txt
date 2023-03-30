@@ -33,7 +33,15 @@ source_group(
 	${LIB_C_LIST}
 )
 
-if(NOT "${TARGET_CPU}" STREQUAL "x86")
+if(${TARGET_CPU} STREQUAL arm64)
+	axl_exclude_from_build(
+		axl_clock.c
+		axl_fcntl.c
+		axl_getenv.c
+		axl_memcpy.c
+		axl_spawn.c
+	)
+elseif(NOT "${TARGET_CPU}" STREQUAL "x86")
 	axl_exclude_from_build(axl_fcntl.c)
 endif()
 

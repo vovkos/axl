@@ -12,23 +12,26 @@
 #include <math.h>
 
 #if (defined __amd64__)
-__asm__(".symver exp,  exp@GLIBC_2.2.5");
-__asm__(".symver exp2, exp2@GLIBC_2.2.5");
-__asm__(".symver log,  log@GLIBC_2.2.5");
-__asm__(".symver log2, log2@GLIBC_2.2.5");
-__asm__(".symver pow,  pow@GLIBC_2.2.5");
+__asm__(".symver exp,   exp@GLIBC_2.2.5");
+__asm__(".symver exp2,  exp2@GLIBC_2.2.5");
+__asm__(".symver log,   log@GLIBC_2.2.5");
+__asm__(".symver log2,  log2@GLIBC_2.2.5");
+__asm__(".symver log2f, log2f@GLIBC_2.2.5");
+__asm__(".symver pow,   pow@GLIBC_2.2.5");
 #elif (defined __i386__)
-__asm__(".symver exp,  exp@GLIBC_2.0");
-__asm__(".symver exp2, exp2@GLIBC_2.1");
-__asm__(".symver log,  log@GLIBC_2.0");
-__asm__(".symver log2, log2@GLIBC_2.1");
-__asm__(".symver pow,  pow@GLIBC_2.0");
+__asm__(".symver exp,   exp@GLIBC_2.0");
+__asm__(".symver exp2,  exp2@GLIBC_2.1");
+__asm__(".symver log,   log@GLIBC_2.0");
+__asm__(".symver log2,  log2@GLIBC_2.1");
+__asm__(".symver log2f, log2f@GLIBC_2.1");
+__asm__(".symver pow,   pow@GLIBC_2.0");
 #elif (defined __aarch64__)
-__asm__(".symver exp,  exp@GLIBC_2.17");
-__asm__(".symver exp2, exp2@GLIBC_2.17");
-__asm__(".symver log,  log@GLIBC_2.17");
-__asm__(".symver log2, log2@GLIBC_2.17");
-__asm__(".symver pow,  pow@GLIBC_2.17");
+__asm__(".symver exp,   exp@GLIBC_2.17");
+__asm__(".symver exp2,  exp2@GLIBC_2.17");
+__asm__(".symver log,   log@GLIBC_2.17");
+__asm__(".symver log2,  log2@GLIBC_2.17");
+__asm__(".symver log2f, log2f@GLIBC_2.17");
+__asm__(".symver pow,   pow@GLIBC_2.17");
 #else
 #	error unsupported CPU architecture
 #endif
@@ -53,6 +56,11 @@ __wrap_log(double x) {
 double
 __wrap_log2(double x) {
 	return log2(x);
+}
+
+float
+__wrap_log2f(float x) {
+	return log2f(x);
 }
 
 double

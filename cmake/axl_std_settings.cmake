@@ -331,14 +331,12 @@ axl_create_gcc_settings)
 			ON
 		)
 
-		if("${TARGET_CPU}" STREQUAL "amd64" OR "${TARGET_CPU}" STREQUAL "x86")
+		if(${TARGET_CPU} MATCHES "^(x86|amd6|arm64)$")
 			option(
 				GCC_LINK_GLIBC_WRAPPERS
 				"Add wraps to a set of versioned GLIBC functions for improved compatibility"
 				ON
 			)
-		else()
-			unset(GCC_LINK_GLIBC_WRAPPERS CACHE)
 		endif()
 	endif()
 
@@ -445,7 +443,7 @@ axl_create_gcc_settings)
 
 	# these warnings only pop up with -Wmost (hardcoded by the Xcode generator)
 
-	if (CMAKE_GENERATOR MATCHES "Xcode")
+	if(CMAKE_GENERATOR MATCHES "Xcode")
 		axl_create_compiler_flag_setting(
 			GCC_FLAG_WARNING_MISSING_BRACES
 			DESCRIPTION "Warn about missing braces in aggregate initializers"
@@ -514,7 +512,7 @@ axl_apply_gcc_settings)
 	axl_apply_compiler_flag(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS ${_REGEX} ${GCC_LINK_FLAG_RDYNAMIC})
 	axl_apply_compiler_flag(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS ${_REGEX} ${GCC_LINK_FLAG_RDYNAMIC})
 
-	if (NOT APPLE)
+	if(NOT APPLE)
 		if(GCC_LINK_EXPORTLESS_EXE)
 			set(_VERSION_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/exportless-exe.version")
 			file(WRITE ${_VERSION_SCRIPT} "{ local: *; };")
@@ -522,25 +520,40 @@ axl_apply_gcc_settings)
 		endif()
 
 		if(GCC_LINK_GLIBC_WRAPPERS)
-			set(
-				_FUNC_LIST
-				memcpy
-				posix_spawn
-				posix_spawnp
-				clock_gettime
-				secure_getenv
-				pow
-				exp
-				exp2
-				log
-				log2
-			)
+			if(${TARGET_CPU} STREQUAL arm64)
+				set(
+					_FUNC_LIST
+					pow
+					exp
+					exp2
+					log
+					log2
+					log2f
+				)
 
-			set(_WRAPPER_FLAGS "-u __wrap_memcpy -Wl") # link memcpy even if not directly called (used in libstdc++)
+				set(_WRAPPER_FLAGS "-Wl")
+			else() # x86/amd64
+				set(
+					_FUNC_LIST
+					memcpy
+					posix_spawn
+					posix_spawnp
+					clock_gettime
+					secure_getenv
+					pow
+					exp
+					exp2
+					log
+					log2
+					log2f
+				)
 
-			if (${TARGET_CPU} STREQUAL "x86")
-				set(_WRAPPER_FLAGS "-u __wrap_fcntl ${_WRAPPER_FLAGS}") # link fcntl even if not directly called (used when compiled with -coverage)
-				list(APPEND _FUNC_LIST fcntl)
+				set(_WRAPPER_FLAGS "-u __wrap_memcpy -Wl") # link memcpy even if not directly called (used in libstdc++)
+
+				if(${TARGET_CPU} STREQUAL "x86")
+					set(_WRAPPER_FLAGS "-u __wrap_fcntl ${_WRAPPER_FLAGS}") # link fcntl even if not directly called (used when compiled with -coverage)
+					list(APPEND _FUNC_LIST fcntl)
+				endif()
 			endif()
 
 			foreach (_FUNC ${_FUNC_LIST})
