@@ -458,9 +458,13 @@ private: \
 #	define AXL_SRC_POS  __FILE__ "(" AXL_ITOA(__LINE__) ")"
 #	define AXL_TODO(s) __pragma(message(AXL_SRC_POS ": TODO: " s))
 #elif (_AXL_CPP_GCC)
-#	define AXL_SRC_POS  __FILE__ ":" AXL_ITOA(__LINE__)
-#	define AXL_PRAGMA_IMPL(p) _Pragma(#p)
-#	define AXL_TODO(s) AXL_PRAGMA_IMPL(message "TODO: " s)
+#	if (_AXL_TODO)
+#		define AXL_SRC_POS  __FILE__ ":" AXL_ITOA(__LINE__)
+#		define AXL_PRAGMA_IMPL(p) _Pragma(#p)
+#		define AXL_TODO(s) AXL_PRAGMA_IMPL(message "TODO: " s)
+#	else
+#		define AXL_TODO(s)
+#	endif
 #endif
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

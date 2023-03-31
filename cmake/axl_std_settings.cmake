@@ -244,6 +244,12 @@ axl_create_gcc_settings)
 		ON
 	)
 
+	option(
+		GCC_USE_AXL_TODO
+		"Use AXL_TODO macros to generate #pragma message (generates verbose output on GCC)"
+		OFF
+	)
+
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_SHOW_INCLUDES
 		DESCRIPTION "GNU C++ shows include stack during compilation"
@@ -499,6 +505,9 @@ endmacro()
 
 macro(
 axl_apply_gcc_settings)
+	if(GCC_USE_AXL_TODO)
+		add_definitions(-D_AXL_TODO=1)
+	endif()
 
 	if(NOT "${GCC_FLAG_SANITIZER_DEBUG}" STREQUAL " " AND CMAKE_GENERATOR MATCHES "Xcode")
 
