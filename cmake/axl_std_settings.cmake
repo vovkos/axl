@@ -630,7 +630,7 @@ axl_create_std_settings)
 		set(LINUX TRUE)
 	endif()
 
-	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 		set(CLANG TRUE)
 		set(GCC TRUE)
 	elseif(CMAKE_COMPILER_IS_GNUCXX)
