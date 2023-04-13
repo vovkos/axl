@@ -122,6 +122,21 @@ target_precompile_headers(
 	${PCH_H}
 )
 
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+add_library(
+	axl_io_usb_error
+	axl_io_UsbError.cpp
+)
+
+target_precompile_headers(
+	axl_io_usb_error
+	REUSE_FROM
+	axl_io_usb
+)
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 axl_install_redirected_includes(
 	${AXL_INSTALL_INC_SUBDIR}
 	axl_io_usb
@@ -129,7 +144,9 @@ axl_install_redirected_includes(
 )
 
 install(
-	TARGETS axl_io_usb
+	TARGETS
+		axl_io_usb
+		axl_io_usb_error
 	DESTINATION ${AXL_INSTALL_LIB_SUBDIR}
 )
 
