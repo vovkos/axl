@@ -1178,8 +1178,11 @@ axl_add_twin_library
 	_NEW_TARGET
 	_OLD_TARGET
 	_EXCLUDE_PATTERN
-	_PCH_H
 )
+
+	if("${_EXCLUDE_PATTERN}" STREQUAL "")
+		set(_EXCLUDE_PATTERN "^$")
+	endif()
 
 	# create a new twin library target
 
@@ -1209,13 +1212,17 @@ axl_add_twin_library
 		${_SOURCE_PATH_LIST}
 	)
 
-	if(NOT "${_PCH_H}" STREQUAL "")
-		target_precompile_headers(
-			${_NEW_TARGET}
-			PRIVATE
-			${_PCH_H}
-		)
-	endif()
+	get_target_property(
+		_PCH_LIST
+		${_OLD_TARGET}
+		PRECOMPILE_HEADERS
+	)
+
+	target_precompile_headers(
+		${_NEW_TARGET}
+		PRIVATE
+		${_PCH_LIST}
+	)
 endmacro()
 
 #...............................................................................
