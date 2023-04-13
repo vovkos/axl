@@ -48,7 +48,6 @@ source_group(
 #
 
 set(PCH_H   pch.h)
-set(PCH_CPP pch.cpp)
 
 set(
 	PCH_H_LIST
@@ -60,7 +59,6 @@ source_group(
 	pch
 	FILES
 	${PCH_H_LIST}
-	${PCH_CPP}
 )
 
 #...............................................................................
@@ -73,15 +71,14 @@ include_directories(${AXL_INC_DIR})
 add_library(
 	axl_cf
 	${PCH_H_LIST}
-	${PCH_CPP}
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
 )
 
-axl_set_pch(
+target_precompile_headers(
 	axl_cf
+	PRIVATE
 	${PCH_H}
-	${PCH_CPP}
 )
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

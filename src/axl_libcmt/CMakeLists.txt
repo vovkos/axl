@@ -34,7 +34,6 @@ foreach(_LIB ${AXL_LIBCMT_TWIN_LIB_LIST})
 		${_LIB}
 		"_psx_|_lnx_|_drw_|.c$"
 		pch.h
-		pch.cpp
 	)
 endforeach()
 

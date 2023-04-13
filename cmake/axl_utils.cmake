@@ -717,269 +717,6 @@ endmacro()
 
 #...............................................................................
 
-# precompiled headers
-
-macro(
-axl_set_pch_msvc
-	_TARGET
-	_PCH_H
-	_PCH_CPP
-)
-
-	get_filename_component(_PCH_NAME ${_PCH_H} NAME_WE)
-	set(_PCH_BIN "${CMAKE_CURRENT_BINARY_DIR}/${_TARGET}.dir/$(Configuration)/${_PCH_NAME}.pch")
-
-	set_property(
-		TARGET ${_TARGET}
-		APPEND_STRING
-		PROPERTY COMPILE_FLAGS
-		" /Yu\"${_PCH_H}\" /Fp\"${_PCH_BIN}\""
-	)
-
-	set_property(
-		SOURCE ${_PCH_CPP}
-		APPEND_STRING
-		PROPERTY COMPILE_FLAGS
-		" /Yc\"${_PCH_H}\" /Fp\"${_PCH_BIN}\""
-	)
-
-	set_source_files_properties(
-		${_PCH_CPP}
-		PROPERTIES
-		OBJECT_OUTPUTS "${_PCH_BIN}"
-	)
-endmacro()
-
-macro(
-axl_append_compile_flag_list
-	_FLAGS
-	_PREFIX
-	# ...
-)
-
-	set(_ARG_LIST ${ARGN})
-
-	foreach(_ARG ${_ARG_LIST})
-		if(_ARG)
-			if("${_PREFIX}" STREQUAL "-I" AND ${_ARG} MATCHES "\\.framework/?$")
-				string(REGEX REPLACE "/[^/]+\\.framework" "" _FRAMEWORK "${_ARG}")
-				list(APPEND ${_FLAGS} "-F${_FRAMEWORK}")
-			else()
-				list(APPEND ${_FLAGS} "${_PREFIX}${_ARG}")
-			endif()
-		endif()
-	endforeach()
-endmacro()
-
-macro(
-axl_add_import_include_dirs
-	_RESULT
-	# ...
-)
-	set(_LIB_LIST ${ARGN})
-
-	foreach(_LIB ${_LIB_LIST})
-		if(NOT TARGET ${_LIB})
-			continue()
-		endif()
-
-		get_target_property(_IS_IMPORTED ${_LIB} IMPORTED)
-		if (NOT _IS_IMPORTED)
-			continue()
-		endif()
-
-		get_target_property(_DIRS ${_LIB} INTERFACE_INCLUDE_DIRECTORIES)
-		if(_DIRS)
-			list(APPEND ${_RESULT} ${_DIRS})
-		endif()
-
-		get_target_property(_DEPS ${_LIB} INTERFACE_LINK_LIBRARIES)
-		if(_DEPS)
-			axl_add_import_include_dirs(${_RESULT} ${_DEPS})
-		endif()
-	endforeach()
-endmacro()
-
-macro(
-axl_set_pch_gcc
-	_TARGET
-	_PCH_H
-	_PCH_CPP
-	# ...
-)
-
-	set(_EXTRA_FLAG_LIST ${ARGN})
-
-	# select file paths: we need to generate a force-included header
-	# in binary directory and precompiled header binary *NEXT* to it
-
-	set(_PCH_PROXY_H "${CMAKE_CURRENT_BINARY_DIR}/${_PCH_CPP}.h")
-	set(_PCH_BIN "${_PCH_PROXY_H}.gch")
-
-	# choose compiler and language by extension
-
-	get_filename_component(_EXT ${_PCH_CPP} EXT)
-
-	if("${_EXT}" STREQUAL ".c")
-		set(_COMPILER ${CMAKE_C_COMPILER})
-		set(_PCH_FLAGS "-x" "c-header")
-		set(_LANGUAGE "C")
-	else()
-		set(_COMPILER ${CMAKE_CXX_COMPILER})
-		set(_PCH_FLAGS "-x" "c++-header")
-		set(_LANGUAGE "CXX")
-	endif()
-
-	# start with compile flags global variables
-
-	string(TOUPPER "${CMAKE_BUILD_TYPE}" _CONFIGURATION)
-
-	set(_COMPILE_FLAGS "${CMAKE_${_LANGUAGE}_COMPILER_ARG1} ${CMAKE_${_LANGUAGE}_FLAGS} ${CMAKE_${_LANGUAGE}_FLAGS_${_CONFIGURATION}}")
-
-	# get and append COMPILE_FLAGS property
-
-	get_directory_property(_DIR_FLAGS COMPILE_FLAGS)
-	get_target_property(_TARGET_FLAGS ${_TARGET} COMPILE_FLAGS)
-
-	if(_DIR_FLAGS)
-		set(_COMPILE_FLAGS "${_COMPILE_FLAGS} ${_DIR_FLAGS}")
-	endif()
-
-	if(_TARGET_FLAGS)
-		set(_COMPILE_FLAGS "${_COMPILE_FLAGS} ${_TARGET_FLAGS}")
-	endif()
-
-	# turn it into a list
-
-	string(STRIP "${_COMPILE_FLAGS}" _COMPILE_FLAGS)
-	string(REGEX REPLACE " +" ";" _COMPILE_FLAGS "${_COMPILE_FLAGS}")
-
-	# get and append COMPILE_DEFINITIONS property
-
-	get_directory_property(_DIR_FLAGS COMPILE_DEFINITIONS)
-	get_directory_property(_DIR_FLAGS_2 COMPILE_DEFINITIONS_${_CONFIGURATION})
-	get_target_property(_TARGET_FLAGS ${_TARGET} COMPILE_DEFINITIONS)
-	get_target_property(_TARGET_FLAGS_2 ${_TARGET} COMPILE_DEFINITIONS_${_CONFIGURATION})
-
-	axl_append_compile_flag_list(
-		_COMPILE_FLAGS
-		"-D"
-		${_DIR_FLAGS}
-		${_DIR_FLAGS_2}
-		${_TARGET_FLAGS}
-		${_TARGET_FLAGS_2}
-	)
-
-	# add -isysroot on MacOS
-
-	if(APPLE AND NOT "${CMAKE_OSX_SYSROOT}" STREQUAL "")
-		list(
-			APPEND
-			_COMPILE_FLAGS
-			"-isysroot"
-			"${CMAKE_OSX_SYSROOT}"
-		)
-	endif()
-
-	set(_INCLUDE_DIRS)
-
-	# collect includes of the current directory...
-
-	get_directory_property(_DIRS INCLUDE_DIRECTORIES)
-	list(APPEND _INCLUDE_DIRS ${_DIRS})
-
-	# ... then includes of the target
-
-	get_target_property(_DIRS ${_TARGET} INCLUDE_DIRECTORIES)
-	list(APPEND _INCLUDE_DIRS ${_DIRS})
-
-	# ... then includes of imported targets
-
-	get_target_property(_LIBS ${_TARGET} LINK_LIBRARIES)
-	if(_LIBS)
-		axl_add_import_include_dirs(_INCLUDE_DIRS ${_LIBS})
-	endif()
-
-	# finalize the include path
-
-	axl_append_compile_flag_list(
-		_COMPILE_FLAGS
-		"-I"
-		${_INCLUDE_DIRS}
-	)
-
-	# append extra flags passed in vararg and finalize list
-
-	if(_EXTRA_FLAG_LIST)
-		list(APPEND _COMPILE_FLAGS "${_EXTRA_FLAG_LIST}")
-	endif()
-
-	list(REMOVE_DUPLICATES _COMPILE_FLAGS)
-
-	# create pch proxy header file and custom command to build pch binary
-
-	if(NOT EXISTS ${_PCH_PROXY_H})
-		file(
-			WRITE ${_PCH_PROXY_H}
-			"\#include \"${CMAKE_CURRENT_SOURCE_DIR}/${_PCH_H}\"\n"
-		)
-	endif()
-
-	add_custom_command(
-		OUTPUT ${_PCH_BIN}
-		MAIN_DEPENDENCY ${_PCH_H}
-		DEPENDS ${_PCH_PROXY_H}
-		COMMAND
-			${_COMPILER}
-			${_COMPILE_FLAGS}
-			${_PCH_FLAGS}
-			"-o" ${_PCH_BIN}
-			"-c" ${_PCH_PROXY_H}
-		)
-
-	# modify target
-
-	target_include_directories(
-		${_TARGET}
-		PUBLIC
-		${CMAKE_CURRENT_BINARY_DIR}
-	)
-
-	set_property(
-		TARGET ${_TARGET}
-		APPEND_STRING
-		PROPERTY COMPILE_FLAGS
-		" -include \"${_PCH_PROXY_H}\""
-	)
-
-	# add dependencies between target and pch binary
-
-	add_custom_target(
-		${_TARGET}_pch
-		DEPENDS ${_PCH_BIN}
-	)
-
-	add_dependencies(${_TARGET} ${_TARGET}_pch)
-endmacro()
-
-macro(
-axl_set_pch
-	_TARGET
-	_PCH_H
-	_PCH_CPP
-)
-	if(MSVC AND MSVC_USE_PCH)
-		axl_set_pch_msvc(${_TARGET} ${_PCH_H} ${_PCH_CPP} ${ARGN})
-	elseif(GCC AND GCC_USE_PCH AND NOT CMAKE_GENERATOR MATCHES "Xcode")
-		# Xcode adds a lot of compiler flags on its own, so it's hard to create
-		# a proper command line by hand
-
-		axl_set_pch_gcc(${_TARGET} ${_PCH_H} ${_PCH_CPP} ${ARGN})
-	endif()
-endmacro()
-
-#...............................................................................
-
 # exclude files from build (but keep it in project tree)
 
 macro(
@@ -987,11 +724,11 @@ axl_set_header_file_only
 	_IS_HEADER_FILE_ONLY
 	# ...
 )
-
 	set_source_files_properties(
 		${ARGN}
 		PROPERTIES
 		HEADER_FILE_ONLY ${_IS_HEADER_FILE_ONLY}
+		SKIP_PRECOMPILE_HEADERS ${_IS_HEADER_FILE_ONLY}
 	)
 endmacro()
 
@@ -1442,7 +1179,6 @@ axl_add_twin_library
 	_OLD_TARGET
 	_EXCLUDE_PATTERN
 	_PCH_H
-	_PCH_CPP
 )
 
 	# create a new twin library target
@@ -1474,10 +1210,10 @@ axl_add_twin_library
 	)
 
 	if(NOT "${_PCH_H}" STREQUAL "")
-		axl_set_pch(
+		target_precompile_headers(
 			${_NEW_TARGET}
+			PRIVATE
 			${_PCH_H}
-			${_SOURCE_DIR}/${_PCH_CPP}
 		)
 	endif()
 endmacro()

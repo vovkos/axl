@@ -68,13 +68,11 @@ endif()
 #
 
 set(PCH_H   pch.h)
-set(PCH_CPP pch.cpp)
 
 source_group(
 	pch
 	FILES
 	${PCH_H}
-	${PCH_CPP}
 )
 
 #...............................................................................
@@ -87,16 +85,15 @@ include_directories(${AXL_INC_DIR})
 add_library(
 	axl_spy
 	${PCH_H}
-	${PCH_CPP}
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
 	${LIB_ASM_LIST}
 )
 
-axl_set_pch(
+target_precompile_headers(
 	axl_spy
+	PRIVATE
 	${PCH_H}
-	${PCH_CPP}
 )
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

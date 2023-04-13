@@ -68,13 +68,11 @@ source_group(
 #
 
 set(PCH_H   pch.h)
-set(PCH_CPP pch.cpp)
 
 source_group(
 	pch
 	FILES
 	${PCH_H}
-	${PCH_CPP}
 )
 
 #...............................................................................
@@ -97,7 +95,6 @@ add_definitions(
 add_executable(
 	axl_test_qt
 	${PCH_H}
-	${PCH_CPP}
 	${SRC_H_LIST}
 	${SRC_CPP_LIST}
 	${GEN_MOC_CPP_LIST}
@@ -105,10 +102,10 @@ add_executable(
 
 qt5_use_modules_alt(axl_test_qt Widgets)
 
-axl_set_pch(
+target_precompile_headers(
 	axl_test_qt
+	PRIVATE
 	${PCH_H}
-	${PCH_CPP}
 )
 
 set_target_properties(
