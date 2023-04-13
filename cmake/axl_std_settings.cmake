@@ -447,6 +447,13 @@ axl_create_gcc_settings)
 		"-Wc++11-extensions" "-Wno-c++11-extensions"
 	)
 
+	axl_create_compiler_flag_setting(
+		GCC_FLAG_WARNING_UNUSED_VALUE
+		DESCRIPTION "Warn about unused expressions"
+		DEFAULT "-Wno-unused-value"
+		"-Wunused-value" "-Wno-unused-value"
+	)
+
 	# these warnings only pop up with -Wmost (hardcoded by the Xcode generator)
 
 	if(CMAKE_GENERATOR MATCHES "Xcode")
@@ -462,13 +469,6 @@ axl_create_gcc_settings)
 			DESCRIPTION "Warn about unused variables"
 			DEFAULT "-Wno-unused-variable"
 			"-Wunused-variable" "-Wno-unused-variable"
-		)
-
-		axl_create_compiler_flag_setting(
-			GCC_FLAG_WARNING_UNUSED_VALUE
-			DESCRIPTION "Warn about unused expressions"
-			DEFAULT "-Wno-unused-value"
-			"-Wunused-value" "-Wno-unused-value"
 		)
 
 		axl_create_compiler_flag_setting(
