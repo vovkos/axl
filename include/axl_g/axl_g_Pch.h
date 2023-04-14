@@ -626,6 +626,8 @@ axl_trace(
 
 //..............................................................................
 
+// warnings suppression (GCC loses diagnostic pragmas defined in PCHs)
+
 #if (_AXL_CPP_MSC)
 #	pragma warning(disable: 4091) // warning C4091: 'typedef ': ignored on left of '...' when no variable is declared
 #	pragma warning(disable: 4146) // warning C4146: unary minus operator applied to unsigned type, result still unsigned
