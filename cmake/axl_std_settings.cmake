@@ -347,14 +347,37 @@ axl_create_gcc_settings)
 	endif()
 
 	# alas, warning suppressions must be passed in command line, not pragma-ed
-	# that is because GCC diagnostic pragmas get lost if defined in precompiled headers
+	# that is because GCC diagnostic pragmas are lost if defined in precompiled headers
 
-	axl_create_compiler_flag_setting(
-		GCC_FLAG_WARNING_UNKNOWN_WARNING_OPTION
-		DESCRIPTION "Warn about unknown warning command-line options"
-		DEFAULT "-Wno-unknown-warning-option"
-		"-Wunknown-warning-option" "-Wno-unknown-warning-option"
-	)
+	if(CLANG) # clang-specific warnings
+		axl_create_compiler_flag_setting(
+			GCC_FLAG_WARNING_UNKNOWN_WARNING_OPTION
+			DESCRIPTION "Warn about unknown warning command-line options"
+			DEFAULT "-Wno-unknown-warning"
+			"-Wunknown-warning-option" "-Wno-unknown-warning-option"
+		)
+
+		axl_create_compiler_flag_setting(
+			GCC_FLAG_WARNING_LOGICAL_OP_PARENTHESES
+			DESCRIPTION "Warn about '&&' within '||'"
+			DEFAULT "-Wno-logical-op-parentheses"
+			"-Wlogical-op-parentheses" "-Wno-logical-op-parentheses"
+		)
+
+		axl_create_compiler_flag_setting(
+			GCC_FLAG_WARNING_INCOMPATIBLE_MS_STRUCT
+			DESCRIPTION "Warn about possible layout incompatibilities with MS compilers"
+			DEFAULT "-Wno-incompatible-ms-struct"
+			"-Wincompatible-ms-struct" "-Wno-incompatible-ms-struct"
+		)
+	else() # GCC-specific warnings
+		axl_create_compiler_flag_setting(
+			GCC_FLAG_WARNING_UNKNOWN_WARNING
+			DESCRIPTION "Warn about unknown warning command-line options"
+			DEFAULT "-Wno-unknown-warning"
+			"-Wunknown-warning" "-Wno-unknown-warning"
+		)
+	endif()
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_WARNING_DEPRECATED_DECLARATIONS
@@ -378,24 +401,10 @@ axl_create_gcc_settings)
 	)
 
 	axl_create_compiler_flag_setting(
-		GCC_FLAG_WARNING_INCOMPATIBLE_MS_STRUCT
-		DESCRIPTION "Warn about possible layout incompatibilities with MS compilers"
-		DEFAULT "-Wno-incompatible-ms-struct"
-		"-Wincompatible-ms-struct" "-Wno-incompatible-ms-struct"
-	)
-
-	axl_create_compiler_flag_setting(
 		GCC_FLAG_WARNING_DANGLING_ELSE
 		DESCRIPTION "Warn about dangling else without explicit braces"
 		DEFAULT "-Wno-dangling-else"
 		"-Wdangling-else" "-Wno-dangling-else"
-	)
-
-	axl_create_compiler_flag_setting(
-		GCC_FLAG_WARNING_LOGICAL_OP_PARENTHESES
-		DESCRIPTION "Warn about '&&' within '||'"
-		DEFAULT "-Wno-logical-op-parentheses"
-		"-Wlogical-op-parentheses" "-Wno-logical-op-parentheses"
 	)
 
 	axl_create_compiler_flag_setting(
@@ -407,7 +416,7 @@ axl_create_gcc_settings)
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_WARNING_STRINGOP_OVERFLOW
-		DESCRIPTION "Warn for calls to memcpy/strcpy which(GCC thinks) might overflow the buffer"
+		DESCRIPTION "Warn for calls to memcpy/strcpy which (GCC thinks) might overflow the buffer"
 		DEFAULT "-Wno-stringop-overflow"
 		"-Wstringop-overflow"
 		"-Wstringop-overflow=1"
@@ -415,6 +424,14 @@ axl_create_gcc_settings)
 		"-Wstringop-overflow=3"
 		"-Wstringop-overflow=4"
 		"-Wno-stringop-overflow"
+	)
+
+	axl_create_compiler_flag_setting(
+		GCC_FLAG_WARNING_STRINGOP_OVERREAD
+		DESCRIPTION "Warn for calls to memcpy/strcpy which (GCC thinks) might overread from the buffer"
+		DEFAULT "-Wno-stringop-overread"
+		"-Wstringop-overread"
+		"-Wno-stringop-overread"
 	)
 
 	# C++ specific warnings
