@@ -353,7 +353,7 @@ axl_create_gcc_settings)
 		axl_create_compiler_flag_setting(
 			GCC_FLAG_WARNING_UNKNOWN_WARNING_OPTION
 			DESCRIPTION "Warn about unknown warning command-line options"
-			DEFAULT "-Wno-unknown-warning"
+			DEFAULT "-Wno-unknown-warning-option"
 			"-Wunknown-warning-option" "-Wno-unknown-warning-option"
 		)
 
@@ -377,6 +377,26 @@ axl_create_gcc_settings)
 			DEFAULT "-Wno-unknown-warning"
 			"-Wunknown-warning" "-Wno-unknown-warning"
 		)
+
+		axl_create_compiler_flag_setting(
+			GCC_FLAG_WARNING_STRINGOP_OVERFLOW
+			DESCRIPTION "Warn for calls to memcpy/strcpy which (GCC thinks) might overflow the buffer"
+			DEFAULT "-Wno-stringop-overflow"
+			"-Wstringop-overflow"
+			"-Wstringop-overflow=1"
+			"-Wstringop-overflow=2"
+			"-Wstringop-overflow=3"
+			"-Wstringop-overflow=4"
+			"-Wno-stringop-overflow"
+		)
+
+		axl_create_compiler_flag_setting(
+			GCC_FLAG_WARNING_STRINGOP_OVERREAD
+			DESCRIPTION "Warn for calls to memcpy/strcpy which (GCC thinks) might overread from the buffer"
+			DEFAULT "-Wno-stringop-overread"
+			"-Wstringop-overread"
+			"-Wno-stringop-overread"
+		)		
 	endif()
 
 	axl_create_compiler_flag_setting(
@@ -412,26 +432,6 @@ axl_create_gcc_settings)
 		DESCRIPTION "Warn about missing case values in a switch statement"
 		DEFAULT "-Wno-switch"
 		"-Wswitch" "-Wno-switch"
-	)
-
-	axl_create_compiler_flag_setting(
-		GCC_FLAG_WARNING_STRINGOP_OVERFLOW
-		DESCRIPTION "Warn for calls to memcpy/strcpy which (GCC thinks) might overflow the buffer"
-		DEFAULT "-Wno-stringop-overflow"
-		"-Wstringop-overflow"
-		"-Wstringop-overflow=1"
-		"-Wstringop-overflow=2"
-		"-Wstringop-overflow=3"
-		"-Wstringop-overflow=4"
-		"-Wno-stringop-overflow"
-	)
-
-	axl_create_compiler_flag_setting(
-		GCC_FLAG_WARNING_STRINGOP_OVERREAD
-		DESCRIPTION "Warn for calls to memcpy/strcpy which (GCC thinks) might overread from the buffer"
-		DEFAULT "-Wno-stringop-overread"
-		"-Wstringop-overread"
-		"-Wno-stringop-overread"
 	)
 
 	# C++ specific warnings
