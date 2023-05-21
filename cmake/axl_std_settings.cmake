@@ -337,7 +337,7 @@ axl_create_gcc_settings)
 			ON
 		)
 
-		if(${TARGET_CPU} MATCHES "^(x86|amd6|arm64)$")
+		if(${TARGET_CPU} MATCHES "^(x86|amd64|arm64)$")
 			option(
 				GCC_LINK_GLIBC_WRAPPERS
 				"Add wraps to a set of versioned GLIBC functions for improved compatibility"
