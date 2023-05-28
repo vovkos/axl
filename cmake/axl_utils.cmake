@@ -1132,23 +1132,46 @@ endmacro()
 macro(
 axl_install_redirected_includes
 	_TARGET_DIR
-	_SUB_DIR
 	# ...
 )
 
 	set(_H_LIST ${ARGN})
-
-	install(
-		FILES ${_H_LIST}
-		DESTINATION ${_TARGET_DIR}/${_SUB_DIR}
-	)
-
+	set(_CUR_SUB_DIR)
+	set(_MAIN_H_LIST)
 	set(_REDIR_H_LIST)
 
-	foreach(_FILE ${LIB_H_LIST})
-		string(REPLACE "/${_SUB_DIR}/" "/" _FILE ${_FILE})
-		list(APPEND _REDIR_H_LIST ${_FILE})
+	foreach(_FILE ${_H_LIST})
+		if("${_FILE}" MATCHES ".+/[^/]+/[^/]+\\.h")
+			string(REGEX REPLACE ".+/([^/]+)/[^/]+\\.h" "\\1" _SUB_DIR ${_FILE})
+			string(REGEX REPLACE "(.+)/([^/]+)/([^/]+\\.h)" "\\1/\\3" _REDIR_H ${_FILE})
+
+			if(NOT "${_SUB_DIR}" STREQUAL "${_CUR_SUB_DIR}")
+				if(_MAIN_H_LIST)
+					install(
+						FILES ${_MAIN_H_LIST}
+						DESTINATION ${_TARGET_DIR}/${_CUR_SUB_DIR}
+					)
+
+					install(
+						FILES ${_REDIR_H_LIST}
+						DESTINATION ${_TARGET_DIR}
+					)
+				endif()
+
+				set(_CUR_SUB_DIR ${_SUB_DIR})
+				set(_MAIN_H_LIST)
+				set(_REDIR_H_LIST)
+			endif()
+
+			list(APPEND _MAIN_H_LIST ${_FILE})
+			list(APPEND _REDIR_H_LIST ${_REDIR_H})
+		endif()
 	endforeach()
+
+	install(
+		FILES ${_MAIN_H_LIST}
+		DESTINATION ${_TARGET_DIR}/${_CUR_SUB_DIR}
+	)
 
 	install(
 		FILES ${_REDIR_H_LIST}

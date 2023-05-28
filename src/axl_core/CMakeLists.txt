@@ -522,50 +522,19 @@ target_precompile_headers(
 
 axl_install_redirected_includes(
 	${AXL_INSTALL_INC_SUBDIR}
-	axl_g
+	${PCH_H_LIST}
 	${G_H_LIST}
-)
-
-axl_install_redirected_includes(
-	${AXL_INSTALL_INC_SUBDIR}
-	axl_err
-	${ERR_H_LIST}
-)
-
-axl_install_redirected_includes(
-	${AXL_INSTALL_INC_SUBDIR}
-	axl_mem
 	${MEM_H_LIST}
-)
-
-axl_install_redirected_includes(
-	${AXL_INSTALL_INC_SUBDIR}
-	axl_ref
-	${REF_H_LIST}
-)
-
-axl_install_redirected_includes(
-	${AXL_INSTALL_INC_SUBDIR}
-	axl_sl
+	${RC_H_LIST}
+	${ERR_H_LIST}
 	${SL_H_LIST}
-)
-
-axl_install_redirected_includes(
-	${AXL_INSTALL_INC_SUBDIR}
-	axl_enc
 	${ENC_H_LIST}
-)
-
-axl_install_redirected_includes(
-	${AXL_INSTALL_INC_SUBDIR}
-	axl_sys
 	${SYS_H_LIST}
 )
 
 if(WIN32)
 	axl_install_redirected_includes(
 		${AXL_INSTALL_INC_SUBDIR}
-		axl_sys_win
 		${SYS_WIN_H_LIST}
 	)
 endif()
@@ -573,7 +542,6 @@ endif()
 if(UNIX)
 	axl_install_redirected_includes(
 		${AXL_INSTALL_INC_SUBDIR}
-		axl_sys_psx
 		${SYS_PSX_H_LIST}
 	)
 endif()
@@ -581,7 +549,6 @@ endif()
 if(LINUX)
 	axl_install_redirected_includes(
 		${AXL_INSTALL_INC_SUBDIR}
-		axl_sys_lnx
 		${SYS_LNX_H_LIST}
 	)
 endif()
@@ -589,7 +556,6 @@ endif()
 if(APPLE)
 	axl_install_redirected_includes(
 		${AXL_INSTALL_INC_SUBDIR}
-		axl_sys_drw
 		${SYS_DRW_H_LIST}
 	)
 endif()

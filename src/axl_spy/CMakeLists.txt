@@ -69,6 +69,12 @@ endif()
 
 set(PCH_H   pch.h)
 
+set(
+	PCH_H_LIST
+	${PCH_H}
+	${AXL_INC_DIR}/axl_spy/axl_spy_Pch.h
+)
+
 source_group(
 	pch
 	FILES
@@ -84,7 +90,7 @@ include_directories(${AXL_INC_DIR})
 
 add_library(
 	axl_spy
-	${PCH_H}
+	${PCH_H_LIST}
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
 	${LIB_ASM_LIST}
@@ -100,7 +106,7 @@ target_precompile_headers(
 
 axl_install_redirected_includes(
 	${AXL_INSTALL_INC_SUBDIR}
-	axl_spy
+	${PCH_H_LIST}
 	${LIB_H_LIST}
 )
 

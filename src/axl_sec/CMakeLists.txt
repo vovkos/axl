@@ -76,8 +76,8 @@ target_precompile_headers(
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 axl_install_redirected_includes(
-	${INSTALL_INCLUDE_DIR}
-	axl_sec
+	${AXL_INSTALL_INC_SUBDIR}
+	${PCH_H_LIST}
 	${LIB_H_LIST}
 )
 

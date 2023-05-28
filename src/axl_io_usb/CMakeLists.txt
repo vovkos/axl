@@ -139,9 +139,16 @@ target_precompile_headers(
 
 axl_install_redirected_includes(
 	${AXL_INSTALL_INC_SUBDIR}
-	axl_io_usb
+	${PCH_H_LIST}
 	${LIB_H_LIST}
 )
+
+if(WIN32)
+	axl_install_redirected_includes(
+		${AXL_INSTALL_INC_SUBDIR}
+		${LIB_WIN_H_LIST}
+	)
+endif()
 
 install(
 	TARGETS

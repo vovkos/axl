@@ -229,14 +229,13 @@ target_precompile_headers(
 
 axl_install_redirected_includes(
 	${AXL_INSTALL_INC_SUBDIR}
-	axl_io
+	${PCH_H_LIST}
 	${LIB_H_LIST}
 )
 
 if(WIN32)
 	axl_install_redirected_includes(
 		${AXL_INSTALL_INC_SUBDIR}
-		axl_io_win
 		${LIB_WIN_H_LIST}
 	)
 endif()
@@ -244,7 +243,6 @@ endif()
 if(UNIX)
 	axl_install_redirected_includes(
 		${AXL_INSTALL_INC_SUBDIR}
-		axl_io_psx
 		${LIB_PSX_H_LIST}
 	)
 endif()

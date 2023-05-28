@@ -137,9 +137,23 @@ target_precompile_headers(
 
 axl_install_redirected_includes(
 	${AXL_INSTALL_INC_SUBDIR}
-	axl_io_usbmon
+	${PCH_H_LIST}
 	${LIB_H_LIST}
 )
+
+if(WIN32)
+	axl_install_redirected_includes(
+		${AXL_INSTALL_INC_SUBDIR}
+		${LIB_WIN_H_LIST}
+	)
+endif()
+
+if(LINUX)
+	axl_install_redirected_includes(
+		${AXL_INSTALL_INC_SUBDIR}
+		${LIB_LNX_H_LIST}
+	)
+endif()
 
 install(
 	TARGETS axl_io_usbmon
