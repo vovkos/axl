@@ -59,10 +59,11 @@ source_group(
 # axl_sys_ca library
 #
 
-include_directories(
-	${OPENSSL_INC_DIR}
-	${AXL_INC_DIR}
-)
+include_directories(${AXL_INC_DIR})
+
+if(LINUX)
+	include_directories(${OPENSSL_INC_DIR})
+endif()
 
 add_definitions(-D_AXL_SYS_CA=1)
 
