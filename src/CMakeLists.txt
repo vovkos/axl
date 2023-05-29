@@ -304,7 +304,7 @@ endif()
 
 #...............................................................................
 
-if(OPENSSL_FOUND)
+if((NOT LINUX) OR OPENSSL_FOUND)
 	option(
 		BUILD_AXL_SYS_CA
 		"Build axl_sys_ca library (code authentication)"
