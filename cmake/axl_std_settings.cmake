@@ -546,6 +546,8 @@ axl_apply_gcc_settings)
 		endif()
 
 		if(GCC_LINK_GLIBC_WRAPPERS)
+			set(_FORCE_FUNC_LIST)
+
 			if(${TARGET_CPU} STREQUAL arm64)
 				set(
 					_FUNC_LIST
@@ -556,8 +558,6 @@ axl_apply_gcc_settings)
 					log2
 					log2f
 				)
-
-				set(_WRAPPER_FLAGS "-Wl")
 			else() # x86/amd64
 				set(
 					_FUNC_LIST
@@ -574,13 +574,25 @@ axl_apply_gcc_settings)
 					log2f
 				)
 
-				set(_WRAPPER_FLAGS "-u __wrap_memcpy -Wl") # link memcpy even if not directly called (used in libstdc++)
+				set(
+					_FORCE_FUNC_LIST
+					memcpy
+					secure_getenv
+				)
 
 				if(${TARGET_CPU} STREQUAL "x86")
-					set(_WRAPPER_FLAGS "-u __wrap_fcntl ${_WRAPPER_FLAGS}") # link fcntl even if not directly called (used when compiled with -coverage)
 					list(APPEND _FUNC_LIST fcntl)
+					list(APPEND _FORCE_FUNC_LIST fcntl)
 				endif()
 			endif()
+
+			set(_WRAPPER_FLAGS)
+
+			foreach (_FUNC ${_FORCE_FUNC_LIST})
+				string(APPEND _WRAPPER_FLAGS "-u __wrap_${_FUNC} ")
+			endforeach()
+
+			set(_WRAPPER_FLAGS "${_WRAPPER_FLAGS}-Wl")
 
 			foreach (_FUNC ${_FUNC_LIST})
 				string(APPEND _WRAPPER_FLAGS ",--wrap=${_FUNC}")
