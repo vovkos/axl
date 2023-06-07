@@ -195,6 +195,7 @@ source_group(
 	pch
 	FILES
 	${PCH_H_LIST}
+	REGULAR_EXPRESSION cmake_pch
 )
 
 #...............................................................................
