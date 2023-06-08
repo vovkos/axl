@@ -13,49 +13,19 @@
 
 #define _AXL_MEM_NEW_H
 
-#include "axl_mem_Allocator.h"
-
 namespace axl {
 namespace mem {
 
 //..............................................................................
 
-template <typename T>
-class StdDelete {
-public:
-	void
-	operator () (T* p) const {
-		p->~T();
-		StdAllocator::free(p);
-	}
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <typename T>
-class CppDelete {
-public:
-	void
-	operator () (T* p) const {
-		delete p;
-	}
-};
+enum class Extra: size_t {};
 
 //..............................................................................
-
-template <typename T>
-void
-stdDelete(T* p) {
-	p->~T();
-	StdAllocator::free(p);
-}
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #ifdef _AXL_DEBUG
 
 #define AXL_MEM_NEW(T) \
-	(new(AXL_MEM_ALLOCATE_EX(sizeof(T), #T)) T)
+	(new (AXL_MEM_ALLOCATE_EX(sizeof(T), #T)) T)
 
 #define AXL_MEM_NEW_EXTRA(T, extra) \
 	(new(AXL_MEM_ALLOCATE_EX(sizeof(T) + extra, #T)) T)
@@ -107,9 +77,117 @@ stdDelete(T* p) {
 #endif
 
 #define AXL_MEM_DELETE(p) \
-	(axl::mem::stdDelete(p))
+	(delete p)
 
 //..............................................................................
 
 } // namespace mem
 } // namespace axl
+
+void*
+operator new (size_t size);
+
+void*
+operator new[] (size_t size) {
+	return operator new (size);
+}
+
+inline
+void*
+operator new (
+    size_t size,
+    const axl::mem::NewParams& params
+) {
+    return operator new (size + params.extra());
+}
+
+inline
+void*
+operator new[] (
+    size_t size,
+    axl::mem::Extra extra
+) {
+    return operator new (size, extra);
+}
+
+inline
+void*
+operator new (
+    size_t size,
+    axl::mem::Zero zero
+) {
+    void* p = operator new(size);
+    if (!p)
+        return NULL;
+
+    memset(p, 0, size);
+    return p;
+}
+
+inline
+void*
+operator new[] (
+    size_t size,
+    axl::mem::Zero zero
+) {
+    return operator new (size, zero);
+}
+
+inline
+void*
+operator new(
+    size_t size,
+    axl::mem::ZeroExtra extra
+) {
+    return operator new (size + extra(), axl::mem::Zero());
+}
+
+inline
+void*
+operator new[] (
+    size_t size,
+    axl::mem::ZeroExtra extra
+) {
+    return operator new (size, extra);
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+void
+operator delete (void* p);
+
+inline
+void
+operator delete[] (void* p) {
+	operator delete (p);
+}
+
+inline
+void
+operator
+delete(
+	void* p,
+	axl::mem::Extra extra
+) {
+	operator delete (p);
+}
+
+void
+operator
+delete (
+	void* p,
+	axl::mem::Zero zero
+) {
+	operator delete (p);
+}
+
+void
+operator
+delete	(
+	void* p,
+	axl::mem::ZeroExtra extra
+) {
+
+}
+
+//..............................................................................

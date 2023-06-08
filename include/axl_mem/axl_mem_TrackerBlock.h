@@ -23,10 +23,6 @@ namespace mem {
 struct TrackerBlockHdr: sl::ListLink {
 	size_t m_size;
 	size_t m_seqNum;
-	const char* m_tag;
-	const char* m_filePath;
-	size_t m_line;
-	size_t padding; // ensure dual-pointer alignment
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
