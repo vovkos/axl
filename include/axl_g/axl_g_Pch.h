@@ -412,6 +412,12 @@ wcslen_s(const wchar_t* p) {
 #	define AXL_GCC_NO_ASAN __attribute__((no_sanitize_address))
 #endif
 
+#if (__cpp_noexcept_function_type)
+#	define AXL_NOEXCEPT noexcept
+#elif (AXL_CPP_MSC_VERSION >= 0x1000)
+#	define AXL_NOEXCEPT throw()
+#endif
+
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // min/max are WAY too conflict-prone, so we use non-conflicting versions

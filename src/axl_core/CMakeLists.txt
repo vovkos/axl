@@ -37,7 +37,6 @@ source_group(
 
 set(
 	MEM_H_LIST
-	${AXL_INC_DIR}/axl_mem/axl_mem_Allocator.h
 	${AXL_INC_DIR}/axl_mem/axl_mem_Block.h
 	${AXL_INC_DIR}/axl_mem/axl_mem_New.h
 	${AXL_INC_DIR}/axl_mem/axl_mem_Pool.h
@@ -49,6 +48,7 @@ set(
 
 set(
 	MEM_CPP_LIST
+	axl_mem_New.cpp
 	axl_mem_Tracker.cpp
 	axl_mem_ScatterGather.cpp
 	axl_mem_ExecutableBlockArena.cpp

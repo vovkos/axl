@@ -151,7 +151,7 @@ class BoxList: public OwningListBase<
 	ImplicitPtrCast<BoxListEntry<T>, ListLink>,
 	BoxIterator<T>,
 	ConstBoxIterator<T>,
-	typename mem::StdDelete<BoxListEntry<T> >
+	typename mem::Delete<BoxListEntry<T> >
 > {
 public:
 	typedef OwningListBase<
@@ -159,7 +159,7 @@ public:
 		ImplicitPtrCast<BoxListEntry<T>, ListLink>,
 		BoxIterator<T>,
 		ConstBoxIterator<T>,
-		typename mem::StdDelete<BoxListEntry<T> >
+		typename mem::Delete<BoxListEntry<T> >
 	> BaseType;
 
 	typedef typename BaseType::Entry Entry;

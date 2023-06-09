@@ -11,7 +11,7 @@
 
 #pragma once
 
-#define _axl_rc_RTFACTORY_H
+#define _AXL_RC_RTFACTORY_H
 
 #include "axl_rc_Ptr.h"
 #include "axl_mem_New.h"

@@ -10,108 +10,44 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_mem_Tracker.h"
-#include "axl_g_Module.h"
+#include "axl_mem_New.h"
+#include <memory>
+
 
 namespace axl {
 namespace mem {
 
 //..............................................................................
 
-void
-addTrackerBlock(TrackerBlockHdr* hdr) {
-	g::getModule()->getMemTracker()->add(hdr);
+void*
+allocate(size_t size) AXL_NOEXCEPT {
+	return malloc(size);
 }
 
 void
-removeTrackerBlock(TrackerBlockHdr* hdr) {
-	g::getModule()->getMemTracker()->remove(hdr);
+deallocate(void* p) AXL_NOEXCEPT {
+	free(p);
 }
 
-//..............................................................................
+#if (__cpp_aligned_new)
 
-Tracker::Tracker() {
-	m_peakBlockCount = 0;
-	m_totalBlockCount = 0;
-	m_size = 0;
-	m_peakSize = 0;
-	m_totalSize = 0;
-}
-
-void
-Tracker::add(TrackerBlockHdr* hdr) {
-	m_lock.lock();
-
-	hdr->m_seqNum = m_totalBlockCount;
-
-	m_totalBlockCount++;
-	m_totalSize += hdr->m_size;
-
-	m_blockList.insertTail(hdr);
-
-	size_t blockCount = m_blockList.getCount();
-	if (blockCount > m_peakBlockCount)
-		m_peakBlockCount = blockCount;
-
-	m_size += hdr->m_size;
-
-	if (m_size > m_peakSize)
-		m_peakSize = m_size;
-
-	m_lock.unlock();
+void*
+allocate(
+	size_t size,
+	std::align_val_t align
+) AXL_NOEXCEPT {
+	return _aligned_malloc(size, (size_t)align);
 }
 
 void
-Tracker::remove(TrackerBlockHdr* hdr) {
-	m_lock.lock();
-
-	m_blockList.remove(hdr);
-	m_size -= hdr->m_size;
-
-	m_lock.unlock();
+deallocate(
+	void* p,
+	std::align_val_t align
+) AXL_NOEXCEPT {
+	_aligned_free(p);
 }
 
-void
-Tracker::trace(bool isDetailed) {
-	m_lock.lock();
-
-	TRACE(
-		"%s: AXL memory stats:\n"
-		"    Current...%d bytes (%d blocks)\n"
-		"    Peak......%d bytes (%d blocks)\n"
-		"    Total.....%d bytes (%d blocks)\n",
-		g::getModule()->getTag(),
-		m_size,
-		m_blockList.getCount(),
-		m_peakSize,
-		m_peakBlockCount,
-		m_totalSize,
-		m_totalBlockCount
-	);
-
-	if (isDetailed && !m_blockList.isEmpty()) {
-		TRACE(
-			"*** Found %d unfreed blocks:\n",
-			m_blockList.getCount()
-		);
-
-		sl::Iterator<TrackerBlockHdr> it = m_blockList.getHead();
-		for (; it; it++) {
-			TrackerBlockHdr* blockHdr = *it;
-
-			TRACE(
-				"    %s(%d): %s; seq = #%d; size = %d;\n",
-				blockHdr->m_filePath,
-				blockHdr->m_line,
-				blockHdr->m_tag,
-				blockHdr->m_seqNum,
-				blockHdr->m_size
-			);
-		}
-	}
-
-	m_lock.unlock();
-}
+#endif // __cpp_aligned_new
 
 //..............................................................................
 

@@ -475,7 +475,7 @@ public:
 template <
 	typename T,
 	typename GetLink = ImplicitPtrCast<T, ListLink>,
-	typename Delete = mem::StdDelete<T>
+	typename Delete = mem::Delete<T>
 >
 class List: public OwningListBase<
 	T,
@@ -484,15 +484,6 @@ class List: public OwningListBase<
 	ConstIterator<T, GetLink>,
 	Delete
 > {
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <
-	typename T,
-	typename GetLink = ImplicitPtrCast<T, ListLink>
->
-class CppList: public List<T, GetLink, mem::CppDelete<T> > {
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

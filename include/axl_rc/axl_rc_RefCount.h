@@ -11,7 +11,7 @@
 
 #pragma once
 
-#define _axl_rc_REFCOUNT_H
+#define _AXL_RC_REFCOUNT_H
 
 #include "axl_sys_Atomic.h"
 
@@ -230,8 +230,7 @@ class Ptr;
 template <typename T>
 class WeakPtr;
 
-AXL_SELECT_ANY struct NullPtr {
-} g_nullPtr;
+AXL_SELECT_ANY struct NullPtr {} g_nullPtr;
 
 //..............................................................................
 

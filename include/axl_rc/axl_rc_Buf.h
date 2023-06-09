@@ -508,7 +508,7 @@ public:
 			this->m_hdr->getRefCount() == 1) {
 			if (!this->m_size) {
 				ASSERT(this->m_p == (T*)(this->m_hdr + 1));
-				new(this->m_p) T;
+				new (this->m_p) T;
 			} else if (!saveContents) {
 				// no need to call destructor on old m_p -- in-buffer shifts are only applicable to non-ctor-dtor types
 				this->m_p = (T*)(this->m_hdr + 1);
@@ -531,12 +531,12 @@ public:
 		T* p = (T*)(hdr + 1);
 
 		if (saveContents && this->m_p) {
-			new(p)T(*this->m_p);
+			new (p) T(*this->m_p);
 			size_t copySize = AXL_MIN(size, this->m_size);
 			if (copySize > sizeof(T))
 				memcpy(p + 1, this->m_p + 1, copySize - sizeof(T));
 		} else {
-			new(p)T;
+			new (p) T;
 		}
 
 		if (this->m_hdr)

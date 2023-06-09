@@ -25,7 +25,7 @@ inline
 void*
 postAllocateRefCount(
 	void* p,
-	FreeFunc* freeFunc = &mem::StdAllocator::free
+	FreeFunc* freeFunc = &mem::deallocate
 ) {
 	if (!p)
 		return NULL;
@@ -62,41 +62,29 @@ primeInPlaceRefCount(
 #define AXL_RC_ALLOC_SIZEOF(T) \
 	(sizeof(axl::rc::RefCountAllocHdr) + sizeof(T))
 
-#ifdef _AXL_DEBUG
-
-#define AXL_RC_ALLOCATE(T) \
-	axl::rc::postAllocateRefCount(AXL_MEM_ALLOCATE_EX(AXL_RC_ALLOC_SIZEOF(T), #T))
-
-#define AXL_RC_ALLOCATE_EXTRA(T, extra) \
-	axl::rc::postAllocateRefCount(AXL_MEM_ALLOCATE_EX(AXL_RC_ALLOC_SIZEOF(T) + extra, #T))
-
-#else
-
 #define AXL_RC_ALLOCATE(T) \
 	axl::rc::postAllocateRefCount(AXL_MEM_ALLOCATE(AXL_RC_ALLOC_SIZEOF(T)))
 
 #define AXL_RC_ALLOCATE_EXTRA(T, extra) \
 	axl::rc::postAllocateRefCount(AXL_MEM_ALLOCATE(AXL_RC_ALLOC_SIZEOF(T) + extra))
 
-#endif
-
 #define AXL_RC_NEW(T) \
-	(axl::rc::primeAllocatedRefCount(new(AXL_RC_ALLOCATE(T)) T))
+	(axl::rc::primeAllocatedRefCount(new (AXL_RC_ALLOCATE(T)) T))
 
 #define AXL_RC_NEW_EXTRA(T, extra) \
-	(axl::rc::primeAllocatedRefCount(new(AXL_RC_ALLOCATE_EXTRA(T, extra)) T))
+	(axl::rc::primeAllocatedRefCount(new (AXL_RC_ALLOCATE_EXTRA(T, extra)) T))
 
 #define AXL_RC_NEW_INPLACE(T, p, parent, flags) \
-	(axl::rc::primeInPlaceRefCount(new(p)T, parent, flags))
+	(axl::rc::primeInPlaceRefCount(new (p) T, parent, flags))
 
 #define AXL_RC_NEW_ARGS(T, args) \
-	(axl::rc::primeAllocatedRefCount(new(AXL_RC_ALLOCATE(T)) T args))
+	(axl::rc::primeAllocatedRefCount(new (AXL_RC_ALLOCATE(T)) T args))
 
 #define AXL_RC_NEW_ARGS_EXTRA(T, args, extra) \
-	(axl::rc::primeAllocatedRefCount(new(AXL_RC_ALLOCATE_EXTRA(T, extra)) T args))
+	(axl::rc::primeAllocatedRefCount(new (AXL_RC_ALLOCATE_EXTRA(T, extra)) T args))
 
 #define AXL_RC_NEW_ARGS_INPLACE(T, args, p, parent, flags) \
-	(axl::rc::primeInPlaceRefCount(new(p)T args, parent, flags))
+	(axl::rc::primeInPlaceRefCount(new (p) T args, parent, flags))
 
 //..............................................................................
 

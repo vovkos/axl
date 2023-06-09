@@ -13,181 +13,633 @@
 
 #define _AXL_MEM_NEW_H
 
+#include "axl_g_Pch.h"
+
 namespace axl {
 namespace mem {
 
 //..............................................................................
 
-enum class Extra: size_t {};
+enum ExtraSize: size_t {};
+const struct ZeroInit_t {} ZeroInit;
 
 //..............................................................................
 
-#ifdef _AXL_DEBUG
+void*
+allocate(size_t size) AXL_NOEXCEPT;
 
-#define AXL_MEM_NEW(T) \
-	(new (AXL_MEM_ALLOCATE_EX(sizeof(T), #T)) T)
+void
+deallocate(void* p) AXL_NOEXCEPT;
 
-#define AXL_MEM_NEW_EXTRA(T, extra) \
-	(new(AXL_MEM_ALLOCATE_EX(sizeof(T) + extra, #T)) T)
+#if (__cpp_aligned_new)
 
-#define AXL_MEM_NEW_ARGS(T, args) \
-	(new(AXL_MEM_ALLOCATE_EX(sizeof(T), #T)) T args)
+void*
+allocate(
+	size_t size,
+	std::align_val_t align
+) AXL_NOEXCEPT;
 
-#define AXL_MEM_NEW_ARGS_EXTRA(T, args, extra) \
-	(new(AXL_MEM_ALLOCATE_EX(sizeof(T) + extra, #T)) T args)
+void
+deallocate(
+	void* p,
+	std::align_val_t align
+) AXL_NOEXCEPT;
 
-#define AXL_MEM_ZERO_NEW(T) \
-	(new(AXL_MEM_ZERO_ALLOCATE_EX(sizeof(T), #T)) T)
+#endif // __cpp_aligned_new
 
-#define AXL_MEM_ZERO_NEW_EXTRA(T, extra) \
-	(new(AXL_MEM_ZERO_ALLOCATE_EX(sizeof(T) + extra, #T)) T)
+//..............................................................................
 
-#define AXL_MEM_ZERO_NEW_ARGS(T, args) \
-	(new(AXL_MEM_ZERO_ALLOCATE_EX(sizeof(T), #T)) T args)
+class Deallocate {
+public:
+	void
+	operator () (void* p) const {
+		deallocate(p);
+	}
+};
 
-#define AXL_MEM_ZERO_NEW_ARGS_EXTRA(T, args, extra) \
-	(new(AXL_MEM_ZERO_ALLOCATE_EX(sizeof(T) + extra, #T)) T args)
+typedef Deallocate StdFree; // legacy
 
-#else
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-#define AXL_MEM_NEW(T) \
-	(new(AXL_MEM_ALLOCATE(sizeof(T))) T)
-
-#define AXL_MEM_NEW_EXTRA(T, extra) \
-	(new(AXL_MEM_ALLOCATE(sizeof(T) + extra)) T)
-
-#define AXL_MEM_NEW_ARGS(T, args) \
-	(new(AXL_MEM_ALLOCATE(sizeof(T))) T args)
-
-#define AXL_MEM_NEW_ARGS_EXTRA(T, args, extra) \
-	(new(AXL_MEM_ALLOCATE(sizeof(T) + extra)) T args)
-
-#define AXL_MEM_ZERO_NEW(T) \
-	(new(AXL_MEM_ZERO_ALLOCATE(sizeof(T))) T)
-
-#define AXL_MEM_ZERO_NEW_EXTRA(T, extra) \
-	(new(AXL_MEM_ZERO_ALLOCATE(sizeof(T) + extra)) T)
-
-#define AXL_MEM_ZERO_NEW_ARGS(T, args) \
-	(new(AXL_MEM_ZERO_ALLOCATE(sizeof(T))) T args)
-
-#define AXL_MEM_ZERO_NEW_ARGS_EXTRA(T, args, extra) \
-	(new(AXL_MEM_ZERO_ALLOCATE(sizeof(T) + extra)) T args)
-
-#endif
-
-#define AXL_MEM_DELETE(p) \
-	(delete p)
+template <typename T>
+class Delete {
+public:
+	void
+	operator () (T* p) const {
+		delete p;
+	}
+};
 
 //..............................................................................
 
 } // namespace mem
 } // namespace axl
 
-void*
-operator new (size_t size);
+// the most basic new
 
+inline
+void*
+operator new (size_t size) {
+	void* p = axl::mem::allocate(size);
+	if (!p)
+		throw new std::bad_alloc();
+	return p;
+}
+
+inline
+void
+operator delete (void* p) AXL_NOEXCEPT {
+	axl::mem::deallocate(p);
+}
+
+inline
 void*
 operator new[] (size_t size) {
 	return operator new (size);
 }
 
 inline
-void*
-operator new (
-    size_t size,
-    const axl::mem::NewParams& params
-) {
-    return operator new (size + params.extra());
+void
+operator delete[] (void* p) AXL_NOEXCEPT {
+	operator delete (p);
 }
 
-inline
-void*
-operator new[] (
-    size_t size,
-    axl::mem::Extra extra
-) {
-    return operator new (size, extra);
-}
+// non-throwing version
 
 inline
 void*
 operator new (
     size_t size,
-    axl::mem::Zero zero
-) {
-    void* p = operator new(size);
-    if (!p)
-        return NULL;
-
-    memset(p, 0, size);
-    return p;
+    const std::nothrow_t& nothrow
+) AXL_NOEXCEPT {
+	return axl::mem::allocate(size);
 }
 
 inline
 void*
 operator new[] (
     size_t size,
-    axl::mem::Zero zero
-) {
-    return operator new (size, zero);
-}
-
-inline
-void*
-operator new(
-    size_t size,
-    axl::mem::ZeroExtra extra
-) {
-    return operator new (size + extra(), axl::mem::Zero());
-}
-
-inline
-void*
-operator new[] (
-    size_t size,
-    axl::mem::ZeroExtra extra
-) {
-    return operator new (size, extra);
+    const std::nothrow_t& nothrow
+) AXL_NOEXCEPT {
+    return operator new (size, nothrow);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-void
-operator delete (void* p);
+// zero-initialized new
+
+inline
+void*
+operator new (
+    size_t size,
+    const axl::mem::ZeroInit_t& zeroInit
+) {
+	void* p = operator new (size);
+	memset(p, 0, size);
+	return p;
+}
 
 inline
 void
-operator delete[] (void* p) {
+operator delete (
+	void* p,
+    const axl::mem::ZeroInit_t& zeroInit
+) AXL_NOEXCEPT {
 	operator delete (p);
 }
 
 inline
-void
-operator
-delete(
-	void* p,
-	axl::mem::Extra extra
+void*
+operator new[] (
+    size_t size,
+    const axl::mem::ZeroInit_t& zeroInit
 ) {
+	return operator new (size, zeroInit);
+}
+
+inline
+void
+operator delete[] (
+	void* p,
+    const axl::mem::ZeroInit_t& zeroInit
+) AXL_NOEXCEPT {
 	operator delete (p);
 }
 
-void
-operator
-delete (
-	void* p,
-	axl::mem::Zero zero
+// non-throwing version
+
+inline
+void*
+operator new (
+    size_t size,
+    const axl::mem::ZeroInit_t& zeroInit,
+    const std::nothrow_t& nothrow
+) AXL_NOEXCEPT {
+	void* p = operator new (size, nothrow);
+	if (p)
+		memset(p, 0, size);
+	return p;
+}
+
+inline
+void*
+operator new[] (
+    size_t size,
+    const axl::mem::ZeroInit_t& zeroInit,
+    const std::nothrow_t& nothrow
+) AXL_NOEXCEPT {
+	return operator new (size, zeroInit, nothrow);
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// new with extra tail space
+
+inline
+void*
+operator new (
+    size_t size,
+    axl::mem::ExtraSize extraSize
 ) {
+	return operator new (size + extraSize);
+}
+
+inline
+void
+operator delete (
+	void* p,
+    axl::mem::ExtraSize extraSize
+) AXL_NOEXCEPT {
 	operator delete (p);
 }
 
-void
-operator
-delete	(
-	void* p,
-	axl::mem::ZeroExtra extra
+inline
+void*
+operator new[] (
+    size_t size,
+    axl::mem::ExtraSize extraSize
 ) {
-
+	return operator new (size + extraSize);
 }
+
+inline
+void
+operator delete[] (
+	void* p,
+    axl::mem::ExtraSize extraSize
+) AXL_NOEXCEPT {
+	operator delete (p);
+}
+
+// non-throwing version
+
+inline
+void*
+operator new (
+    size_t size,
+    axl::mem::ExtraSize extraSize,
+    const std::nothrow_t& nothrow
+) AXL_NOEXCEPT {
+	return operator new (size + extraSize, nothrow);
+}
+
+inline
+void*
+operator new[] (
+    size_t size,
+    axl::mem::ExtraSize extraSize,
+    const std::nothrow_t& nothrow
+) AXL_NOEXCEPT {
+	return operator new (size + extraSize, nothrow);
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// zero-initialized new with extra tail space
+
+inline
+void*
+operator new (
+    size_t size,
+    axl::mem::ExtraSize extraSize,
+    const axl::mem::ZeroInit_t& zeroInit
+) {
+	return operator new (size + extraSize, zeroInit);
+}
+
+inline
+void
+operator delete (
+	void* p,
+    axl::mem::ExtraSize extraSize,
+    const axl::mem::ZeroInit_t& zeroInit
+) AXL_NOEXCEPT {
+	operator delete (p);
+}
+
+inline
+void*
+operator new[] (
+    size_t size,
+    axl::mem::ExtraSize extraSize,
+    const axl::mem::ZeroInit_t& zeroInit
+) {
+	return operator new (size + extraSize, zeroInit);
+}
+
+inline
+void
+operator delete[] (
+	void* p,
+    axl::mem::ExtraSize extraSize,
+    const axl::mem::ZeroInit_t& zeroInit
+) AXL_NOEXCEPT {
+	operator delete (p);
+}
+
+// non-throwing version
+
+inline
+void*
+operator new (
+    size_t size,
+    axl::mem::ExtraSize extraSize,
+    const axl::mem::ZeroInit_t& zeroInit,
+    const std::nothrow_t& nothrow
+) AXL_NOEXCEPT {
+	return operator new (size + extraSize, zeroInit, nothrow);
+}
+
+inline
+void*
+operator new[] (
+    size_t size,
+    axl::mem::ExtraSize extraSize,
+    const axl::mem::ZeroInit_t& zeroInit,
+    const std::nothrow_t& nothrow
+) AXL_NOEXCEPT {
+	return operator new (size + extraSize, zeroInit, nothrow);
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+#if (__cpp_aligned_new)
+
+// overaligned new
+
+inline
+void*
+operator new (
+	size_t size,
+	std::align_val_t align
+) {
+	void* p = axl::mem::allocate(size, align);
+	if (!p)
+		throw new std::bad_alloc();
+	return p;
+}
+
+inline
+void
+operator delete (
+	void* p,
+	std::align_val_t align
+) {
+	axl::mem::deallocate(p, align);
+}
+
+inline
+void*
+operator new[] (
+	size_t size,
+	std::align_val_t align
+) {
+	return operator new (size);
+}
+
+inline
+void
+operator delete[] (
+	void* p,
+	std::align_val_t align
+) AXL_NOEXCEPT {
+	operator delete (p);
+}
+
+// non-throwing version
+
+inline
+void*
+operator new (
+    size_t size,
+	std::align_val_t align,
+    const std::nothrow_t& nothrow
+) AXL_NOEXCEPT {
+	return axl::mem::allocate(size, align);
+}
+
+inline
+void*
+operator new[] (
+    size_t size,
+	std::align_val_t align,
+    const std::nothrow_t& nothrow
+) AXL_NOEXCEPT {
+    return operator new (size, nothrow);
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// zero-initialized new
+
+inline
+void*
+operator new (
+    size_t size,
+    const axl::mem::ZeroInit_t& zeroInit,
+	std::align_val_t align
+) {
+	void* p = operator new (size, align);
+	memset(p, 0, size);
+	return p;
+}
+
+inline
+void
+operator delete (
+	void* p,
+	std::align_val_t align,
+    const axl::mem::ZeroInit_t& zeroInit
+) AXL_NOEXCEPT {
+	operator delete (p);
+}
+
+inline
+void*
+operator new[] (
+    size_t size,
+    const axl::mem::ZeroInit_t& zeroInit,
+	std::align_val_t align
+) {
+	return operator new (size, zeroInit, align);
+}
+
+inline
+void
+operator delete[] (
+	void* p,
+    const axl::mem::ZeroInit_t& zeroInit,
+	std::align_val_t align
+) AXL_NOEXCEPT {
+	operator delete (p);
+}
+
+// non-throwing version
+
+inline
+void*
+operator new (
+    size_t size,
+    const axl::mem::ZeroInit_t& zeroInit,
+	std::align_val_t align,
+    const std::nothrow_t& nothrow
+) AXL_NOEXCEPT {
+	void* p = operator new (size, align, nothrow);
+	if (p)
+		memset(p, 0, size);
+	return p;
+}
+
+inline
+void*
+operator new[] (
+    size_t size,
+    const axl::mem::ZeroInit_t& zeroInit,
+	std::align_val_t align,
+    const std::nothrow_t& nothrow
+) AXL_NOEXCEPT {
+	return operator new (size, zeroInit, align, nothrow);
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// new with extra tail space
+
+inline
+void*
+operator new (
+    size_t size,
+    axl::mem::ExtraSize extraSize,
+	std::align_val_t align
+) {
+	return operator new (size + extraSize, align);
+}
+
+inline
+void
+operator delete (
+	void* p,
+    axl::mem::ExtraSize extraSize,
+	std::align_val_t align
+) AXL_NOEXCEPT {
+	operator delete (p);
+}
+
+inline
+void*
+operator new[] (
+    size_t size,
+    axl::mem::ExtraSize extraSize,
+	std::align_val_t align
+) {
+	return operator new (size + extraSize, align);
+}
+
+inline
+void
+operator delete[] (
+	void* p,
+    axl::mem::ExtraSize extraSize,
+	std::align_val_t align
+) AXL_NOEXCEPT {
+	operator delete (p);
+}
+
+// non-throwing version
+
+inline
+void*
+operator new (
+    size_t size,
+    axl::mem::ExtraSize extraSize,
+	std::align_val_t align,
+    const std::nothrow_t& nothrow
+) AXL_NOEXCEPT {
+	return operator new (size + extraSize, align, nothrow);
+}
+
+inline
+void*
+operator new[] (
+    size_t size,
+    axl::mem::ExtraSize extraSize,
+	std::align_val_t align,
+    const std::nothrow_t& nothrow
+) AXL_NOEXCEPT {
+	return operator new (size + extraSize, align, nothrow);
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// zero-initialized new with extra tail space
+
+inline
+void*
+operator new (
+    size_t size,
+    axl::mem::ExtraSize extraSize,
+    const axl::mem::ZeroInit_t& zeroInit,
+	std::align_val_t align
+) {
+	return operator new (size + extraSize, zeroInit, align);
+}
+
+inline
+void
+operator delete (
+	void* p,
+    axl::mem::ExtraSize extraSize,
+    const axl::mem::ZeroInit_t& zeroInit,
+	std::align_val_t align
+) AXL_NOEXCEPT {
+	operator delete (p);
+}
+
+inline
+void*
+operator new[] (
+    size_t size,
+    axl::mem::ExtraSize extraSize,
+    const axl::mem::ZeroInit_t& zeroInit,
+	std::align_val_t align
+) {
+	return operator new (size + extraSize, zeroInit, align);
+}
+
+inline
+void
+operator delete[] (
+	void* p,
+    axl::mem::ExtraSize extraSize,
+    const axl::mem::ZeroInit_t& zeroInit,
+	std::align_val_t align
+) AXL_NOEXCEPT {
+	operator delete (p);
+}
+
+// non-throwing version
+
+inline
+void*
+operator new (
+    size_t size,
+    axl::mem::ExtraSize extraSize,
+    const axl::mem::ZeroInit_t& zeroInit,
+	std::align_val_t align,
+    const std::nothrow_t& nothrow
+) AXL_NOEXCEPT {
+	return operator new (size + extraSize, zeroInit, align, nothrow);
+}
+
+inline
+void*
+operator new[] (
+    size_t size,
+    axl::mem::ExtraSize extraSize,
+    const axl::mem::ZeroInit_t& zeroInit,
+	std::align_val_t align,
+    const std::nothrow_t& nothrow
+) AXL_NOEXCEPT {
+	return operator new (size + extraSize, zeroInit, align, nothrow);
+}
+
+#endif // __cpp_aligned_new
+
+//..............................................................................
+
+// legacy macros
+
+#define AXL_MEM_ALLOCATE(size) \
+	(axl::mem::allocate(size))
+
+#define AXL_MEM_FREE(size) \
+	(axl::mem::deallocate(size))
+
+#define AXL_MEM_NEW(T) \
+	(new T)
+
+#define AXL_MEM_NEW_EXTRA(T, extra) \
+	(new (axl::mem::ExtraSize(extra)) T)
+
+#define AXL_MEM_NEW_ARGS(T, args) \
+	(new T args)
+
+#define AXL_MEM_NEW_ARGS_EXTRA(T, args, extra) \
+	(new (axl::mem::ExtraSize(extra)) T args)
+
+#define AXL_MEM_ZERO_NEW(T) \
+	(new (axl::mem::ZeroInit) T)
+
+#define AXL_MEM_ZERO_NEW_EXTRA(T, extra) \
+	(new (axl::mem::ExtraSize(extra), axl::mem::ZeroInit) T)
+
+#define AXL_MEM_ZERO_NEW_ARGS(T, args) \
+	(new (axl::mem::ZeroInit) T args)
+
+#define AXL_MEM_ZERO_NEW_ARGS_EXTRA(T, args, extra) \
+	(new (axl::mem::ExtraSize(extra), axl::mem::ZeroInit) T args)
+
+#define AXL_MEM_DELETE(p) \
+	(delete p)
 
 //..............................................................................

@@ -23,7 +23,7 @@ namespace sl {
 
 template <
 	typename T,
-	typename Delete0 = typename mem::StdDelete<T>
+	typename Delete0 = typename mem::Delete<T>
 >
 class AutoPtrArray: public Array<T*> {
 	AXL_DISABLE_COPY(AutoPtrArray)

@@ -11,7 +11,7 @@
 
 #pragma once
 
-#define _axl_rc_PTR_H
+#define _AXL_RC_PTR_H
 
 #include "axl_rc_RefCount.h"
 

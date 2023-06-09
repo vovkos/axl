@@ -100,10 +100,7 @@ Tracker::trace(bool isDetailed) {
 			TrackerBlockHdr* blockHdr = *it;
 
 			TRACE(
-				"    %s(%d): %s; seq = #%d; size = %d;\n",
-				blockHdr->m_filePath,
-				blockHdr->m_line,
-				blockHdr->m_tag,
+				"    seq: #%05d; size: %d;\n",
 				blockHdr->m_seqNum,
 				blockHdr->m_size
 			);

@@ -35,7 +35,7 @@ void run() {
 	sl::List<
 		MyStruct,
 		sl::Offset<MyStruct, sl::ListLink, offsetof(MyStruct, m_Link1) >,
-		mem::CppDelete<MyStruct>
+		mem::Delete<MyStruct>
 	> list1;
 
 	sl::AuxList<
@@ -54,7 +54,7 @@ void run() {
 	sl::List<
 		MyStruct2,
 		sl::ExplicitCast<MyStruct2*, sl::ListLink*>,
-		mem::CppDelete<MyStruct2>
+		mem::Delete<MyStruct2>
 	> list3;
 
 	MyStruct2* p2 = new MyStruct2;

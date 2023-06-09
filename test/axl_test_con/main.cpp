@@ -2536,7 +2536,7 @@ testInheritance() {
 	iface->m_p2 = "govno";
 	iface->m_p3 = "muravei";
 
-	new(buffer)Foo();
+	new (buffer) Foo();
 }
 
 //..............................................................................
