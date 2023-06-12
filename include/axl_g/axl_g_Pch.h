@@ -200,6 +200,7 @@
 #include <errno.h>
 
 #include <new>
+#include <cstdlib>
 #include <utility>
 #include <algorithm>
 

@@ -54,7 +54,9 @@ protected:
 
 	SystemInfo m_systemInfo;
 
+#if (_AXL_MEM_TRACKER)
 	mem::Tracker m_memTracker;
+#endif
 
 	// finalizers
 
@@ -101,10 +103,12 @@ public:
 		return &m_systemInfo;
 	}
 
+#if (_AXL_MEM_TRACKER)
 	mem::Tracker*
 	getMemTracker() {
 		return &m_memTracker;
 	}
+#endif
 
 	bool
 	addFinalizer(const rc::Ptr<Finalizer>& finalizer);

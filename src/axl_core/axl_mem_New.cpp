@@ -11,32 +11,60 @@
 
 #include "pch.h"
 #include "axl_mem_New.h"
+#include "axl_g_Module.h"
 #include <memory>
-
 
 namespace axl {
 namespace mem {
 
 //..............................................................................
 
+#if (_AXL_MEM_TRACKER)
+
+inline
+void*
+postAllocate(
+	void* p,
+	size_t size
+) {
+	if (!p)
+		return NULL;
+
+	TrackerBlock* block = (TrackerBlock*)p;
+	block->m_size = size;
+	g::getModule()->getMemTracker()->add(block);
+	return block + 1;
+}
+
+inline
+void*
+preDeallocate(void* p) {
+	if (!p)
+		return NULL;
+
+	TrackerBlock* block = (TrackerBlock*)((char*)p - sizeof(TrackerBlock));
+	g::getModule()->getMemTracker()->remove(block);
+	return block;
+}
+
 void*
 allocate(size_t size) AXL_NOEXCEPT {
-	return malloc(size);
+	return postAllocate(std::malloc(sizeof(TrackerBlock) + size), size);
 }
 
 void
 deallocate(void* p) AXL_NOEXCEPT {
-	free(p);
+	std::free(preDeallocate(p));
 }
 
-#if (__cpp_aligned_new)
+#	if (__cpp_aligned_new)
 
 void*
 allocate(
 	size_t size,
 	std::align_val_t align
 ) AXL_NOEXCEPT {
-	return _aligned_malloc(size, (size_t)align);
+	return postAllocate(std::aligned_alloc((size_t)align, sizeof(TrackerBlock) + size));
 }
 
 void
@@ -44,10 +72,13 @@ deallocate(
 	void* p,
 	std::align_val_t align
 ) AXL_NOEXCEPT {
-	_aligned_free(p);
+	std::free(preDeallocate(p));
 }
 
-#endif // __cpp_aligned_new
+#	endif // __cpp_aligned_new
+
+#else // _AXL_MEM_TRACKER
+#endif // _AXL_MEM_TRACKER
 
 //..............................................................................
 

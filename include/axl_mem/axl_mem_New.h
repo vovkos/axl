@@ -15,6 +15,12 @@
 
 #include "axl_g_Pch.h"
 
+#if (_AXL_DEBUG)
+#	define _AXL_MEM_TRACKER _AXL_MEM_TRACKER_DEBUG
+#else
+#	define _AXL_MEM_TRACKER _AXL_MEM_TRACKER_RELEASE
+#endif
+
 namespace axl {
 namespace mem {
 
@@ -25,13 +31,15 @@ const struct ZeroInit_t {} ZeroInit;
 
 //..............................................................................
 
+#if (_AXL_MEM_TRACKER)
+
 void*
 allocate(size_t size) AXL_NOEXCEPT;
 
 void
 deallocate(void* p) AXL_NOEXCEPT;
 
-#if (__cpp_aligned_new)
+#	if (__cpp_aligned_new)
 
 void*
 allocate(
@@ -45,7 +53,45 @@ deallocate(
 	std::align_val_t align
 ) AXL_NOEXCEPT;
 
-#endif // __cpp_aligned_new
+#	endif // __cpp_aligned_new
+
+#else // _AXL_MEM_TRACKER
+
+inline
+void*
+allocate(size_t size) AXL_NOEXCEPT {
+	return std::malloc(size);
+}
+
+inline
+void
+deallocate(void* p) AXL_NOEXCEPT {
+	std::free(p);
+}
+
+#	if (__cpp_aligned_new)
+
+inline
+void*
+allocate(
+	size_t size,
+	std::align_val_t align
+) AXL_NOEXCEPT {
+	return std::aligned_alloc(align, size);
+}
+
+inline
+void
+deallocate(
+	void* p,
+	std::align_val_t align
+) AXL_NOEXCEPT {
+	std::free(p);
+}
+
+#	endif // __cpp_aligned_new
+
+#endif // _AXL_MEM_TRACKER
 
 //..............................................................................
 
@@ -57,7 +103,7 @@ public:
 	}
 };
 
-typedef Deallocate StdFree; // legacy
+typedef Deallocate StdFree; // legacy name
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -74,6 +120,8 @@ public:
 
 } // namespace mem
 } // namespace axl
+
+#if (_AXL_MEM_TRACKER)
 
 // the most basic new
 
@@ -123,6 +171,8 @@ operator new[] (
 ) AXL_NOEXCEPT {
     return operator new (size, nothrow);
 }
+
+#endif
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

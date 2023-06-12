@@ -90,6 +90,22 @@ axl_create_build_type_setting)
 			${CMAKE_CONFIGURATION_TYPES}
 		)
 	endif()
+
+	set(
+		_OPTION_LIST
+		"0 (OFF)"
+		"1 (Debug builds only)"
+		"2 (Always ON)"
+	)
+
+	list(GET _OPTION_LIST 1 _DEFAULT)
+
+	axl_create_setting(
+		AXL_MEM_TRACKER
+		DESCRIPTION "AXL memory tracker usage"
+		DEFAULT ${_DEFAULT}
+		${_OPTION_LIST}
+	)
 endmacro()
 
 macro(
@@ -115,6 +131,14 @@ axl_apply_build_type_setting)
 
 	set(CONFIGURATION_SUFFIX   "${CONFIGURATION}")
 	set(CONFIGURATION_SUFFIX_0 "${CONFIGURATION_SCG}")
+
+	string(SUBSTRING ${AXL_MEM_TRACKER} 0 1 _LEVEL)
+	if("${_LEVEL}" STREQUAL "2")
+		add_definitions(-D_AXL_MEM_TRACKER_DEBUG=1)
+		add_definitions(-D_AXL_MEM_TRACKER_RELEASE=1)
+	elseif("${_LEVEL}" STREQUAL "1")
+		add_definitions(-D_AXL_MEM_TRACKER_DEBUG=1)
+	endif()
 endmacro()
 
 #...............................................................................
@@ -125,12 +149,6 @@ axl_create_msvc_settings)
 	option(
 		MSVC_USE_FOLDERS
 		"Use solution folders in Microsoft Visual Studio"
-		ON
-	)
-
-	option(
-		MSVC_USE_PCH
-		"Use precompiled headers in Microsoft Visual C/C++"
 		ON
 	)
 
@@ -237,12 +255,6 @@ endmacro()
 
 macro(
 axl_create_gcc_settings)
-
-	option(
-		GCC_USE_PCH
-		"Use precompiled headers in GNU C/C++"
-		ON
-	)
 
 	option(
 		GCC_USE_AXL_TODO

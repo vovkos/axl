@@ -16,17 +16,7 @@
 namespace axl {
 namespace mem {
 
-//..............................................................................
-
-void
-addTrackerBlock(TrackerBlockHdr* hdr) {
-	g::getModule()->getMemTracker()->add(hdr);
-}
-
-void
-removeTrackerBlock(TrackerBlockHdr* hdr) {
-	g::getModule()->getMemTracker()->remove(hdr);
-}
+#if (_AXL_MEM_TRACKER)
 
 //..............................................................................
 
@@ -36,24 +26,32 @@ Tracker::Tracker() {
 	m_size = 0;
 	m_peakSize = 0;
 	m_totalSize = 0;
+	m_breakSeqNum = -1;
 }
 
 void
-Tracker::add(TrackerBlockHdr* hdr) {
+Tracker::add(TrackerBlock* block) {
 	m_lock.lock();
 
-	hdr->m_seqNum = m_totalBlockCount;
+	block->m_seqNum = m_totalBlockCount;
+	if (m_totalBlockCount == m_breakSeqNum) {
+#if (_AXL_CPP_MSC)
+		_CrtDbgBreak();
+#else
+		__builtin_trap();
+#endif
+	}
 
 	m_totalBlockCount++;
-	m_totalSize += hdr->m_size;
+	m_totalSize += block->m_size;
 
-	m_blockList.insertTail(hdr);
+	m_blockList.insertTail(block);
 
 	size_t blockCount = m_blockList.getCount();
 	if (blockCount > m_peakBlockCount)
 		m_peakBlockCount = blockCount;
 
-	m_size += hdr->m_size;
+	m_size += block->m_size;
 
 	if (m_size > m_peakSize)
 		m_peakSize = m_size;
@@ -62,11 +60,11 @@ Tracker::add(TrackerBlockHdr* hdr) {
 }
 
 void
-Tracker::remove(TrackerBlockHdr* hdr) {
+Tracker::remove(TrackerBlock* block) {
 	m_lock.lock();
 
-	m_blockList.remove(hdr);
-	m_size -= hdr->m_size;
+	m_blockList.remove(block);
+	m_size -= block->m_size;
 
 	m_lock.unlock();
 }
@@ -77,9 +75,9 @@ Tracker::trace(bool isDetailed) {
 
 	TRACE(
 		"%s: AXL memory stats:\n"
-		"    Current...%d bytes (%d blocks)\n"
-		"    Peak......%d bytes (%d blocks)\n"
-		"    Total.....%d bytes (%d blocks)\n",
+		"    Current...%d byte(s) %d block(s)\n"
+		"    Peak......%d byte(s) %d block(s)\n"
+		"    Total.....%d byte(s) %d block(s)\n",
 		g::getModule()->getTag(),
 		m_size,
 		m_blockList.getCount(),
@@ -91,18 +89,18 @@ Tracker::trace(bool isDetailed) {
 
 	if (isDetailed && !m_blockList.isEmpty()) {
 		TRACE(
-			"*** Found %d unfreed blocks:\n",
+			"*** Found %d unfreed block(s):\n",
 			m_blockList.getCount()
 		);
 
-		sl::Iterator<TrackerBlockHdr> it = m_blockList.getHead();
+		sl::Iterator<TrackerBlock> it = m_blockList.getHead();
 		for (; it; it++) {
-			TrackerBlockHdr* blockHdr = *it;
+			TrackerBlock* block = *it;
 
 			TRACE(
-				"    seq: #%05d; size: %d;\n",
-				blockHdr->m_seqNum,
-				blockHdr->m_size
+				"    #%d: %d byte(s)\n",
+				block->m_seqNum,
+				block->m_size
 			);
 		}
 	}
@@ -111,6 +109,8 @@ Tracker::trace(bool isDetailed) {
 }
 
 //..............................................................................
+
+#endif  // _AXL_MEM_TRACKER
 
 } // namespace err
 } // namespace axl

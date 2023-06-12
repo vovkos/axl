@@ -74,7 +74,9 @@ Module::~Module() {
 		AXL_MEM_DELETE(finalizerEntry);
 	}
 
+#if ( _AXL_MEM_TRACKER)
 	m_memTracker.trace();
+#endif
 }
 
 bool

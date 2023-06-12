@@ -34,40 +34,13 @@ FreeFunc(void* p);
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct RefCountAllocHdr {
-	union {
-		//! \unnamed{union}
-		FreeFunc* m_freeFunc;
-		uint64_t _m_padding; // ensure 8-byte alignment
-	};
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <typename T>
-class RefCountAllocBuffer:
-	public RefCountAllocHdr,
-	public T {
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-enum RefCountFlag {
-	RefCountFlag_Allocated = 0x01, // must be freed, free func is in hdr
-
-	// ok to define and use your own flags 0x08..0x80
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 class RefCount {
 	AXL_DISABLE_COPY(RefCount)
 
 protected:
+	FreeFunc* m_freeFunc;
 	volatile int32_t m_refCount;
 	volatile int32_t m_weakRefCount;
-	uint_t m_parentOffset;
-	uint_t m_refCountFlags;
 
 public:
 	RefCount();
@@ -78,10 +51,10 @@ public:
 	}
 
 	void
-	prime(
-		RefCount* parent,
-		uint_t flags = 0
-	);
+	prime(FreeFunc* freeFunc) {
+		ASSERT(m_refCount == 0); // should only be called once in the very beginning
+		m_freeFunc = freeFunc;
+	}
 
 	size_t
 	getRefCount() {
@@ -91,11 +64,6 @@ public:
 	size_t
 	getWeakRefCount() {
 		return m_weakRefCount;
-	}
-
-	uint_t
-	getRefCountFlags() {
-		return m_refCountFlags;
 	}
 
 	size_t
@@ -122,30 +90,11 @@ public:
 
 inline
 RefCount::RefCount() {
+	m_freeFunc = NULL;
 	m_refCount = 0;
 	m_weakRefCount = 1;
-	m_parentOffset = 0;
-	m_refCountFlags = 0;
 }
 
-inline
-void
-RefCount::prime(
-	RefCount* parent,
-	uint_t flags
-) {
-	ASSERT(m_refCount == 0); // should only be called once in the very beginning
-
-	if (!parent) {
-		m_parentOffset = 0;
-	} else {
-		ASSERT(parent < this);
-		m_parentOffset = (uint_t)((char*)this - (char*)parent);
-		parent->addWeakRef();
-	}
-
-	m_refCountFlags = flags;
-}
 
 inline
 size_t
@@ -164,15 +113,8 @@ inline
 size_t
 RefCount::weakRelease() {
 	intptr_t refCount = sys::atomicDec(&m_weakRefCount);
-
-	if (!refCount)
-		if (m_refCountFlags & RefCountFlag_Allocated) {
-			RefCountAllocHdr* hdr = (RefCountAllocHdr*)this - 1;
-			hdr->m_freeFunc(hdr);
-		} else if (m_parentOffset) {
-			RefCount* parent = (RefCount*)((char*)this - m_parentOffset);
-			parent->weakRelease();
-		}
+	if (!refCount && m_freeFunc)
+		m_freeFunc(this);
 
 	return refCount;
 }

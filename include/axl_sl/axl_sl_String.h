@@ -1125,7 +1125,7 @@ public:
 		}
 
 		rc::BufHdr* hdr = src.getHdr();
-		if (!hdr || (hdr->getRefCountFlags() & rc::BufHdrFlag_Exclusive) || !src.isNullTerminated()) {
+		if (!hdr || (hdr->m_flags & rc::BufHdrFlag_Exclusive) || !src.isNullTerminated()) {
 			copy(src.cp(), src.getLength());
 			src.release();
 			return this->m_length;
@@ -1152,7 +1152,7 @@ public:
 		}
 
 		rc::BufHdr* hdr = src.getHdr();
-		if (!hdr || (hdr->getRefCountFlags() & rc::BufHdrFlag_Exclusive) || !src.isNullTerminated())
+		if (!hdr || (hdr->m_flags & rc::BufHdrFlag_Exclusive) || !src.isNullTerminated())
 			return copy(src.cp(), src.getLength());
 
 		this->attach(src);
@@ -1761,11 +1761,9 @@ public:
 
 		size_t bufferSize = getAllocSize(size);
 
-		rc::Ptr<rc::BufHdr> hdr = AXL_RC_NEW_EXTRA(rc::BufHdr, bufferSize);
+		rc::Ptr<rc::BufHdr> hdr = AXL_RC_NEW_ARGS_EXTRA(rc::BufHdr, (bufferSize), bufferSize);
 		if (!hdr)
 			return NULL;
-
-		hdr->m_bufferSize = bufferSize;
 
 		C* p = (C*)(hdr + 1);
 
@@ -1794,11 +1792,10 @@ public:
 	) {
 		ASSERT(size >= sizeof(rc::BufHdr) + sizeof(C));
 
-		uint_t flags = kind != rc::BufKind_Static ? rc::BufHdrFlag_Exclusive : 0;
 		size_t bufferSize = size - sizeof(rc::BufHdr);
+		uint_t flags = kind != rc::BufKind_Static ? rc::BufHdrFlag_Exclusive : 0;
 
-		rc::Ptr<rc::BufHdr> hdr = AXL_RC_NEW_INPLACE(rc::BufHdr, p, NULL, flags);
-		hdr->m_bufferSize = bufferSize;
+		rc::Ptr<rc::BufHdr> hdr = AXL_RC_NEW_ARGS_INPLACE(rc::BufHdr, (bufferSize, flags), p, NULL);
 
 		if (this->m_hdr)
 			this->m_hdr->release();

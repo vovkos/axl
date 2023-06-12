@@ -13,25 +13,36 @@
 
 #define _AXL_MEM_TRACKER_H
 
-#include "axl_mem_TrackerBlock.h"
 #include "axl_sl_List.h"
 #include "axl_sys_Lock.h"
 
 namespace axl {
 namespace mem {
 
+#if (_AXL_MEM_TRACKER)
+
 //..............................................................................
+
+struct TrackerBlock: sl::ListLink {
+	size_t m_size;
+	size_t m_seqNum;
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class Tracker {
 protected:
 	sys::Lock m_lock;
-	sl::AuxList<TrackerBlockHdr> m_blockList;
+	sl::AuxList<TrackerBlock> m_blockList;
 
 	size_t m_peakBlockCount;
 	size_t m_totalBlockCount;
 	size_t m_size;
 	size_t m_peakSize;
 	size_t m_totalSize;
+
+public:
+	size_t m_breakSeqNum; // freely adjustible
 
 public:
 	Tracker();
@@ -67,14 +78,16 @@ public:
 	}
 
 	void
-	add(TrackerBlockHdr* hdr);
+	add(TrackerBlock* block);
 
 	void
-	remove(TrackerBlockHdr* hdr);
+	remove(TrackerBlock* block);
 
 	void
 	trace(bool isDetailed = true);
 };
+
+#endif // _AXL_MEM_TRACKER
 
 //..............................................................................
 

@@ -30,13 +30,19 @@ class Child {
 	AXL_DISABLE_COPY(Child)
 
 protected:
+	union {
+		size_t m_parentOffset;
+		uint64_t _m_align;
+	};
+
 	char m_buffer[sizeof(T) + extra];
 
 public:
 	Child(RefCount* parent) {
-		memset(m_buffer, 0, sizeof(m_buffer));
-		T* p = AXL_RC_NEW_INPLACE(T, m_buffer, parent, 0);
-		p->addRef();
+		m_parentOffset = m_buffer - (char*)parent;
+		AXL_RC_NEW_INPLACE(T, m_buffer, weakReleaseParent);
+		parent->addWeakRef();
+		p()->addRef();
 	}
 
 	~Child() {
@@ -59,6 +65,12 @@ public:
 
 	T* p() {
 		return (T*)m_buffer;
+	}
+
+protected:
+	static void weakReleaseParent(void* p) {
+		size_t parentOffset = *(size_t*)((uint64_t*)p - 1);
+		((RefCount*)((char*)p - parentOffset))->weakRelease();
 	}
 };
 

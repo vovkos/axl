@@ -30,6 +30,10 @@ public:
 	T* m_p;
 
 public:
+	DestructSingleton(T* p) {
+		m_p = p;
+	}
+
 	virtual
 	void
 	finalize() {
@@ -48,9 +52,7 @@ public:
 	void
 	operator () (void* p) {
 		new(p)T;
-		rc::Ptr<Destruct> destruct = AXL_RC_NEW(Destruct);
-		destruct->m_p = (T*)p;
-		g::getModule()->addFinalizer(destruct);
+		g::getModule()->addFinalizer(AXL_RC_NEW_ARGS(Destruct, ((T*)p)));
 	}
 };
 

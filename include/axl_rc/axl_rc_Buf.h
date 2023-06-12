@@ -47,6 +47,15 @@ enum BufHdrFlag {
 
 struct BufHdr: public RefCount {
 	size_t m_bufferSize;
+	uintptr_t m_flags;
+
+	BufHdr(
+		size_t bufferSize,
+		uintptr_t flags = 0
+	) {
+		m_bufferSize = bufferSize;
+		m_flags = flags;
+	}
 
 	const void*
 	cp() const {
@@ -273,6 +282,11 @@ class Buf: public Ref {
 protected:
 	class Hdr: public BufHdr {
 	public:
+		Hdr(
+			size_t bufferSize,
+			uintptr_t flags = 0
+		): BufHdr(bufferSize, flags) {}
+
 		~Hdr() {
 			((T*)(this + 1))->~T();
 		}
@@ -404,7 +418,7 @@ public:
 		}
 
 		BufHdr* hdr = src.getHdr();
-		if (!hdr || (hdr->getRefCountFlags() & BufHdrFlag_Exclusive)) {
+		if (!hdr || (hdr->m_flags & BufHdrFlag_Exclusive)) {
 			copy(src, src.getSize());
 			src.release();
 			return this->m_size;
@@ -426,7 +440,7 @@ public:
 		}
 
 		BufHdr* hdr = src.getHdr();
-		if (!hdr || (hdr->getRefCountFlags() & BufHdrFlag_Exclusive))
+		if (!hdr || (hdr->m_flags & BufHdrFlag_Exclusive))
 			return copy(src, src.getSize());
 
 		this->attach(src);
@@ -522,11 +536,9 @@ public:
 
 		size_t bufferSize = sl::getAllocSize(size);
 
-		Ptr<Hdr> hdr = AXL_RC_NEW_EXTRA(Hdr, bufferSize);
+		Ptr<Hdr> hdr = AXL_RC_NEW_ARGS_EXTRA(Hdr, (bufferSize), bufferSize);
 		if (!hdr)
 			return NULL;
-
-		hdr->m_bufferSize = bufferSize;
 
 		T* p = (T*)(hdr + 1);
 
@@ -556,11 +568,10 @@ public:
 	) {
 		ASSERT(size >= MinBufSize);
 
-		uint_t flags = kind != BufKind_Static ? BufHdrFlag_Exclusive : 0;
 		size_t bufferSize = size - sizeof(BufHdr);
+		uint_t flags = kind != BufKind_Static ? BufHdrFlag_Exclusive : 0;
 
-		Ptr<Hdr> hdr = AXL_RC_NEW_INPLACE(Hdr, p, NULL, flags);
-		hdr->m_bufferSize = bufferSize;
+		Ptr<Hdr> hdr = AXL_RC_NEW_ARGS_INPLACE(Hdr, (bufferSize, flags), p, NULL);
 
 		if (this->m_hdr)
 			this->m_hdr->release();

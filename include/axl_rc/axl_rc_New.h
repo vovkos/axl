@@ -21,70 +21,35 @@ namespace rc {
 
 //..............................................................................
 
-inline
-void*
-postAllocateRefCount(
-	void* p,
+template <typename T>
+T*
+primeRefCount(
+	T* p,
 	FreeFunc* freeFunc = &mem::deallocate
 ) {
-	if (!p)
-		return NULL;
-
-	RefCountAllocHdr* hdr = (RefCountAllocHdr*)p;
-	hdr->m_freeFunc = freeFunc;
-	return hdr + 1;
-}
-
-template <typename T>
-T*
-primeAllocatedRefCount(T* p) {
-	if (!p)
-		return NULL;
-
-	p->prime(NULL, RefCountFlag_Allocated);
-	return p;
-}
-
-template <typename T>
-T*
-primeInPlaceRefCount(
-	T* p,
-	RefCount* parent,
-	uint_t flags
-) {
-	ASSERT(p);
-	p->prime(parent, flags);
+	p->prime(freeFunc);
 	return p;
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-#define AXL_RC_ALLOC_SIZEOF(T) \
-	(sizeof(axl::rc::RefCountAllocHdr) + sizeof(T))
-
-#define AXL_RC_ALLOCATE(T) \
-	axl::rc::postAllocateRefCount(AXL_MEM_ALLOCATE(AXL_RC_ALLOC_SIZEOF(T)))
-
-#define AXL_RC_ALLOCATE_EXTRA(T, extra) \
-	axl::rc::postAllocateRefCount(AXL_MEM_ALLOCATE(AXL_RC_ALLOC_SIZEOF(T) + extra))
-
 #define AXL_RC_NEW(T) \
-	(axl::rc::primeAllocatedRefCount(new (AXL_RC_ALLOCATE(T)) T))
+	(axl::rc::primeRefCount(new (AXL_MEM_ALLOCATE(sizeof(T))) T))
 
 #define AXL_RC_NEW_EXTRA(T, extra) \
-	(axl::rc::primeAllocatedRefCount(new (AXL_RC_ALLOCATE_EXTRA(T, extra)) T))
+	(axl::rc::primeRefCount(new (AXL_MEM_ALLOCATE(sizeof(T) + extra)) T))
 
-#define AXL_RC_NEW_INPLACE(T, p, parent, flags) \
-	(axl::rc::primeInPlaceRefCount(new (p) T, parent, flags))
+#define AXL_RC_NEW_INPLACE(T, p, freeFunc) \
+	(axl::rc::primeRefCount(new (p) T, freeFunc))
 
 #define AXL_RC_NEW_ARGS(T, args) \
-	(axl::rc::primeAllocatedRefCount(new (AXL_RC_ALLOCATE(T)) T args))
+	(axl::rc::primeRefCount(new (AXL_MEM_ALLOCATE(sizeof(T))) T args))
 
 #define AXL_RC_NEW_ARGS_EXTRA(T, args, extra) \
-	(axl::rc::primeAllocatedRefCount(new (AXL_RC_ALLOCATE_EXTRA(T, extra)) T args))
+	(axl::rc::primeRefCount(new (AXL_MEM_ALLOCATE(sizeof(T) + extra)) T args))
 
-#define AXL_RC_NEW_ARGS_INPLACE(T, args, p, parent, flags) \
-	(axl::rc::primeInPlaceRefCount(new (p) T args, parent, flags))
+#define AXL_RC_NEW_ARGS_INPLACE(T, args, p, freeFunc) \
+	(axl::rc::primeRefCount(new (p) T args, freeFunc))
 
 //..............................................................................
 

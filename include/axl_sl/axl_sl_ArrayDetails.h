@@ -97,6 +97,11 @@ public:
 	public:
 		size_t m_count;
 
+		Hdr(
+			size_t bufferSize,
+			uintptr_t flags = 0
+		): BufHdr(bufferSize, flags) {}
+
 		~Hdr() {
 			destruct((T*)(this + 1), m_count);
 		}
