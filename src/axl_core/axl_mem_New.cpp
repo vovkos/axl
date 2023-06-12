@@ -64,7 +64,7 @@ allocate(
 	size_t size,
 	std::align_val_t align
 ) AXL_NOEXCEPT {
-	return postAllocate(std::aligned_alloc((size_t)align, sizeof(TrackerBlock) + size));
+	return postAllocate(std::aligned_alloc((size_t)align, sizeof(TrackerBlock) + size), size);
 }
 
 void
