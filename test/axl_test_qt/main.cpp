@@ -603,7 +603,6 @@ main(
 #endif
 
 #if (0)
-	g::getModule()->setTag("axl_test_qt");
 	benchFormat();
 	return 0;
 #endif

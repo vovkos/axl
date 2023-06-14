@@ -45,10 +45,7 @@ public:
 
 //..............................................................................
 
-// make ASSERT work even in Release
-
-#undef ASSERT
-#define ASSERT(e) ((bool) (e) ? \
+#define TEST_ASSERT(e) ((bool) (e) ? \
 	(void) 0 : \
 	(void)(throw "Assertion failure at: " __FILE__ "(" AXL_ITOA(__LINE__) "): " #e))
 

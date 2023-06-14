@@ -23,7 +23,7 @@ namespace sl {
 template <typename T>
 void
 construct(T* p) {
-	new(p)T;
+	new (p) T;
 }
 
 template <
@@ -35,7 +35,7 @@ construct(
 	T* p,
 	Arg arg
 ) {
-	new(p)T(arg);
+	new (p) T(arg);
 }
 
 template <
@@ -49,7 +49,7 @@ construct(
 	Arg1 arg1,
 	Arg2 arg2
 ) {
-	new(p)T(arg1, arg2);
+	new (p) T(arg1, arg2);
 }
 
 template <
@@ -65,7 +65,7 @@ construct(
 	Arg2 arg2,
 	Arg3 arg3
 ) {
-	new(p)T(arg1, arg2, arg3);
+	new (p) T(arg1, arg2, arg3);
 }
 
 template <
@@ -83,7 +83,7 @@ construct(
 	Arg3 arg3,
 	Arg4 arg4
 ) {
-	new(p)T(arg1, arg2, arg3, arg4);
+	new (p) T(arg1, arg2, arg3, arg4);
 }
 
 template <typename T>
@@ -115,7 +115,7 @@ class Construct {
 public:
 	void
 	operator () (T* p) const {
-		new(p)T;
+		new (p) T;
 	}
 };
 

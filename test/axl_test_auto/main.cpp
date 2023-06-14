@@ -45,6 +45,8 @@ runTest(
 
 //.............................................................................
 
+#include "axl_mem_Tracker.h"
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -62,16 +64,17 @@ main(
 #if (_AXL_OS_POSIX)
 	setvbuf(stdout, NULL, _IOLBF, 1024);
 #endif
+	srand((uint_t)sys::getTimestamp());
 
 #if (_AXL_OS_WIN)
 	WSADATA wsaData;
 	WORD versionRequested = MAKEWORD(2, 2);
 	WSAStartup(versionRequested, &wsaData);
 #endif
-	srand((uint_t)sys::getTimestamp());
-
-	g::getModule()->setTag("axl_test_auto");
 	lex::registerParseErrorProvider();
+
+	int* p = new int;
+	delete p;
 
 	size_t total;
 	size_t passed = 0;

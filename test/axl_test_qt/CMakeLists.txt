@@ -118,6 +118,7 @@ set_target_properties(
 target_link_libraries(
 	axl_test_qt
 	axl_io
+	axl_mem_new
 	axl_core
 )
 

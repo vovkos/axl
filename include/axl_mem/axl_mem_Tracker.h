@@ -14,12 +14,12 @@
 #define _AXL_MEM_TRACKER_H
 
 #include "axl_sl_List.h"
+#include "axl_sl_CallOnce.h"
+#include "axl_sl_Construct.h"
 #include "axl_sys_Lock.h"
 
 namespace axl {
 namespace mem {
-
-#if (_AXL_MEM_TRACKER)
 
 //..............................................................................
 
@@ -31,6 +31,12 @@ struct TrackerBlock: sl::ListLink {
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class Tracker {
+public:
+	enum DispatchCode {
+		DispatchCode_Trace,
+		DispatchCode_SetWatermarkSeqNum,
+	};
+
 protected:
 	sys::Lock m_lock;
 	sl::AuxList<TrackerBlock> m_blockList;
@@ -40,12 +46,17 @@ protected:
 	size_t m_size;
 	size_t m_peakSize;
 	size_t m_totalSize;
+	size_t m_watermarkSeqNum;
 
 public:
 	size_t m_breakSeqNum; // freely adjustible
 
 public:
 	Tracker();
+
+	~Tracker() {
+		ASSERT(false); // should never be destroyed
+	}
 
 	size_t
 	getBlockCount() {
@@ -85,9 +96,24 @@ public:
 
 	void
 	trace(bool isDetailed = true);
+
+protected:
+	static
+	void
+	dispatch(DispatchCode code);
 };
 
-#endif // _AXL_MEM_TRACKER
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+Tracker*
+getTracker() {
+	static char buffer[sizeof(Tracker)];
+	sl::callOnce(sl::Construct<Tracker>(), (Tracker*)buffer);
+	return (Tracker*)buffer;
+}
+
+AXL_SELECT_ANY void (*g_trackerDispatchFunc)(Tracker::DispatchCode code) = NULL;
 
 //..............................................................................
 

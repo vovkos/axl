@@ -10,77 +10,292 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_mem_New.h"
-#include "axl_g_Module.h"
+#include "axl_mem_Tracker.h"
 #include <memory>
+
+#if (_AXL_DEBUG)
+#	define _AXL_MEM_TRACKER _AXL_MEM_TRACKER_DEBUG
+#else
+#	define _AXL_MEM_TRACKER _AXL_MEM_TRACKER_RELEASE
+#endif
+
+#if (_AXL_MEM_TRACKER)
 
 namespace axl {
 namespace mem {
 
-//..............................................................................
+// on gcc/clang replacement new/delete operators should not have "hidden" visibility
 
-#if (_AXL_MEM_TRACKER)
+#if (_AXL_CPP_GCC)
+#	define AXL_VISIBILITY_DEFAULT __attribute__((visibility("default")))
+#else
+#	define AXL_VISIBILITY_DEFAULT
+#endif
+
+//..............................................................................
 
 inline
 void*
-postAllocate(
+addTrackerBlock(
 	void* p,
 	size_t size
-) {
-	if (!p)
-		return NULL;
-
+) AXL_NOEXCEPT {
 	TrackerBlock* block = (TrackerBlock*)p;
 	block->m_size = size;
-	g::getModule()->getMemTracker()->add(block);
+	getTracker()->add(block);
 	return block + 1;
 }
 
 inline
 void*
-preDeallocate(void* p) {
-	if (!p)
-		return NULL;
-
+removeTrackerBlock(void* p) AXL_NOEXCEPT {
 	TrackerBlock* block = (TrackerBlock*)((char*)p - sizeof(TrackerBlock));
-	g::getModule()->getMemTracker()->remove(block);
+	getTracker()->remove(block);
 	return block;
 }
 
+inline
 void*
-allocate(size_t size) AXL_NOEXCEPT {
-	return postAllocate(std::malloc(sizeof(TrackerBlock) + size), size);
+removeTrackerBlock(
+	void* p,
+	size_t size
+) AXL_NOEXCEPT {
+	TrackerBlock* block = (TrackerBlock*)((char*)p - sizeof(TrackerBlock));
+	ASSERT(block->m_size == size);
+	getTracker()->remove(block);
+	return block;
 }
 
+inline
+void*
+trackingAllocate(size_t size) AXL_NOEXCEPT {
+	void* p = std::malloc(sizeof(TrackerBlock) + size);
+	return p ? addTrackerBlock(p, size) : NULL;
+}
+
+inline
 void
-deallocate(void* p) AXL_NOEXCEPT {
-	std::free(preDeallocate(p));
+trackingDeallocate(void* p) AXL_NOEXCEPT {
+	if (p)
+		std::free(removeTrackerBlock(p));
+}
+
+inline
+void
+trackingDeallocate(
+	void* p,
+	size_t size
+) AXL_NOEXCEPT {
+	if (p)
+		std::free(removeTrackerBlock(p, size));
+}
+
+#	if (__cpp_aligned_new)
+inline
+void*
+trackingAllocate(
+	size_t size,
+	std::align_val_t align
+) AXL_NOEXCEPT {
+	void* p = std::aligned_alloc((size_t)align, sizeof(TrackerBlock) + size);
+	return p ? addTrackerBlock(p, size) : NULL;
+}
+#	endif
+
+//..............................................................................
+
+} // namespace mem
+} // namespace axl
+
+AXL_VISIBILITY_DEFAULT
+void*
+operator new (size_t size) {
+	void* p = axl::mem::trackingAllocate(size);
+	if (!p)
+		throw new std::bad_alloc();
+	return p;
+}
+
+AXL_VISIBILITY_DEFAULT
+void
+operator delete (void* p) AXL_NOEXCEPT {
+	axl::mem::trackingDeallocate(p);
+}
+
+AXL_VISIBILITY_DEFAULT
+void
+operator delete (
+	void* p,
+	size_t size
+) AXL_NOEXCEPT {
+	axl::mem::trackingDeallocate(p, size);
+}
+
+AXL_VISIBILITY_DEFAULT
+void*
+operator new[] (size_t size) {
+	return operator new (size);
+}
+
+AXL_VISIBILITY_DEFAULT
+void
+operator delete[] (void* p) AXL_NOEXCEPT {
+	operator delete (p);
+}
+
+AXL_VISIBILITY_DEFAULT
+void
+operator delete[] (
+	void* p,
+	size_t size
+) AXL_NOEXCEPT {
+	operator delete (p, size);
+}
+
+// non-throwing version
+
+AXL_VISIBILITY_DEFAULT
+void*
+operator new (
+	size_t size,
+    const std::nothrow_t& nothrow
+) AXL_NOEXCEPT {
+	return axl::mem::trackingAllocate(size);
+}
+
+AXL_VISIBILITY_DEFAULT
+void
+operator delete (
+	void* p,
+	const std::nothrow_t& nothrow
+) AXL_NOEXCEPT {
+	operator delete (p);
+}
+
+AXL_VISIBILITY_DEFAULT
+void*
+operator new[] (
+	size_t size,
+    const std::nothrow_t& nothrow
+) AXL_NOEXCEPT {
+    return operator new (size, nothrow);
+}
+
+AXL_VISIBILITY_DEFAULT
+void
+operator delete[] (
+	void* p,
+	const std::nothrow_t& nothrow
+) AXL_NOEXCEPT {
+	operator delete (p);
 }
 
 #	if (__cpp_aligned_new)
 
+// overaligned new
+
+AXL_VISIBILITY_DEFAULT
 void*
-allocate(
+operator new (
 	size_t size,
 	std::align_val_t align
-) AXL_NOEXCEPT {
-	return postAllocate(std::aligned_alloc((size_t)align, sizeof(TrackerBlock) + size), size);
+) {
+	void* p = axl::mem::trackingAllocate(size, align);
+	if (!p)
+		throw new std::bad_alloc();
+	return p;
 }
 
+AXL_VISIBILITY_DEFAULT
 void
-deallocate(
+operator delete (
 	void* p,
 	std::align_val_t align
 ) AXL_NOEXCEPT {
-	std::free(preDeallocate(p));
+	axl::mem::trackingDeallocate(p);
+}
+
+AXL_VISIBILITY_DEFAULT
+void
+operator delete (
+	void* p,
+	size_t size,
+	std::align_val_t align
+) AXL_NOEXCEPT {
+	axl::mem::trackingDeallocate(p, size);
+}
+
+AXL_VISIBILITY_DEFAULT
+void*
+operator new[] (
+	size_t size,
+	std::align_val_t align
+) {
+	return operator new (size, align);
+}
+
+AXL_VISIBILITY_DEFAULT
+void
+operator delete[] (
+	void* p,
+	std::align_val_t align
+) AXL_NOEXCEPT {
+	operator delete (p, align);
+}
+
+AXL_VISIBILITY_DEFAULT
+void
+operator delete[] (
+	void* p,
+	size_t size,
+	std::align_val_t align
+) AXL_NOEXCEPT {
+	operator delete (p, size, align);
+}
+
+// non-throwing version
+
+AXL_VISIBILITY_DEFAULT
+void*
+operator new (
+	size_t size,
+	std::align_val_t align,
+    const std::nothrow_t& nothrow
+) AXL_NOEXCEPT {
+	return axl::mem::trackingAllocate(size, align);
+}
+
+AXL_VISIBILITY_DEFAULT
+void
+operator delete (
+	void* p,
+	std::align_val_t align,
+	const std::nothrow_t& nothrow
+) AXL_NOEXCEPT {
+	operator delete (p, align);
+}
+
+AXL_VISIBILITY_DEFAULT
+void*
+operator new[] (
+	size_t size,
+	std::align_val_t align,
+    const std::nothrow_t& nothrow
+) AXL_NOEXCEPT {
+    return operator new (size, align, nothrow);
+}
+
+AXL_VISIBILITY_DEFAULT
+void
+operator delete[] (
+	void* p,
+	std::align_val_t align,
+	const std::nothrow_t& nothrow
+) AXL_NOEXCEPT {
+	operator delete (p, align);
 }
 
 #	endif // __cpp_aligned_new
-
-#else // _AXL_MEM_TRACKER
-#endif // _AXL_MEM_TRACKER
+#endif    // _AXL_MEM_TRACKER
 
 //..............................................................................
-
-} // namespace err
-} // namespace axl

@@ -7112,8 +7112,6 @@ main(
 #if (_AXL_OS_POSIX)
 	setvbuf(stdout, NULL, _IOLBF, 1024);
 #endif
-
-	g::getModule()->setTag("axl_test_con");
 	srand((uint_t)sys::getTimestamp());
 
 #if (_AXL_OS_WIN)

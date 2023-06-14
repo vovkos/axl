@@ -38,7 +38,7 @@ public:
 	UdevEnumerate() {}
 
 	UdevEnumerate(udev_enumerate* enumerate) {
-		if (m_h = enumerate)
+		if ((m_h = enumerate))
 			ref();
 	}
 

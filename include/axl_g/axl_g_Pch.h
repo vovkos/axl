@@ -415,7 +415,7 @@ wcslen_s(const wchar_t* p) {
 
 #if (__cpp_noexcept_function_type)
 #	define AXL_NOEXCEPT noexcept
-#elif (AXL_CPP_MSC_VERSION >= 0x1000)
+#else
 #	define AXL_NOEXCEPT throw()
 #endif
 
@@ -585,9 +585,13 @@ public:
 	axl_va_list va; \
 	axl_va_start(va, a);
 
-//..............................................................................
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-// TRACE macro
+// 6) debugging facilities
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// TRACE macro (redirectable to a file)
 
 #if (_AXL_DEBUG)
 AXL_SELECT_ANY FILE* axl_g_traceFile = stdout;
@@ -620,15 +624,28 @@ axl_trace(
 	axl_trace_va(formatString, va);
 }
 
-#	define AXL_TRACE \
-		axl_trace
+#	define AXL_TRACE axl_trace
 #else
-#	define AXL_TRACE \
-		(void)
+#	define AXL_TRACE (void)
 #endif
 
 #ifndef TRACE
 #	define TRACE AXL_TRACE
+#endif
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// break into the debugger
+
+#if (_AXL_CPP_MSC)
+#	define AXL_DEBUG_BREAK() (_CrtDbgBreak())
+#elif (_AXL_CPP_GCC && (_AXL_CPU_X86 || _AXL_CPU_AMD64))
+#	define AXL_DEBUG_BREAK() do { __asm__("int3"); } while (0)
+#elif (_AXL_OS_POSIX)
+#	include <signal.h>
+#	define AXL_DEBUG_BREAK() (raise(SIGTRAP))
+#else
+#	error unsupported platform
 #endif
 
 //..............................................................................

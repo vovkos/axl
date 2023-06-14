@@ -88,7 +88,7 @@ void run() {
 
 	bool result = verifyEcProductKey(key, userName, productKey);
 	printf("verify:  %d\n", result);
-	ASSERT(result);
+	TEST_ASSERT(result);
 
 	privateKey.detach();
 	publicKey.detach();

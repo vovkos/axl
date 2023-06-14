@@ -91,21 +91,34 @@ axl_create_build_type_setting)
 		)
 	endif()
 
-	set(
-		_OPTION_LIST
-		"0 (OFF)"
-		"1 (Debug builds only)"
-		"2 (Always ON)"
-	)
+	if(${PROJECT_NAME} STREQUAL "axl")
+		set(
+			_OPTION_LIST
+			"0 (OFF)"
+			"1 (Debug builds only)"
+			"2 (Always ON)"
+		)
 
-	list(GET _OPTION_LIST 1 _DEFAULT)
+		if(WIN32 OR APPLE)
+			set(_DEFAULT_IDX 1)
+		else()
+			# with libstdc++, new/delete operators are versioned which makes it hard
+			# to override them in shared objects (leads to crashes otherwise)
 
-	axl_create_setting(
-		AXL_MEM_TRACKER
-		DESCRIPTION "AXL memory tracker usage"
-		DEFAULT ${_DEFAULT}
-		${_OPTION_LIST}
-	)
+			# still OK to use with libc++ or when no shared objects are involved
+
+			set(_DEFAULT_IDX 0)
+		endif()
+
+		list(GET _OPTION_LIST ${_DEFAULT_IDX} _DEFAULT)
+
+		axl_create_setting(
+			AXL_MEM_TRACKER
+			DESCRIPTION "AXL memory tracker usage"
+			DEFAULT ${_DEFAULT}
+			${_OPTION_LIST}
+		)
+	endif()
 endmacro()
 
 macro(
@@ -132,12 +145,14 @@ axl_apply_build_type_setting)
 	set(CONFIGURATION_SUFFIX   "${CONFIGURATION}")
 	set(CONFIGURATION_SUFFIX_0 "${CONFIGURATION_SCG}")
 
-	string(SUBSTRING ${AXL_MEM_TRACKER} 0 1 _LEVEL)
-	if("${_LEVEL}" STREQUAL "2")
-		add_definitions(-D_AXL_MEM_TRACKER_DEBUG=1)
-		add_definitions(-D_AXL_MEM_TRACKER_RELEASE=1)
-	elseif("${_LEVEL}" STREQUAL "1")
-		add_definitions(-D_AXL_MEM_TRACKER_DEBUG=1)
+	if(${PROJECT_NAME} STREQUAL "axl")
+		string(SUBSTRING ${AXL_MEM_TRACKER} 0 1 AXL_MEM_TRACKER_LEVEL)
+		if("${AXL_MEM_TRACKER_LEVEL}" STREQUAL "2")
+			add_definitions(-D_AXL_MEM_TRACKER_DEBUG=1)
+			add_definitions(-D_AXL_MEM_TRACKER_RELEASE=1)
+		elseif("${AXL_MEM_TRACKER_LEVEL}" STREQUAL "1")
+			add_definitions(-D_AXL_MEM_TRACKER_DEBUG=1)
+		endif()
 	endif()
 endmacro()
 
@@ -286,7 +301,16 @@ axl_create_gcc_settings)
 		"-std=c++98" "-std=c++11" "-std=c++14" "-std=gnu++98" "-std=gnu++11" "-std=gnu++14"
 	)
 
-	if(NOT CLANG)
+	if(CLANG)
+		axl_create_compiler_flag_setting(
+			GCC_FLAG_CPP_STDLIB
+			DESCRIPTION "Specify C++ standard library implementation"
+			DEFAULT " "
+			"-stdlib=libstdc++"
+			"-stdlib=libc++"
+			"-stdlib=platform"
+		)
+	else()
 		axl_create_compiler_flag_setting(
 			GCC_FLAG_STATIC_LIBGCC
 			DESCRIPTION "Use static linkage to libgcc"
@@ -552,9 +576,18 @@ axl_apply_gcc_settings)
 
 	if(NOT APPLE)
 		if(GCC_LINK_EXPORTLESS_EXE)
-			set(_VERSION_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/exportless-exe.version")
-			file(WRITE ${_VERSION_SCRIPT} "{ local: *; };")
-			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--version-script='${_VERSION_SCRIPT}'")
+			set(_FILE "${CMAKE_CURRENT_BINARY_DIR}/exportless-exe.version")
+
+			if("${AXL_MEM_TRACKER_LEVEL}" EQUAL 2 OR
+				"${AXL_MEM_TRACKER_LEVEL}" EQUAL 1 AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug"
+			)
+				set(_SCRIPT "{ global: _Znw*\; _Zdl*\; local: *\; }\;")
+			else()
+				set(_SCRIPT "{ local: *\; }\;")
+			endif()
+
+			file(WRITE ${_FILE} ${_SCRIPT})
+			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--version-script='${_FILE}'")
 		endif()
 
 		if(GCC_LINK_GLIBC_WRAPPERS)

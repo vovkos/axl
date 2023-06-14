@@ -17,6 +17,16 @@
 #	include "axl_sys_win_NtDll.h"
 #endif
 
+#if (_AXL_DEBUG)
+#	define _AXL_MEM_TRACKER _AXL_MEM_TRACKER_DEBUG
+#else
+#	define _AXL_MEM_TRACKER _AXL_MEM_TRACKER_RELEASE
+#endif
+
+#if (_AXL_MEM_TRACKER)
+#	include "axl_mem_Tracker.h"
+#endif
+
 namespace axl {
 namespace sys {
 
@@ -29,24 +39,17 @@ namespace g {
 
 //.............................................................................
 
-// ensure module creation at startup
+// ensure early initialization of the module during startup
 
-class ModuleCreator {
-public:
-	ModuleCreator() {
+static struct ModuleInit {
+	ModuleInit() {
 		getModule();
 	}
-};
+} g_moduleInit;
 
-static ModuleCreator g_moduleCreator;
-
-//..............................................................................
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 Module::Module() {
-#ifdef _AXL_DEBUG
-	m_tag = "<untagged-module>";
-#endif
-
 #if (_AXL_OS_WIN)
 	m_hModule = ::GetModuleHandle(NULL);
 
@@ -65,6 +68,11 @@ Module::Module() {
 #endif
 
 	sys::initPreciseTimestamps();
+
+#if (_AXL_MEM_TRACKER)
+	if (mem::g_trackerDispatchFunc)
+		mem::g_trackerDispatchFunc(mem::Tracker::DispatchCode_SetWatermarkSeqNum);
+#endif
 }
 
 Module::~Module() {
@@ -74,8 +82,9 @@ Module::~Module() {
 		AXL_MEM_DELETE(finalizerEntry);
 	}
 
-#if ( _AXL_MEM_TRACKER)
-	m_memTracker.trace();
+#if (_AXL_MEM_TRACKER)
+	if (mem::g_trackerDispatchFunc)
+		mem::g_trackerDispatchFunc(mem::Tracker::DispatchCode_Trace);
 #endif
 }
 

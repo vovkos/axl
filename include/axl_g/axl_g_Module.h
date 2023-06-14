@@ -16,7 +16,6 @@
 #include "axl_sl_List.h"
 #include "axl_sys_Lock.h"
 #include "axl_sl_CallOnce.h"
-#include "axl_mem_Tracker.h"
 #include "axl_rc_Ptr.h"
 
 namespace axl {
@@ -51,45 +50,13 @@ protected:
 #if (_AXL_OS_WIN)
 	HMODULE m_hModule;
 #endif
-
 	SystemInfo m_systemInfo;
-
-#if (_AXL_MEM_TRACKER)
-	mem::Tracker m_memTracker;
-#endif
-
-	// finalizers
-
 	sys::Lock m_finalizerListLock;
 	sl::List<FinalizerEntry> m_finalizerList;
-
-#ifdef _AXL_DEBUG
-	const char* m_tag;
-#endif
 
 public:
 	Module();
 	~Module();
-
-#ifdef _AXL_DEBUG
-	const char*
-	getTag() {
-		return m_tag;
-	}
-
-	void
-	setTag(const char* tag) {
-		m_tag = tag;
-	}
-#else
-	const char*
-	getTag() {
-		return "<untagged-module>";
-	}
-
-	void
-	setTag(const char* tag) {}
-#endif
 
 #if (_AXL_OS_WIN)
 	HMODULE
@@ -102,13 +69,6 @@ public:
 	getSystemInfo() {
 		return &m_systemInfo;
 	}
-
-#if (_AXL_MEM_TRACKER)
-	mem::Tracker*
-	getMemTracker() {
-		return &m_memTracker;
-	}
-#endif
 
 	bool
 	addFinalizer(const rc::Ptr<Finalizer>& finalizer);
