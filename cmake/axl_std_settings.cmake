@@ -90,35 +90,6 @@ axl_create_build_type_setting)
 			${CMAKE_CONFIGURATION_TYPES}
 		)
 	endif()
-
-	if(${PROJECT_NAME} STREQUAL "axl")
-		set(
-			_OPTION_LIST
-			"0 (OFF)"
-			"1 (Debug builds only)"
-			"2 (Always ON)"
-		)
-
-		if(WIN32 OR APPLE)
-			set(_DEFAULT_IDX 1)
-		else()
-			# with libstdc++, new/delete operators are versioned which makes it hard
-			# to override them in shared objects (leads to crashes otherwise)
-
-			# still OK to use with libc++ or when no shared objects are involved
-
-			set(_DEFAULT_IDX 0)
-		endif()
-
-		list(GET _OPTION_LIST ${_DEFAULT_IDX} _DEFAULT)
-
-		axl_create_setting(
-			AXL_MEM_TRACKER
-			DESCRIPTION "AXL memory tracker usage"
-			DEFAULT ${_DEFAULT}
-			${_OPTION_LIST}
-		)
-	endif()
 endmacro()
 
 macro(
@@ -144,25 +115,60 @@ axl_apply_build_type_setting)
 
 	set(CONFIGURATION_SUFFIX   "${CONFIGURATION}")
 	set(CONFIGURATION_SUFFIX_0 "${CONFIGURATION_SCG}")
+endmacro()
 
-	if(${PROJECT_NAME} STREQUAL "axl")
-		string(SUBSTRING ${AXL_MEM_TRACKER} 0 1 AXL_MEM_TRACKER_LEVEL)
+#...............................................................................
+
+macro(
+axl_create_mem_tracker_setting)
+	set(
+		_OPTION_LIST
+		"0 (OFF)"
+		"1 (Debug builds only)"
+		"2 (Always ON)"
+	)
+
+	if(WIN32 OR APPLE)
+		set(_DEFAULT_IDX 1)
+	else()
+		# with libstdc++, new/delete operators are versioned which makes it hard
+		# to override them in shared objects (and otherwise, it leads to crashes)
+
+		# but it's still OK to use with libc++ or when no shared objects are involved
+
+		set(_DEFAULT_IDX 0)
 	endif()
 
+	list(GET _OPTION_LIST ${_DEFAULT_IDX} _DEFAULT)
+
+	axl_create_setting(
+		AXL_MEM_TRACKER
+		DESCRIPTION "AXL memory tracker usage"
+		DEFAULT ${_DEFAULT}
+		${_OPTION_LIST}
+	)
+endmacro()
+
+macro(
+axl_apply_mem_tracker_setting)
+	string(SUBSTRING ${AXL_MEM_TRACKER} 0 1 _LEVEL)
+
 	if(IS_MULTI_CONFIGURATION)
-		if("${AXL_MEM_TRACKER_LEVEL}" EQUAL 2)
+		if("${_LEVEL}" EQUAL 2)
 			add_definitions(-D_AXL_MEM_TRACKER_DEBUG=1)
 			add_definitions(-D_AXL_MEM_TRACKER_RELEASE=1)
-		elseif("${AXL_MEM_TRACKER_LEVEL}" EQUAL 1)
+		elseif("${_LEVEL}" EQUAL 1)
 			add_definitions(-D_AXL_MEM_TRACKER_DEBUG=1)
 		endif()
 	elseif(
-		"${AXL_MEM_TRACKER_LEVEL}" EQUAL 2 OR
-		"${AXL_MEM_TRACKER_LEVEL}" EQUAL 1 AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug"
+		"${_LEVEL}" EQUAL 2 OR
+		"${_LEVEL}" EQUAL 1 AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug"
 	)
 		add_definitions(-D_AXL_MEM_TRACKER=1)
+		set(AXL_MEM_TRACKER_ENABLED TRUE)
+	else()
+		unset(AXL_MEM_TRACKER_ENABLED)
 	endif()
-
 endmacro()
 
 #...............................................................................
@@ -587,9 +593,7 @@ axl_apply_gcc_settings)
 		if(GCC_LINK_EXPORTLESS_EXE)
 			set(_FILE "${CMAKE_CURRENT_BINARY_DIR}/exportless-exe.version")
 
-			if("${AXL_MEM_TRACKER_LEVEL}" EQUAL 2 OR
-				"${AXL_MEM_TRACKER_LEVEL}" EQUAL 1 AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug"
-			)
+			if(AXL_MEM_TRACKER_ENABLED)
 				set(_SCRIPT "{ global: _Znw*\; _Zdl*\; local: *\; }\;")
 			else()
 				set(_SCRIPT "{ local: *\; }\;")
@@ -723,6 +727,10 @@ axl_create_std_settings)
 	axl_create_target_cpu_setting()
 	axl_create_build_type_setting()
 
+	if(${PROJECT_NAME} STREQUAL "axl")
+		axl_create_mem_tracker_setting()
+	endif()
+
 	if(MSVC)
 		axl_create_msvc_settings()
 	elseif(GCC)
@@ -735,6 +743,10 @@ axl_apply_std_settings)
 
 	axl_apply_target_cpu_setting()
 	axl_apply_build_type_setting()
+
+	if(${PROJECT_NAME} STREQUAL "axl")
+		axl_apply_mem_tracker_setting()
+	endif()
 
 	if(MSVC)
 		axl_apply_msvc_settings()
