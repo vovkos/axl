@@ -17,16 +17,6 @@
 #	include "axl_sys_win_NtDll.h"
 #endif
 
-#if (_AXL_DEBUG)
-#	define _AXL_MEM_TRACKER _AXL_MEM_TRACKER_DEBUG
-#else
-#	define _AXL_MEM_TRACKER _AXL_MEM_TRACKER_RELEASE
-#endif
-
-#if (_AXL_MEM_TRACKER)
-#	include "axl_mem_Tracker.h"
-#endif
-
 namespace axl {
 namespace sys {
 
@@ -68,11 +58,6 @@ Module::Module() {
 #endif
 
 	sys::initPreciseTimestamps();
-
-#if (_AXL_MEM_TRACKER)
-	if (mem::g_trackerDispatchFunc)
-		mem::g_trackerDispatchFunc(mem::Tracker::DispatchCode_SetWatermarkSeqNum);
-#endif
 }
 
 Module::~Module() {
@@ -81,11 +66,6 @@ Module::~Module() {
 		finalizerEntry->m_finalizer->finalize();
 		AXL_MEM_DELETE(finalizerEntry);
 	}
-
-#if (_AXL_MEM_TRACKER)
-	if (mem::g_trackerDispatchFunc)
-		mem::g_trackerDispatchFunc(mem::Tracker::DispatchCode_Trace);
-#endif
 }
 
 bool

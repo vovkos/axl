@@ -46,7 +46,6 @@ protected:
 	size_t m_size;
 	size_t m_peakSize;
 	size_t m_totalSize;
-	size_t m_watermarkSeqNum;
 
 public:
 	size_t m_breakSeqNum; // freely adjustible
@@ -96,11 +95,6 @@ public:
 
 	void
 	trace(bool isDetailed = true);
-
-protected:
-	static
-	void
-	dispatch(DispatchCode code);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -109,11 +103,16 @@ inline
 Tracker*
 getTracker() {
 	static char buffer[sizeof(Tracker)];
-	sl::callOnce(sl::Construct<Tracker>(), (Tracker*)buffer);
+	sl::callOnce(sl::Construct<Tracker>(), (Tracker*)buffer); // never destruct
+
+	static struct TraceAtExit {
+		~TraceAtExit () {
+			((Tracker*)buffer)->trace();
+		}
+	} traceAtExit;
+
 	return (Tracker*)buffer;
 }
-
-AXL_SELECT_ANY void (*g_trackerDispatchFunc)(Tracker::DispatchCode code) = NULL;
 
 //..............................................................................
 

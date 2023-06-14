@@ -12,12 +12,6 @@
 #include "pch.h"
 #include "axl_mem_Tracker.h"
 
-#if (_AXL_DEBUG)
-#	define _AXL_MEM_TRACKER _AXL_MEM_TRACKER_DEBUG
-#else
-#	define _AXL_MEM_TRACKER _AXL_MEM_TRACKER_RELEASE
-#endif
-
 namespace axl {
 namespace mem {
 
@@ -32,7 +26,6 @@ Tracker::Tracker() {
 	m_peakSize = 0;
 	m_totalSize = 0;
 	m_breakSeqNum = -1;
-	g_trackerDispatchFunc = dispatch;
 }
 
 void
@@ -71,69 +64,34 @@ Tracker::remove(TrackerBlock* block) {
 void
 Tracker::trace(bool isDetailed) {
 	m_lock.lock();
-
-	size_t aboveSize = 0;
-	size_t aboveCount = 0;
-	size_t belowSize = 0;
-	size_t belowCount = 0;
-
-	sl::Iterator<TrackerBlock> it = m_blockList.getHead();
-	for (; it; it++)
-		if (it->m_seqNum >= m_watermarkSeqNum) {
-			aboveSize += it->m_size;
-			aboveCount++;
-		} else {
-			belowSize += it->m_size;
-			belowCount++;
-		}
+	size_t blockCount = m_blockList.getCount();
 
 	TRACE(
 		"AXL memory tracker stats:\n"
-		"    Current:\n"
-		"        Above ... %d byte(s) %d block(s)\n"
-		"        Below ... %d byte(s) %d block(s)\n"
-		"    Peak ........ %d byte(s) %d block(s)\n"
-		"    Total ....... %d byte(s) %d block(s)\n",
-		aboveSize,
-		aboveCount,
-		belowSize,
-		belowCount,
+		"    Current ... %d byte(s) %d block(s)\n"
+		"    Peak ...... %d byte(s) %d block(s)\n"
+		"    Total ..... %d byte(s) %d block(s)\n",
+		m_size,
+		blockCount,
 		m_peakSize,
 		m_peakBlockCount,
 		m_totalSize,
 		m_totalBlockCount
 	);
 
-	if (isDetailed && aboveCount) {
-		TRACE("*** %d unfreed block(s):\n", aboveCount);
+	if (isDetailed && blockCount) {
+		TRACE("*** Found %d unfreed block(s):\n", blockCount);
 
 		sl::Iterator<TrackerBlock> it = m_blockList.getHead();
-		for (; it; it++) {
-			if (it->m_seqNum >= m_watermarkSeqNum) // ignore blocks below watermark
-				TRACE(
-					"    #%d: %d byte(s)\n",
-					it->m_seqNum,
-					it->m_size
-				);
-		}
+		for (; it; it++)
+			TRACE(
+				"    #%d: %d byte(s)\n",
+				it->m_seqNum,
+				it->m_size
+			);
 	}
 
 	m_lock.unlock();
-}
-
-void
-Tracker::dispatch(DispatchCode code) {
-	Tracker* self = getTracker();
-
-	switch (code) {
-	case DispatchCode_Trace:
-		self->trace();
-		break;
-
-	case DispatchCode_SetWatermarkSeqNum:
-		self->m_watermarkSeqNum = self->m_blockList.getCount();
-		break;
-	}
 }
 
 //..............................................................................

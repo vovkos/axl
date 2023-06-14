@@ -13,12 +13,6 @@
 #include "axl_mem_Tracker.h"
 #include <memory>
 
-#if (_AXL_DEBUG)
-#	define _AXL_MEM_TRACKER _AXL_MEM_TRACKER_DEBUG
-#else
-#	define _AXL_MEM_TRACKER _AXL_MEM_TRACKER_RELEASE
-#endif
-
 #if (_AXL_MEM_TRACKER)
 
 namespace axl {

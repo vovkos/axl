@@ -147,13 +147,22 @@ axl_apply_build_type_setting)
 
 	if(${PROJECT_NAME} STREQUAL "axl")
 		string(SUBSTRING ${AXL_MEM_TRACKER} 0 1 AXL_MEM_TRACKER_LEVEL)
+	endif()
+
+	if(IS_MULTI_CONFIGURATION)
 		if("${AXL_MEM_TRACKER_LEVEL}" EQUAL 2)
 			add_definitions(-D_AXL_MEM_TRACKER_DEBUG=1)
 			add_definitions(-D_AXL_MEM_TRACKER_RELEASE=1)
 		elseif("${AXL_MEM_TRACKER_LEVEL}" EQUAL 1)
 			add_definitions(-D_AXL_MEM_TRACKER_DEBUG=1)
 		endif()
+	elseif(
+		"${AXL_MEM_TRACKER_LEVEL}" EQUAL 2 OR
+		"${AXL_MEM_TRACKER_LEVEL}" EQUAL 1 AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug"
+	)
+		add_definitions(-D_AXL_MEM_TRACKER=1)
 	endif()
+
 endmacro()
 
 #...............................................................................

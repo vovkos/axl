@@ -73,9 +73,6 @@ main(
 #endif
 	lex::registerParseErrorProvider();
 
-	int* p = new int;
-	delete p;
-
 	size_t total;
 	size_t passed = 0;
 

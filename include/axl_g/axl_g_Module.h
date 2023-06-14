@@ -82,6 +82,14 @@ getModule() {
 	// guaranteed to be thread safe since C++11
 	// otherwise it's still OK -- unless going MT in static constructors
 
+#if (_AXL_MEM_TRACKER)
+	static struct EnsureMemTracker {
+		EnsureMemTracker() {
+			delete new int;
+		}
+	} ensureMemTracker;
+#endif
+
 	static Module module;
 	return &module;
 }
