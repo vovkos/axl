@@ -61,7 +61,7 @@ removeTrackerBlock(
 	size_t size
 ) AXL_NOEXCEPT {
 	TrackerBlock* block = (TrackerBlock*)((char*)p - sizeof(TrackerBlock));
-	ASSERT(block->m_size == size);
+	ASSERT(size = sizeof(TrackerBlock) + block->m_size);
 	getTracker()->remove(block);
 	return block;
 }
