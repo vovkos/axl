@@ -57,9 +57,18 @@ public:
 	}
 
 	TlsValue
-	getSlotValue(size_t slot);
+	getSlotValue(size_t slot) {
+		sl::BoxListEntry<TlsValue>* entry = getSlotEntry(slot);
+		return entry ? entry->m_value : rc::g_nullPtr;
+	}
 
-	TlsValue
+	void*
+	getSlotValuePtr(size_t slot) {
+		sl::BoxListEntry<TlsValue>* entry = getSlotEntry(slot);
+		return entry ? entry->m_value.p() : NULL;
+	}
+
+	void*
 	setSlotValue(
 		size_t slot,
 		const TlsValue& value
@@ -108,6 +117,12 @@ protected:
 		AXL_MEM_DELETE((Page*)p);
 	}
 #endif
+
+	sl::BoxListEntry<TlsValue>*
+	getSlotEntry(size_t slot) {
+		Page* page = findCurrentThreadPage();
+		return page && slot < page->m_array.getCount() ? page->m_array[slot] : NULL;
+	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -163,6 +178,7 @@ setSimpleTlsValue(
 }
 
 #endif
+
 //..............................................................................
 
 } // namespace sys

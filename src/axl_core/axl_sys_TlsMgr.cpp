@@ -77,24 +77,7 @@ TlsMgr::~TlsMgr() {
 
 #endif
 
-TlsValue
-TlsMgr::getSlotValue(size_t slot) {
-	Page* page = findCurrentThreadPage();
-	if (!page)
-		return rc::g_nullPtr;
-
-	size_t count = page->m_array.getCount();
-	if (slot >= count)
-		return rc::g_nullPtr;
-
-	sl::BoxListEntry<TlsValue>* entry = page->m_array[slot];
-	if (!entry)
-		return rc::g_nullPtr;
-
-	return entry->m_value;
-}
-
-TlsValue
+void*
 TlsMgr::setSlotValue(
 	size_t slot,
 	const TlsValue& value
@@ -104,17 +87,17 @@ TlsMgr::setSlotValue(
 	size_t count = page->m_array.getCount();
 	if (slot >= count) {
 		if (!value)
-			return TlsValue();
+			return NULL;
 
 		page->m_array.setCountZeroConstruct(slot + 1);
 	}
 
 	sl::BoxListEntry<TlsValue>* entry = page->m_array[slot];
 
-	TlsValue oldValue;
+	void* prev = NULL;
 
 	if (entry) {
-		oldValue = entry->m_value;
+		prev = entry->m_value;
 
 		if (value) {
 			entry->m_value = value;
@@ -127,7 +110,7 @@ TlsMgr::setSlotValue(
 		page->m_array[slot] = entry;
 	}
 
-	return oldValue;
+	return prev;
 }
 
 TlsMgr::Page*

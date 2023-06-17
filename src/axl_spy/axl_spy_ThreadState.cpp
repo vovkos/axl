@@ -77,9 +77,9 @@ getCurrentThreadState(bool createIfNotExists) {
 	ASSERT(getCurrentThreadDisableCount() && "thread hooks are not disabled (should be)");
 
 	sys::TlsMgr* tlsMgr = sys::getTlsMgr();
-	sys::TlsValue currentState = tlsMgr->getSlotValue(g_threadStateSlot);
+	ThreadState* currentState = (ThreadState*)tlsMgr->getSlotValuePtr(g_threadStateSlot);
 	if (currentState || !createIfNotExists)
-		return (ThreadState*)currentState.p();
+		return currentState;
 
 	rc::Ptr<ThreadState> newState = AXL_RC_NEW(ThreadState);
 	tlsMgr->setSlotValue(g_threadStateSlot, newState);

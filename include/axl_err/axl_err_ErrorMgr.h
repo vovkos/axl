@@ -94,7 +94,7 @@ protected:
 
 	ThreadEntry*
 	findThreadEntry() {
-		return (ThreadEntry*)(void*)sys::getTlsMgr()->getSlotValue(m_tlsSlot);
+		return (ThreadEntry*)sys::getTlsMgr()->getSlotValuePtr(m_tlsSlot);
 	}
 
 	ThreadEntry*

@@ -441,14 +441,12 @@ set(
 	SYS_DRW_H_LIST
 	${AXL_INC_DIR}/axl_sys/axl_sys_drw_MachError.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_drw_Semaphore.h
-	${AXL_INC_DIR}/axl_sys/axl_sys_drw_Dyld.h
 )
 
 set(
 	SYS_DRW_CPP_LIST
 	axl_sys_drw_MachError.cpp
 	axl_sys_drw_Semaphore.cpp
-	axl_sys_drw_Dyld.cpp
 )
 
 source_group(
