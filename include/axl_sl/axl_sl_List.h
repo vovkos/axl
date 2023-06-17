@@ -88,6 +88,8 @@ public:
 
 	T*
 	remove(Iterator it) {
+		ASSERT(!isEmpty());
+
 		ListLink* link = it.getLink();
 		ListLink* next = link->m_next;
 		ListLink* prev = link->m_prev;
@@ -108,12 +110,14 @@ public:
 
 	T*
 	removeHead() {
-		return this->m_head ? remove(this->m_head) : NULL;
+		ASSERT(!isEmpty());
+		return remove(this->m_head);
 	}
 
 	T*
 	removeTail() {
-		return this->m_tail ? remove(this->m_tail) : NULL;
+		ASSERT(!isEmpty());
+		return remove(this->m_tail);
 	}
 
 	Iterator
@@ -429,26 +433,21 @@ public:
 		this->construct();
 	}
 
-	bool
-	clearButHead() {
-		if (this->isEmpty())
-			return false;
-
-		T* p = this->removeHead();
+	Iterator
+	clearButEntry(const Iterator it) {
+		T* p = this->remove(it);
 		clear();
-		this->insertHead(p);
-		return true;
+		return this->insertTail(p);
 	}
 
-	bool
-	clearButTail() {
-		if (this->isEmpty())
-			return false;
+	Iterator
+	clearButHead() {
+		return !this->isEmpty() ? clearButEntry(m_head) : NULL;
+	}
 
-		T* p = this->removeTail();
-		clear();
-		this->insertTail(p);
-		return true;
+	Iterator
+	clearButTail() {
+		return !this->isEmpty() ? clearButEntry(m_tail) : NULL;
 	}
 
 	void
@@ -460,13 +459,13 @@ public:
 	void
 	eraseHead() {
 		T* p = this->removeHead();
-		p ? Delete()(p) : (void) 0;
+		Delete()(p);
 	}
 
 	void
 	eraseTail() {
 		T* p = this->removeTail();
-		p ? Delete()(p) : (void) 0;
+		Delete()(p);
 	}
 };
 
