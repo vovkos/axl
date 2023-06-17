@@ -17,6 +17,14 @@ namespace mem {
 
 #if (_AXL_MEM_TRACKER)
 
+// ensure static initialization of the tracker during startup
+
+static struct TrackerInit {
+	TrackerInit() {
+		getTracker();
+	}
+} g_moduleInit;
+
 //..............................................................................
 
 Tracker::Tracker() {
