@@ -14,6 +14,7 @@
 #define _AXL_MEM_POOL_H
 
 #include "axl_sl_List.h"
+#include "axl_sys_TlsSlot.h"
 
 namespace axl {
 namespace mem {
@@ -36,9 +37,30 @@ public:
 		return !m_freeList.isEmpty() ? m_freeList.removeHead() : AXL_MEM_NEW(T);
 	}
 
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	T*
+	get(T&& src) {
+		T* p = get();
+		*p = std::move(src);
+		return p;
+	}
+#endif
+
+	T*
+	get(const T& src) {
+		T* p = get();
+		*p = src;
+		return p;
+	}
+
 	void
 	put(T* p) {
 		putFront(p); // by default, use stack rather than queue semantics
+	}
+
+	void
+	put(sl::List<T>* list) {
+		putFront(list);
 	}
 
 	void
@@ -52,7 +74,12 @@ public:
 	}
 
 	void
-	put(sl::List<T>* list) {
+	putFront(sl::List<T>* list) {
+		m_freeList.insertListHead(list);
+	}
+
+	void
+	putBack(sl::List<T>* list) {
 		m_freeList.insertListTail(list);
 	}
 
@@ -74,6 +101,20 @@ public:
 		return true;
 	}
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <typename T>
+Pool<T>*
+getCurrentThreadPool() {
+	Pool<T>* pool = sys::getTlsPtrSlotValue<Pool<T> >();
+	if (pool)
+		return pool;
+
+	rc::Ptr<Pool<T> > newPool = AXL_RC_NEW(rc::Box<Pool<T> >);
+	sys::setTlsPtrSlotValue<Pool<T> >(newPool);
+	return newPool;
+}
 
 //..............................................................................
 
