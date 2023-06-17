@@ -32,122 +32,113 @@ public:
 	typedef typename Token::Pos Pos;
 
 protected:
-	typedef sl::BoxList<Token, const Token&> TokenList;
-	typedef sl::BoxListEntry<Token> TokenEntry;
-
-protected:
-	TokenList m_tokenList;
-	TokenList m_freeTokenList;
-
-	Pos m_lastTokenPos;
-
-public:
-	uint_t m_channelMask;
+	sl::List<Token> m_tokenList;
+	mem::Pool<Token>* m_tokenPool;
 
 public:
 	Lexer() {
-		m_channelMask = TokenChannelMask_Main;
+		// the same lexer is normally never shared among threads
+		// if it does, be sure to update the token pool
+
+		m_tokenPool = mem::getCurrentThreadPool<Token>();
+	}
+
+	static
+	void
+	clearTokenPool() {
+		mem::getCurrentThreadPool<Token>()->clear();
 	}
 
 	void
 	reset() {
-		m_freeTokenList.insertListTail(&m_tokenList);
-		m_lastTokenPos.clear();
-
+		m_tokenPool->put(&m_tokenList);
 		static_cast<T*>(this)->onReset();
 	}
 
 	const Token*
-	getChannelToken(
-		uint_t channelMask,
-		size_t index = 0
-	) {
-		channelMask |= TokenChannelMask_Main; // make sure main channel is ALWAYS in the mask
+	getToken() {
+		while (m_tokenList.isEmpty())
+			static_cast<T*>(this)->tokenize();
 
-		size_t i = 0;
-		sl::BoxIterator<Token> it = m_tokenList.getHead();
-
-		for (;;) {
-			// check prefetched list first ...
-
-			for (; it; it++) {
-				if (it->m_token <= 0)
-					return &*it;
-
-				bool isMatch = (channelMask & it->m_channelMask) != 0;
-				if (isMatch) {
-					if (i >= index) {
-						m_lastTokenPos = it->m_pos;
-						return &*it;
-					}
-
-					i++;
-				}
-			}
-
-			// ...nope, need to fetch more tokens
-
-			sl::BoxIterator<Token> tail = m_tokenList.getTail();
-
-			size_t oldCount = m_tokenList.getCount();
-			do {
-				((T*)(this))->tokenize();
-			} while (m_tokenList.getCount() == oldCount);
-
-			it = tail ? tail + 1 : m_tokenList.getHead();
-		}
-	}
-
-	void
-	nextChannelToken(
-		uint_t channelMask,
-		size_t count = 1
-	) {
-		channelMask |= TokenChannelMask_Main; // make sure main channel is ALWAYS in the mask
-
-		for (size_t i = 0; i < count; i++) {
-			while (!m_tokenList.isEmpty()) {
-				sl::BoxIterator<Token> it = m_tokenList.getHead();
-
-				if (it->m_token <= 0) // done! but don't remove it!
-					return;
-
-				bool isMatch = (channelMask & it->m_channelMask) != 0;
-
-				TokenEntry* entry = it.getEntry();
-
-				m_tokenList.removeEntry(entry);
-				m_freeTokenList.insertHeadEntry(entry);
-
-				if (isMatch)
-					break;
-			}
-		}
+		return *m_tokenList.getHead();
 	}
 
 	const Token*
-	getToken(size_t index = 0) {
-		return getChannelToken(m_channelMask, index);
+	expectToken(int tokenKind) {
+		const Token* token = getToken();
+		if (token->m_token == tokenKind)
+			return token;
+
+		lex::setExpectedTokenError(Token::getName(tokenKind), token->getName());
+		return NULL;
+	}
+
+	Token*
+	takeToken() {
+		while (m_tokenList.isEmpty())
+			static_cast<T*>(this)->tokenize();
+
+		Token* token = *m_tokenList.getHead();
+		if (token->m_token > 0) // not EOF or ERROR
+			return m_tokenList.removeHead();
+
+		Token* clone = m_tokenPool->get();
+		*clone = *token;
+		return clone;
 	}
 
 	void
-	nextToken(size_t count = 1) {
-		return nextChannelToken(m_channelMask, count);
+	nextToken() {
+		if (!m_tokenList.isEmpty() && m_tokenList.getHead()->m_token > 0) // not EOF or ERROR
+			m_tokenPool->put(m_tokenList.removeHead());
+	}
+
+	const Token*
+	getToken(size_t index) {
+		// check prefetched list first ...
+
+		size_t i = 0;
+
+		sl::Iterator<Token> it = m_tokenList.getHead();
+		for (; it; it++, i++)
+			if (i >= index || it->m_token <= 0) // EOF or ERROR
+				return *it;
+
+		// nope, need to tokenize more
+
+		sl::Iterator<Token> tail = m_tokenList.getTail();
+
+		do {
+			static_cast<T*>(this)->tokenize();
+		} while (
+			m_tokenList.isEmpty() ||
+			m_tokenList.getCount() < index && m_tokenList.getTail()->m_token > 0 // not EOF or ERROR
+		);
+
+		// start with the first new token
+
+		it = tail ? tail.getNext() : m_tokenList.getHead();
+		for (; it; it++, i++)
+			if (i >= index || it->m_token <= 0) // EOF or ERROR
+				return *it;
+
+		ASSERT(false && "tokenize loop didn't add enough tokens");
+		return NULL;
+	}
+
+	void
+	nextToken(size_t count) {
+		for (size_t i = 0; i < count; i++) {
+			if (m_tokenList.isEmpty() || m_tokenList.getHead()->m_token <= 0) // EOF or ERROR
+				break;
+
+			m_tokenPool->put(m_tokenList.removeHead());
+		}
 	}
 
 protected:
 	void
 	onReset() {}
-
-	Token*
-	allocateToken() {
-		TokenEntry* entry = !m_freeTokenList.isEmpty() ?
-			m_freeTokenList.removeHeadEntry() :
-			AXL_MEM_NEW(TokenEntry);
-
-		m_tokenList.insertTailEntry(entry);
-		return &entry->m_value;
-	}
 };
 
 //..............................................................................

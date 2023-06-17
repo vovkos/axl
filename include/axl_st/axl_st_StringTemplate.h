@@ -152,7 +152,7 @@ protected:
 		bool result;
 
 		Lexer lexer;
-		lexer.create(fileName, frame);
+		lexer.create(frame);
 
 		scriptSource->clear();
 

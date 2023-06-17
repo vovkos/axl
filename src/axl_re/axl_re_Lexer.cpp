@@ -71,7 +71,7 @@ void
 Lexer::create(const sl::StringRef& source) {
 	reset();
 	init();
-	setSource(source, true);
+	setSource(source, lex::RagelBomMode_Preserve);
 }
 
 void

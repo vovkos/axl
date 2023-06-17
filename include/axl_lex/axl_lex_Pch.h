@@ -11,8 +11,9 @@
 
 #pragma once
 
-#include "axl_sl_BoxList.h"
+#include "axl_sl_List.h"
 #include "axl_sl_Pack.h"
 #include "axl_sl_String.h"
 #include "axl_sl_CharLiteral.h"
+#include "axl_mem_Pool.h"
 #include "axl_err_ErrorMgr.h"

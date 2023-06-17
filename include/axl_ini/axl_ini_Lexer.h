@@ -20,7 +20,7 @@ namespace ini {
 
 //..............................................................................
 
-class Lexer {
+class Lexer: lex::Ragel {
 public:
 	enum ScanResultKind {
 		ScanResultKind_Error = -1,
@@ -33,7 +33,6 @@ public:
 protected:
 	sl::String m_filePath;
 
-	char* m_begin;
 	int m_line;
 	size_t m_lineOffset;
 	bool m_isLineContinuation;
@@ -43,16 +42,6 @@ protected:
 	sl::String m_value;
 
 	ScanResultKind m_scanResultKind;
-
-	// ragel interface variables
-
-	char* p;
-	char* pe;
-	char* eof;
-	char* ts;
-	char* te;
-	int act;
-	int cs;
 
 protected: // should only be used as part of ini::CParser
 	Lexer() {
@@ -108,11 +97,6 @@ protected:
 
 	void
 	newLine(char* line);
-
-	void
-	stop() {
-		pe = p + 1;
-	}
 
 	// implemented in lexer.rl
 

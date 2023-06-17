@@ -132,7 +132,7 @@ Parser::addComment(
 	}
 
 	Lexer lexer;
-	lexer.create("doxy", comment);
+	lexer.create(comment);
 	lexer.setLineCol(pos);
 
 	int lastTokenLine = -1;

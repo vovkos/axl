@@ -27,7 +27,6 @@ set(
 set(
 	LIB_CPP_LIST
 	axl_lex_SrcPos.cpp
-	axl_lex_Ragel.cpp
 	axl_lex_ParseError.cpp
 )
 

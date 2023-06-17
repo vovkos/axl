@@ -79,6 +79,13 @@ RagelRoot::postPop() {
 		m_stack.setCount(count - 1);
 }
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+enum RagelBomMode {
+	RagelBomMode_Skip     = 0,
+	RagelBomMode_Preserve = 1,
+};
+
 //..............................................................................
 
 template <typename T>
@@ -106,12 +113,12 @@ public:
 	void
 	setSource(
 		const sl::StringRefBase<T>& source,
-		bool isBomNeeded = false
+		RagelBomMode bomMode = RagelBomMode_Skip
 	) {
 		m_begin = p = (T*)source.cp();
 		pe = eof = (T*)source.getEnd();
 
-		if (!isBomNeeded) {
+		if (bomMode == RagelBomMode_Skip) {
 			size_t bomLength = Encoding::getBomLength();
 			if (source.getLength() >= bomLength && memcmp(p, Encoding::getBom(), bomLength) == 0)
 				p += bomLength;

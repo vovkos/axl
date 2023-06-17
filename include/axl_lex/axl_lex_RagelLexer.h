@@ -47,35 +47,16 @@ public:
 		return sl::StringRef(this->m_pos.m_p, this->m_pos.m_length);
 	}
 
-	template <typename IsSpaceNeeded>
 	static
-	sl::String
-	getTokenListString(
-		const sl::BoxList<RagelToken>& list,
-		const IsSpaceNeeded& isSpaceNeeded
-	) {
+	sl::StringRef
+	getText(const sl::List<RagelToken>& list) {
 		if (list.isEmpty())
 			return sl::String();
 
-		sl::ConstBoxIterator<RagelToken> token = list.getHead();
-		int prevToken = token->m_token;
-		sl::String string(token->m_pos.m_p, token->m_pos.m_length);
-
-		for (token++; token; token++) {
-			if (isSpaceNeeded(prevToken, token->m_token))
-				string.append(' ');
-
-			string.append(token->m_pos.m_p, token->m_pos.m_length);
-			prevToken = token->m_token;
-		}
-
-		return string;
-	}
-
-	static
-	sl::String
-	getTokenListString(const sl::BoxList<RagelToken>& list) {
-		return getTokenListString(list, isSpaceNeededStd);
+		const char* p = list.getHead()->m_pos.m_p;
+		const RagelToken* tail = *list.getTail();
+		size_t length = tail->m_pos.m_p + tail->m_pos.m_length - p;
+		return sl::StringRef(p, length);
 	}
 
 protected:
@@ -108,8 +89,6 @@ protected:
 	size_t m_tokenizeLimit;
 	size_t m_tokenizeCount;
 
-	sl::StringRef m_filePath;
-
 	int m_line;
 	size_t m_lineOffset;
 
@@ -132,39 +111,21 @@ public:
 	void
 	create(
 		int state,
-		const sl::StringRef& filePath,
 		const sl::StringRef& source,
-		bool isBomNeeded = false
+		RagelBomMode bomMode = RagelBomMode_Skip
 	) {
-		create(filePath, source, isBomNeeded);
+		create(source, bomMode);
 		cs = state;
 	}
 
 	void
 	create(
-		const sl::StringRef& filePath,
 		const sl::StringRef& source,
-		bool isBomNeeded = false
+		RagelBomMode bomMode = RagelBomMode_Skip
 	) {
 		this->reset();
 		static_cast<T*>(this)->init();
-		m_filePath = filePath;
-		Ragel::setSource(source, isBomNeeded);
-	}
-
-	const Token*
-	expectToken(int tokenKind) {
-		const Token* token = this->getToken();
-		if (token->m_token == tokenKind)
-			return token;
-
-		lex::setExpectedTokenError(Token::getName(tokenKind), token->getName());
-		return NULL;
-	}
-
-	void
-	ensureSrcPosError() {
-		lex::ensureSrcPosError(m_filePath, this->m_lastTokenPos);
+		Ragel::setSource(source, bomMode);
 	}
 
 	enum GotoStateKind {
@@ -233,21 +194,18 @@ protected:
 	onLexerError() {}
 
 	Token*
-	preCreateToken(
-		int tokenKind,
-		uint_t channelMask = TokenChannelMask_Main
-	) {
+	preCreateToken(int tokenKind) {
 		size_t offset = ts - m_begin;
 		size_t length = te - ts;
 
-		Token* token = this->allocateToken();
+		Token* token = this->m_tokenPool->get();
 		token->m_token = tokenKind;
-		token->m_channelMask = channelMask;
 		token->m_pos.m_offset = offset;
 		token->m_pos.m_line = m_line;
 		token->m_pos.m_col = offset - m_lineOffset;
 		token->m_pos.m_length = length;
 		token->m_pos.m_p = ts;
+		m_tokenList.insertTail(token);
 		return token;
 	}
 
@@ -259,11 +217,8 @@ protected:
 	}
 
 	Token*
-	createToken(
-		int tokenKind,
-		uint_t channelMask = TokenChannelMask_Main
-	) {
-		Token* token = preCreateToken(tokenKind, channelMask);
+	createToken(int tokenKind) {
+		Token* token = preCreateToken(tokenKind);
 		postCreateToken();
 		return token;
 	}
@@ -284,7 +239,6 @@ protected:
 		m_lineOffset = 0;
 		m_tokenizeLimit = 8;
 		m_tokenizeCount = 0;
-		m_filePath.clear();
 	}
 
 	void

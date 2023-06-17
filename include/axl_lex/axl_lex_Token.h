@@ -41,13 +41,11 @@ struct StdTokenData {
 	}
 };
 
-//..............................................................................
-
-enum TokenChannelMask {
-	TokenChannelMask_Main = 0x01,
-};
-
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// the choise of token ID values is arbitrary with the following restrictions:
+//   0   -> EOF
+//   < 0 -> ERROR
 
 template <
 	typename TokenKind0,
@@ -55,7 +53,7 @@ template <
 	typename Data0 = StdTokenData,
 	typename Pos0 = LineCol
 >
-struct Token {
+struct Token: sl::ListLink {
 	typedef TokenKind0 TokenKind;
 	typedef Name0 Name;
 	typedef Data0 Data;
@@ -69,11 +67,6 @@ struct Token {
 		wchar_t m_WCharToken;
 	};
 
-	union {
-		uint_t m_channelMask;
-		uint_t m_flags;
-	};
-
 	Data m_data;
 	Pos m_pos;
 
@@ -81,13 +74,12 @@ struct Token {
 
 	Token() {
 		m_token = 0;
-		m_channelMask = TokenChannelMask_Main;
 	}
 
 	static
 	const char*
 	getName(int token) {
-		return Name() (token);
+		return Name()(token);
 	}
 
 	const char*

@@ -23,15 +23,11 @@ Lexer::create(
 	const sl::StringRef& filePath,
 	const sl::StringRef& source
 ) {
-	this->reset();
-
-	init();
-
-	p   = (char*)source.cp();
-	eof = (char*)source.getEnd();
-
 	m_filePath = filePath;
-	m_begin = p;
+
+	reset();
+	init();
+	lex::Ragel::setSource(source);
 	return true;
 }
 
@@ -154,15 +150,8 @@ Lexer::scanLine() {
 
 void
 Lexer::reset() {
-	p = NULL;
-	pe = NULL;
-	eof = NULL;
-	ts = NULL;
-	te = NULL;
-	act = 0;
-	cs = 0;
+	lex::Ragel::clear();
 
-	m_begin = NULL;
 	m_line = 0;
 	m_lineOffset = 0;
 	m_isLineContinuation = false;
