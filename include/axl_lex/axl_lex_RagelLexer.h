@@ -205,7 +205,7 @@ protected:
 		token->m_pos.m_col = offset - m_lineOffset;
 		token->m_pos.m_length = length;
 		token->m_pos.m_p = ts;
-		m_tokenList.insertTail(token);
+		this->m_tokenList.insertTail(token);
 		return token;
 	}
 

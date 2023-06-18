@@ -442,12 +442,12 @@ public:
 
 	Iterator
 	clearButHead() {
-		return !this->isEmpty() ? clearButEntry(m_head) : NULL;
+		return !this->isEmpty() ? clearButEntry(this->m_head) : NULL;
 	}
 
 	Iterator
 	clearButTail() {
-		return !this->isEmpty() ? clearButEntry(m_tail) : NULL;
+		return !this->isEmpty() ? clearButEntry(this->m_tail) : NULL;
 	}
 
 	void
