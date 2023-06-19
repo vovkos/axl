@@ -51,12 +51,36 @@ public:
 	sl::StringRef
 	getText(const sl::List<RagelToken>& list) {
 		if (list.isEmpty())
-			return sl::String();
+			return sl::StringRef();
 
-		const char* p = list.getHead()->m_pos.m_p;
 		const RagelToken* tail = *list.getTail();
-		size_t length = tail->m_pos.m_p + tail->m_pos.m_length - p;
-		return sl::StringRef(p, length);
+		const char* start = list.getHead()->m_pos.m_p;
+		const char* end = tail->m_pos.m_p + tail->m_pos.m_length;
+
+		// remove new lines (if any) and replace with spaces
+
+		sl::String string;
+		const char* p0 = start;
+		const char* p = start;
+		while (p < end) {
+			if (*p != '\n') {
+				p++;
+				continue;
+			}
+
+			string.append(p0, p - p0);
+			string.append(' ');
+			do {
+				p++;
+			} while (p < end && isspace(*p));
+			p0 = p;
+		}
+
+		if (string.isEmpty()) // no newlines -- simply return the source slice
+			return sl::StringRef(start, end - start);
+
+		string.append(p0, end - p0);
+		return string;
 	}
 
 protected:
