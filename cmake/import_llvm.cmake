@@ -74,7 +74,9 @@ target_link_llvm_jit_libraries
 	)
 
 	if(${LLVM_VERSION} VERSION_LESS 3.6)
-		set(_COMPONENT_LIST ${_COMPONENT_LIST} jit)
+		list(APPEND _COMPONENT_LIST jit)
+	elseif(${LLVM_VERSION} VERSION_GREATER_EQUAL 7.0)
+		list(APPEND _COMPONENT_LIST OrcJIT)
 	endif()
 
 	target_link_llvm_libraries(
