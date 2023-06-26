@@ -29,6 +29,10 @@ if(EXISTS ${LLVM_CMAKE_DIR}/LLVMConfig.cmake)
 
 	set(LLVM_VERSION ${LLVM_PACKAGE_VERSION})
 
+	if(NOT LLVM_VERSION_PATCH) # LLVM < 3.5
+		string(REGEX MATCH "[0-9]+$" LLVM_VERSION_PATCH ${LLVM_VERSION})
+	endif()
+
 	axl_message("LLVM ${LLVM_VERSION} paths:")
 	axl_message("    CMake files:" "${LLVM_CMAKE_DIR}")
 	axl_message("    Includes:"    "${LLVM_INC_DIR}")
