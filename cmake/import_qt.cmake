@@ -110,7 +110,7 @@ qt5_wrap_cpp_alt
 		get_filename_component(_H_NAME ${_H_PATH} NAME_WE)
 		get_filename_component(_H_EXT ${_H_PATH} EXT)
 
-		string(COMPARE EQUAL ${_H_EXT} ".cpp" _IS_CPP)
+		string(COMPARE EQUAL "${_H_EXT}" ".cpp" _IS_CPP)
 
 		if(${_IS_CPP})
 			set(_MOC_CPP_PATH ${CMAKE_CURRENT_BINARY_DIR}/${_H_NAME}.moc)
