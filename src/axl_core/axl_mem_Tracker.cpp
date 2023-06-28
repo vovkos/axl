@@ -69,13 +69,31 @@ Tracker::remove(TrackerBlock* block) {
 	m_lock.unlock();
 }
 
+#if (_AXL_OS_WIN)
+EXTERN_C IMAGE_DOS_HEADER __ImageBase;
+#endif
+
 void
 Tracker::trace(bool isDetailed) {
 	m_lock.lock();
 	size_t blockCount = m_blockList.getCount();
 
+#if (_AXL_OS_WIN)
+	// on Windows, we add tracker to DLLs as well; therefore, want to know a particular DLL name
+
+	wchar_t imageFileName[MAX_PATH] = { 0 };
+	GetModuleFileName((HMODULE)&__ImageBase, imageFileName, lengthof(imageFileName));
+
 	TRACE(
 		"AXL memory tracker stats:\n"
+		"    Module .... %S\n",
+		imageFileName
+	);
+#else
+	TRACE("AXL memory tracker stats:\n");
+#endif
+
+	TRACE(
 		"    Current ... %d byte(s) %d block(s)\n"
 		"    Peak ...... %d byte(s) %d block(s)\n"
 		"    Total ..... %d byte(s) %d block(s)\n",
