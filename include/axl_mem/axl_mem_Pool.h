@@ -91,7 +91,7 @@ public:
 
 		count -= freeCount;
 		for (size_t i = 0; i < count; i++) {
-			T* p = new (std::nothrow_t) T;
+			T* p = new (std::nothrow) T;
 			if (!p)
 				return false;
 
