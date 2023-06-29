@@ -128,7 +128,7 @@ axl_create_mem_tracker_setting)
 		"2 (Always ON)"
 	)
 
-	if(WIN32 OR APPLE)
+	if(WIN32)
 		set(_DEFAULT_IDX 1)
 	else()
 		# with libstdc++, new/delete operators are versioned which makes it hard
