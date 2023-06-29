@@ -9,7 +9,6 @@
 #
 #...............................................................................
 
-brew update
 brew install lua
 brew install libusb
 brew install ragel
