@@ -60,7 +60,7 @@ SerialPortEnumerator::createPortList(
 		};
 
 		for (size_t i = 0; i < countof(deviceNameTable); i++) {
-			SerialPortDesc* portDesc = AXL_MEM_NEW(SerialPortDesc);
+			SerialPortDesc* portDesc = new SerialPortDesc;
 			portDesc->m_deviceName = deviceNameTable[i][0];
 			portDesc->m_description = deviceNameTable[i][1];
 			portList->insertTail(portDesc);
@@ -98,7 +98,7 @@ SerialPortEnumerator::createPortList(
 				continue;
 		}
 
-		SerialPortDesc* portDesc = AXL_MEM_NEW(SerialPortDesc);
+		SerialPortDesc* portDesc = new SerialPortDesc;
 		portDesc->m_deviceName = name;
 
 		if (flags & SerialPortDescFlag_Description) {

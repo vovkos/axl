@@ -121,7 +121,7 @@ SerialPortEnumerator::createPortList(
 				continue;
 		}
 
-		SerialPortDesc* portDesc = AXL_MEM_NEW(SerialPortDesc);
+		SerialPortDesc* portDesc = new SerialPortDesc;
 		portDesc->m_deviceName = prop.toString();
 
 		if (flags & SerialPortDescFlag_Location)

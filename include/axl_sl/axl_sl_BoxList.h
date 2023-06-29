@@ -179,9 +179,7 @@ public:
 	T
 	remove(Iterator it) {
 		T value = *it;
-		Entry* entry = it.getEntry();
-		BaseType::remove(entry);
-		AXL_MEM_DELETE(entry);
+		BaseType::erase(it);
 		return value;
 	}
 
@@ -197,14 +195,14 @@ public:
 
 	Iterator
 	insertHead(ValueArg value) {
-		Entry* entry = AXL_MEM_NEW(Entry);
+		Entry* entry = new Entry;
 		entry->m_value = value;
 		return insertHeadEntry(entry);
 	}
 
 	Iterator
 	insertTail(ValueArg value) {
-		Entry* entry = AXL_MEM_NEW(Entry);
+		Entry* entry = new Entry;
 		entry->m_value = value;
 		return insertTailEntry(entry);
 	}
@@ -214,7 +212,7 @@ public:
 		ValueArg value,
 		Iterator before
 	) {
-		Entry* entry = AXL_MEM_NEW(Entry);
+		Entry* entry = new Entry;
 		entry->m_value = value;
 		return insertBeforeEntry(entry, before);
 	}
@@ -224,7 +222,7 @@ public:
 		ValueArg value,
 		Iterator after
 	) {
-		Entry* entry = AXL_MEM_NEW(Entry);
+		Entry* entry = new Entry;
 		entry->m_value = value;
 		return insertAfterEntry(entry, after);
 	}
@@ -233,25 +231,25 @@ public:
 
 	Iterator
 	insertHead() {
-		Entry* entry = AXL_MEM_NEW(Entry);
+		Entry* entry = new Entry;
 		return insertHeadEntry(entry);
 	}
 
 	Iterator
 	insertTail() {
-		Entry* entry = AXL_MEM_NEW(Entry);
+		Entry* entry = new Entry;
 		return insertTailEntry(entry);
 	}
 
 	Iterator
 	insertBefore(Iterator before) {
-		Entry* entry = AXL_MEM_NEW(Entry);
+		Entry* entry = new Entry;
 		return insertBeforeEntry(entry, before);
 	}
 
 	Iterator
 	insertAfter(Iterator after) {
-		Entry* entry = AXL_MEM_NEW(Entry);
+		Entry* entry = new Entry;
 		return insertAfterEntry(entry, after);
 	}
 

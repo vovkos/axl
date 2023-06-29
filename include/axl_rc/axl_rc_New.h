@@ -34,19 +34,19 @@ primeRefCount(
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_RC_NEW(T) \
-	(axl::rc::primeRefCount(new (AXL_MEM_ALLOCATE(sizeof(T))) T))
+	(axl::rc::primeRefCount(new (axl::mem::allocate(sizeof(T))) T))
 
 #define AXL_RC_NEW_EXTRA(T, extra) \
-	(axl::rc::primeRefCount(new (AXL_MEM_ALLOCATE(sizeof(T) + extra)) T))
+	(axl::rc::primeRefCount(new (axl::mem::allocate(sizeof(T) + extra)) T))
 
 #define AXL_RC_NEW_INPLACE(T, p, freeFunc) \
 	(axl::rc::primeRefCount(new (p) T, freeFunc))
 
 #define AXL_RC_NEW_ARGS(T, args) \
-	(axl::rc::primeRefCount(new (AXL_MEM_ALLOCATE(sizeof(T))) T args))
+	(axl::rc::primeRefCount(new (axl::mem::allocate(sizeof(T))) T args))
 
 #define AXL_RC_NEW_ARGS_EXTRA(T, args, extra) \
-	(axl::rc::primeRefCount(new (AXL_MEM_ALLOCATE(sizeof(T) + extra)) T args))
+	(axl::rc::primeRefCount(new (axl::mem::allocate(sizeof(T) + extra)) T args))
 
 #define AXL_RC_NEW_ARGS_INPLACE(T, args, p, freeFunc) \
 	(axl::rc::primeRefCount(new (p) T args, freeFunc))

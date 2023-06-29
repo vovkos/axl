@@ -64,13 +64,13 @@ Module::~Module() {
 	while (!m_finalizerList.isEmpty()) {
 		FinalizerEntry* finalizerEntry = m_finalizerList.removeTail();
 		finalizerEntry->m_finalizer->finalize();
-		AXL_MEM_DELETE(finalizerEntry);
+		delete finalizerEntry;
 	}
 }
 
 bool
 Module::addFinalizer(const rc::Ptr<Finalizer>& finalizer) {
-	FinalizerEntry* finalizerEntry = AXL_MEM_NEW(FinalizerEntry);
+	FinalizerEntry* finalizerEntry = new FinalizerEntry;
 	finalizerEntry->m_finalizer = finalizer;
 
 	m_finalizerListLock.lock();

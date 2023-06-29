@@ -87,7 +87,7 @@ SerialPortEnumerator::createPortDesc(
 	if (!result)
 		return NULL;
 
-	SerialPortDesc* portDesc = AXL_MEM_NEW(SerialPortDesc);
+	SerialPortDesc* portDesc = new SerialPortDesc;
 	portDesc->m_deviceName = devRegKey.queryStringValue(L"PortName");
 
 	if (flags & SerialPortDescFlag_Description) {

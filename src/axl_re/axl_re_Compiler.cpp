@@ -123,7 +123,7 @@ Compiler::concat() {
 		);
 	} else {
 		sequence = m_program->insertState(start);
-		accept = AXL_MEM_NEW(NfaState);
+		accept = new NfaState;
 
 		NfaState* link = m_program->getLastState();
 		link->createLink(start);
@@ -287,7 +287,7 @@ Compiler::quantifier(NfaState* start) {
 		}
 	} else {
 		sequence = m_program->insertState(start);
-		accept = AXL_MEM_NEW(NfaState);
+		accept = new NfaState;
 
 		NfaState* link = m_program->getLastState();
 		link->createLink(start);

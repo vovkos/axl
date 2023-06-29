@@ -19,16 +19,6 @@ namespace err {
 
 //..............................................................................
 
-// we can't use any of our error facilities from axl_mem_Allocate.h
-// this is a dedicated function for marking out-of-memory incidents
-
-void
-setOutOfMemoryError() {
-	setError(SystemErrorCode_InsufficientResources);
-}
-
-//..............................................................................
-
 sl::StringRef
 ErrorHdr::getDescription() const {
 	return getErrorMgr()->getErrorDescription(this);

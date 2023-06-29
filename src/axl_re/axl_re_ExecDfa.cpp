@@ -448,11 +448,7 @@ protected:
 		ExecResult execResult;
 
 		if (matchEndOffset < offset) {
-			ExecReverseOffsetScanner<Encoding>* scanner = AXL_MEM_NEW_ARGS(
-				ExecReverseOffsetScanner<Encoding>,
-				(this, matchEndOffset)
-			);
-
+			ExecReverseOffsetScanner<Encoding>* scanner = new ExecReverseOffsetScanner<Encoding>(this, matchEndOffset);
 			this->m_parent->m_engine = scanner; // replace engine
 
 			scanner->initialize(init, NULL);
@@ -460,7 +456,7 @@ protected:
 			execResult = scanner->getExecResult();
 		} else {
 			typedef ExecDfa<sl::True, Encoding> ReverseDfa;
-			ReverseDfa* reverseDfa = AXL_MEM_NEW_ARGS(ReverseDfa, (this));
+			ReverseDfa* reverseDfa = new ReverseDfa(this);
 			this->m_parent->m_engine = reverseDfa; // replace engine
 
 			uint_t prevCharFlags;
@@ -517,7 +513,7 @@ protected:
 			engine->exec(p, length);
 			engine->eof(true);
 			this->m_execResult = engine->getExecResult();
-			AXL_MEM_DELETE(engine);
+			delete engine;
 		}
 	}
 
@@ -589,7 +585,7 @@ template <typename Encoding>
 void
 ExecReverseOffsetScanner<Encoding>::execReverseDfa() {
 	typedef ExecDfa<sl::True, Encoding> ReverseDfa;
-	ReverseDfa* reverseDfa = AXL_MEM_NEW_ARGS(ReverseDfa, (this));
+	ReverseDfa* reverseDfa = new ReverseDfa(this);
 	this->m_parent->m_engine = reverseDfa; // replace engine
 
 	StateInit init;
@@ -615,7 +611,7 @@ public:
 	ExecEngine*
 	createExecEngine(StateImpl* parent) {
 		typedef ExecDfa<IsReverse, Encoding> Dfa;
-		return AXL_MEM_NEW_ARGS(Dfa, (parent));
+		return new Dfa(parent);
 	}
 };
 

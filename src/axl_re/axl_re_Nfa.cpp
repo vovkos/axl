@@ -100,7 +100,7 @@ void
 NfaState::freeCharSet() {
 	if (m_stateKind == NfaStateKind_MatchCharSet) {
 		ASSERT(m_charSet);
-		AXL_MEM_DELETE(m_charSet);
+		delete m_charSet;
 	}
 }
 
@@ -132,7 +132,7 @@ NfaState::addChar(utf32_t c) {
 
 		m_stateKind = NfaStateKind_MatchCharSet;
 		ASSERT(!m_charSet);
-		m_charSet = AXL_MEM_NEW(CharSet);
+		m_charSet = new CharSet;
 		m_charSet->add(m_char);
 
 		// and fall through
@@ -161,7 +161,7 @@ NfaState::addCharRange(
 
 		m_stateKind = NfaStateKind_MatchCharSet;
 		ASSERT(!m_charSet);
-		m_charSet = AXL_MEM_NEW(CharSet);
+		m_charSet = new CharSet;
 		m_charSet->add(m_char);
 
 		// and fall through
@@ -217,7 +217,7 @@ void
 NfaState::copy(NfaState& src) {
 	if (m_stateKind == NfaStateKind_MatchCharSet) {
 		ASSERT(m_charSet);
-		AXL_MEM_DELETE(m_charSet);
+		delete m_charSet;
 	}
 
 	m_stateKind = src.m_stateKind;
@@ -229,7 +229,7 @@ NfaState::copy(NfaState& src) {
 
 	if (m_stateKind == NfaStateKind_MatchCharSet) {
 		ASSERT(src.m_charSet);
-		m_charSet = AXL_MEM_NEW(CharSet);
+		m_charSet = new CharSet;
 		m_charSet->copy(*src.m_charSet);
 	}
 }
@@ -444,8 +444,8 @@ NfaProgram::finalize(bool isMatchOnly) {
 	m_matchStartState = *m_stateList.getHead();
 
 	if (!isMatchOnly) {
-		NfaState* matchAny = AXL_MEM_NEW(NfaState);
-		NfaState* split = AXL_MEM_NEW(NfaState);
+		NfaState* matchAny = new NfaState;
+		NfaState* split = new NfaState;
 		split->createSplit(m_matchStartState, matchAny);
 		matchAny->createMatchAnyChar(split);
 		m_stateList.insertHead(matchAny);

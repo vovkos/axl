@@ -253,7 +253,7 @@ public:
 	virtual
 	ExecEngine*
 	createExecEngine(StateImpl* parent) {
-		return AXL_MEM_NEW_ARGS(ExecNfaSp<Decoder>, (parent));
+		return new ExecNfaSp<Decoder>(parent);
 	}
 };
 

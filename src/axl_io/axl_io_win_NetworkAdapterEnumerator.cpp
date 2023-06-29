@@ -65,7 +65,7 @@ NetworkAdapterEnumerator::createAdapterList(sl::List<NetworkAdapterDesc>* adapte
 
 	IP_ADAPTER_ADDRESSES* srcAdapter = (IP_ADAPTER_ADDRESSES*)buffer.p();
 	for (; srcAdapter; srcAdapter = srcAdapter->Next) {
-		NetworkAdapterDesc* adapter = AXL_MEM_NEW(NetworkAdapterDesc);
+		NetworkAdapterDesc* adapter = new NetworkAdapterDesc;
 		setupAdapter(adapter, srcAdapter);
 		adapterList->insertTail(adapter);
 	}
@@ -137,7 +137,7 @@ NetworkAdapterEnumerator::setupAdapter(
 		if (!srcAddress->Address.lpSockaddr || srcAddress->Address.iSockaddrLength > sizeof(io::SockAddr))
 			continue;
 
-		NetworkAdapterAddress* address = AXL_MEM_NEW(NetworkAdapterAddress);
+		NetworkAdapterAddress* address = new NetworkAdapterAddress;
 		memcpy(&address->m_address, srcAddress->Address.lpSockaddr, srcAddress->Address.iSockaddrLength);
 
 		if (srcAddress->Length >= sizeof(IP_ADAPTER_UNICAST_ADDRESS))

@@ -77,7 +77,6 @@ set(
 	${AXL_INC_DIR}/axl_rc/axl_rc_New.h
 	${AXL_INC_DIR}/axl_rc/axl_rc_Ptr.h
 	${AXL_INC_DIR}/axl_rc/axl_rc_RefCount.h
-	${AXL_INC_DIR}/axl_rc/axl_rc_RtFactory.h
 	${AXL_INC_DIR}/axl_rc/axl_rc_WeakPtr.h
 )
 
@@ -139,7 +138,6 @@ set(
 	${AXL_INC_DIR}/axl_sl/axl_sl_SimpleSingleton.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_Array.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_ArrayDetails.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_ArrayList.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_AutoPtrArray.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_BinTree.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_BitIdx.h

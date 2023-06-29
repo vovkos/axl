@@ -131,7 +131,7 @@ DfaProgram::getState(const NfaStateSet& nfaStateSet) {
 	if (it->m_value)
 		return it->m_value;
 
-	DfaState* state = AXL_MEM_NEW(DfaState);
+	DfaState* state = new DfaState;
 	state->m_flags = m_stateFlags;
 	state->m_nfaStateSet = nfaStateSet;
 

@@ -27,7 +27,7 @@ GenericParser::onSection(const sl::StringRef& sectionName) {
 		return true;
 	}
 
-	Section* section = AXL_MEM_NEW(Section);
+	Section* section = new Section;
 	section->m_name = sectionName;
 	m_ini->m_namedSectionList.insertTail(section);
 	m_ini->m_namedSectionMap[section->m_name] = section;
@@ -52,7 +52,7 @@ GenericParser::onKeyValue(
 		return true;
 	}
 
-	NamedValue* namedValue = AXL_MEM_NEW(NamedValue);
+	NamedValue* namedValue = new NamedValue;
 	namedValue->m_name = keyName;
 	namedValue->m_value = value;
 	m_currentSection->m_namedValueList.insertTail(namedValue);

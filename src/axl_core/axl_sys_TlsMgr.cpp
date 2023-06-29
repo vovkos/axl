@@ -29,7 +29,7 @@ TlsMgr::TlsMgr() {
 TlsMgr::~TlsMgr() {
 	Page* page = findCurrentThreadPage();
 	if (page) {
-		AXL_MEM_DELETE(page);
+		delete page;
 		setCurrentThreadPage(NULL);
 	}
 
@@ -48,14 +48,12 @@ TlsMgr::tlsCallback(
 		return;
 
 	TlsMgr* self = getTlsMgr();
-
 	Page* page = self->findCurrentThreadPage();
 	if (!page)
 		return;
 
-	AXL_MEM_DELETE(page);
-
-	::TlsSetValue(self->m_tlsIdx, NULL);
+	delete page;
+	self->setCurrentThreadPage(NULL);
 }
 
 #elif (_AXL_OS_POSIX)
@@ -68,7 +66,7 @@ TlsMgr::TlsMgr() {
 TlsMgr::~TlsMgr() {
 	Page* page = findCurrentThreadPage();
 	if (page) {
-		AXL_MEM_DELETE(page);
+		delete page;
 		setCurrentThreadPage(NULL);
 	}
 
@@ -119,7 +117,7 @@ TlsMgr::getCurrentThreadPage() {
 	if (page)
 		return page;
 
-	page = AXL_MEM_NEW(Page);
+	page = new Page;
 	setCurrentThreadPage(page);
 	return page;
 }

@@ -265,7 +265,7 @@ AppStoreReceiptPayloadParser::decode(
 			break;
 
 		case AttributeId_Iap:
-			m_iap = *m_receipt->m_iapList.insertTail(AXL_MEM_NEW(AppStoreIap));
+			m_iap = *m_receipt->m_iapList.insertTail(new AppStoreIap);
 
 			p = decode(
 				State_Set,

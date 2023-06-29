@@ -252,7 +252,7 @@ public:
 	virtual
 	ExecEngine*
 	clone(StateImpl* parent) {
-		T* exec = AXL_MEM_NEW_ARGS(T, (parent));
+		T* exec = new T(parent);
 		exec->copy(this);
 		return exec;
 	}

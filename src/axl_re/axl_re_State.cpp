@@ -30,14 +30,14 @@ StateImpl::StateImpl() {
 void
 StateImpl::freeEngine() {
 	if (m_engine) {
-		AXL_MEM_DELETE(m_engine);
+		delete m_engine;
 		m_engine = NULL;
 	}
 }
 
 StateImpl*
 StateImpl::clone() {
-	StateImpl* state = AXL_MEM_NEW(StateImpl);
+	StateImpl* state = new StateImpl;
 
 	state->m_regex = m_regex;
 	state->m_engine = m_engine->clone(state);

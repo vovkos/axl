@@ -40,7 +40,7 @@ public:
 
 	virtual ~ExecDfaBase() {
 		if (m_prevEngine)
-			AXL_MEM_DELETE(m_prevEngine);
+			delete m_prevEngine;
 	}
 
 	size_t

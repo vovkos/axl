@@ -60,13 +60,13 @@ ExecNfaVmBase::copy(const ExecNfaVmBase* src) {
 
 	sl::ConstIterator<Thread> it = src->m_consumingThreadList.getHead();
 	for (; it; it++) {
-		Thread* thread = AXL_MEM_NEW_ARGS(Thread, (**it));
+		Thread* thread = new Thread(**it);
 		m_consumingThreadList.insertTail(thread);
 	}
 
 	it = src->m_nonConsumingThreadList.getHead();
 	for (; it; it++) {
-		Thread* thread = AXL_MEM_NEW_ARGS(Thread, (**it));
+		Thread* thread = new Thread(**it);
 		m_nonConsumingThreadList.insertTail(thread);
 	}
 }
@@ -82,7 +82,7 @@ ExecNfaVmBase::initialize(
 	m_nonConsumingThreadList.clear();
 	m_matchState = NULL;
 
-	Thread* thread = AXL_MEM_NEW(Thread);
+	Thread* thread = new Thread;
 	thread->m_state = state;
 
 	if (thread->isConsuming())
@@ -120,7 +120,7 @@ ExecNfaVmBase::advanceNonConsumingThreads(uint32_t anchors) {
 				break;
 
 			case NfaStateKind_Split:
-				newThread = AXL_MEM_NEW_ARGS(Thread, (*thread));
+				newThread = new Thread(*thread);
 				newThread->m_state = state->m_splitState;
 				if (newThread->isConsuming())
 					m_consumingThreadList.insertTail(newThread);
@@ -136,7 +136,8 @@ ExecNfaVmBase::advanceNonConsumingThreads(uint32_t anchors) {
 					m_matchPos.m_endOffset = m_offset;
 					m_capturePosArray = thread->m_capturePosArray;
 				}
-				AXL_MEM_DELETE(thread);
+
+				delete thread;
 				goto Break2;
 
 			case NfaStateKind_OpenCapture:
@@ -157,7 +158,7 @@ ExecNfaVmBase::advanceNonConsumingThreads(uint32_t anchors) {
 					break;
 				}
 
-				AXL_MEM_DELETE(thread);
+				delete thread;
 				goto Break2;
 
 			case NfaStateKind_MatchChar:
@@ -191,14 +192,14 @@ ExecNfaVmBase::advanceConsumingThreads(utf32_t c) {
 			if (thread->m_state->m_char == c)
 				continueConsumingThread(thread);
 			else
-				AXL_MEM_DELETE(thread);
+				delete thread;
 			break;
 
 		case NfaStateKind_MatchCharSet:
 			if (thread->m_state->m_charSet->isSet(c))
 				continueConsumingThread(thread);
 			else
-				AXL_MEM_DELETE(thread);
+				delete thread;
 			break;
 
 		case NfaStateKind_MatchAnyChar:
@@ -272,7 +273,7 @@ public:
 	virtual
 	ExecEngine*
 	createExecEngine(StateImpl* parent) {
-		return AXL_MEM_NEW_ARGS(ExecNfaVm<Decoder>, (parent));
+		return new ExecNfaVm<Decoder>(parent);
 	}
 };
 

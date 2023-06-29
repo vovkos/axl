@@ -4555,13 +4555,13 @@ testReadWriteLock() {
 	lock.writeLock();
 
 	for (size_t i = 0; i < ReaderCount; i++) {
-		RwLockThread* thread = AXL_MEM_NEW_ARGS(RwLockThread, (mappingName, readEventName, writeEventName, i, IterationCount, false));
+		RwLockThread* thread = new RwLockThread(mappingName, readEventName, writeEventName, i, IterationCount, false);
 		thread->start();
 		threadList.insertTail(thread);
 	}
 
 	for (size_t i = 0; i < WriterCount; i++) {
-		RwLockThread* thread = AXL_MEM_NEW_ARGS(RwLockThread, (mappingName, readEventName, writeEventName, i, IterationCount, true));
+		RwLockThread* thread = new RwLockThread(mappingName, readEventName, writeEventName, i, IterationCount, true);
 		thread->start();
 		threadList.insertTail(thread);
 	}
@@ -4596,12 +4596,12 @@ void
 testConstList() {
 	sl::List<Point2d> list;
 
-	Point2d* point = AXL_MEM_NEW(Point2d);
+	Point2d* point = new Point2d;
 	point->m_x = 10;
 	point->m_y = 20;
 	list.insertTail(point);
 
-	point = AXL_MEM_NEW(Point2d);
+	point = new Point2d;
 	point->m_x = 30;
 	point->m_y = 40;
 	list.insertTail(point);

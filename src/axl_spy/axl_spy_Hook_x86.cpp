@@ -101,12 +101,12 @@ hookLeave(
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 HookArena::HookArena() {
-	m_impl = AXL_MEM_NEW(mem::ExecutableBlockArena<Hook>);
+	m_impl = new mem::ExecutableBlockArena<Hook>;
 }
 
 HookArena::~HookArena() {
 	((mem::ExecutableBlockArena<Hook>*)m_impl)->detach(); // don't free unless explicitly requested
-	AXL_MEM_DELETE((mem::ExecutableBlockArena<Hook>*)m_impl);
+	delete (mem::ExecutableBlockArena<Hook>*)m_impl;
 }
 
 inline

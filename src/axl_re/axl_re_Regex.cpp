@@ -84,7 +84,7 @@ Regex::load(
 	stateArray.setCount(hdr->m_stateCount);
 
 	for (size_t i = 0; i < hdr->m_stateCount; i++) {
-		NfaState* state = AXL_MEM_NEW(NfaState);
+		NfaState* state = new NfaState;
 		state->m_id = i;
 		m_nfaProgram.m_stateList.insertTail(state);
 		stateArray[i] = state;
@@ -163,7 +163,7 @@ Regex::load(
 			break;
 
 		case NfaStateKind_MatchCharSet:
-			state->m_charSet = AXL_MEM_NEW(CharSet);
+			state->m_charSet = new CharSet;
 
 			for (size_t j = 0; j < stateStorage->m_charRangeCount; j++) {
 				const NfaCharRangeStorage* rangeStorage = (NfaCharRangeStorage*)p;

@@ -266,7 +266,7 @@ public:
 				return it;
 		}
 
-		Entry* entry = AXL_MEM_ZERO_NEW(Entry);
+		Entry* entry = new (mem::ZeroInit) Entry;
 		entry->m_key = key;
 		entry->m_bucket = bucket;
 		m_list.insertTail(entry);
@@ -329,10 +329,8 @@ public:
 
 	void
 	erase(Iterator it) {
-		Entry* entry = *it;
-		entry->m_bucket->remove(entry);
-		m_list.remove(entry);
-		AXL_MEM_DELETE(entry);
+		it->m_bucket->remove(*it);
+		m_list.erase(it);
 	}
 
 	bool

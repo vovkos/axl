@@ -21,7 +21,7 @@ namespace sys {
 void
 ReadWriteLock::close() {
 	if (m_data && m_data != m_mapping.p())
-		AXL_MEM_FREE((void*)m_data);
+		delete m_data;
 
 	m_data = NULL;
 
@@ -34,7 +34,7 @@ bool
 ReadWriteLock::create() {
 	close();
 
-	m_data = AXL_MEM_ZERO_NEW(Data);
+	m_data = new (mem::ZeroInit) Data;
 	m_readEvent.create();
 	m_writeEvent.create();
 

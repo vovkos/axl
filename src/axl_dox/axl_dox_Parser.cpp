@@ -313,7 +313,7 @@ Parser::addComment(
 			if (commandParam.isEmpty())
 				break; // ignore
 
-			param = AXL_MEM_NEW(Param);
+			param = new Param;
 
 			i = commandParam.findOneOf(" \t");
 			if (i == -1) {

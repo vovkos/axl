@@ -38,7 +38,7 @@ Module::getGroup(const sl::StringRef& name) {
 	refId.format("group_%s", name.sz());
 	refId.replace('-', '_');
 
-	Group* group = AXL_MEM_NEW_ARGS(Group, (m_host));
+	Group* group = new Group(m_host);
 	group->m_name = name;
 	group->m_refId = adjustRefId(refId);
 
@@ -49,7 +49,7 @@ Module::getGroup(const sl::StringRef& name) {
 
 Block*
 Module::createBlock(handle_t item) {
-	Block* block = AXL_MEM_NEW_ARGS(Block, (m_host));
+	Block* block = new Block(m_host);
 	block->m_item = item;
 	m_blockList.insertTail(block);
 	return  block;
@@ -57,7 +57,7 @@ Module::createBlock(handle_t item) {
 
 Footnote*
 Module::createFootnote() {
-	Footnote* footnote = AXL_MEM_NEW_ARGS(Footnote, (m_host));
+	Footnote* footnote = new Footnote(m_host);
 	m_blockList.insertTail(footnote);
 	return footnote;
 }
@@ -84,7 +84,7 @@ Module::setBlockTarget(
 	const sl::StringRef& itemName,
 	size_t overloadIdx
 ) {
-	Target* target = AXL_MEM_NEW(Target);
+	Target* target = new Target;
 	target->m_block = block;
 	target->m_tokenKind = tokenKind;
 	target->m_itemName = itemName;

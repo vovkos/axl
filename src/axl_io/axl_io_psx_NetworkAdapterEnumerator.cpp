@@ -75,7 +75,7 @@ NetworkAdapterEnumerator::createAdapterList(sl::List<NetworkAdapterDesc>* adapte
 
 		sl::StringHashTableIterator<NetworkAdapterDesc*> it = adapterMap.visit(iface->ifa_name);
 		if (!it->m_value) {
-			NetworkAdapterDesc* adapter = AXL_MEM_NEW(NetworkAdapterDesc);
+			NetworkAdapterDesc* adapter = new NetworkAdapterDesc;
 			setupAdapter(adapter, iface, &socket);
 			adapterList->insertTail(adapter);
 			it->m_value = adapter;
@@ -142,7 +142,7 @@ NetworkAdapterEnumerator::addAdapterAddress(
 	}
 #endif
 
-	NetworkAdapterAddress* address = AXL_MEM_NEW(NetworkAdapterAddress);
+	NetworkAdapterAddress* address = new NetworkAdapterAddress;
 	address->m_address.setup(addr);
 	address->m_netMaskBitCount = netMask ? getSockAddrNetMaskBitCount(netMask) : 0;
 	adapter->m_addressList.insertTail(address);

@@ -72,7 +72,7 @@ enumerateUsbDevices(
 		if (!(flags & UsbEnumFlag_Hubs) && deviceDescriptor.bDeviceClass == 0x09)
 			continue;
 
-		UsbDeviceEntry* deviceEntry = AXL_MEM_NEW(UsbDeviceEntry);
+		UsbDeviceEntry* deviceEntry = new UsbDeviceEntry;
 
 #if (_AXL_OS_WIN)
 #	if (_AXL_IO_USBDEVICE_GETSESSIONDATA)

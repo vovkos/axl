@@ -61,7 +61,7 @@ MappedViewMgr::view(
 	uint64_t origBegin,
 	uint64_t origEnd
 ) {
-	ViewEntry* viewEntry = AXL_MEM_NEW(ViewEntry);
+	ViewEntry* viewEntry = new ViewEntry;
 
 	MappedFile* mappedFile = getMappedFile();
 	void* p;
@@ -89,7 +89,7 @@ MappedViewMgr::view(
 #endif
 
 	if (!p) {
-		AXL_MEM_DELETE(viewEntry);
+		delete viewEntry;
 		return NULL;
 	}
 
@@ -145,7 +145,7 @@ MappedViewMgr::limitViewCount(size_t maxViewCount) {
 		if (view->m_mapIt)
 			m_viewMap.erase(view->m_mapIt);
 
-		AXL_MEM_DELETE(view);
+		delete view;
 	}
 }
 

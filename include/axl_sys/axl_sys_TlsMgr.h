@@ -114,7 +114,7 @@ protected:
 	void
 	tlsDestructor(void* p) {
 		ASSERT(p);
-		AXL_MEM_DELETE((Page*)p);
+		delete (Page*)p;
 	}
 #endif
 

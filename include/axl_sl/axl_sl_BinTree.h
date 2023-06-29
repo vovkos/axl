@@ -216,11 +216,9 @@ public:
 
 		// create and insert new node
 
-		node = AXL_MEM_ZERO_NEW(Node);
+		node = new (mem::ZeroInit) Node;
 		node->m_key = key;
 		node->m_parent = parent;
-		node->m_left = NULL;
-		node->m_right = NULL;
 
 		if (!parent) {
 			m_root = node;

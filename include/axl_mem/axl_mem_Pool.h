@@ -34,7 +34,7 @@ public:
 
 	T*
 	get() {
-		return !m_freeList.isEmpty() ? m_freeList.removeHead() : AXL_MEM_NEW(T);
+		return !m_freeList.isEmpty() ? m_freeList.removeHead() : new T;
 	}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
@@ -91,7 +91,7 @@ public:
 
 		count -= freeCount;
 		for (size_t i = 0; i < count; i++) {
-			T* p = AXL_MEM_NEW(T);
+			T* p = new (std::nothrow_t) T;
 			if (!p)
 				return false;
 

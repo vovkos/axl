@@ -70,7 +70,7 @@ protected:
 		for (size_t i = 0; i < count; i++) {
 			T* e = this->m_p[i];
 			if (e)
-				Delete() (e);
+				Delete()(e);
 		}
 	}
 };

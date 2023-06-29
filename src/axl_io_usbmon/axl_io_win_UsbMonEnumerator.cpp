@@ -328,7 +328,7 @@ UsbPcapDeviceEnumerator::createDevice(
 
 	ASSERT(!connectionInfo.DeviceIsHub || connectionInfo.DeviceDescriptor.bDeviceClass == 0x09);
 
-	UsbMonDeviceDesc* device = AXL_MEM_NEW(UsbMonDeviceDesc);
+	UsbMonDeviceDesc* device = new UsbMonDeviceDesc;
 	device->m_captureDeviceName = pcapDeviceName;
 	device->m_captureDeviceId = getCaptureDeviceId(pcapDeviceName);
 	device->m_vendorId = connectionInfo.DeviceDescriptor.idVendor;

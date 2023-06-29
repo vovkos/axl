@@ -62,7 +62,7 @@ enumerateUsbMonDevices(
 		if (isHub && !(flags & UsbMonEnumFlag_Hubs))
 			continue;
 
-		UsbMonDeviceDesc* deviceDesc = AXL_MEM_NEW(UsbMonDeviceDesc);
+		UsbMonDeviceDesc* deviceDesc = new UsbMonDeviceDesc;
 		deviceDesc->m_captureDeviceName = string;
 		deviceDesc->m_captureDeviceId = busNumber;
 		deviceDesc->m_vendorId = deviceDescriptor.idVendor;

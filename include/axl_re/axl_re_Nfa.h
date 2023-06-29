@@ -342,7 +342,7 @@ NfaState::createMatchCharSet(NfaState* nextState) {
 	ASSERT(!m_stateKind && !m_nextState);
 
 	m_stateKind = NfaStateKind_MatchCharSet;
-	m_charSet = AXL_MEM_NEW(CharSet);
+	m_charSet = new CharSet;
 	m_nextState = nextState;
 }
 
@@ -587,7 +587,7 @@ struct NfaProgram {
 inline
 NfaState*
 NfaProgram::addState() {
-	NfaState* state = AXL_MEM_NEW(NfaState);
+	NfaState* state = new NfaState;
 	m_stateList.insertTail(state);
 	return state;
 }
@@ -595,7 +595,7 @@ NfaProgram::addState() {
 inline
 NfaState*
 NfaProgram::insertState(NfaState* beforeState) {
-	NfaState* state = AXL_MEM_NEW(NfaState);
+	NfaState* state = new NfaState;
 	m_stateList.insertBefore(state, beforeState);
 	return state;
 }

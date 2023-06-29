@@ -107,7 +107,7 @@ UsbHubDb::getUsbHub(sys::win::DeviceInfo* deviceInfo) {
 	if (!result)
 		return NULL;
 
-	hub = AXL_MEM_NEW(UsbHub);
+	hub = new UsbHub;
 	result = hub->create(
 		path,
 		GENERIC_READ,
@@ -117,7 +117,7 @@ UsbHubDb::getUsbHub(sys::win::DeviceInfo* deviceInfo) {
 	);
 
 	if (!result) {
-		AXL_MEM_DELETE(hub);
+		delete hub;
 		return NULL;
 	}
 
