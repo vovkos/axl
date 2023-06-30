@@ -151,7 +151,7 @@ endmacro()
 
 macro(
 axl_apply_mem_tracker_setting)
-	string(SUBSTRING ${AXL_MEM_TRACKER} 0 1 _LEVEL)
+	string(SUBSTRING "${AXL_MEM_TRACKER}" 0 1 _LEVEL)
 
 	if(IS_MULTI_CONFIGURATION)
 		if("${_LEVEL}" EQUAL 2)
@@ -712,7 +712,6 @@ endmacro()
 
 macro(
 axl_create_std_settings)
-
 	if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
 		set(LINUX TRUE)
 	endif()
@@ -727,7 +726,7 @@ axl_create_std_settings)
 	axl_create_target_cpu_setting()
 	axl_create_build_type_setting()
 
-	if(${PROJECT_NAME} STREQUAL "axl")
+	if(AXL_MEM_TRACKER_SETTING)
 		axl_create_mem_tracker_setting()
 	endif()
 
@@ -744,7 +743,7 @@ axl_apply_std_settings)
 	axl_apply_target_cpu_setting()
 	axl_apply_build_type_setting()
 
-	if(${PROJECT_NAME} STREQUAL "axl")
+	if(AXL_MEM_TRACKER_SETTING)
 		axl_apply_mem_tracker_setting()
 	endif()
 
@@ -799,6 +798,10 @@ axl_print_std_settings)
 
 	if(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "")
 		axl_message("    Build configuration:" ${CMAKE_BUILD_TYPE})
+	endif()
+
+	if("${PROJECT_NAME}" STREQUAL "axl")
+		axl_message("    Memory tracker:" "${AXL_MEM_TRACKER}")
 	endif()
 
 	set(_C_FLAGS_DEBUG "${CMAKE_C_COMPILER_ARG1} ${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_DEBUG}")

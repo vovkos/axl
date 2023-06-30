@@ -13,6 +13,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(axl)
 
+set(AXL_MEM_TRACKER_SETTING TRUE)
 include(cmake/axl_cmake.cmake NO_POLICY_SCOPE)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
