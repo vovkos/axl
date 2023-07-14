@@ -416,7 +416,7 @@ public:
 	) {
 		return Convert<T, Utf8>::calcRequiredLength(
 			string.cp(),
-			string.getLength(),
+			string.getEnd(),
 			replacement
 		) * sizeof(C);
 	}
@@ -429,7 +429,7 @@ public:
 	) {
 		return Convert<T, Utf16>::calcRequiredLength(
 			string.cp(),
-			string.getLength(),
+			string.getEnd(),
 			replacement
 		) * sizeof(C);
 	}
@@ -442,7 +442,7 @@ public:
 	) {
 		return Convert<T, Utf32>::calcRequiredLength(
 			string.cp(),
-			string.getLength(),
+			string.getEnd(),
 			replacement
 		) * sizeof(C);
 	}
@@ -454,15 +454,17 @@ public:
 		const sl::StringRef_utf8& string,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		ConvertLengthResult result = Convert<T, Utf8>::convert_u(
+		ConvertResult<C, Utf8::C> result = Convert<T, Utf8>::convert_u(
 			(C*)buffer,
 			string.cp(),
-			string.getLength(),
+			string.getEnd(),
 			replacement
 		);
 
-		result.m_dstLength *= sizeof(C);
-		return result;
+		return ConvertLengthResult(
+			(result.m_dst - (C*)buffer) * sizeof(C),
+			result.m_src - string.cp()
+		);
 	}
 
 	virtual
@@ -472,15 +474,17 @@ public:
 		const sl::StringRef_utf16& string,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		ConvertLengthResult result = Convert<T, Utf16>::convert_u(
+		ConvertResult<C, Utf16::C> result = Convert<T, Utf16>::convert_u(
 			(C*)buffer,
 			string.cp(),
-			string.getLength(),
+			string.getEnd(),
 			replacement
 		);
 
-		result.m_dstLength *= sizeof(C);
-		return result;
+		return ConvertLengthResult(
+			(result.m_dst - (C*)buffer) * sizeof(C),
+			result.m_src - string.cp()
+		);
 	}
 
 	virtual
@@ -490,15 +494,17 @@ public:
 		const sl::StringRef_utf32& string,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		ConvertLengthResult result = Convert<T, Utf32>::convert_u(
+		ConvertResult<C, Utf32::C> result = Convert<T, Utf32>::convert_u(
 			(C*)buffer,
 			string.cp(),
-			string.getLength(),
+			string.getEnd(),
 			replacement
 		);
 
-		result.m_dstLength *= sizeof(C);
-		return result;
+		return ConvertLengthResult(
+			(result.m_dst - (C*)buffer) * sizeof(C),
+			result.m_src - string.cp()
+		);
 	}
 
 	virtual
@@ -509,16 +515,18 @@ public:
 		const sl::StringRef_utf8& string,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		ConvertLengthResult result = Convert<T, Utf8>::convert(
+		ConvertResult<C, Utf8::C> result = Convert<T, Utf8>::convert(
 			(C*)buffer,
-			bufferSize / sizeof(C),
+			(C*)buffer + bufferSize / sizeof(C),
 			string.cp(),
-			string.getLength(),
+			string.getEnd(),
 			replacement
 		);
 
-		result.m_dstLength *= sizeof(C);
-		return result;
+		return ConvertLengthResult(
+			(result.m_dst - (C*)buffer) * sizeof(C),
+			result.m_src - string.cp()
+		);
 	}
 
 	virtual
@@ -529,16 +537,18 @@ public:
 		const sl::StringRef_utf16& string,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		ConvertLengthResult result = Convert<T, Utf16>::convert(
+		ConvertResult<C, Utf16::C> result = Convert<T, Utf16>::convert(
 			(C*)buffer,
-			bufferSize / sizeof(C),
+			(C*)buffer + bufferSize / sizeof(C),
 			string.cp(),
-			string.getLength(),
+			string.getEnd(),
 			replacement
 		);
 
-		result.m_dstLength *= sizeof(C);
-		return result;
+		return ConvertLengthResult(
+			(result.m_dst - (C*)buffer) * sizeof(C),
+			result.m_src - string.cp()
+		);
 	}
 
 	virtual
@@ -549,16 +559,18 @@ public:
 		const sl::StringRef_utf32& string,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		ConvertLengthResult result = Convert<T, Utf32>::convert(
+		ConvertResult<C, Utf32::C> result = Convert<T, Utf32>::convert(
 			(C*)buffer,
-			bufferSize / sizeof(C),
+			(C*)buffer + bufferSize / sizeof(C),
 			string.cp(),
-			string.getLength(),
+			string.getEnd(),
 			replacement
 		);
 
-		result.m_dstLength *= sizeof(C);
-		return result;
+		return ConvertLengthResult(
+			(result.m_dst - (C*)buffer) * sizeof(C),
+			result.m_src - string.cp()
+		);
 	}
 
 	virtual
@@ -568,7 +580,11 @@ public:
 		size_t size,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		return Convert<Utf8, T>::calcRequiredLength((C*)p, size / sizeof(C), replacement);
+		return Convert<Utf8, T>::calcRequiredLength(
+			(C*)p,
+			(C*)p + size / sizeof(C),
+			replacement
+		);
 	}
 
 	virtual
@@ -578,7 +594,11 @@ public:
 		size_t size,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		return Convert<Utf16, T>::calcRequiredLength((C*)p, size / sizeof(C), replacement);
+		return Convert<Utf16, T>::calcRequiredLength(
+			(C*)p,
+			(C*)p + size / sizeof(C),
+			replacement
+		);
 	}
 
 	virtual
@@ -588,7 +608,11 @@ public:
 		size_t size,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		return Convert<Utf32, T>::calcRequiredLength((C*)p, size / sizeof(C), replacement);
+		return Convert<Utf32, T>::calcRequiredLength(
+			(C*)p,
+			(C*)p + size / sizeof(C),
+			replacement
+		);
 	}
 
 	virtual
@@ -600,16 +624,18 @@ public:
 		size_t size,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		ConvertLengthResult result = Convert<Utf8, T>::convert_u(
+		ConvertResult<Utf8::C, C> result = Convert<Utf8, T>::convert_u(
 			state,
 			buffer,
 			(C*)p,
-			size / sizeof(C),
+			(C*)p + size / sizeof(C),
 			replacement
 		);
 
-		result.m_srcLength *= sizeof(C);
-		return result;
+		return ConvertLengthResult(
+			result.m_dst - buffer,
+			(result.m_src - (C*)p) * sizeof(C)
+		);
 	}
 
 	virtual
@@ -621,16 +647,18 @@ public:
 		size_t size,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		ConvertLengthResult result = Convert<Utf16, T>::convert_u(
+		ConvertResult<Utf16::C, C> result = Convert<Utf16, T>::convert_u(
 			state,
 			buffer,
 			(C*)p,
-			size / sizeof(C),
+			(C*)p + size / sizeof(C),
 			replacement
 		);
 
-		result.m_srcLength *= sizeof(C);
-		return result;
+		return ConvertLengthResult(
+			result.m_dst - buffer,
+			(result.m_src - (C*)p) * sizeof(C)
+		);
 	}
 
 	virtual
@@ -642,16 +670,18 @@ public:
 		size_t size,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		ConvertLengthResult result = Convert<Utf32, T>::convert_u(
+		ConvertResult<Utf32::C, C> result = Convert<Utf32, T>::convert_u(
 			state,
 			buffer,
 			(C*)p,
-			size / sizeof(C),
+			(C*)p + size / sizeof(C),
 			replacement
 		);
 
-		result.m_srcLength *= sizeof(C);
-		return result;
+		return ConvertLengthResult(
+			result.m_dst - buffer,
+			(result.m_src - (C*)p) * sizeof(C)
+		);
 	}
 
 	virtual
@@ -664,17 +694,19 @@ public:
 		size_t size,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		ConvertLengthResult result = Convert<Utf8, T>::convert(
+		ConvertResult<Utf8::C, C> result = Convert<Utf8, T>::convert(
 			state,
 			buffer,
-			bufferLength,
+			buffer + bufferLength,
 			(C*)p,
-			size / sizeof(C),
+			(C*)p + size / sizeof(C),
 			replacement
 		);
 
-		result.m_srcLength *= sizeof(C);
-		return result;
+		return ConvertLengthResult(
+			result.m_dst - buffer,
+			(result.m_src - (C*)p) * sizeof(C)
+		);
 	}
 
 	virtual
@@ -687,17 +719,19 @@ public:
 		size_t size,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		ConvertLengthResult result = Convert<Utf16, T>::convert(
+		ConvertResult<Utf16::C, C> result = Convert<Utf16, T>::convert(
 			state,
 			buffer,
-			bufferLength,
+			buffer + bufferLength,
 			(C*)p,
-			size / sizeof(C),
+			(C*)p + size / sizeof(C),
 			replacement
 		);
 
-		result.m_srcLength *= sizeof(C);
-		return result;
+		return ConvertLengthResult(
+			result.m_dst - buffer,
+			(result.m_src - (C*)p) * sizeof(C)
+		);
 	}
 
 	virtual
@@ -710,17 +744,19 @@ public:
 		size_t size,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		ConvertLengthResult result = Convert<Utf32, T>::convert(
+		ConvertResult<Utf32::C, C> result = Convert<Utf32, T>::convert(
 			state,
 			buffer,
-			bufferLength,
+			buffer + bufferLength,
 			(C*)p,
-			size / sizeof(C),
+			(C*)p + size / sizeof(C),
 			replacement
 		);
 
-		result.m_srcLength *= sizeof(C);
-		return result;
+		return ConvertLengthResult(
+			result.m_dst - buffer,
+			(result.m_src - (C*)p) * sizeof(C)
+		);
 	}
 };
 

@@ -15,6 +15,7 @@
 
 #include "axl_enc_Utf32.h"
 #include "axl_enc_Utf32sDfa.h"
+#include "axl_sl_PtrIterator.h"
 
 namespace axl {
 namespace enc {
@@ -73,13 +74,14 @@ public:
 //..............................................................................
 
 template <
-	typename IsReverse,
+	bool IsReverse0,
 	typename Dfa0
 >
 class Utf32sDecoderBase {
 public:
 	enum {
 		MaxEmitLength = 1, // always one codepoint
+		IsReverse     = IsReverse0
 	};
 
 	typedef char C;
@@ -126,23 +128,16 @@ protected:
 	decode(
 		Dfa& dfa,
 		Emitter& emitter,
-		const C* src,
+		const C* src0,
 		const C* srcEnd
 	) {
-		if (IsReverse()())
-			while (src > srcEnd && emitter.canEmit()) {
-				C c = *src--;
-				uint_t state = dfa.decode(c);
-				if (Dfa::isReady(state))
-					emitter.emitCp(src, dfa.getCodePoint());
-			}
-		else
-			while (src < srcEnd && emitter.canEmit()) {
-				C c = *src++;
-				uint_t state = dfa.decode(c);
-				if (Dfa::isReady(state))
-					emitter.emitCp(src, dfa.getCodePoint());
-			}
+		sl::PtrIterator<const C, IsReverse> src = src0;
+		while (src < srcEnd && emitter.canEmit()) {
+			C c = *src++;
+			uint_t state = dfa.decode(c);
+			if (Dfa::isReady(state))
+				emitter.emitCp(src, dfa.getCodePoint());
+		}
 
 		return src;
 	}
@@ -150,10 +145,10 @@ protected:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef Utf32sDecoderBase<sl::False, Utf32sDfa>    Utf32sDecoder;
-typedef Utf32sDecoderBase<sl::False, Utf32sDfa_be> Utf32sDecoder_be;
-typedef Utf32sDecoderBase<sl::True,  Utf32sDfa_be> Utf32sReverseDecoder;
-typedef Utf32sDecoderBase<sl::True,  Utf32sDfa>    Utf32sReverseDecoder_be;
+typedef Utf32sDecoderBase<false, Utf32sDfa>    Utf32sDecoder;
+typedef Utf32sDecoderBase<false, Utf32sDfa_be> Utf32sDecoder_be;
+typedef Utf32sDecoderBase<true,  Utf32sDfa_be> Utf32sReverseDecoder;
+typedef Utf32sDecoderBase<true,  Utf32sDfa>    Utf32sReverseDecoder_be;
 
 //..............................................................................
 

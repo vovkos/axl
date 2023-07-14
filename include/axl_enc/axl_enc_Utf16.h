@@ -16,6 +16,7 @@
 #include "axl_enc_Unicode.h"
 #include "axl_enc_Utf16Dfa.h"
 #include "axl_sl_ByteOrder.h"
+#include "axl_sl_PtrIterator.h"
 
 namespace axl {
 namespace enc {
@@ -129,12 +130,13 @@ public:
 template <typename Impl>
 class Utf16DecoderBase {
 public:
-	enum {
-		MaxEmitLength = 2, // replacement + cp
-	};
-
 	typedef typename Impl::C C;
 	typedef typename Impl::Dfa Dfa;
+
+	enum {
+		MaxEmitLength = 2, // replacement + cp
+		IsReverse     = Dfa::IsReverse
+	};
 
 public:
 	static
@@ -186,41 +188,25 @@ public:
 	decode(
 		Dfa& dfa,
 		Emitter& emitter,
-		const C* p,
+		const C* p0,
 		const C* end
 	) {
-		if (Dfa::IsReverse)
-			for (; p > end && emitter.canEmit(); p--) {
-				uint16_t c = *p;
-				Dfa next = dfa.decode(c);
-				if (next.isError()) {
-					if (dfa.getPendingLength())
-						emitter.emitCu(p + 1, dfa.getCodePoint());
-					if (next.getState() == Dfa::State_Error)
-						emitter.emitCu(p - 1, next.getCodePoint());
-					else if (next.isReady())
-						emitter.emitCpAfterCu(p - 1, next.getCodePoint());
-				} else if (next.isReady())
-					emitter.emitCp(p - 1, next.getCodePoint());
+		sl::PtrIterator<const C, Dfa::IsReverse> p = p0;
+		for (; p < end && emitter.canEmit(); p++) {
+			uint16_t c = *p;
+			Dfa next = dfa.decode(c);
+			if (next.isError()) {
+				if (dfa.getPendingLength())
+					emitter.emitCu(p - 1, dfa.getCodePoint());
+				if (next.getState() == Dfa::State_Error)
+					emitter.emitCu(p + 1, next.getCodePoint());
+				else if (next.isReady())
+					emitter.emitCpAfterCu(p + 1, next.getCodePoint());
+			} else if (next.isReady())
+				emitter.emitCp(p + 1, next.getCodePoint());
 
-				dfa = next;
-			}
-		else
-			for (; p < end && emitter.canEmit(); p++) {
-				uint16_t c = *p;
-				Dfa next = dfa.decode(c);
-				if (next.isError()) {
-					if (dfa.getPendingLength())
-						emitter.emitCu(p - 1, dfa.getCodePoint());
-					if (next.getState() == Dfa::State_Error)
-						emitter.emitCu(p + 1, next.getCodePoint());
-					else if (next.isReady())
-						emitter.emitCpAfterCu(p + 1, next.getCodePoint());
-				} else if (next.isReady())
-					emitter.emitCp(p + 1, next.getCodePoint());
-
-				dfa = next;
-			}
+			dfa = next;
+		}
 
 		return p;
 	}

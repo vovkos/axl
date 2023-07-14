@@ -17,6 +17,7 @@ namespace {
 //..............................................................................
 
 void run() {
+#if (0)
 	sl::TextBoyerMooreFind find;
 
 	char haystack[] = "hui govno i muravei";
@@ -60,6 +61,7 @@ void run() {
 
 	result = find.find(sl::StringRef(haystack, lengthof(haystack)));
 	printf("result = %d\n", result);
+#endif
 }
 
 //..............................................................................

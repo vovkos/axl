@@ -212,13 +212,16 @@ public:
 
 //..............................................................................
 
-// no-op (identity)
+// NOP (no-operation, identity)
 
-template <typename T>
-class NoOp {
+template <
+	typename T,
+	typename Arg = typename ArgType<T>::Type
+>
+class Nop {
 public:
 	T
-	operator () (T a) const {
+	operator () (Arg a) const {
 		return a;
 	}
 };

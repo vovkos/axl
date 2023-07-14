@@ -15,7 +15,6 @@
 
 #include "axl_enc_UtfDfa.h"
 #include "axl_sl_ByteOrder.h"
-#include "axl_sl_Operator.h"
 
 //
 // AXL UTF-16 DFA specifics:

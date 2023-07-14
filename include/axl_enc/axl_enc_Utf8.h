@@ -85,12 +85,13 @@ public:
 template <typename Dfa0>
 class Utf8DecoderBase {
 public:
-	enum {
-		MaxEmitLength = 4, // 4 replacements (or 3 replacement + codepoint)
-	};
-
 	typedef utf8_t C;
 	typedef Dfa0 Dfa;
+
+	enum {
+		MaxEmitLength = 4, // 4 replacements (or 3 replacement + codepoint)
+		IsReverse     = Dfa::IsReverse,
+	};
 
 public:
 	static
@@ -133,39 +134,24 @@ protected:
 	decode(
 		Dfa& dfa,
 		Emitter& emitter,
-		const C* p,
+		const C* p0,
 		const C* end
 	) {
-		if (Dfa::IsReverse)
-			for (; p > end && emitter.canEmit(); p--) {
-				uchar_t c = *p;
-				Dfa next = dfa.decode(c);
-				if (next.isError()) {
-					dfa.emitPendingCus(emitter, p);
-					if (next.getState() == Dfa::State_Error)
-						emitter.emitCu(p - 1, c);
-					else if (next.isReady())
-						emitter.emitCpAfterCu(p - 1, next.getCodePoint());
-				} else if (next.isReady())
-					emitter.emitCp(p - 1, next.getCodePoint());
+		sl::PtrIterator<const C, Dfa::IsReverse> p = p0;
+		for (; p < end && emitter.canEmit(); p++) {
+			uchar_t c = *p;
+			Dfa next = dfa.decode(c);
+			if (next.isError()) {
+				dfa.emitPendingCus(emitter, p);
+				if (next.getState() == Dfa::State_Error)
+					emitter.emitCu(p + 1, c);
+				else if (next.isReady())
+					emitter.emitCpAfterCu(p + 1, next.getCodePoint());
+			} else if (next.isReady())
+				emitter.emitCp(p + 1, next.getCodePoint());
 
-				dfa = next;
-			}
-		else
-			for (; p < end && emitter.canEmit(); p++) {
-				uchar_t c = *p;
-				Dfa next = dfa.decode(c);
-				if (next.isError()) {
-					dfa.emitPendingCus(emitter, p);
-					if (next.getState() == Dfa::State_Error)
-						emitter.emitCu(p + 1, c);
-					else if (next.isReady())
-						emitter.emitCpAfterCu(p + 1, next.getCodePoint());
-				} else if (next.isReady())
-					emitter.emitCp(p + 1, next.getCodePoint());
-
-				dfa = next;
-			}
+			dfa = next;
+		}
 
 		return p;
 	}

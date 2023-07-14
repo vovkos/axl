@@ -4255,7 +4255,71 @@ testSymbolicLinks() {
 
 void
 testBoyerMoore() {
-#if (0)
+#if (1)
+	size_t result;
+
+	char haystack[] = "hui govno i muravei, muravei govno i hui!";
+	char needle[] = "muravei";
+
+	do {
+		sl::BoyerMooreBinFind find(needle, lengthof(needle));
+		sl::BoyerMooreBinState state(find);
+
+		for (size_t i = 0; i < lengthof(haystack); i++) {
+			result = find.find(&state, haystack + i, 1);
+			if (result != -1)
+				break;
+		}
+
+
+		printf("forward find result: %d (%s)\n", result, haystack + result);
+	} while (0);
+
+	do {
+		sl::BoyerMooreBinReverseFind find(needle, lengthof(needle));
+		sl::BoyerMooreBinState state(find);
+
+		for (intptr_t i = lengthof(haystack) - 1; i >= 0; i--) {
+			result = find.find(&state, haystack + i, 1);
+			if (result != -1)
+				break;
+		}
+
+		size_t offset = lengthof(haystack) - lengthof(needle) - result;
+		printf("reverse find result: %d (%s)\n", offset, haystack + offset);
+	} while (0);
+
+	do {
+		sl::BoyerMooreTextFind find(needle);
+		sl::BoyerMooreTextState state(find);
+
+		for (size_t i = 0; i < lengthof(haystack); i++) {
+			result = find.find(&state, haystack + i, 1);
+			if (result != -1)
+				break;
+		}
+
+
+		printf("forward find result: %d (%s)\n", result, haystack + result);
+	} while (0);
+
+#elif (1)
+	static const char pattern[] = "D)";
+
+	sl::TextBoyerMooreFind find;
+	find.setPattern(pattern);
+
+	static const char data[] = {
+		0xfe, 0x10, 0xec, 0x44, 0x29,
+		0xfc, 0xd4, 0x50, 0x8c, 0x31,
+		0x05, 0x25, 0x61, 0x62, 0x63
+	};
+
+	sl::TextBoyerMooreFind::IncrementalContext incrementalContext;
+	size_t offset = find.find(&incrementalContext, enc::CharCodecKind_Utf8, 0, data, lengthof(data));
+	printf("offset = %d\n", offset);
+
+#elif (0)
 	static const char pattern[] = "muravei";
 
 	sl::BinaryBoyerMooreFind find;
@@ -7121,10 +7185,7 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-#if (_AXL_IO_USBMON)
-	testUsbMon();
-#endif
-
+	testBoyerMoore();
 	return 0;
 }
 

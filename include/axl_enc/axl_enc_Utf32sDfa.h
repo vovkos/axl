@@ -14,7 +14,6 @@
 #define _AXL_ENC_UTF32SDFA_H
 
 #include "axl_enc_UtfDfa.h"
-#include "axl_sl_Operator.h"
 
 // UTF-32-S DFA is for stream-based decoding of UTF-32
 
@@ -25,7 +24,7 @@ namespace enc {
 
 struct Utf32sDfaRoot {};
 
-template <typename IsBigEndian>
+template <bool IsBigEndian>
 class Utf32sDfaBase: public UtfDfa<Utf32sDfaBase<IsBigEndian>, Utf32sDfaRoot> {
 public:
 	typedef UtfDfa<Utf32sDfaBase<IsBigEndian>, Utf32sDfaRoot> BaseType;
@@ -66,13 +65,13 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-template <typename IsBigEndian>
+template <bool IsBigEndian>
 uint_t
 Utf32sDfaBase<IsBigEndian>::decode(uchar_t c) {
 	uint_t prevState = this->m_state & 3;
 	uint_t nextState = prevState + 1;
 
-	if (IsBigEndian()())
+	if (IsBigEndian)
 		this->m_cp = prevState ? this->m_cp | (c << ((3 - prevState) << 3)) : c << 24;
 	else
 		this->m_cp = prevState ? this->m_cp | (c << (prevState << 3)) : c;
@@ -82,8 +81,8 @@ Utf32sDfaBase<IsBigEndian>::decode(uchar_t c) {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef Utf32sDfaBase<sl::False> Utf32sDfa;
-typedef Utf32sDfaBase<sl::True>  Utf32sDfa_be;
+typedef Utf32sDfaBase<false> Utf32sDfa;
+typedef Utf32sDfaBase<true>  Utf32sDfa_be;
 
 //..............................................................................
 

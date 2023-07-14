@@ -142,8 +142,10 @@ set(
 	${AXL_INC_DIR}/axl_sl/axl_sl_BinTree.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_BitIdx.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_BitMap.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_BmhFind.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_BoyerMooreFind.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_BoyerMooreState.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_BoyerMooreSkipTables.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_BoyerMooreDetails.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_MemMem.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_BoxList.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_BuddyAllocMap.h
@@ -155,7 +157,9 @@ set(
 	${AXL_INC_DIR}/axl_sl/axl_sl_HandleTable.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_HashTable.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_Iterator.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_PtrIterator.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_List.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_ListLink.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_MapEntry.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_Pack.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_Packer.h
@@ -172,9 +176,6 @@ set(
 set(
 	SL_CPP_LIST
 	axl_sl_BitMap.cpp
-	axl_sl_BmhFind.cpp
-	axl_sl_BoyerMooreAccessor.h
-	axl_sl_BoyerMooreFind.cpp
 	axl_sl_MemMem.cpp
 	axl_sl_BuddyAllocMap.cpp
 	axl_sl_CmdLineParser.cpp
@@ -183,7 +184,6 @@ set(
 	axl_sl_Packer.cpp
 	axl_sl_Packetizer.cpp
 	axl_sl_Unpacker.cpp
-	axl_sl_CircularBuffer.cpp
 )
 
 source_group(

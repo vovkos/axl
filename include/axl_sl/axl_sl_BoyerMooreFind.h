@@ -13,321 +13,353 @@
 
 #define _AXL_SL_BOYERMOOREFIND_H
 
-#include "axl_sl_Array.h"
+#include "axl_sl_BoyerMooreDetails.h"
+#include "axl_sl_BoyerMooreState.h"
 #include "axl_sl_String.h"
-#include "axl_enc_CharCodec.h"
 
 namespace axl {
 namespace sl {
 
+//
+// Boyer-Moore & Boyer-Moore-Horspool adaptation with added support for:
+//
+//   - reverse matching
+//   - incremental (stream) matching
+//   - misc text encodings
+//   - case-folded matching
+//   - whole-word matching
+//
+
 //..............................................................................
 
-template <typename T>
-class BoyerMooreIncrementalContext {
-public:
-	Array<T> m_tail;
-	utf32_t m_prefix;
-
-public:
-	BoyerMooreIncrementalContext() {
-		m_prefix = ' ';
-	}
-
-	void
-	reset() {
-		m_tail.clear();
-		m_prefix = ' ';
-	}
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-enum BoyerMooreFlag {
-	BoyerMooreFlag_Reverse  = 0x01,
-	BoyerMooreFlag_Horspool = 0x02, // don't use good-skip table
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <typename T>
+template <typename Details0>
 class BoyerMooreFindBase {
 public:
-	typedef BoyerMooreIncrementalContext<T> IncrementalContext;
+	typedef Details0 Details;
+	typedef typename Details::C C;
+	typedef typename Details::SkipTables SkipTables;
+
+	enum {
+		IsReverse = Details::IsReverse
+	};
 
 protected:
-	Array<T> m_pattern;
-	Array<size_t> m_badSkipTable;
-	Array<size_t> m_goodSkipTable;
-	uint_t m_flags;
+	Array<C> m_pattern;
+	SkipTables m_skipTables;
 
 public:
-	BoyerMooreFindBase() {
-		m_flags = 0;
+	BoyerMooreFindBase() {}
+
+	BoyerMooreFindBase(
+		const C* p,
+		size_t length
+	) {
+		setPattern(p, length);
 	}
 
 	bool
-	isEmpty() {
+	isEmpty() const {
 		return m_pattern.isEmpty();
 	}
 
-	Array<T>
-	getPattern() {
+	const Array<C>&
+	getPattern() const {
 		return m_pattern;
-	}
-
-	uint_t
-	getFlags() {
-		return m_flags;
 	}
 
 	void
 	clear() {
 		m_pattern.clear();
-		m_badSkipTable.clear();
-		m_goodSkipTable.clear();
-		m_flags = 0;
+		m_skipTables.clear();
 	}
 
-protected:
-	// wikipedia implementation adaptation
-
 	bool
-	isPrefix(intptr_t pos) {
-		intptr_t suffixSize = m_pattern.getCount() - pos;
+	setPattern(
+		const C* p,
+		size_t length
+	) {
+		bool result = IsReverse ?
+			m_pattern.copyReverse(p, length) :
+			m_pattern.copy(p, length);
 
-		for (intptr_t i = 0, j = pos; i < suffixSize; i++, j++)
-			if (m_pattern[i] != m_pattern[j])
-				return false;
-
-		return true;
+		return m_skipTables.build(m_pattern, length, Details::BadSkipTableSize);
 	}
 
 	size_t
-	calcSuffixSize(intptr_t pos) {
-		intptr_t i = 0;
-		intptr_t j = pos;
-		intptr_t k = m_pattern.getCount() - 1;
+	find(
+		const C* p,
+		size_t length
+	) const {
+		size_t i = findImpl(sl::PtrIterator<const C, IsReverse>(IsReverse ? p + length - 1 : p), length);
+		return i < length ? i : -1;
+	}
 
-		while (i < pos && m_pattern[j] == m_pattern[k]) {
-			i++;
-			j--;
-			k--;
+	uint64_t
+	find(
+		BoyerMooreStateBase<C>* state,
+		const C* p,
+		size_t length
+	) const {
+		BoyerMooreIncrementalAccessorBase<C, IsReverse> accessor(state, IsReverse ? p + length - 1 : p);
+		size_t fullLength = length + state->getTailLength();
+		size_t i = findImpl(accessor, fullLength);
+		if (i < fullLength) {
+			uint64_t offset = state->getOffset() + i;
+			state->reset(offset + m_pattern.getCount());
+			return offset;
+		}
+
+		i -= m_pattern.getCount() - 1; // prospective start of match
+		state->advance<IsReverse>(i, p, length);
+		return -1;
+	}
+
+protected:
+	template <typename Accessor>
+	size_t
+	findImpl(
+		const Accessor& accessor,
+		size_t length
+	) const {
+		size_t last = m_pattern.getCount() - 1;
+		size_t i = last;
+		while (i < length) {
+			intptr_t j = last;
+			uchar_t c;
+			for (;;) {
+				c = accessor[i];
+				if (c != m_pattern[j])
+					break;
+
+				if (j == 0)
+					return i;
+
+				i--;
+				j--;
+			}
+
+			i += m_skipTables.getSkip(c, j);
 		}
 
 		return i;
 	}
-
-	bool
-	buildGoodSkipTable() {
-		intptr_t patternSize = m_pattern.getCount();
-
-		bool result = m_goodSkipTable.setCount(patternSize);
-		if (!result)
-			return false;
-
-		if (!patternSize)
-			return true;
-
-		intptr_t lastPrefixPos = patternSize - 1;
-		for (intptr_t i = patternSize - 1; i >= 0; i--) {
-			if (isPrefix(i + 1))
-				lastPrefixPos = i + 1;
-
-			m_goodSkipTable[i] = lastPrefixPos + patternSize - 1 - i;
-		}
-
-		for (intptr_t i = 0; i < patternSize - 1; i++) {
-			intptr_t suffixSize = calcSuffixSize(i);
-			if (m_pattern[i - suffixSize] != m_pattern[patternSize - 1 - suffixSize])
-				m_goodSkipTable[patternSize - 1 - suffixSize] = patternSize - 1 - i + suffixSize;
-		}
-
-		return true;
-	}
 };
 
 //..............................................................................
 
-class BinaryBoyerMooreFind: public BoyerMooreFindBase<uchar_t> {
-public:
-	BinaryBoyerMooreFind() {}
+struct BoyerMooreTextFindResult {
+	size_t m_charOffset;
+	size_t m_binOffset;
+	size_t m_binEndOffset; // not necessarily the size needed to "properly" encode pattern!
 
-	BinaryBoyerMooreFind(
-		const void* p,
-		size_t size,
-		uint_t flags = 0
-	) {
-		setPattern(p, size, flags);
+	BoyerMooreTextFindResult() {
+		m_charOffset = -1;
+		m_binOffset = -1;
+		m_binEndOffset = -1;
 	}
 
-	bool
-	setPattern(
-		const void* p,
-		size_t size,
-		uint_t flags = 0
-	);
-
-	size_t
-	find(
-		const void* p,
-		size_t size
-	);
-
-	size_t
-	find(
-		IncrementalContext* incrementalContext,
-		size_t offset,
-		const void* p,
-		size_t size
-	);
-
-protected:
-	void
-	buildBadSkipTable();
-
-	template <typename Accessor>
-	size_t
-	findImpl(
-		const Accessor& accessor,
-		size_t size
-	);
-};
-
-//..............................................................................
-
-enum TextBoyerMooreFlag {
-	TextBoyerMooreFlag_CaseInsensitive = 0x10,
-	TextBoyerMooreFlag_WholeWord       = 0x20,
+	operator bool () const {
+		return m_charOffset != -1;
+	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class TextBoyerMooreFind: public BoyerMooreFindBase<utf32_t> {
+template <typename Details>
+class BoyerMooreTextFindBase: public BoyerMooreFindBase<Details> {
 public:
-	enum Def {
-		Def_BadSkipTableSize = 256, // any number will do, actually (code points are hashed)
+	typedef typename Details::Encoding Encoding;
+	typedef typename Details::Decoder Decoder;
+	typedef typename Details::CaseOp CaseOp;
+
+	typedef enc::Convert<
+		enc::Utf32,
+		Encoding,
+		CaseOp,
+		Decoder
+	> Convert;
+
+	typedef enc::Locate<Encoding, Decoder> Locate;
+
+	enum {
+		IsCaseFolded = Details::IsCaseFolded
 	};
 
-protected:
-	sl::String_utf32 m_buffer;
-
 public:
-	bool
-	setPattern(
-		size_t badSkipTableSize,
-		enc::CharCodec* codec,
-		const void* p,
-		size_t size,
-		uint_t flags = 0
-	);
+	BoyerMooreTextFindBase() {}
 
-	bool
-	setPattern(
-		size_t badSkipTableSize,
-		enc::CharCodecKind codecKind,
-		const void* p,
-		size_t size,
-		uint_t flags = 0
-	) {
-		return setPattern(badSkipTableSize, enc::getCharCodec(codecKind), p, size, flags);
+	BoyerMooreTextFindBase(const sl::StringRef& pattern) {
+		setPattern(pattern);
+	}
+
+	BoyerMooreTextFindBase(const sl::StringRef_utf32& pattern) {
+		setPattern(pattern);
 	}
 
 	bool
-	setPattern(
-		enc::CharCodec* codec,
-		const void* p,
-		size_t size,
-		uint_t flags = 0
-	) {
-		return setPattern(Def_BadSkipTableSize, codec, p, size, flags);
+	setPattern(const sl::StringRef& pattern) {
+		char buffer[256];
+		sl::String_utf32 pattern_utf32(rc::BufKind_Stack, buffer, sizeof(buffer));
+		return
+			pattern_utf32.copy(pattern) != -1 &&
+			setPattern(pattern_utf32);
 	}
 
 	bool
-	setPattern(
-		enc::CharCodecKind codecKind,
-		const void* p,
-		size_t size,
-		uint_t flags = 0
-	) {
-		return setPattern(Def_BadSkipTableSize, codecKind, p, size, flags);
+	setPattern(const sl::StringRef_utf32& pattern) {
+		size_t length = pattern.getLength();
+		bool result = IsReverse ?
+			m_pattern.copyReverse(pattern.cp(), length) :
+			m_pattern.copy(pattern.cp(), length);
+
+		if (!result)
+			return false;
+
+		if (IsCaseFolded)
+			for (size_t i = 0; i < length; i++)
+				m_pattern[i] = CaseOp()(pattern[i]);
+
+		m_skipTables.build(m_pattern, length, Details::BadSkipTableSize);
+		return true;
 	}
 
-	bool
-	setPattern(
-		const sl::StringRef& pattern,
-		uint_t flags = 0
-	) {
-		return setPattern(
-			Def_BadSkipTableSize,
-			enc::CharCodecKind_Utf8,
-			pattern.cp(),
-			pattern.getLength(),
-			flags
-		);
-	}
-
-	size_t
+	BoyerMooreTextFindResult
 	find(
-		enc::CharCodec* codec,
 		const void* p,
 		size_t size
-	);
-
-	size_t
-	find(
-		enc::CharCodecKind codecKind,
-		const void* p,
-		size_t size
-	) {
-		return find(enc::getCharCodec(codecKind), p, size);
+	) const {
+		BoyerMooreTextState state(*this);
+		return find(&state, p, size);
 	}
 
-	size_t
-	find(const sl::StringRef& string) {
-		return find(enc::CharCodecKind_Utf8, string.cp(), string.getLength());
-	}
-
-	size_t
+	BoyerMooreTextFindResult
 	find(
-		IncrementalContext* incrementalContext,
-		enc::CharCodec* codec,
-		size_t offset,
-		const void* p,
+		BoyerMooreTextState* state,
+		const void* p0,
 		size_t size
-	);
+	) const {
+		sl::PtrIterator<const char, IsReverse> p(IsReverse ? (char*)p0 + size - 1 : (char*)p0);
+		const char* end = p + size;
 
-	size_t
-	find(
-		IncrementalContext* incrementalContext,
-		enc::CharCodecKind codecKind,
-		size_t offset,
-		const void* p,
-		size_t size
-	) {
-		return find(incrementalContext, enc::getCharCodec(codecKind), offset, p, size);
-	}
+		enc::DecoderState decoderState = state->getDecoderState();
 
-	size_t
-	find(
-		IncrementalContext* incrementalContext,
-		size_t offset,
-		const sl::StringRef& string
-	) {
-		return find(incrementalContext, enc::CharCodecKind_Utf8, offset, string.cp(), string.getLength());
+		while (p < end) {
+			utf32_t buffer[4]; // [Details::DecoderBufferLength]
+			Convert::Result convertResult = Convert::convert(
+				&decoderState,
+				buffer,
+				buffer + countof(buffer),
+				p,
+				end
+			);
+
+			const char* next = convertResult.m_src;
+
+			BoyerMooreTextAccessor accessor(state, buffer);
+			size_t fullLength = next - p + state->getTailLength();
+			size_t i = findImpl(accessor, fullLength);
+			if (i < fullLength) {
+				BoyerMooreTextFindResult result;
+				result.m_charOffset = state->getOffset() + i;
+				result.m_binOffset = state->getBinOffset() + locateBinOffset(state, i, p, next);
+				result.m_binEndOffset = state->getBinOffset() + locateBinOffset(state, i + m_pattern.getCount(), p, next);
+				state->reset(result.m_charOffset, result.m_binOffset);
+				return result;
+			}
+
+			i -= m_pattern.getCount() - 1; // prospective start of match...
+			size_t binOffset = locateBinOffset(state, i, p, next); // ...and its bin-offset
+
+			state->advance<IsReverse>(
+				i,
+				buffer,
+				convertResult.m_dst - buffer,
+				binOffset,
+				p,
+				-(p - convertResult.m_src), // respect IsReverse
+				decoderState
+			);
+
+			p = next;
+		}
+
+		return BoyerMooreTextFindResult();
 	}
 
 protected:
-	bool
-	buildBadSkipTable(size_t tableSize);
-
-	template <typename Accessor>
+	static
 	size_t
-	findImpl(
-		const Accessor& accessor,
-		size_t end,
-		size_t size
-	);
+	locateBinOffset(
+		BoyerMooreTextState* state,
+		size_t i,
+		const char* p,
+		const char* end
+	) {
+		size_t charTailLength = state->m_tail.getDataLength();
+		size_t binTailSize = state->m_binTail.getDataSize();
+		if (i >= charTailLength) { // past tail, find in latest data
+			enc::DecoderState decoderState = state->getDecoderState();
+			return binTailSize + Locate::locate(&decoderState, i - charTailLength, p, end).m_srcLength;
+		}
+
+		// need to find in tail
+
+		const char* front = state->m_binTail.getFront();
+		const char* back = state->m_binTail.getBack();
+
+		if (front < back) // one continous chunk
+			return IsReverse ?
+				Locate::locate(i, back - 1, front - 1).m_srcLength :
+				Locate::locate(i, front, back).m_srcLength;
+
+		// two disjoint chunks
+
+		p = state->m_binTail.getBuffer();
+		end = state->m_binTail.getBufferEnd();
+		enc::DecoderState decoderState = 0;
+
+		if (IsReverse) { // first back, then front
+			enc::ConvertLengthResult result = Locate::locate(&decoderState, i, back - 1, p - 1);
+			return result.m_dstLength < i ?
+				Locate::locate(&decoderState, i, end - 1, front - 1).m_srcLength :
+				result.m_srcLength;
+		} else { // first front, then back
+			enc::ConvertLengthResult result = Locate::locate(&decoderState, i, front, end);
+			return result.m_dstLength < i ?
+				Locate::locate(&decoderState, i, p, back).m_srcLength :
+				result.m_srcLength;
+		}
+	}
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+typedef BoyerMooreFindBase<BoyerMooreHorspoolBinDetails>        BoyerMooreHorspoolBinFind;
+typedef BoyerMooreFindBase<BoyerMooreHorspoolBinReverseDetails> BoyerMooreHorspoolBinReverseFind;
+typedef BoyerMooreFindBase<BoyerMooreBinDetails>                BoyerMooreBinFind;
+typedef BoyerMooreFindBase<BoyerMooreBinReverseDetails>         BoyerMooreBinReverseFind;
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+typedef BoyerMooreTextFindBase<BoyerMooreHorspoolTextDetails_utf8>           BoyerMooreHorspoolTextFind_utf8;
+typedef BoyerMooreTextFindBase<BoyerMooreHorspoolTextReverseDetails_utf8>    BoyerMooreHorspoolTextReverseFind_utf8;
+typedef BoyerMooreTextFindBase<BoyerMooreHorspoolCaseFoldedTextDetails_utf8> BoyerMooreHorspoolCaseFoldedTextFind_utf8;
+typedef BoyerMooreTextFindBase<BoyerMooreHorspoolCaseFoldedTextReverseDetails_utf8> BoyerMooreHorspoolCaseFoldedTextReverseFind_utf8;
+
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8>                  BoyerMooreTextFind_utf8;
+typedef BoyerMooreTextFindBase<BoyerMooreTextReverseDetails_utf8>           BoyerMooreTextReverseFind_utf8;
+typedef BoyerMooreTextFindBase<BoyerMooreCaseFoldedTextDetails_utf8>        BoyerMooreCaseFoldedTextFind_utf8;
+typedef BoyerMooreTextFindBase<BoyerMooreCaseFoldedTextReverseDetails_utf8> BoyerMooreCaseFoldedTextReverseFind_utf8;
+
+typedef BoyerMooreHorspoolTextFind_utf8                  BoyerMooreHorspoolTextFind;
+typedef BoyerMooreHorspoolTextReverseFind_utf8           BoyerMooreHorspoolTextReverseFind;
+typedef BoyerMooreHorspoolCaseFoldedTextFind_utf8        BoyerMooreHorspoolCaseFoldedTextFind;
+typedef BoyerMooreHorspoolCaseFoldedTextReverseFind_utf8 BoyerMooreHorspoolCaseFoldedTextReverseFind;
+
+typedef BoyerMooreTextFind_utf8                  BoyerMooreTextFind;
+typedef BoyerMooreTextReverseFind_utf8           BoyerMooreTextReverseFind;
+typedef BoyerMooreCaseFoldedTextFind_utf8        BoyerMooreCaseFoldedTextFind;
+typedef BoyerMooreCaseFoldedTextReverseFind_utf8 BoyerMooreCaseFoldedTextReverseFind;
 
 //..............................................................................
 

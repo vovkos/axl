@@ -185,20 +185,20 @@ public:
 		while (src < srcEnd) {
 			utf32_t buffer[64];
 
-			ConvertLengthResult result = Convert<Utf32, UtfEncoding>::convert(
+			ConvertResult<Utf32::C, UtfEncoding::C> result = Convert<Utf32, UtfEncoding>::convert(
 				buffer,
-				countof(buffer),
+				buffer + countof(buffer),
 				src,
-				srcEnd - src
+				srcEnd
 			);
 
-			if (!result.m_srcLength)
+			if (result.m_src == src)
 				break;
 
-			src += result.m_srcLength;
+			src = result.m_src;
 
 			const utf32_t* p = buffer;
-			const utf32_t* end = p + result.m_dstLength;
+			const utf32_t* end = result.m_dst;
 			const utf32_t* base = p;
 
 			for (; p < end; p++) {

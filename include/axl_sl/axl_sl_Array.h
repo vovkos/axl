@@ -780,30 +780,29 @@ public:
 		size_t index,
 		size_t count
 	) {
-		size_t thisCount = this->m_count;
-
-		if (index >= thisCount)
+		if (index >= this->m_count)
 			return;
 
-		if (index + count > thisCount)
-			count = thisCount - index;
+		if (index + count > this->m_count)
+			count = this->m_count - index;
 
 		Details::reverse(this->m_p + index, count);
 	}
 
 	void
 	reverse() {
-		reverse(0, -1);
+		Details::reverse(this->m_p, this->m_count);
 	}
 
 	void
 	reverseFrom(size_t index) {
-		reverse(index, -1);
+		if (index < this->m_count)
+			Details::reverse(this->m_p + index, this->m_count - index);
 	}
 
 	void
 	reverseUntil(size_t index) {
-		reverse(0, index);
+		Details::reverse(this->m_p, AXL_MIN(index, this->m_count));
 	}
 
 	bool

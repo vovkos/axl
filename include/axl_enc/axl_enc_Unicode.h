@@ -14,6 +14,7 @@
 #define _AXL_ENC_UNICODE_H
 
 #include "axl_sl_Operator.h"
+#include "axl_sl_PtrIterator.h"
 
 namespace axl {
 namespace enc {
@@ -292,16 +293,17 @@ public:
 template <
 	typename DstEncoding0,
 	typename SrcEncoding0,
-	typename Op = sl::NoOp<utf32_t> // e.g. ToLowerCase, ToUpperCase, ToCaseFold
+	typename Op = sl::Nop<utf32_t>, // e.g. ToLowerCase, ToUpperCase, ToCaseFold
+	typename Decoder0 = typename SrcEncoding0::Decoder // allows for reverse decoding
 >
 class Convert {
 public:
 	typedef DstEncoding0 DstEncoding;
 	typedef SrcEncoding0 SrcEncoding;
+	typedef Decoder0 Decoder;
 	typedef typename DstEncoding::C DstUnit;
 	typedef typename SrcEncoding::C SrcUnit;
 	typedef typename DstEncoding::Encoder Encoder;
-	typedef typename SrcEncoding::Decoder Decoder;
 	typedef ConvertResult<DstUnit, SrcUnit> Result;
 
 	class CountingEmitter {
@@ -436,17 +438,6 @@ public:
 	static
 	size_t
 	calcRequiredLength(
-		DecoderState* state,
-		const SrcUnit* p,
-		size_t length,
-		utf32_t replacement = StdChar_Replacement
-	) {
-		return calcRequiredLength(state, p, p + length, replacement);
-	}
-
-	static
-	size_t
-	calcRequiredLength(
 		const SrcUnit* p,
 		const SrcUnit* end,
 		utf32_t replacement = StdChar_Replacement
@@ -457,16 +448,6 @@ public:
 	}
 
 	static
-	size_t
-	calcRequiredLength(
-		const SrcUnit* p,
-		size_t length,
-		utf32_t replacement = StdChar_Replacement
-	) {
-		return calcRequiredLength(p, p + length, replacement);
-	}
-
-	static
 	Result
 	convert_u(
 		DecoderState* state,
@@ -481,19 +462,6 @@ public:
 	}
 
 	static
-	ConvertLengthResult
-	convert_u(
-		DecoderState* state,
-		DstUnit* dst,
-		const SrcUnit* src,
-		size_t srcLength,
-		utf32_t replacement = StdChar_Replacement
-	) {
-		Result result = convert_u(state, dst, src, src + srcLength, replacement);
-		return ConvertLengthResult(result.m_dst - dst, result.m_src - src);
-	}
-
-	static
 	Result
 	convert_u(
 		DstUnit* dst,
@@ -504,18 +472,6 @@ public:
 		EncodingEmitter_u emitter(dst, replacement);
 		src = Decoder::decode(emitter, src, srcEnd);
 		return Result(emitter.p(), src);
-	}
-
-	static
-	ConvertLengthResult
-	convert_u(
-		DstUnit* dst,
-		const SrcUnit* src,
-		size_t srcLength,
-		utf32_t replacement = StdChar_Replacement
-	) {
-		Result result = convert_u(dst, src, src + srcLength, replacement);
-		return ConvertLengthResult(result.m_dst - dst, result.m_src - src);
 	}
 
 	static
@@ -534,20 +490,6 @@ public:
 	}
 
 	static
-	ConvertLengthResult
-	convert(
-		DecoderState* state,
-		DstUnit* dst,
-		size_t dstLength,
-		const SrcUnit* src,
-		size_t srcLength,
-		utf32_t replacement = StdChar_Replacement
-	) {
-		Result result = convert(state, dst, dst + dstLength, src, src + srcLength, replacement);
-		return ConvertLengthResult(result.m_dst - dst, result.m_src - src);
-	}
-
-	static
 	Result
 	convert(
 		DstUnit* dst,
@@ -560,18 +502,101 @@ public:
 		src = Decoder::decode(emitter, src, srcEnd);
 		return Result(emitter.p(), src);
 	}
+};
+
+//..............................................................................
+
+// locates offsets of code-units that decode into a given character position
+
+template <
+	typename Encoding0,
+	typename Decoder0 = typename Encoding0::Decoder // allows for reverse decoding
+>
+class Locate {
+public:
+	typedef Encoding0 Encoding;
+	typedef Decoder0 Decoder;
+	typedef typename Encoding::C C;
+	typedef sl::PtrIterator<const C, Decoder::IsReverse> PtrIterator;
+
+	class Emitter {
+	protected:
+		size_t m_pos;
+		size_t m_targetPos;
+
+	public:
+		Emitter(size_t pos) {
+			m_pos = 0;
+			m_targetPos = pos;
+		}
+
+		size_t
+		getPos() const {
+			return m_pos;
+		}
+
+		bool
+		canEmit() const {
+			return m_pos < m_targetPos;
+		}
+
+		void
+		emitCp(
+			const C* p,
+			utf32_t cp
+		) {
+			m_pos++;
+		}
+
+		void
+		emitCu(
+			const C* p,
+			utf32_t cu
+		) {
+			m_pos++;
+		}
+
+		void
+		emitCpAfterCu(
+			const C* p,
+			utf32_t cp
+		) {
+			m_pos++;
+		}
+	};
+
+public:
+	static
+	ConvertLengthResult
+	locate(
+		DecoderState* state,
+		size_t pos,
+		const C* src,
+		const C* srcEnd
+	) {
+		Emitter emitter(pos);
+		const C* p = Decoder::decode(state, emitter, src, srcEnd);
+		size_t srcLength = PtrIterator::sub(p, src);
+		size_t actualPos = emitter.getPos();
+		return actualPos > pos ? // overshoot due to emission of CUs
+			ConvertLengthResult(pos, srcLength - (actualPos - pos)) :
+			ConvertLengthResult(actualPos, srcLength);
+	}
 
 	static
 	ConvertLengthResult
-	convert(
-		DstUnit* dst,
-		size_t dstLength,
-		const SrcUnit* src,
-		size_t srcLength,
-		utf32_t replacement = StdChar_Replacement
+	locate(
+		size_t pos,
+		const C* src,
+		const C* srcEnd
 	) {
-		Result result = convert(dst, dst + dstLength, src, src + srcLength, replacement);
-		return ConvertLengthResult(result.m_dst - dst, result.m_src - src);
+		Emitter emitter(pos);
+		const C* p = Decoder::decode(emitter, src, srcEnd);
+		size_t srcLength = PtrIterator::sub(p, src);
+		size_t actualPos = emitter.getPos();
+		return actualPos > pos ? // overshoot due to emission of CUs
+			ConvertLengthResult(pos, srcLength - (actualPos - pos)) :
+			ConvertLengthResult(actualPos, srcLength);
 	}
 };
 

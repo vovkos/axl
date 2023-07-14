@@ -1217,11 +1217,11 @@ public:
 
 		// TODO: remove pre-calculation of required length
 
-		size_t newLength = enc::Convert<Encoding, Encoding2>::calcRequiredLength(p, length);
+		size_t newLength = enc::Convert<Encoding, Encoding2>::calcRequiredLength(p, p + length);
 		if (!createBuffer(newLength, false))
 			return -1;
 
-		enc::Convert<Encoding, Encoding2>::convert_u(this->m_p, p, length);
+		enc::Convert<Encoding, Encoding2>::convert_u(this->m_p, p, p + length);
 		return newLength;
 	}
 
@@ -1240,11 +1240,11 @@ public:
 
 		// TODO: remove pre-calculation of required length
 
-		size_t newLength = enc::Convert<Encoding, Encoding3>::calcRequiredLength(p, length);
+		size_t newLength = enc::Convert<Encoding, Encoding3>::calcRequiredLength(p, p + length);
 		if (!createBuffer(newLength, false))
 			return -1;
 
-		enc::Convert<Encoding, Encoding3>::convert_u(this->m_p, p, length);
+		enc::Convert<Encoding, Encoding3>::convert_u(this->m_p, p, p + length);
 		return newLength;
 	}
 
@@ -1402,14 +1402,12 @@ public:
 		if (length == 0)
 			return oldLength;
 
-		// TODO: remove pre-calculation of required length
-
-		size_t insertLength = enc::Convert<Encoding, Encoding2>::calcRequiredLength(p, length);
+		size_t insertLength = enc::Convert<Encoding, Encoding2>::calcRequiredLength(p, p + length);
 		C* dst = insertSpace(index, insertLength);
 		if (!dst)
 			return -1;
 
-		enc::Convert<Encoding, Encoding2>::convert_u(dst, p, length);
+		enc::Convert<Encoding, Encoding2>::convert_u(dst, p, p + length);
 		return oldLength + insertLength;
 	}
 
@@ -1427,14 +1425,12 @@ public:
 		if (length == 0)
 			return oldLength;
 
-		// TODO: remove pre-calculation of required length
-
-		size_t insertLength = enc::Convert<Encoding, Encoding3>::calcRequiredLength(p, length);
+		size_t insertLength = enc::Convert<Encoding, Encoding3>::calcRequiredLength(p, p + length);
 		C* dst = insertSpace(index, insertLength);
 		if (!dst)
 			return -1;
 
-		enc::Convert<Encoding, Encoding3>::convert_u(dst, p, length);
+		enc::Convert<Encoding, Encoding3>::convert_u(dst, p, p + length);
 		return oldLength + insertLength;
 	}
 
@@ -1919,12 +1915,12 @@ protected:
 	convertCase_pcp() {
 		StringRef src = *this; // save old contents -- can't convert in-place because length can increase
 
-		size_t length = enc::Convert<Encoding, Encoding, CaseOp>::calcRequiredLength(this->m_p, this->m_length);
+		size_t length = enc::Convert<Encoding, Encoding, CaseOp>::calcRequiredLength(this->m_p, this->m_p + this->m_length);
 		C* p = createBuffer(length);
 		if (!p)
 			return -1;
 
-		enc::Convert<Encoding, Encoding, CaseOp>::convert_u(p, src.cp(), src.getLength());
+		enc::Convert<Encoding, Encoding, CaseOp>::convert_u(p, src.cp(), src.getEnd());
 		return length;
 	}
 };

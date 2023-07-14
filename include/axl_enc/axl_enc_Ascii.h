@@ -14,7 +14,7 @@
 #define _AXL_ENC_ASCII_H
 
 #include "axl_enc_Unicode.h"
-#include "axl_sl_Operator.h"
+#include "axl_sl_PtrIterator.h"
 
 namespace axl {
 namespace enc {
@@ -53,11 +53,12 @@ public:
 
 //..............................................................................
 
-template <typename IsReverse>
+template <bool IsReverse0>
 class AsciiDecoderBase {
 public:
 	enum {
 		MaxEmitLength = 1,
+		IsReverse     = IsReverse0
 	};
 
 	typedef char C;
@@ -86,19 +87,14 @@ public:
 	const C*
 	decode(
 		Emitter& emitter,
-		const C* src,
+		const C* src0,
 		const C* srcEnd
 	) {
-		if (IsReverse()())
-			while (src > srcEnd && emitter.canEmit()) {
-				utf32_t cp = (uchar_t)*src--;
-				emitter.emitCp(src, cp);
-			}
-		else
-			while (src < srcEnd && emitter.canEmit()) {
-				utf32_t cp = (uchar_t)*src++;
-				emitter.emitCp(src, cp);
-			}
+		sl::PtrIterator<const C, IsReverse> src = src0;
+		while (src < srcEnd && emitter.canEmit()) {
+			utf32_t cp = (uchar_t)*src++;
+			emitter.emitCp(src, cp);
+		}
 
 		return src;
 	}
@@ -106,8 +102,8 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef AsciiDecoderBase<sl::False> AsciiDecoder;
-typedef AsciiDecoderBase<sl::True>  AsciiReverseDecoder;
+typedef AsciiDecoderBase<false> AsciiDecoder;
+typedef AsciiDecoderBase<true>  AsciiReverseDecoder;
 
 //..............................................................................
 

@@ -15,6 +15,7 @@
 
 #include "axl_enc_Unicode.h"
 #include "axl_sl_ByteOrder.h"
+#include "axl_sl_PtrIterator.h"
 
 namespace axl {
 namespace enc {
@@ -75,13 +76,14 @@ public:
 //..............................................................................
 
 template <
-	typename IsReverse,
-	typename IsBigEndian
+	bool IsReverse0,
+	bool IsBigEndian
 >
 class Utf32DecoderBase {
 public:
 	enum {
 		MaxEmitLength = 1,
+		IsReverse     = IsReverse0
 	};
 
 	typedef utf32_t C;
@@ -110,19 +112,14 @@ public:
 	const C*
 	decode(
 		Emitter& emitter,
-		const C* src,
+		const C* src0,
 		const C* srcEnd
 	) {
-		if (IsReverse()())
-			while (src > srcEnd && emitter.canEmit()) {
-				utf32_t c = *src--;
-				emitter.emitCp(src, IsBigEndian()() ? sl::swapByteOrder32(c) : c);
-			}
-		else
-			while (src < srcEnd && emitter.canEmit()) {
-				utf32_t c = *src++;
-				emitter.emitCp(src, IsBigEndian()() ? sl::swapByteOrder32(c) : c);
-			}
+		sl::PtrIterator<const C, IsReverse> src = src0;
+		while (src < srcEnd && emitter.canEmit()) {
+			utf32_t c = *src++;
+			emitter.emitCp(src, IsBigEndian ? sl::swapByteOrder32(c) : c);
+		}
 
 		return src;
 	}
@@ -130,10 +127,10 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef Utf32DecoderBase<sl::False, sl::False> Utf32Decoder;
-typedef Utf32DecoderBase<sl::True, sl::False>  Utf32ReverseDecoder;
-typedef Utf32DecoderBase<sl::False, sl::True>  Utf32Decoder_be;
-typedef Utf32DecoderBase<sl::True, sl::True>   Utf32ReverseDecoder_be;
+typedef Utf32DecoderBase<false, false> Utf32Decoder;
+typedef Utf32DecoderBase<true,  false> Utf32ReverseDecoder;
+typedef Utf32DecoderBase<false, true>  Utf32Decoder_be;
+typedef Utf32DecoderBase<true,  true>  Utf32ReverseDecoder_be;
 
 //..............................................................................
 
