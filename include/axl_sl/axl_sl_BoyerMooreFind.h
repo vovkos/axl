@@ -158,7 +158,8 @@ struct BoyerMooreTextFindResult {
 		m_binEndOffset = -1;
 	}
 
-	operator bool () const {
+	bool
+	isValid() const {
 		return m_charOffset != -1;
 	}
 };
@@ -254,34 +255,36 @@ public:
 				end
 			);
 
-			const char* next = convertResult.m_src;
+			const char* p2 = convertResult.m_src; // just a short alias
+			size_t srcLength = -(p - p2); // respect IsReverse
+			size_t dstLength = convertResult.m_dst - buffer;
+			size_t fullLength = dstLength + state->getTailLength();
 
 			BoyerMooreTextAccessor accessor(state, buffer);
-			size_t fullLength = next - p + state->getTailLength();
 			size_t i = this->findImpl(accessor, fullLength);
 			if (i < fullLength) {
 				BoyerMooreTextFindResult result;
 				result.m_charOffset = state->getOffset() + i;
-				result.m_binOffset = state->getBinOffset() + locateBinOffset(state, i, p, next);
-				result.m_binEndOffset = state->getBinOffset() + locateBinOffset(state, i + this->m_pattern.getCount(), p, next);
+				result.m_binOffset = state->getBinOffset() + locateBinOffset(state, i, p, p2);
+				result.m_binEndOffset = state->getBinOffset() + locateBinOffset(state, i + this->m_pattern.getCount(), p, p2);
 				state->reset(result.m_charOffset, result.m_binOffset);
 				return result;
 			}
 
 			i -= this->m_pattern.getCount() - 1; // prospective start of match...
-			size_t binOffset = locateBinOffset(state, i, p, next); // ...and its bin-offset
+			size_t binOffset = locateBinOffset(state, i, p, p2); // ...and its bin-offset
 
 			state->advance<IsReverse>(
 				i,
 				buffer,
-				convertResult.m_dst - buffer,
+				dstLength,
 				binOffset,
 				p,
-				-(p - convertResult.m_src), // respect IsReverse
+				srcLength,
 				decoderState
 			);
 
-			p = next;
+			p = p2;
 		}
 
 		return BoyerMooreTextFindResult();
@@ -296,40 +299,47 @@ protected:
 		const char* p,
 		const char* end
 	) {
+		enc::ConvertLengthResult result;
+		enc::DecoderState decoderState;
 		size_t charTailLength = state->m_tail.getDataLength();
 		size_t binTailSize = state->m_binTail.getDataSize();
-		if (i >= charTailLength) { // past tail, find in latest data
-			enc::DecoderState decoderState = state->getDecoderState();
-			return binTailSize + Locate::locate(&decoderState, i - charTailLength, p, end).m_srcLength;
+
+		if (i > charTailLength)
+			decoderState = state->getDecoderState(); // well past tail; can skip tail search
+		else { // search tail first
+			const char* front = state->m_binTail.getFront();
+			const char* back = state->m_binTail.getBack();
+			decoderState = 0;
+
+			if (front < back) // one continous chunk
+				result = IsReverse ?
+					Locate::locate(&decoderState, i, back - 1, front - 1) :
+					Locate::locate(&decoderState, i, front, back);
+			else { // two disjoint chunks
+				p = state->m_binTail.getBuffer();
+				end = state->m_binTail.getBufferEnd();
+				enc::DecoderState decoderState = 0;
+
+				if (IsReverse) {
+					result = Locate::locate(&decoderState, i, back - 1, p - 1); // back first
+					if (result.m_dstLength < i) // not found; search front now
+						result = Locate::locate(&decoderState, i, end - 1, front - 1);
+				} else {
+					result = Locate::locate(&decoderState, i, front, end); // front first
+					if (result.m_dstLength < i) // not found; search back now
+						result = Locate::locate(&decoderState, i, p, back);
+				}
+			}
+
+			if (result.m_dstLength >= i) // found in tail
+				return result.m_srcLength;
+
+			// otherwise, move on to the latest data
 		}
 
-		// need to find in tail
+		// search the latest data
 
-		const char* front = state->m_binTail.getFront();
-		const char* back = state->m_binTail.getBack();
-
-		if (front < back) // one continous chunk
-			return IsReverse ?
-				Locate::locate(i, back - 1, front - 1).m_srcLength :
-				Locate::locate(i, front, back).m_srcLength;
-
-		// two disjoint chunks
-
-		p = state->m_binTail.getBuffer();
-		end = state->m_binTail.getBufferEnd();
-		enc::DecoderState decoderState = 0;
-
-		if (IsReverse) { // first back, then front
-			enc::ConvertLengthResult result = Locate::locate(&decoderState, i, back - 1, p - 1);
-			return result.m_dstLength < i ?
-				Locate::locate(&decoderState, i, end - 1, front - 1).m_srcLength :
-				result.m_srcLength;
-		} else { // first front, then back
-			enc::ConvertLengthResult result = Locate::locate(&decoderState, i, front, end);
-			return result.m_dstLength < i ?
-				Locate::locate(&decoderState, i, p, back).m_srcLength :
-				result.m_srcLength;
-		}
+		return binTailSize + Locate::locate(&decoderState, i - charTailLength, p, end).m_srcLength;
 	}
 };
 
