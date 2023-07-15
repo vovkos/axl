@@ -24,7 +24,7 @@ namespace sl {
 template <typename C>
 class BoyerMooreStateBase {
 	template <
-		typename C,
+		typename C2,
 		bool IsReverse
 	>
 	friend class BoyerMooreIncrementalAccessorBase;

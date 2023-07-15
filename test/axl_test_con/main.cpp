@@ -4271,8 +4271,7 @@ testBoyerMoore() {
 				break;
 		}
 
-
-		printf("forward find result: %d (%s)\n", result, haystack + result);
+		printf("bin forward find result: %d (%s)\n", result, haystack + result);
 	} while (0);
 
 	do {
@@ -4286,7 +4285,7 @@ testBoyerMoore() {
 		}
 
 		size_t offset = lengthof(haystack) - lengthof(needle) - result;
-		printf("reverse find result: %d (%s)\n", offset, haystack + offset);
+		printf("bin reverse find result: %d (%s)\n", offset, haystack + offset);
 	} while (0);
 
 	do {
@@ -4298,7 +4297,6 @@ testBoyerMoore() {
 			if (result != -1)
 				break;
 		}
-
 
 		printf("forward find result: %d (%s)\n", result, haystack + result);
 	} while (0);

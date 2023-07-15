@@ -110,7 +110,7 @@ public:
 		}
 
 		i -= m_pattern.getCount() - 1; // prospective start of match
-		state->advance<IsReverse>(i, p, length);
+		state->template advance<IsReverse>(i, p, length);
 		return -1;
 	}
 
@@ -182,7 +182,8 @@ public:
 	typedef enc::Locate<Encoding, Decoder> Locate;
 
 	enum {
-		IsCaseFolded = Details::IsCaseFolded
+		IsCaseFolded = Details::IsCaseFolded,
+		IsReverse    = Details::IsReverse,
 	};
 
 public:
@@ -209,17 +210,17 @@ public:
 	setPattern(const sl::StringRef_utf32& pattern) {
 		size_t length = pattern.getLength();
 		bool result = IsReverse ?
-			m_pattern.copyReverse(pattern.cp(), length) :
-			m_pattern.copy(pattern.cp(), length);
+			this->m_pattern.copyReverse(pattern.cp(), length) :
+			this->m_pattern.copy(pattern.cp(), length);
 
 		if (!result)
 			return false;
 
 		if (IsCaseFolded)
 			for (size_t i = 0; i < length; i++)
-				m_pattern[i] = CaseOp()(pattern[i]);
+				this->m_pattern[i] = CaseOp()(pattern[i]);
 
-		m_skipTables.build(m_pattern, length, Details::BadSkipTableSize);
+		this->m_skipTables.build(this->m_pattern, length, Details::BadSkipTableSize);
 		return true;
 	}
 
@@ -245,7 +246,7 @@ public:
 
 		while (p < end) {
 			utf32_t buffer[4]; // [Details::DecoderBufferLength]
-			Convert::Result convertResult = Convert::convert(
+			typename Convert::Result convertResult = Convert::convert(
 				&decoderState,
 				buffer,
 				buffer + countof(buffer),
@@ -257,17 +258,17 @@ public:
 
 			BoyerMooreTextAccessor accessor(state, buffer);
 			size_t fullLength = next - p + state->getTailLength();
-			size_t i = findImpl(accessor, fullLength);
+			size_t i = this->findImpl(accessor, fullLength);
 			if (i < fullLength) {
 				BoyerMooreTextFindResult result;
 				result.m_charOffset = state->getOffset() + i;
 				result.m_binOffset = state->getBinOffset() + locateBinOffset(state, i, p, next);
-				result.m_binEndOffset = state->getBinOffset() + locateBinOffset(state, i + m_pattern.getCount(), p, next);
+				result.m_binEndOffset = state->getBinOffset() + locateBinOffset(state, i + this->m_pattern.getCount(), p, next);
 				state->reset(result.m_charOffset, result.m_binOffset);
 				return result;
 			}
 
-			i -= m_pattern.getCount() - 1; // prospective start of match...
+			i -= this->m_pattern.getCount() - 1; // prospective start of match...
 			size_t binOffset = locateBinOffset(state, i, p, next); // ...and its bin-offset
 
 			state->advance<IsReverse>(

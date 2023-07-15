@@ -185,7 +185,7 @@ public:
 		while (src < srcEnd) {
 			utf32_t buffer[64];
 
-			ConvertResult<Utf32::C, UtfEncoding::C> result = Convert<Utf32, UtfEncoding>::convert(
+			ConvertResult<Utf32::C, typename UtfEncoding::C> result = Convert<Utf32, UtfEncoding>::convert(
 				buffer,
 				buffer + countof(buffer),
 				src,

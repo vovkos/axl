@@ -177,7 +177,7 @@ template <typename T>
 class PtrReverseIterator: PtrIterator<T, true> {
 public:
 	PtrReverseIterator(T* p = NULL):
-		PtrIterator(p) {}
+		PtrIterator<T, true>(p) {}
 };
 
 //..............................................................................
