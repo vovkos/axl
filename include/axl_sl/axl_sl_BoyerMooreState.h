@@ -24,8 +24,9 @@ namespace sl {
 template <typename C>
 class BoyerMooreStateBase {
 	template <
-		typename C2,
-		bool IsReverse
+		typename C,
+		bool IsReverse,
+		typename State
 	>
 	friend class BoyerMooreIncrementalAccessorBase;
 
@@ -105,7 +106,7 @@ typedef BoyerMooreStateBase<char> BoyerMooreBinState;
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class BoyerMooreTextState: BoyerMooreStateBase<utf32_t> {
+class BoyerMooreTextState: public BoyerMooreStateBase<utf32_t> {
 	template <typename Details>
 	friend class BoyerMooreTextFindBase;
 
@@ -113,6 +114,7 @@ protected:
 	sl::CircularBuffer m_binTail;
 	uint64_t m_binOffset;
 	enc::DecoderState m_decoderState;
+	utf32_t m_prefix;
 
 public:
 	template <typename T>
@@ -144,6 +146,16 @@ public:
 		return m_decoderState;
 	}
 
+	utf32_t
+	getPrefix() const {
+		return m_prefix;
+	}
+
+	void
+	setPrefix(utf32_t c) {
+		m_prefix = c;
+	}
+
 	template <typename T>
 	bool
 	create(const T& find) {
@@ -159,6 +171,7 @@ public:
 	) {
 		m_binOffset = binOffset;
 		m_decoderState = 0;
+		m_prefix = 0;
 
 		return
 			BoyerMooreStateBase<utf32_t>::create(find, charOffset) &&
@@ -179,6 +192,7 @@ public:
 		m_binTail.clear();
 		m_binOffset = binOffset;
 		m_decoderState = 0;
+		m_prefix = 0;
 	}
 
 	template <bool IsReverse>
@@ -230,86 +244,21 @@ public:
 	}
 };
 
-/*
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-class BoyerMooreWholeWordTextState: public BoyerMooreTextState {
-protected:
-	enum {
-		Flag_WaitSuffix = 0x01,
-	};
-
-protected:
-	utf32_t m_prefix;
-	uint_t m_flags;
-
-public:
-	template <typename T>
-	BoyerMooreWholeWordTextState(const T& find) {
-		create(find, 0, 0);
-	}
-
-	template <typename T>
-	BoyerMooreWholeWordTextState(
-		const T& find,
-		uint64_t offset,
-		uint64_t binOffset
-	) {
-		create(find, offset, binOffset);
-	}
-
-	template <typename T>
-	bool
-	create(const T& find) {
-		return create(find, 0, 0);
-	}
-
-	template <typename T>
-	bool
-	create(
-		const T& find,
-		uint64_t offset,
-		uint64_t binOffset
-	) {
-		m_prefix = ' ';
-		m_flags = 0;
-		return BoyerMooreTextState::create(find, offset, binOffset);
-	}
-
-	void
-	reset() { // keeps offset intact
-		BoyerMooreTextState::reset();
-		m_prefix = ' ';
-		m_flags = 0;
-	}
-
-	void
-	reset(
-		uint64_t offset,
-		uint64_t binOffset
-	) {
-		BoyerMooreTextState::reset(offset, binOffset);
-		m_prefix = ' ';
-		m_flags = 0;
-	}
-};
-
-*/
-
 //..............................................................................
 
 template <
 	typename C,
-	bool IsReverse
+	bool IsReverse,
+	typename State = BoyerMooreStateBase<C>
 >
 class BoyerMooreIncrementalAccessorBase {
 protected:
-	BoyerMooreStateBase<C>* m_state;
+	State* m_state;
 	const C* m_p;
 
 public:
 	BoyerMooreIncrementalAccessorBase(
-		BoyerMooreStateBase<C>* state,
+		State* state,
 		const C* p
 	) {
 		m_state = state;
@@ -327,7 +276,24 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef BoyerMooreIncrementalAccessorBase<utf32_t, false> BoyerMooreTextAccessor;
+class BoyerMooreTextAccessor: public BoyerMooreIncrementalAccessorBase<
+	utf32_t,
+	false,
+	BoyerMooreTextState
+> {
+	template <typename Details>
+	friend class BoyerMooreTextFindBase;
+
+public:
+	BoyerMooreTextAccessor(
+		BoyerMooreTextState* state,
+		const utf32_t* p
+	):	BoyerMooreIncrementalAccessorBase<
+			utf32_t,
+			false,
+			BoyerMooreTextState
+		>(state, p) {}
+};
 
 //..............................................................................
 

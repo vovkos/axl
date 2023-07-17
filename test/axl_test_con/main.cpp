@@ -4255,7 +4255,6 @@ testSymbolicLinks() {
 
 void
 testBoyerMoore() {
-#if (1)
 	size_t result;
 	size_t offset;
 	sl::BoyerMooreTextFindResult textFindResult;
@@ -4279,7 +4278,7 @@ testBoyerMoore() {
 	} while (0);
 
 	do {
-		sl::BoyerMooreBinReverseFind find(needle, lengthof(needle));
+		sl::BoyerMooreReverseBinFind find(needle, lengthof(needle));
 		result = find.find(haystack, lengthof(haystack));
 		offset = lengthof(haystack) - lengthof(needle) - result;
 		printf("bin reverse find result: %d (%s)\n", offset, haystack + offset);
@@ -4311,7 +4310,7 @@ testBoyerMoore() {
 	} while (0);
 
 	do {
-		sl::BoyerMooreTextReverseFind find(needle);
+		sl::BoyerMooreReverseTextFind find(needle);
 		textFindResult = find.find(haystack, lengthof(haystack));
 		offset = lengthof(haystack) - lengthof(needle) - textFindResult.m_binOffset;
 		printf("text reverse find result: %d (%s)\n", offset, haystack + offset);
@@ -4365,7 +4364,7 @@ testBoyerMoore() {
 			0x00
 		};
 
-		sl::BoyerMooreTextReverseFind find(needle);
+		sl::BoyerMooreReverseTextFind find(needle);
 		textFindResult = find.find(haystack, lengthof(haystack));
 
 		offset = lengthof(haystack) - lengthof(needle) - textFindResult.m_binOffset;
@@ -4382,51 +4381,87 @@ testBoyerMoore() {
 		printf("text reverse find result: %d (%s)\n", offset, haystack + offset);
 	} while (0);
 
-#elif (1)
+	do {
+		char haystack[] = "muraveii amuravei muravei muraveib muravei amuravei";
 
-	sl::TextBoyerMooreFind find;
-	find.setPattern(pattern);
+		sl::BoyerMooreWholeWordTextFind find(needle);
+		textFindResult = find.find(haystack, lengthof(haystack));
+		printf("text forward find result: %d (%s)\n", textFindResult.m_binOffset, haystack + textFindResult.m_binOffset);
 
+		sl::BoyerMooreTextState state(find);
+		for (size_t i = 0; i < lengthof(haystack); i++) {
+			textFindResult = find.find(&state, haystack + i, 1);
+			if (textFindResult.isValid())
+				break;
+		}
 
-	sl::TextBoyerMooreFind::IncrementalContext incrementalContext;
-	size_t offset = find.find(&incrementalContext, enc::CharCodecKind_Utf8, 0, data, lengthof(data));
-	printf("offset = %d\n", offset);
+		if (!textFindResult.isValid())
+			textFindResult = find.eof(&state);
+		printf("text forward find result: %d (%s)\n", textFindResult.m_binOffset, haystack + textFindResult.m_binOffset);
+	} while (0);
 
-#elif (0)
-	static const char pattern[] = "muravei";
+	do {
+		char haystack[] = "muraveii amuravei muravei muraveib muravei amuravei";
 
-	sl::BinaryBoyerMooreFind find;
-	find.setPattern(pattern, lengthof(pattern), sl::BoyerMooreFlag_Reverse);
+		sl::BoyerMooreWholeWordReverseTextFind find(needle);
+		textFindResult = find.find(haystack, lengthof(haystack));
+		offset = lengthof(haystack) - lengthof(needle) - textFindResult.m_binOffset;
+		printf("text reverse find result: %d (%s)\n", offset, haystack + offset);
 
-	static const char chunk1[] = "vei! mura";
-	static const char chunk2[] = "vei, go";
+		sl::BoyerMooreTextState state(find);
+		for (intptr_t i = lengthof(haystack) - 1; i >= 0; i--) {
+			textFindResult = find.find(&state, haystack + i, 1);
+			if (textFindResult.isValid())
+				break;
+		}
 
-	size_t offset;
+		if (!textFindResult.isValid())
+			textFindResult = find.eof(&state);
 
-	sl::BinaryBoyerMooreFind::IncrementalContext incrementalContext;
-	offset = find.find(&incrementalContext, 0, chunk2, lengthof(chunk2));
-	offset = find.find(&incrementalContext, 0, chunk1, lengthof(chunk1));
+		offset = lengthof(haystack) - lengthof(needle) - textFindResult.m_binOffset;
+		printf("text reverse find result: %d (%s)\n", offset, haystack + offset);
+	} while (0);
 
-	printf("offset = %d\n", offset);
-#else
-	static const char pattern[] = "s";
+	do {
+		char haystack[] = "muravei amuravei muravei muraveib muravei";
 
-	sl::TextBoyerMooreFind find;
-	find.setPattern(
-		enc::CharCodecKind_Utf8,
-		pattern,
-		lengthof(pattern),
-		sl::BoyerMooreFlag_Reverse | sl::TextBoyerMooreFlag_CaseInsensitive
-	);
+		sl::BoyerMooreWholeWordTextFind find(needle);
+		textFindResult = find.find(haystack, lengthof(haystack));
+		printf("text forward find result: %d (%s)\n", textFindResult.m_binOffset, haystack + textFindResult.m_binOffset);
 
-	static const utf32_t chunk1[] = { 'S', 'e' };
+		sl::BoyerMooreTextState state(find);
+		for (size_t i = 0; i < lengthof(haystack); i++) {
+			textFindResult = find.find(&state, haystack + i, 1);
+			if (textFindResult.isValid())
+				break;
+		}
 
-	size_t offset;
+		if (!textFindResult.isValid())
+			textFindResult = find.eof(&state);
+		printf("text forward find result: %d (%s)\n", textFindResult.m_binOffset, haystack + textFindResult.m_binOffset);
+	} while (0);
 
-	sl::TextBoyerMooreFind::IncrementalContext incrementalContext;
-	offset = find.find(&incrementalContext, enc::CharCodecKind_Utf32, 0, chunk1, sizeof(chunk1));
+	do {
+		char haystack[] = "muravei amuravei muravei muraveib muravei";
 
-#endif
+		sl::BoyerMooreWholeWordReverseTextFind find(needle);
+		textFindResult = find.find(haystack, lengthof(haystack));
+		offset = lengthof(haystack) - lengthof(needle) - textFindResult.m_binOffset;
+		printf("text reverse find result: %d (%s)\n", offset, haystack + offset);
+
+		sl::BoyerMooreTextState state(find);
+		for (intptr_t i = lengthof(haystack) - 1; i >= 0; i--) {
+			textFindResult = find.find(&state, haystack + i, 1);
+			if (textFindResult.isValid())
+				break;
+		}
+
+		if (!textFindResult.isValid())
+			textFindResult = find.eof(&state);
+
+		offset = lengthof(haystack) - lengthof(needle) - textFindResult.m_binOffset;
+		printf("text reverse find result: %d (%s)\n", offset, haystack + offset);
+	} while (0);
 }
 
 //..............................................................................

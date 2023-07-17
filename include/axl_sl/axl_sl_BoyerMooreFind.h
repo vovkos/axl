@@ -101,15 +101,14 @@ public:
 		size_t length
 	) const {
 		BoyerMooreIncrementalAccessorBase<C, IsReverse> accessor(state, IsReverse ? p + length - 1 : p);
-		size_t fullLength = length + state->getTailLength();
+		size_t fullLength = state->getTailLength() + length;
 		size_t i = findImpl(accessor, fullLength);
-		if (i < fullLength) {
+		if (i + m_pattern.getCount() <= fullLength) {
 			uint64_t offset = state->getOffset() + i;
 			state->reset(offset + m_pattern.getCount());
 			return offset;
 		}
 
-		i -= m_pattern.getCount() - 1; // prospective start of match
 		state->template advance<IsReverse>(i, p, length);
 		return -1;
 	}
@@ -141,7 +140,7 @@ protected:
 			i += m_skipTables.getSkip(c, j);
 		}
 
-		return i;
+		return i - last; // prospective start of match
 	}
 };
 
@@ -184,6 +183,7 @@ public:
 
 	enum {
 		IsCaseFolded = Details::IsCaseFolded,
+		IsWholeWord  = Details::IsWholeWord,
 		IsReverse    = Details::IsReverse,
 	};
 
@@ -231,7 +231,23 @@ public:
 		size_t size
 	) const {
 		BoyerMooreTextState state(*this);
-		return find(&state, p, size);
+		BoyerMooreTextFindResult result = find(&state, p, size);
+		if (IsWholeWord && !result.isValid())
+			result = eof(&state);
+		return result;
+	}
+
+	BoyerMooreTextFindResult
+	eof(BoyerMooreTextState* state) const {
+		ASSERT(IsWholeWord);
+
+		static utf32_t suffix = ' ';
+		BoyerMooreTextAccessor accessor(state, &suffix);
+		size_t fullLength = state->getTailLength() + 1;
+		size_t i = findWholeWordImpl(accessor, fullLength);
+		return i + m_pattern.getCount() < fullLength ? // account for suffix
+			createFindResult(state, i, NULL, NULL) :
+			BoyerMooreTextFindResult();
 	}
 
 	BoyerMooreTextFindResult
@@ -258,21 +274,23 @@ public:
 			const char* p2 = convertResult.m_src; // just a short alias
 			size_t srcLength = -(p - p2); // respect IsReverse
 			size_t dstLength = convertResult.m_dst - buffer;
-			size_t fullLength = dstLength + state->getTailLength();
+			size_t fullLength = state->getTailLength() + dstLength;
+			size_t i;
 
 			BoyerMooreTextAccessor accessor(state, buffer);
-			size_t i = this->findImpl(accessor, fullLength);
-			if (i < fullLength) {
-				BoyerMooreTextFindResult result;
-				result.m_charOffset = state->getOffset() + i;
-				result.m_binOffset = state->getBinOffset() + locateBinOffset(state, i, p, p2);
-				result.m_binEndOffset = state->getBinOffset() + locateBinOffset(state, i + this->m_pattern.getCount(), p, p2);
-				state->reset(result.m_charOffset, result.m_binOffset);
-				return result;
+
+			if (IsWholeWord) {
+				i = findWholeWordImpl(accessor, fullLength);
+				if (i + m_pattern.getCount() < fullLength) // account for suffix
+					return createFindResult(state, i, p, p2);
+
+			} else {
+				i = this->findImpl(accessor, fullLength);
+				if (i + m_pattern.getCount() <= fullLength)
+					return createFindResult(state, i, p, p2);
 			}
 
-			i -= this->m_pattern.getCount() - 1; // prospective start of match...
-			size_t binOffset = locateBinOffset(state, i, p, p2); // ...and its bin-offset
+			size_t binOffset = locateBinOffset(state, i, p, p2); // locate bin-offset of the prospective start of match
 
 			state->advance<IsReverse>(
 				i,
@@ -291,10 +309,52 @@ public:
 	}
 
 protected:
+	size_t
+	findWholeWordImpl(
+		BoyerMooreTextAccessor& accessor,
+		size_t length
+	) const {
+		size_t patternLength = this->m_pattern.getCount();
+		if (!length)
+			return 0;
+
+		size_t end = length - 1;
+		size_t i = findImpl(accessor, end);
+		if (i) // update prefix
+			accessor.m_state->m_prefix = accessor[i - 1];
+
+		if (i + patternLength > end)
+			return i;
+
+		utf32_t suffix = accessor[i + patternLength];
+		if (enc::isWord(accessor.m_state->m_prefix) || enc::isWord(suffix)) { // not a whole word
+			size_t last = patternLength - 1; // to calculate skip, use the last character of the pattern
+			utf32_t c = accessor[i + last];
+			i += this->m_skipTables.getSkip(c, last);
+		}
+
+		return i;
+	}
+
+	BoyerMooreTextFindResult
+	createFindResult(
+		BoyerMooreTextState* state,
+		size_t i,
+		const char* p,
+		const char* end
+	) const {
+		BoyerMooreTextFindResult result;
+		result.m_charOffset = state->getOffset() + i;
+		result.m_binOffset = state->getBinOffset() + locateBinOffset(state, i, p, end);
+		result.m_binEndOffset = state->getBinOffset() + locateBinOffset(state, i + this->m_pattern.getCount(), p, end);
+		state->reset(result.m_charOffset, result.m_binOffset);
+		return result;
+	}
+
 	static
 	size_t
 	locateBinOffset(
-		BoyerMooreTextState* state,
+		const BoyerMooreTextState* state,
 		size_t i,
 		const char* p,
 		const char* end
@@ -346,31 +406,29 @@ protected:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef BoyerMooreFindBase<BoyerMooreHorspoolBinDetails>        BoyerMooreHorspoolBinFind;
-typedef BoyerMooreFindBase<BoyerMooreHorspoolBinReverseDetails> BoyerMooreHorspoolBinReverseFind;
+typedef BoyerMooreFindBase<BoyerMooreHorspoolReverseBinDetails> BoyerMooreHorspoolReverseBinFind;
 typedef BoyerMooreFindBase<BoyerMooreBinDetails>                BoyerMooreBinFind;
-typedef BoyerMooreFindBase<BoyerMooreBinReverseDetails>         BoyerMooreBinReverseFind;
+typedef BoyerMooreFindBase<BoyerMooreReverseBinDetails>         BoyerMooreReverseBinFind;
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef BoyerMooreTextFindBase<BoyerMooreHorspoolTextDetails_utf8>           BoyerMooreHorspoolTextFind_utf8;
-typedef BoyerMooreTextFindBase<BoyerMooreHorspoolTextReverseDetails_utf8>    BoyerMooreHorspoolTextReverseFind_utf8;
-typedef BoyerMooreTextFindBase<BoyerMooreHorspoolCaseFoldedTextDetails_utf8> BoyerMooreHorspoolCaseFoldedTextFind_utf8;
-typedef BoyerMooreTextFindBase<BoyerMooreHorspoolCaseFoldedTextReverseDetails_utf8> BoyerMooreHorspoolCaseFoldedTextReverseFind_utf8;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::Details>                    BoyerMooreTextFind_utf8;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::ReverseDetails>             BoyerMooreReverseTextFind_utf8;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::WholeWordDetails>           BoyerMooreWholeWordTextFind_utf8;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::WholeWordReverseDetails>    BoyerMooreWholeWordReverseTextFind_utf8;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::CaseFoldedDetails>          BoyerMooreCaseFoldedTextFind_utf8;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::CaseFoldedReverseDetails>   BoyerMooreCaseFoldedReverseTextFind_utf8;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::CaseFoldedWholeWordDetails> BoyerMooreCaseFoldedWholeWordTextFind_utf8;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::CaseFoldedWholeWordReverseDetails> BoyerMooreCaseFoldedWholeWordReverseTextFind_utf8;
 
-typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8>                  BoyerMooreTextFind_utf8;
-typedef BoyerMooreTextFindBase<BoyerMooreTextReverseDetails_utf8>           BoyerMooreTextReverseFind_utf8;
-typedef BoyerMooreTextFindBase<BoyerMooreCaseFoldedTextDetails_utf8>        BoyerMooreCaseFoldedTextFind_utf8;
-typedef BoyerMooreTextFindBase<BoyerMooreCaseFoldedTextReverseDetails_utf8> BoyerMooreCaseFoldedTextReverseFind_utf8;
-
-typedef BoyerMooreHorspoolTextFind_utf8                  BoyerMooreHorspoolTextFind;
-typedef BoyerMooreHorspoolTextReverseFind_utf8           BoyerMooreHorspoolTextReverseFind;
-typedef BoyerMooreHorspoolCaseFoldedTextFind_utf8        BoyerMooreHorspoolCaseFoldedTextFind;
-typedef BoyerMooreHorspoolCaseFoldedTextReverseFind_utf8 BoyerMooreHorspoolCaseFoldedTextReverseFind;
-
-typedef BoyerMooreTextFind_utf8                  BoyerMooreTextFind;
-typedef BoyerMooreTextReverseFind_utf8           BoyerMooreTextReverseFind;
-typedef BoyerMooreCaseFoldedTextFind_utf8        BoyerMooreCaseFoldedTextFind;
-typedef BoyerMooreCaseFoldedTextReverseFind_utf8 BoyerMooreCaseFoldedTextReverseFind;
+typedef BoyerMooreTextFind_utf8                    BoyerMooreTextFind;
+typedef BoyerMooreReverseTextFind_utf8             BoyerMooreReverseTextFind;
+typedef BoyerMooreWholeWordTextFind_utf8           BoyerMooreWholeWordTextFind;
+typedef BoyerMooreWholeWordReverseTextFind_utf8    BoyerMooreWholeWordReverseTextFind;
+typedef BoyerMooreCaseFoldedTextFind_utf8          BoyerMooreCaseFoldedTextFind;
+typedef BoyerMooreCaseFoldedReverseTextFind_utf8   BoyerMooreCaseFoldedReverseTextFind;
+typedef BoyerMooreCaseFoldedWholeWordTextFind_utf8 BoyerMooreCaseFoldedWholeWordTextFind;
+typedef BoyerMooreCaseFoldedWholeWordReverseTextFind_utf8 BoyerMooreCaseFoldedWholeWordReverseTextFind;
 
 //..............................................................................
 

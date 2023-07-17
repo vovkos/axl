@@ -10,6 +10,7 @@
 //..............................................................................
 
 #include "pch.h"
+#include "axl_sl_MemMem.h"
 #include "axl_sl_BoyerMooreFind.h"
 
 namespace axl {
@@ -17,7 +18,7 @@ namespace sl {
 
 //..............................................................................
 
-// building good-skip table is not worth it -- it's a single search
+// building the good-skip table is not worth it -- it's a single search
 
 const void*
 memMem(
@@ -38,7 +39,7 @@ reverseMemMem(
 	const void* p2,
 	size_t size2
 ) {
-	sl::BoyerMooreHorspoolBinReverseFind find((char*)p2, size2);
+	sl::BoyerMooreHorspoolReverseBinFind find((char*)p2, size2);
 	size_t offset = find.find((char*)p1, size1);
 	return offset != -1 ? (char*)p1 + size1 - offset - size2 : NULL;
 }
