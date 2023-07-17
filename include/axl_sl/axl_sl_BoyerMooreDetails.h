@@ -17,6 +17,7 @@
 #include "axl_enc_Utf8.h"
 #include "axl_enc_Utf16.h"
 #include "axl_enc_Utf32.h"
+#include "axl_enc_Ascii.h"
 
 namespace axl {
 namespace sl {
@@ -188,10 +189,12 @@ struct BoyerMooreTextDetailsImpl {
 typedef BoyerMooreTextDetailsImpl<BoyerMooreBadSkipTableBase<utf32_t>, enc::Utf8>  BoyerMooreHorspoolTextDetails_utf8;
 typedef BoyerMooreTextDetailsImpl<BoyerMooreBadSkipTableBase<utf32_t>, enc::Utf16> BoyerMooreHorspoolTextDetails_utf16;
 typedef BoyerMooreTextDetailsImpl<BoyerMooreBadSkipTableBase<utf32_t>, enc::Utf32> BoyerMooreHorspoolTextDetails_utf32;
+typedef BoyerMooreTextDetailsImpl<BoyerMooreBadSkipTableBase<utf32_t>, enc::Ascii> BoyerMooreHorspoolTextDetails_ascii;
 
 typedef BoyerMooreTextDetailsImpl<BoyerMooreSkipTablesBase<utf32_t>, enc::Utf8>  BoyerMooreTextDetails_utf8;
 typedef BoyerMooreTextDetailsImpl<BoyerMooreSkipTablesBase<utf32_t>, enc::Utf16> BoyerMooreTextDetails_utf16;
 typedef BoyerMooreTextDetailsImpl<BoyerMooreSkipTablesBase<utf32_t>, enc::Utf32> BoyerMooreTextDetails_utf32;
+typedef BoyerMooreTextDetailsImpl<BoyerMooreSkipTablesBase<utf32_t>, enc::Ascii> BoyerMooreTextDetails_ascii;
 
 //..............................................................................
 
