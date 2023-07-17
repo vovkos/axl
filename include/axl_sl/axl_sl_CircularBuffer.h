@@ -347,6 +347,55 @@ public:
 	setBufferSize(size_t size) {
 		return setBufferLength(size);
 	}
+
+	size_t
+	read(
+		void* p,
+		size_t length
+	) {
+		return CircularBufferBase<char>::read((char*)p, length);
+	}
+
+	size_t
+	write(
+		const void* p,
+		size_t length
+	) {
+		return CircularBufferBase<char>::write((char*)p, length);
+	}
+
+	size_t
+	readFront(
+		void* p,
+		size_t length
+	) {
+		return CircularBufferBase<char>::readFront((char*)p, length);
+
+	}
+
+	size_t
+	readBack(
+		void* p,
+		size_t length
+	) {
+		return CircularBufferBase<char>::readBack((char*)p, length);
+	}
+
+	size_t
+	writeFront(
+		const void* p,
+		size_t length
+	) {
+		return CircularBufferBase<char>::writeFront((char*)p, length);
+	}
+
+	size_t
+	writeBack(
+		const void* p,
+		size_t length
+	) {
+		return CircularBufferBase<char>::writeBack((char*)p, length);
+	}
 };
 
 //..............................................................................
