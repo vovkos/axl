@@ -63,9 +63,7 @@ public:
 			m_back < m_buffer.getCount() &&	(
 				m_front < m_back ? m_length == m_back - m_front :
 				m_front > m_back ? m_length == m_buffer.getCount() - (m_front - m_back) :
-				m_length == 0 ?
-					m_front == 0 && m_back == 0 :
-					m_length == m_buffer.getCount()
+				m_length == 0 || m_length == m_buffer.getCount()
 			);
 	}
 #endif
