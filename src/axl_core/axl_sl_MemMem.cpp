@@ -27,8 +27,8 @@ memMem(
 	const void* p2,
 	size_t size2
 ) {
-	sl::BoyerMooreHorspoolBinFind find((char*)p2, size2);
-	size_t offset = find.find((char*)p1, size1);
+	sl::BoyerMooreHorspoolBinFind find(p2, size2);
+	size_t offset = find.find(p1, size1);
 	return offset != -1 ? (char*)p1 + offset : NULL;
 }
 
@@ -39,8 +39,8 @@ reverseMemMem(
 	const void* p2,
 	size_t size2
 ) {
-	sl::BoyerMooreHorspoolReverseBinFind find((char*)p2, size2);
-	size_t offset = find.find((char*)p1, size1);
+	sl::BoyerMooreHorspoolReverseBinFind find(p2, size2);
+	size_t offset = find.find(p1, size1);
 	return offset != -1 ? (char*)p1 + size1 - offset - size2 : NULL;
 }
 

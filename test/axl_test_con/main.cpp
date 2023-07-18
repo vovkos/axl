@@ -4267,7 +4267,7 @@ testBoyerMoore() {
 		result = find.find(haystack, lengthof(haystack));
 		printf("bin forward find result: %d (%s)\n", result, haystack + result);
 
-		sl::BoyerMooreBinState state(find);
+		sl::BoyerMooreBinState state(lengthof(needle));
 		for (size_t i = 0; i < lengthof(haystack); i++) {
 			result = find.find(&state, haystack + i, 1);
 			if (result != -1)
@@ -4283,7 +4283,7 @@ testBoyerMoore() {
 		offset = lengthof(haystack) - lengthof(needle) - result;
 		printf("bin reverse find result: %d (%s)\n", offset, haystack + offset);
 
-		sl::BoyerMooreBinState state(find);
+		sl::BoyerMooreBinState state(lengthof(needle));
 		for (intptr_t i = lengthof(haystack) - 1; i >= 0; i--) {
 			result = find.find(&state, haystack + i, 1);
 			if (result != -1)
@@ -4299,7 +4299,7 @@ testBoyerMoore() {
 		textFindResult = find.find(haystack, lengthof(haystack));
 		printf("text forward find result: %d (%s)\n", textFindResult.m_binOffset, haystack + textFindResult.m_binOffset);
 
-		sl::BoyerMooreTextState state(find);
+		sl::BoyerMooreTextState state(lengthof(needle));
 		for (size_t i = 0; i < lengthof(haystack); i++) {
 			textFindResult = find.find(&state, haystack + i, 1);
 			if (textFindResult.isValid())
@@ -4315,7 +4315,7 @@ testBoyerMoore() {
 		offset = lengthof(haystack) - lengthof(needle) - textFindResult.m_binOffset;
 		printf("text reverse find result: %d (%s)\n", offset, haystack + offset);
 
-		sl::BoyerMooreTextState state(find);
+		sl::BoyerMooreTextState state(lengthof(needle));
 		for (intptr_t i = lengthof(haystack) - 1; i >= 0; i--) {
 			textFindResult = find.find(&state, haystack + i, 1);
 			if (textFindResult.isValid())
@@ -4342,7 +4342,7 @@ testBoyerMoore() {
 		textFindResult = find.find(haystack, lengthof(haystack));
 		printf("text forward find result: %d (%s)\n", textFindResult.m_binOffset, haystack + textFindResult.m_binOffset);
 
-		sl::BoyerMooreTextState state(find);
+		sl::BoyerMooreTextState state(lengthof(needle));
 		for (size_t i = 0; i < lengthof(haystack); i++) {
 			textFindResult = find.find(&state, haystack + i, 1);
 			if (textFindResult.isValid())
@@ -4370,7 +4370,7 @@ testBoyerMoore() {
 		offset = lengthof(haystack) - lengthof(needle) - textFindResult.m_binOffset;
 		printf("text reverse find result: %d (%s)\n", offset, haystack + offset);
 
-		sl::BoyerMooreTextState state(find);
+		sl::BoyerMooreTextState state(lengthof(needle));
 		for (intptr_t i = lengthof(haystack) - 1; i >= 0; i--) {
 			textFindResult = find.find(&state, haystack + i, 1);
 			if (textFindResult.isValid())
@@ -4388,7 +4388,7 @@ testBoyerMoore() {
 		textFindResult = find.find(haystack, lengthof(haystack));
 		printf("text forward find result: %d (%s)\n", textFindResult.m_binOffset, haystack + textFindResult.m_binOffset);
 
-		sl::BoyerMooreTextState state(find);
+		sl::BoyerMooreTextState state(lengthof(needle));
 		for (size_t i = 0; i < lengthof(haystack); i++) {
 			textFindResult = find.find(&state, haystack + i, 1);
 			if (textFindResult.isValid())
@@ -4408,7 +4408,7 @@ testBoyerMoore() {
 		offset = lengthof(haystack) - lengthof(needle) - textFindResult.m_binOffset;
 		printf("text reverse find result: %d (%s)\n", offset, haystack + offset);
 
-		sl::BoyerMooreTextState state(find);
+		sl::BoyerMooreTextState state(lengthof(needle));
 		for (intptr_t i = lengthof(haystack) - 1; i >= 0; i--) {
 			textFindResult = find.find(&state, haystack + i, 1);
 			if (textFindResult.isValid())
@@ -4429,7 +4429,7 @@ testBoyerMoore() {
 		textFindResult = find.find(haystack, lengthof(haystack));
 		printf("text forward find result: %d (%s)\n", textFindResult.m_binOffset, haystack + textFindResult.m_binOffset);
 
-		sl::BoyerMooreTextState state(find);
+		sl::BoyerMooreTextState state(lengthof(needle));
 		for (size_t i = 0; i < lengthof(haystack); i++) {
 			textFindResult = find.find(&state, haystack + i, 1);
 			if (textFindResult.isValid())
@@ -4449,7 +4449,7 @@ testBoyerMoore() {
 		offset = lengthof(haystack) - lengthof(needle) - textFindResult.m_binOffset;
 		printf("text reverse find result: %d (%s)\n", offset, haystack + offset);
 
-		sl::BoyerMooreTextState state(find);
+		sl::BoyerMooreTextState state(lengthof(needle));
 		for (intptr_t i = lengthof(haystack) - 1; i >= 0; i--) {
 			textFindResult = find.find(&state, haystack + i, 1);
 			if (textFindResult.isValid())

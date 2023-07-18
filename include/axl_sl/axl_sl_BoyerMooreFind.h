@@ -67,12 +67,6 @@ public:
 		return m_pattern;
 	}
 
-	void
-	clear() {
-		m_pattern.clear();
-		m_skipTables.clear();
-	}
-
 	bool
 	setPattern(
 		const C* p,
@@ -83,6 +77,12 @@ public:
 			m_pattern.copy(p, length);
 
 		return m_skipTables.build(m_pattern, length, Details::BadSkipTableSize);
+	}
+
+	void
+	clear() {
+		m_pattern.clear();
+		m_skipTables.clear();
 	}
 
 	size_t
@@ -100,6 +100,8 @@ public:
 		const C* p,
 		size_t length
 	) const {
+		ASSERT(state->getPatternLength() == m_pattern.getCount());
+
 		BoyerMooreIncrementalAccessorBase<C, IsReverse> accessor(state, IsReverse ? p + length - 1 : p);
 		size_t fullLength = state->getTailLength() + length;
 		size_t i = findImpl(accessor, fullLength);
@@ -144,12 +146,57 @@ protected:
 	}
 };
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <typename Details>
+class BoyerMooreBinFindBase: public BoyerMooreFindBase<Details> {
+public:
+	BoyerMooreBinFindBase() {}
+
+	BoyerMooreBinFindBase(
+		const void* p,
+		size_t size
+	): BoyerMooreFindBase<Details>((char*)p, size) {}
+
+	bool
+	setPattern(
+		const void* p,
+		size_t size
+	) {
+		return BoyerMooreFindBase<Details>::setPattern((char*)p, size);
+	}
+
+	size_t
+	find(
+		const void* p,
+		size_t size
+	) const {
+		return BoyerMooreFindBase<Details>::find((char*)p, size);
+	}
+
+	uint64_t
+	find(
+		BoyerMooreBinState* state,
+		const void* p,
+		size_t size
+	) const {
+		return BoyerMooreFindBase<Details>::find(state, (char*)p, size);
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+typedef BoyerMooreBinFindBase<BoyerMooreHorspoolBinDetails>        BoyerMooreHorspoolBinFind;
+typedef BoyerMooreBinFindBase<BoyerMooreHorspoolReverseBinDetails> BoyerMooreHorspoolReverseBinFind;
+typedef BoyerMooreBinFindBase<BoyerMooreBinDetails>                BoyerMooreBinFind;
+typedef BoyerMooreBinFindBase<BoyerMooreReverseBinDetails>         BoyerMooreReverseBinFind;
+
 //..............................................................................
 
 struct BoyerMooreTextFindResult {
-	size_t m_charOffset;
-	size_t m_binOffset;
-	size_t m_binEndOffset; // not necessarily the size needed to "properly" encode pattern!
+	uint64_t m_charOffset;
+	uint64_t m_binOffset;
+	uint64_t m_binEndOffset; // not necessarily the size needed to "properly" encode pattern!
 
 	BoyerMooreTextFindResult() {
 		m_charOffset = -1;
@@ -230,24 +277,11 @@ public:
 		const void* p,
 		size_t size
 	) const {
-		BoyerMooreTextState state(*this);
+		BoyerMooreTextState state(m_pattern.getCount());
 		BoyerMooreTextFindResult result = find(&state, p, size);
 		if (IsWholeWord && !result.isValid())
 			result = eof(&state);
 		return result;
-	}
-
-	BoyerMooreTextFindResult
-	eof(BoyerMooreTextState* state) const {
-		ASSERT(IsWholeWord);
-
-		static utf32_t suffix = ' ';
-		BoyerMooreTextAccessor accessor(state, &suffix);
-		size_t fullLength = state->getTailLength() + 1;
-		size_t i = findWholeWordImpl(accessor, fullLength);
-		return i + m_pattern.getCount() < fullLength ? // account for suffix
-			createFindResult(state, i, NULL, NULL) :
-			BoyerMooreTextFindResult();
 	}
 
 	BoyerMooreTextFindResult
@@ -256,13 +290,15 @@ public:
 		const void* p0,
 		size_t size
 	) const {
+		ASSERT(state->getPatternLength() == m_pattern.getCount());
+
 		sl::PtrIterator<const char, IsReverse> p(IsReverse ? (char*)p0 + size - 1 : (char*)p0);
 		const char* end = p + size;
 
 		enc::DecoderState decoderState = state->getDecoderState();
 
 		while (p < end) {
-			utf32_t buffer[4]; // [Details::DecoderBufferLength]
+			utf32_t buffer[Details::DecoderBufferLength];
 			typename Convert::Result convertResult = Convert::convert(
 				&decoderState,
 				buffer,
@@ -280,7 +316,7 @@ public:
 			BoyerMooreTextAccessor accessor(state, buffer);
 
 			if (IsWholeWord) {
-				i = findWholeWordImpl(accessor, fullLength);
+				i = findWholeWordImpl(state, accessor, fullLength);
 				if (i + m_pattern.getCount() < fullLength) // account for suffix
 					return createFindResult(state, i, p, p2);
 
@@ -308,10 +344,24 @@ public:
 		return BoyerMooreTextFindResult();
 	}
 
+	BoyerMooreTextFindResult
+	eof(BoyerMooreTextState* state) const {
+		ASSERT(IsWholeWord);
+
+		static utf32_t suffix = ' ';
+		BoyerMooreTextAccessor accessor(state, &suffix);
+		size_t fullLength = state->getTailLength() + 1;
+		size_t i = findWholeWordImpl(state, accessor, fullLength);
+		return i + m_pattern.getCount() < fullLength ? // account for suffix
+			createFindResult(state, i, NULL, NULL) :
+			BoyerMooreTextFindResult();
+	}
+
 protected:
 	size_t
 	findWholeWordImpl(
-		BoyerMooreTextAccessor& accessor,
+		BoyerMooreTextState* state,
+		const BoyerMooreTextAccessor& accessor,
 		size_t length
 	) const {
 		size_t patternLength = this->m_pattern.getCount();
@@ -321,13 +371,13 @@ protected:
 		size_t end = length - 1;
 		size_t i = findImpl(accessor, end);
 		if (i) // update prefix
-			accessor.m_state->m_prefix = accessor[i - 1];
+			state->setPrefix(accessor[i - 1]);
 
 		if (i + patternLength > end)
 			return i;
 
 		utf32_t suffix = accessor[i + patternLength];
-		if (enc::isWord(accessor.m_state->m_prefix) || enc::isWord(suffix)) { // not a whole word
+		if (enc::isWord(state->getPrefix()) || enc::isWord(suffix)) { // not a whole word
 			size_t last = patternLength - 1; // to calculate skip, use the last character of the pattern
 			utf32_t c = accessor[i + last];
 			i += this->m_skipTables.getSkip(c, last);
@@ -361,14 +411,14 @@ protected:
 	) {
 		enc::ConvertLengthResult result;
 		enc::DecoderState decoderState;
-		size_t charTailLength = state->m_tail.getDataLength();
-		size_t binTailSize = state->m_binTail.getDataSize();
+		size_t charTailLength = state->getTailLength();
+		size_t binTailSize = state->getBinTailSize();
 
 		if (i > charTailLength)
 			decoderState = state->getDecoderState(); // well past tail; can skip tail search
 		else { // search tail first
-			const char* front = state->m_binTail.getFront();
-			const char* back = state->m_binTail.getBack();
+			const char* front = state->getBinTailFront();
+			const char* back = state->getBinTailBack();
 			decoderState = 0;
 
 			if (front < back) // one continous chunk
@@ -376,8 +426,8 @@ protected:
 					Locate::locate(&decoderState, i, back - 1, front - 1) :
 					Locate::locate(&decoderState, i, front, back);
 			else { // two disjoint chunks
-				p = state->m_binTail.getBuffer();
-				end = state->m_binTail.getBufferEnd();
+				p = state->getBinTailBuffer();
+				end = state->getBinTailBufferEnd();
 				enc::DecoderState decoderState = 0;
 
 				if (IsReverse) {
@@ -402,13 +452,6 @@ protected:
 		return binTailSize + Locate::locate(&decoderState, i - charTailLength, p, end).m_srcLength;
 	}
 };
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-typedef BoyerMooreFindBase<BoyerMooreHorspoolBinDetails>        BoyerMooreHorspoolBinFind;
-typedef BoyerMooreFindBase<BoyerMooreHorspoolReverseBinDetails> BoyerMooreHorspoolReverseBinFind;
-typedef BoyerMooreFindBase<BoyerMooreBinDetails>                BoyerMooreBinFind;
-typedef BoyerMooreFindBase<BoyerMooreReverseBinDetails>         BoyerMooreReverseBinFind;
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

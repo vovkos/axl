@@ -35,12 +35,15 @@ protected:
 	uint64_t m_offset; // for reverse find, it's the (positive) offset from the end
 
 public:
-	template <typename T>
+	BoyerMooreStateBase() {
+		m_offset = 0;
+	}
+
 	BoyerMooreStateBase(
-		const T& find,
+		size_t patternLength,
 		uint64_t offset = 0
 	) {
-		create(find, offset);
+		create(patternLength, offset);
 	}
 
 	uint64_t
@@ -49,18 +52,22 @@ public:
 	}
 
 	size_t
+	getPatternLength() const {
+		return m_tail.getBufferLength();
+	}
+
+	size_t
 	getTailLength() const {
 		return m_tail.getDataLength();
 	}
 
-	template <typename T>
 	bool
 	create(
-		const T& find,
+		size_t patternLength,
 		uint64_t offset = 0
 	) {
 		m_offset = offset;
-		return m_tail.create(find.getPattern().getCount());
+		return m_tail.create(patternLength);
 	}
 
 	void
@@ -95,9 +102,6 @@ public:
 			ASSERT(result == length);
 		}
 	}
-
-protected:
-	BoyerMooreStateBase() {}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -107,9 +111,6 @@ typedef BoyerMooreStateBase<char> BoyerMooreBinState;
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class BoyerMooreTextState: public BoyerMooreStateBase<utf32_t> {
-	template <typename Details>
-	friend class BoyerMooreTextFindBase;
-
 protected:
 	sl::CircularBuffer m_binTail;
 	uint64_t m_binOffset;
@@ -117,18 +118,21 @@ protected:
 	utf32_t m_prefix;
 
 public:
-	template <typename T>
-	BoyerMooreTextState(const T& find) {
-		create(find, 0, 0);
+	BoyerMooreTextState() {
+		m_binOffset = 0;
+		m_prefix = 0;
 	}
 
-	template <typename T>
+	BoyerMooreTextState(size_t patternLength) {
+		create(patternLength, 0, 0);
+	}
+
 	BoyerMooreTextState(
-		const T& find,
+		size_t patternLength,
 		uint64_t charOffset,
 		uint64_t binOffset
 	) {
-		create(find, charOffset, binOffset);
+		create(patternLength, charOffset, binOffset);
 	}
 
 	uint64_t
@@ -139,6 +143,26 @@ public:
 	size_t
 	getBinTailSize() const {
 		return m_binTail.getDataSize();
+	}
+
+	const char*
+	getBinTailFront() const {
+		return m_binTail.getFront();
+	}
+
+	const char*
+	getBinTailBack() const {
+		return m_binTail.getBack();
+	}
+
+	const char*
+	getBinTailBuffer() const {
+		return m_binTail.getBuffer();
+	}
+
+	const char*
+	getBinTailBufferEnd() const {
+		return m_binTail.getBufferEnd();
 	}
 
 	enc::DecoderState
@@ -156,16 +180,14 @@ public:
 		m_prefix = c;
 	}
 
-	template <typename T>
 	bool
-	create(const T& find) {
-		return create(find, 0, 0);
+	create(size_t patternLength) {
+		return create(patternLength, 0, 0);
 	}
 
-	template <typename T>
 	bool
 	create(
-		const T& find,
+		size_t patternLength,
 		uint64_t charOffset,
 		uint64_t binOffset
 	) {
@@ -174,8 +196,8 @@ public:
 		m_prefix = 0;
 
 		return
-			BoyerMooreStateBase<utf32_t>::create(find, charOffset) &&
-			m_binTail.create(find.getPattern().getCount() * 4); // a codepoint takes up to 4 bytes
+			BoyerMooreStateBase<utf32_t>::create(patternLength, charOffset) &&
+			m_binTail.create(patternLength * 4); // a codepoint takes up to 4 bytes
 	}
 
 	void
@@ -281,9 +303,6 @@ class BoyerMooreTextAccessor: public BoyerMooreIncrementalAccessorBase<
 	false,
 	BoyerMooreTextState
 > {
-	template <typename Details>
-	friend class BoyerMooreTextFindBase;
-
 public:
 	BoyerMooreTextAccessor(
 		BoyerMooreTextState* state,
