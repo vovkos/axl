@@ -12,7 +12,7 @@
 #pragma once
 
 #include "axl_sl_CircularBuffer.h"
-#include "axl_enc_Unicode.h"
+#include "axl_sl_String.h"
 
 namespace axl {
 namespace sl {
@@ -115,7 +115,9 @@ protected:
 	sl::CircularBuffer m_binTail;
 	uint64_t m_binOffset;
 	enc::DecoderState m_decoderState;
-	utf32_t m_prefix;
+
+public:
+	utf32_t m_prefix; // freely adjustible
 
 public:
 	BoyerMooreTextState() {
@@ -123,16 +125,28 @@ public:
 		m_prefix = 0;
 	}
 
-	BoyerMooreTextState(size_t patternLength) {
-		create(patternLength, 0, 0);
+	BoyerMooreTextState(const sl::StringRef& pattern) {
+		create(pattern, 0, 0);
+	}
+
+	BoyerMooreTextState(const sl::StringRef_utf32& pattern) {
+		create(pattern, 0, 0);
 	}
 
 	BoyerMooreTextState(
-		size_t patternLength,
+		const sl::StringRef& pattern,
 		uint64_t charOffset,
 		uint64_t binOffset
 	) {
-		create(patternLength, charOffset, binOffset);
+		create(pattern, charOffset, binOffset);
+	}
+
+	BoyerMooreTextState(
+		const sl::StringRef_utf32& pattern,
+		uint64_t charOffset,
+		uint64_t binOffset
+	) {
+		create(pattern, charOffset, binOffset);
 	}
 
 	uint64_t
@@ -170,34 +184,33 @@ public:
 		return m_decoderState;
 	}
 
-	utf32_t
-	getPrefix() const {
-		return m_prefix;
-	}
-
-	void
-	setPrefix(utf32_t c) {
-		m_prefix = c;
+	bool
+	create(const sl::StringRef& pattern) {
+		return create(pattern, 0, 0);
 	}
 
 	bool
-	create(size_t patternLength) {
-		return create(patternLength, 0, 0);
+	create(const sl::StringRef_utf32& pattern) {
+		return create(pattern, 0, 0);
 	}
 
 	bool
 	create(
-		size_t patternLength,
+		const sl::StringRef& pattern,
 		uint64_t charOffset,
 		uint64_t binOffset
 	) {
-		m_binOffset = binOffset;
-		m_decoderState = 0;
-		m_prefix = 0;
+		size_t patternLength = enc::Convert<enc::Utf32, enc::Utf8>::calcRequiredLength(pattern.cp(), pattern.getEnd());
+		return create(pattern.getLength(), charOffset, binOffset);
+	}
 
-		return
-			BoyerMooreStateBase<utf32_t>::create(patternLength, charOffset) &&
-			m_binTail.create(patternLength * 4); // a codepoint takes up to 4 bytes
+	bool
+	create(
+		const sl::StringRef_utf32& pattern,
+		uint64_t charOffset,
+		uint64_t binOffset
+	) {
+		return create(pattern.getLength(), charOffset, binOffset);
 	}
 
 	void
@@ -228,6 +241,8 @@ public:
 		size_t binSize,
 		enc::DecoderState decoderState
 	) {
+		ASSERT(binOffset >= charOffset);
+
 		m_offset += charOffset;
 		m_binOffset += binOffset;
 		m_decoderState = decoderState;
@@ -235,14 +250,15 @@ public:
 		size_t charTailLength = m_tail.getDataLength();
 		size_t binTailSize = m_binTail.getDataSize();
 
-		if (charOffset >= charTailLength) {
+		if (binOffset >= binTailSize) {
+			ASSERT(charOffset >= charTailLength);
+
 			charOffset -= charTailLength;
 			size_t textCopyLength = textLength - charOffset;
 			m_tail.clear();
 			size_t result = m_tail.write(text + charOffset, textCopyLength);
 			ASSERT(result == textCopyLength);
 
-			ASSERT(binOffset >= binTailSize);
 			binOffset -= binTailSize;
 			size_t binCopySize = binSize - binOffset;
 			m_binTail.clear();
@@ -263,6 +279,24 @@ public:
 				ASSERT(result == binSize);
 			}
 		}
+
+		ASSERT(m_binTail.getDataSize() >= m_tail.getDataLength());
+	}
+
+protected:
+	bool
+	create(
+		size_t patternLength,
+		uint64_t charOffset,
+		uint64_t binOffset
+	) {
+		m_binOffset = binOffset;
+		m_decoderState = 0;
+		m_prefix = 0;
+
+		return
+			BoyerMooreStateBase<utf32_t>::create(patternLength, charOffset) &&
+			m_binTail.create(patternLength * 4); // a codepoint takes up to 4 bytes
 	}
 };
 

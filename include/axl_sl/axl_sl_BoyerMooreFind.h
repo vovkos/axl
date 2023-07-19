@@ -90,7 +90,7 @@ public:
 		const C* p,
 		size_t length
 	) const {
-		size_t i = findImpl(sl::PtrIterator<const C, IsReverse>(IsReverse ? p + length - 1 : p), length);
+		size_t i = findImpl(sl::PtrIterator<const C, IsReverse>(IsReverse ? p + length - 1 : p), 0, length);
 		return i < length ? i : -1;
 	}
 
@@ -104,7 +104,7 @@ public:
 
 		BoyerMooreIncrementalAccessorBase<C, IsReverse> accessor(state, IsReverse ? p + length - 1 : p);
 		size_t fullLength = state->getTailLength() + length;
-		size_t i = findImpl(accessor, fullLength);
+		size_t i = findImpl(accessor, 0, fullLength);
 		if (i + m_pattern.getCount() <= fullLength) {
 			uint64_t offset = state->getOffset() + i;
 			state->reset(offset + m_pattern.getCount());
@@ -120,10 +120,11 @@ protected:
 	size_t
 	findImpl(
 		const Accessor& accessor,
+		size_t i0,
 		size_t length
 	) const {
 		size_t last = m_pattern.getCount() - 1;
-		size_t i = last;
+		size_t i = i0 + last;
 		while (i < length) {
 			intptr_t j = last;
 			uchar_t c;
@@ -277,7 +278,7 @@ public:
 		const void* p,
 		size_t size
 	) const {
-		BoyerMooreTextState state(m_pattern.getCount());
+		BoyerMooreTextState state(sl::StringRef_utf32(m_pattern, m_pattern.getCount()));
 		BoyerMooreTextFindResult result = find(&state, p, size);
 		if (IsWholeWord && !result.isValid())
 			result = eof(&state);
@@ -321,7 +322,7 @@ public:
 					return createFindResult(state, i, p, p2);
 
 			} else {
-				i = this->findImpl(accessor, fullLength);
+				i = this->findImpl(accessor, 0, fullLength);
 				if (i + m_pattern.getCount() <= fullLength)
 					return createFindResult(state, i, p, p2);
 			}
@@ -364,24 +365,31 @@ protected:
 		const BoyerMooreTextAccessor& accessor,
 		size_t length
 	) const {
-		size_t patternLength = this->m_pattern.getCount();
 		if (!length)
 			return 0;
 
-		size_t end = length - 1;
-		size_t i = findImpl(accessor, end);
-		if (i) // update prefix
-			state->setPrefix(accessor[i - 1]);
+		size_t patternLength = this->m_pattern.getCount();
+		size_t i = 0;
 
-		if (i + patternLength > end)
-			return i;
+		for (;;) {
+			size_t end = length - 1;
+			i = findImpl(accessor, i, end);
+			if (i + patternLength > end)
+				break;
 
-		utf32_t suffix = accessor[i + patternLength];
-		if (enc::isWord(state->getPrefix()) || enc::isWord(suffix)) { // not a whole word
+			utf32_t prefix = i ? accessor[i - 1] : state->m_prefix;
+			utf32_t suffix = accessor[i + patternLength];
+			if (!enc::isWord(prefix) && !enc::isWord(suffix)) // a whole word, done!
+				return i;
+
 			size_t last = patternLength - 1; // to calculate skip, use the last character of the pattern
 			utf32_t c = accessor[i + last];
-			i += this->m_skipTables.getSkip(c, last);
+			size_t skip = this->m_skipTables.getSkip(c, last);
+			i += skip;
 		}
+
+		if (i) // update prefix
+			state->m_prefix = accessor[i - 1];
 
 		return i;
 	}
