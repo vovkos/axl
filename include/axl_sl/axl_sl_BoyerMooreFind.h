@@ -278,7 +278,7 @@ public:
 		const void* p,
 		size_t size
 	) const {
-		BoyerMooreTextState state(sl::StringRef_utf32(m_pattern, m_pattern.getCount()));
+		BoyerMooreTextState state(sl::StringRef_utf32(this->m_pattern, this->m_pattern.getCount()));
 		BoyerMooreTextFindResult result = find(&state, p, size);
 		if (IsWholeWord && !result.isValid())
 			result = eof(&state);
@@ -291,7 +291,7 @@ public:
 		const void* p0,
 		size_t size
 	) const {
-		ASSERT(state->getPatternLength() == m_pattern.getCount());
+		ASSERT(state->getPatternLength() == this->m_pattern.getCount());
 
 		sl::PtrIterator<const char, IsReverse> p(IsReverse ? (char*)p0 + size - 1 : (char*)p0);
 		const char* end = p + size;
@@ -318,12 +318,12 @@ public:
 
 			if (IsWholeWord) {
 				i = findWholeWordImpl(state, accessor, fullLength);
-				if (i + m_pattern.getCount() < fullLength) // account for suffix
+				if (i + this->m_pattern.getCount() < fullLength) // account for suffix
 					return createFindResult(state, i, p, p2);
 
 			} else {
 				i = this->findImpl(accessor, 0, fullLength);
-				if (i + m_pattern.getCount() <= fullLength)
+				if (i + this->m_pattern.getCount() <= fullLength)
 					return createFindResult(state, i, p, p2);
 			}
 
@@ -353,7 +353,7 @@ public:
 		BoyerMooreTextAccessor accessor(state, &suffix);
 		size_t fullLength = state->getTailLength() + 1;
 		size_t i = findWholeWordImpl(state, accessor, fullLength);
-		return i + m_pattern.getCount() < fullLength ? // account for suffix
+		return i + this->m_pattern.getCount() < fullLength ? // account for suffix
 			createFindResult(state, i, NULL, NULL) :
 			BoyerMooreTextFindResult();
 	}
@@ -373,7 +373,7 @@ protected:
 
 		for (;;) {
 			size_t end = length - 1;
-			i = findImpl(accessor, i, end);
+			i = this->findImpl(accessor, i, end);
 			if (i + patternLength > end)
 				break;
 
