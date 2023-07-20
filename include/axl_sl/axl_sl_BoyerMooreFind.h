@@ -267,7 +267,7 @@ public:
 
 		if (IsCaseFolded)
 			for (size_t i = 0; i < length; i++)
-				this->m_pattern[i] = CaseOp()(pattern[i]);
+				this->m_pattern[i] = CaseOp()(this->m_pattern[i]);
 
 		this->m_skipTables.build(this->m_pattern, length, Details::BadSkipTableSize);
 		return true;
