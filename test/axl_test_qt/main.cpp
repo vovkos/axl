@@ -14,6 +14,9 @@
 #include "axl_sys_Thread.h"
 #include "axl_re_Regex.h"
 
+#include <QCheckBox>
+#include <QDialogButtonBox>
+
 //..............................................................................
 
 #if 0
@@ -725,6 +728,32 @@ main(
 #endif
 
 	QApplication app(argc, argv);
+
+	/*
+	QStringList items;
+	items.append("Hui");
+	items.append("Govno");
+	items.append("Muravei");
+
+	QPlainTextEdit edit;
+	QCheckBox checkBox("Check box");
+	QComboBox comboBox;
+	comboBox.addItems(items);
+
+	QDialogButtonBox buttons;
+	buttons.setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+
+	QVBoxLayout l;
+	l.addWidget(&edit);
+	l.addWidget(&checkBox);
+	l.addWidget(&comboBox);
+	l.addWidget(&buttons);
+
+	QDialog dlg;
+	dlg.setWindowTitle("Hui");
+	dlg.setLayout(&l);
+	dlg.exec();
+	*/
 
 	MainWindow mainWindow;
 	mainWindow.show();

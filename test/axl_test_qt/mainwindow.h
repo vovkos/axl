@@ -13,8 +13,9 @@
 
 #define MAINWINDOW_H
 
-#define _TEST_PAINT 1
-#define _TEST_EDIT  1
+#define _TEST_PAINT 0
+#define _TEST_EDIT  0
+#define _TEST_TREE  1
 
 //..............................................................................
 
@@ -22,7 +23,8 @@
 
 class MyWidget: public QWidget {
 public:
-	MyWidget(QWidget* parent = NULL);
+	MyWidget(QWidget* parent = NULL):
+		QWidget(parent) {}
 
 	virtual
 	void
@@ -31,6 +33,32 @@ public:
 	virtual
 	void
 	keyPressEvent(QKeyEvent *event);
+};
+
+#endif
+
+#if (_TEST_TREE)
+
+class MyTreeWidget: public QTreeWidget {
+public:
+	MyTreeWidget(QWidget* parent = NULL):
+		QTreeWidget(parent) {}
+
+	virtual
+	void
+	drawRow(
+		QPainter* painter,
+		const QStyleOptionViewItem& option,
+        const QModelIndex& index
+	) const;
+
+	virtual
+	void
+	drawBranches(
+		QPainter* painter,
+		const QRect& rect,
+		const QModelIndex& index
+	) const;
 };
 
 #endif
@@ -52,6 +80,8 @@ private:
 	MyWidget m_myWidget;
 #elif (_TEST_EDIT)
 	QTextEdit m_editWidget;
+#elif (_TEST_TREE)
+	MyTreeWidget m_treeWidget;
 #endif
 };
 

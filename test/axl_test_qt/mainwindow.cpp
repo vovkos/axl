@@ -12,13 +12,28 @@
 #include "pch.h"
 #include "mainwindow.h"
 #include "moc_mainwindow.cpp"
+#include "QProxyStyle"
+
+class StyleFix: public QProxyStyle {
+public:
+	StyleFix(QStyle* style):
+		QProxyStyle(style) {}
+
+	int styleHint(
+		StyleHint hint,
+		const QStyleOption *option,
+		const QWidget *widget,
+		QStyleHintReturn *returnData
+	) const {
+		return hint == SH_ItemView_ShowDecorationSelected ?
+			1 :
+			QProxyStyle::styleHint(hint, option, widget, returnData);
+	}
+};
 
 #if (_TEST_PAINT)
 
 //..............................................................................
-
-MyWidget::MyWidget(QWidget* parent):
-	QWidget(parent) {}
 
 void
 MyWidget::paintEvent(QPaintEvent* e) {
@@ -65,6 +80,28 @@ MyWidget::keyPressEvent(QKeyEvent *event) {
 
 	if (event->key() == Qt::Key_I)
 		printf("I key\n");
+}
+
+#elif (_TEST_TREE)
+
+void
+MyTreeWidget::drawRow(
+	QPainter *painter,
+	const QStyleOptionViewItem &option,
+    const QModelIndex &index
+) const {
+	QStyleOptionViewItem option2 = option;
+	// option2.showDecorationSelected = true;
+	QTreeWidget::drawRow(painter, option2, index);
+}
+
+void
+MyTreeWidget::drawBranches(
+	QPainter *painter,
+	const QRect &rect,
+	const QModelIndex &index
+) const {
+	QTreeWidget::drawBranches(painter, rect, index);
 }
 
 #endif
@@ -146,12 +183,16 @@ protected:
 	}
 };
 
+
+
 MainWindow::MainWindow(QWidget* parent) :
 	QMainWindow(parent),
 #if (_TEST_PAINT)
 	m_myWidget(this)
 #elif (_TEST_EDIT)
 	m_editWidget(this)
+#elif (_TEST_TREE)
+	m_treeWidget(this)
 #endif
 {
 	QFont f("Consolas", 10);
@@ -178,6 +219,26 @@ MainWindow::MainWindow(QWidget* parent) :
 	m_editWidget.setContentsMargins(0, 0, 0, 0);
 	m_editWidget.setText("abcdefghijklmnopqrstuvwxyz");
 	vlayout->addWidget(&m_editWidget);
+#elif (_TEST_TREE)
+	m_treeWidget.setFont(f);
+	m_treeWidget.setFrameStyle(0);
+	m_treeWidget.setAlternatingRowColors(true);
+	m_treeWidget.setHeaderHidden(true);
+	m_treeWidget.setRootIsDecorated(true);
+
+	for (int i = 0; i < 10; i++) {
+		QTreeWidgetItem* item = new QTreeWidgetItem;
+		item->setText(0, QString("Item #%1").arg(i));
+		for (int j = 0; j < 3 + i % 2; j++) {
+			QTreeWidgetItem* subItem = new QTreeWidgetItem;
+			subItem->setText(0, QString("SubItem #%1").arg(j));
+			item->addChild(subItem);
+		}
+
+		m_treeWidget.addTopLevelItem(item);
+	}
+
+	vlayout->addWidget(&m_treeWidget);
 #endif
 
 	QHBoxLayout* hlayout = new QHBoxLayout;
@@ -221,8 +282,17 @@ MainWindow::MainWindow(QWidget* parent) :
 	combo2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	hlayout->addWidget(combo2);
 
-	setFocusProxy(&m_myWidget);
-	m_myWidget.setFocus();
+#if (_TEST_PAINT)
+	QWidget* widget = &m_myWidget;
+#elif (_TEST_EDIT)
+	QWidget* widget = &m_editWidget;
+#elif (_TEST_TREE)
+	QWidget* widget = &m_treeWidget;
+	widget->setStyle(new StyleFix(widget->style()));
+#endif
+
+	setFocusProxy(widget);
+	widget->setFocus();
 }
 
 //..............................................................................
