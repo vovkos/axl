@@ -90,6 +90,13 @@ if(QT_FOUND)
 
 	if(QT_DLL_DIR)
 		axl_message("    DLLs:" "${QT_DLL_DIR}")
+		if(NOT QT_PLUGIN_DIR)
+			get_filename_component(QT_PLUGIN_DIR "${QT_DLL_DIR}/../plugins" ABSOLUTE)
+		endif()
+	endif()
+
+	if(QT_PLUGIN_DIR)
+		axl_message("    Plugins:" "${QT_PLUGIN_DIR}")
 	endif()
 endif()
 
@@ -151,6 +158,18 @@ qt5_use_modules_alt
 		endforeach()
 		target_link_libraries(${_TARGET} ${_IMPORTS})
 	endif()
+endmacro()
+
+macro(
+qt5_create_qt_conf
+	_DIR
+)
+
+	file(
+		WRITE ${_DIR}/qt.conf
+		"[Paths]\n"
+		"Plugins = ${QT_PLUGIN_DIR}\n"
+	)
 endmacro()
 
 #...............................................................................
