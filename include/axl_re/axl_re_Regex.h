@@ -293,7 +293,7 @@ public:
 		bool isLastExecDataAvailable
 	) const {
 		ASSERT(state && state->isStream() && !state->isFinal() && state->getRegex() == this);
-		return state->eof(true);
+		return state->eof(isLastExecDataAvailable);
 	}
 
 #if (_AXL_DEBUG)

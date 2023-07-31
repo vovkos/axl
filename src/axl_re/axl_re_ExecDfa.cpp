@@ -104,7 +104,7 @@ public:
 
 	ExecReverseOffsetScanner(
 		ExecDfaBase* prevEngine,
-		size_t matchEndOffset
+		uint64_t matchEndOffset
 	):
 		ExecImpl<ExecReverseOffsetScanner, ExecDfaBase, typename Encoding::Decoder>(prevEngine->getParent()) {
 		this->m_prevEngine = prevEngine;
@@ -137,9 +137,9 @@ public:
 
 		// be careful not to overshoot base offset
 
-		size_t maxSize = this->m_offset - this->m_baseOffset;
-		if (size > maxSize) {
-			size_t delta = size - maxSize;
+		uint64_t maxSize = this->m_offset - this->m_baseOffset;
+		if ((uint64_t)size > maxSize) {
+			size_t delta = (size_t)(size - maxSize);
 			p = (char*)p + delta;
 			size -= delta;
 		}
@@ -240,9 +240,9 @@ public:
 		if (IsReverse()()) {
 			// be careful not to overshoot base offset
 
-			size_t maxSize = this->m_offset - this->m_baseOffset;
-			if (size > maxSize) {
-				size_t delta = size - maxSize;
+			uint64_t maxSize = this->m_offset - this->m_baseOffset;
+			if ((uint64_t)size > maxSize) {
+				size_t delta = (size_t)(size - maxSize);
 				p = (char*)p + delta;
 				size -= delta;
 			}
@@ -267,7 +267,7 @@ public:
 		if (IsReverse()() && !this->isFinalized() && this->m_offset <= this->m_baseOffset) {
 			ASSERT(this->m_offset == this->m_baseOffset);
 
-			size_t matchOffset;
+			uint64_t matchOffset;
 
 			if (this->m_matchAcceptId == -1) { // didn't reach the beginning of the match (due to the base offset limit)
 				this->m_matchAcceptId = this->m_savedMatchAcceptId;
@@ -348,7 +348,7 @@ protected:
 	inline
 	void
 	gotoState(
-		size_t offset,
+		uint64_t offset,
 		const DfaState* state
 	) {
 		this->gotoStateImpl(state);
@@ -376,7 +376,7 @@ protected:
 
 	void
 	processBoundary(
-		size_t offset,
+		uint64_t offset,
 		uint_t anchors
 	) {
 		anchors &= this->m_state->m_anchorMask;
@@ -396,7 +396,7 @@ protected:
 			return;
 		}
 
-		size_t matchEndOffset = this->m_matchEnd ?
+		uint64_t matchEndOffset = this->m_matchEnd ?
 			this->m_lastExecOffset + (char*)this->m_matchEnd - (char*)this->m_lastExecData :
 			this->m_matchEndOffset;
 
@@ -432,11 +432,11 @@ protected:
 	void
 	reverse(
 		bool isEof,
-		size_t matchEndOffset
+		uint64_t matchEndOffset
 	) {
 		ASSERT(!IsReverse()());
 
-		size_t offset = this->m_lastExecOffset + (char*)this->m_p - (char*)this->m_lastExecData;
+		uint64_t offset = this->m_lastExecOffset + ((char*)this->m_p - (char*)this->m_lastExecData);
 		ASSERT(matchEndOffset <= offset);
 
 		StateInit init;
@@ -452,7 +452,7 @@ protected:
 			this->m_parent->m_engine = scanner; // replace engine
 
 			scanner->initialize(init, NULL);
-			scanner->exec(this->m_lastExecData, offset - this->m_lastExecOffset);
+			scanner->exec(this->m_lastExecData, (size_t)(offset - this->m_lastExecOffset));
 			execResult = scanner->getExecResult();
 		} else {
 			typedef ExecDfa<sl::True, Encoding> ReverseDfa;
@@ -473,7 +473,7 @@ protected:
 			init.m_prevCharFlags = prevCharFlags;
 
 			reverseDfa->initialize(init, this->m_parent->m_regex->getDfaReverseStartState());
-			reverseDfa->exec(this->m_lastExecData, matchEndOffset - this->m_lastExecOffset);
+			reverseDfa->exec(this->m_lastExecData, (size_t)(matchEndOffset - this->m_lastExecOffset));
 			execResult = reverseDfa->getExecResult();
 		}
 
@@ -493,16 +493,17 @@ protected:
 			this->m_execResult = ExecResult_MatchOffsetsOnly;
 		} else if (
 			(this->m_execFlags & ExecFlag_DisableCapture) ||
-			!this->m_parent->m_regex->getMatchCaptureCount(this->m_matchAcceptId)
+			!this->m_parent->m_regex->getMatchCaptureCount(this->m_matchAcceptId) ||
+			pos.m_offset < this->m_lastExecOffset
 		) {
-			// no captures so no need to run the NFA
+			// no need to run the NFA
 			this->m_parent->createMatch(this->m_matchAcceptId, this->m_lastExecOffset, this->m_lastExecData, pos);
 			this->m_execResult = ExecResult_Match;
 		} else {
 			// TODO: use NFA-SP when possible
 			const NfaState* nfaState = this->m_parent->m_regex->getMatchNfaStartState(this->m_matchAcceptId);
-			const void* p = (char*)this->m_lastExecData - this->m_lastExecOffset + pos.m_offset;
-			size_t length = pos.m_endOffset - pos.m_offset;
+			const void* p = (char*)this->m_lastExecData + (size_t)(pos.m_offset - this->m_lastExecOffset);
+			size_t length = (size_t)(pos.m_endOffset - pos.m_offset);
 
 			StateInit init;
 			init.m_prevCharFlags = prevCharFlags | ExecEngine::CharFlag_Other; // ensure non-zero flags
@@ -595,7 +596,7 @@ ExecReverseOffsetScanner<Encoding>::execReverseDfa() {
 	init.m_baseOffset = this->m_baseOffset;
 	init.m_matchAcceptId = this->m_savedMatchAcceptId;
 	reverseDfa->initialize(init, this->m_parent->m_regex->getDfaReverseStartState());
-	reverseDfa->exec(this->m_lastExecData, this->m_savedMatchEndOffset - this->m_lastExecOffset);
+	reverseDfa->exec(this->m_lastExecData, (size_t)(this->m_savedMatchEndOffset - this->m_lastExecOffset));
 	this->m_execResult = reverseDfa->getExecResult();
 }
 

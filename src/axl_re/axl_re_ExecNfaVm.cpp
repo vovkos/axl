@@ -22,7 +22,7 @@ namespace re {
 
 void
 ExecNfaVmBase::Thread::openCapture(
-	size_t offset,
+	uint64_t offset,
 	size_t captureId
 ) {
 	AXL_RE_TRACE_CAPTURE("%p: open capture(%d)\n", offset, captureId);
@@ -36,7 +36,7 @@ ExecNfaVmBase::Thread::openCapture(
 
 void
 ExecNfaVmBase::Thread::closeCapture(
-	size_t offset,
+	uint64_t offset,
 	size_t captureId
 ) {
 	ASSERT(captureId < m_capturePosArray.getCount());

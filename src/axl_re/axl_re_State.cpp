@@ -123,7 +123,7 @@ StateImpl::setRegex(const Regex* regex) {
 void
 StateImpl::preCreateMatch(
 	size_t acceptId,
-	size_t endOffset
+	uint64_t endOffset
 ) {
 	ASSERT(m_matchAcceptId == -1);
 
@@ -134,7 +134,7 @@ StateImpl::preCreateMatch(
 void
 StateImpl::createMatch(
 	size_t acceptId,
-	size_t lastExecOffset,
+	uint64_t lastExecOffset,
 	const void* lastExecData,
 	const MatchPos& matchPos,
 	const sl::ArrayRef<MatchPos>& capturePosArray
@@ -146,12 +146,9 @@ StateImpl::createMatch(
 	m_match.m_endOffset = matchPos.m_endOffset;
 	m_match.m_text.clear();
 
-	char* base;
-
-	if (lastExecData) {
-		base = (char*)lastExecData - lastExecOffset;
+	if (lastExecData && matchPos.m_offset >= lastExecOffset) {
+		m_match.m_p = (char*)lastExecData + (size_t)(m_match.m_offset - lastExecOffset);
 		m_match.m_codec = enc::getCharCodec(m_init.m_codecKind);
-		m_match.m_p = base + m_match.m_offset;
 	}
 
 	size_t count = capturePosArray.getCount();
@@ -171,9 +168,9 @@ StateImpl::createMatch(
 		match->m_offset = pos.m_offset;
 		match->m_endOffset = pos.m_endOffset;
 
-		if (lastExecData) {
+		if (lastExecData && pos.m_offset >= lastExecOffset) {
 			match->m_codec = m_match.m_codec;
-			match->m_p = base + pos.m_offset;
+			match->m_p = (char*)lastExecData + (size_t)(pos.m_offset - lastExecOffset);
 		}
 
 		m_captureArray[i] = match;
@@ -215,7 +212,7 @@ State::initialize(
 }
 
 void
-State::reset(size_t offset) {
+State::reset(uint64_t offset) {
 	ASSERT(m_p);
 
 	StateInit init(m_p->m_init.m_execFlags, offset, m_p->m_init.m_codecKind);

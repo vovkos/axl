@@ -31,13 +31,13 @@ protected:
 
 		void
 		openCapture(
-			size_t offset,
+			uint64_t offset,
 			size_t captureId
 		);
 
 		void
 		closeCapture(
-			size_t offset,
+			uint64_t offset,
 			size_t captureId
 		);
 	};

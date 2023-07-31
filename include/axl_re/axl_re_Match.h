@@ -23,8 +23,8 @@ struct StateImpl;
 //..............................................................................
 
 struct MatchPos {
-	size_t m_offset;
-	size_t m_endOffset;
+	uint64_t m_offset;
+	uint64_t m_endOffset;
 
 	MatchPos() {
 		m_offset = -1;
@@ -32,8 +32,8 @@ struct MatchPos {
 	}
 
 	MatchPos(
-		size_t offset,
-		size_t endOffset
+		uint64_t offset,
+		uint64_t endOffset
 	) {
 		m_offset = offset;
 		m_endOffset = endOffset;
@@ -56,8 +56,8 @@ struct MatchPos {
 
 	bool
 	isInside(
-		size_t offset,
-		size_t endOffset
+		uint64_t offset,
+		uint64_t endOffset
 	) const {
 		return m_offset >= offset && m_endOffset <= endOffset;
 	}
@@ -95,18 +95,23 @@ public:
 		return m_offset == m_endOffset;
 	}
 
-	size_t
+	uint64_t
 	getOffset() const {
 		return m_offset;
 	}
 
-	size_t
+	uint64_t
 	getEndOffset() const {
 		return m_endOffset;
 	}
 
 	size_t
 	getSize() const {
+		return (size_t)(m_endOffset - m_offset);
+	}
+
+	uint64_t
+	getSize64() const {
 		return m_endOffset - m_offset;
 	}
 

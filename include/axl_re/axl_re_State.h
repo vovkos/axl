@@ -63,13 +63,13 @@ public:
 	void
 	preCreateMatch(
 		size_t acceptId,
-		size_t endOffset
+		uint64_t endOffset
 	);
 
 	void
 	createMatch(
 		size_t acceptId,
-		size_t lastExecOffset,
+		uint64_t lastExecOffset,
 		const void* lastExecData,
 		const MatchPos& matchPos,
 		const sl::ArrayRef<MatchPos>& capturePosArray = sl::ArrayRef<MatchPos>()
@@ -224,7 +224,7 @@ public:
 	initialize(const StateInit& init);
 
 	void
-	reset(size_t offset = 0);
+	reset(uint64_t offset = 0);
 
 	void
 	resume() {

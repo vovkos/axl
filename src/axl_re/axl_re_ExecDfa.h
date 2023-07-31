@@ -28,12 +28,14 @@ protected:
 	const DfaState* m_state;
 	const void* m_p;
 	const void* m_matchEnd;
+
+	uint64_t m_baseOffset;
+	uint64_t m_matchEndOffset;
+	uint64_t m_savedMatchEndOffset; // reverse DFA only
+
 	uint_t m_baseCharFlags;
-	size_t m_baseOffset;
 	size_t m_matchAcceptId;
-	size_t m_matchEndOffset;
 	size_t m_savedMatchAcceptId;  // reverse DFA only
-	size_t m_savedMatchEndOffset; // reverse DFA only
 
 public:
 	ExecDfaBase(StateImpl* parent);

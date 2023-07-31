@@ -70,9 +70,9 @@ protected:
 	ExecEngineKind m_engineKind;
 	StateImpl* m_parent;
 	const void* m_lastExecData;
-	size_t m_lastExecOffset;
-	size_t m_lastExecEndOffset;
-	size_t m_offset;
+	uint64_t m_lastExecOffset;
+	uint64_t m_lastExecEndOffset;
+	uint64_t m_offset;
 	uint_t m_execFlags; // cache to save one indirection
 	ExecResult m_execResult;
 	enc::DecoderState m_decoderState;

@@ -24,15 +24,15 @@ struct StateInit {
 	uint_t m_execFlags;
 	enc::CharCodecKind m_codecKind;
 	enc::DecoderState m_decoderState;
-	uint_t m_prevCharFlags;
-	size_t m_offset;
+	uint64_t m_offset;
 	size_t m_dfaStateId;
+	uint_t m_prevCharFlags;
 
 	// below fields are relevant for reverse DFA only
 
-	uint_t m_baseCharFlags;
-	size_t m_baseOffset;
+	uint64_t m_baseOffset;
 	size_t m_matchAcceptId;
+	uint_t m_baseCharFlags;
 
 	StateInit() {
 		setup(0, 0, enc::CharCodecKind_Utf8);
@@ -40,7 +40,7 @@ struct StateInit {
 
 	StateInit(
 		uint_t execFlags,
-		size_t offset = 0,
+		uint64_t offset = 0,
 		enc::CharCodecKind codecKind = enc::CharCodecKind_Utf8
 	) {
 		setup(execFlags, offset, codecKind);
@@ -49,7 +49,7 @@ struct StateInit {
 	void
 	setup(
 		uint_t execFlags,
-		size_t offset = 0,
+		uint64_t offset = 0,
 		enc::CharCodecKind codecKind = enc::CharCodecKind_Utf8
 	);
 };
@@ -60,19 +60,19 @@ inline
 void
 StateInit::setup(
 	uint_t execFlags,
-	size_t offset,
+	uint64_t offset,
 	enc::CharCodecKind codecKind
 ) {
 	m_execFlags = execFlags;
 	m_codecKind = codecKind;
 	m_decoderState = 0;
-	m_prevCharFlags = Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary;
 	m_offset = offset;
 	m_dfaStateId = -1;
+	m_prevCharFlags = Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary;
 
-	m_baseCharFlags = Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary;
 	m_baseOffset = offset;
 	m_matchAcceptId = -1;
+	m_baseCharFlags = Anchor_BeginLine | Anchor_BeginText | Anchor_WordBoundary;
 }
 
 //..............................................................................
