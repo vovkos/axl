@@ -188,6 +188,18 @@ axl_create_msvc_settings)
 		ON
 	)
 
+	axl_create_setting(
+		CMAKE_MSVC_RUNTIME_LIBRARY
+		DESCRIPTION "Microsoft Visual C/C++ C runtime library"
+		DEFAULT "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
+		"MultiThreadedDLL"
+		"MultiThreadedDebugDLL"
+		"MultiThreaded$<$<CONFIG:Debug>:Debug>DLL"
+		"MultiThreaded"
+		"MultiThreadedDebug"
+		"MultiThreaded$<$<CONFIG:Debug>:Debug>"
+	)
+
 	axl_create_compiler_flag_setting(
 		MSVC_FLAG_SHOW_INCLUDES
 		DESCRIPTION "Microsoft Visual C++ shows includes stack during compilation"
@@ -204,20 +216,6 @@ axl_create_msvc_settings)
 		MSVC_FLAG_RTTI
 		DESCRIPTION "Microsoft Visual C++ RTTI(run-time type information) support"
 		"/GR" "/GR-"
-	)
-
-	axl_create_compiler_flag_setting(
-		MSVC_FLAG_CRT_DEBUG
-		DESCRIPTION "Microsoft Visual C++ CRT(Debug)"
-		DEFAULT "/MDd"
-		"/MT" "/MTd" "/MD" "/MDd"
-	)
-
-	axl_create_compiler_flag_setting(
-		MSVC_FLAG_CRT_RELEASE
-		DESCRIPTION "Microsoft Visual C++ CRT(Release)"
-		DEFAULT "/MD"
-		"/MT" "/MTd" "/MD" "/MDd"
 	)
 
 	axl_create_compiler_flag_setting(
@@ -250,7 +248,6 @@ endmacro()
 
 macro(
 axl_apply_msvc_settings)
-
 	set_property(
 		GLOBAL PROPERTY
 		USE_FOLDERS ${MSVC_USE_FOLDERS}
@@ -824,6 +821,10 @@ axl_print_std_settings)
 	axl_message("        Version:"       ${CMAKE_CXX_COMPILER_VERSION})
 	axl_message("        Debug flags:"   ${_CXX_FLAGS_DEBUG})
 	axl_message("        Release flags:" ${_CXX_FLAGS_RELEASE})
+
+	if(MSVC)
+		axl_message("    C/C++ runtime:" ${CMAKE_MSVC_RUNTIME_LIBRARY})
+	endif()
 
 	if(_WARNING_FLAG_LIST)
 		message(STATUS "    C/C++ warning flags:")
