@@ -23,13 +23,6 @@ namespace sl {
 
 template <typename C>
 class BoyerMooreStateBase {
-	template <
-		typename C2,
-		bool IsReverse,
-		typename State
-	>
-	friend class BoyerMooreIncrementalAccessorBase;
-
 protected:
 	sl::CircularBufferBase<C> m_tail;
 	uint64_t m_offset; // for reverse find, it's the (positive) offset from the end
@@ -59,6 +52,11 @@ public:
 	size_t
 	getTailLength() const {
 		return m_tail.getDataLength();
+	}
+
+	C
+	getTailChar(size_t i) const {
+		return m_tail[i];
 	}
 
 	bool
@@ -323,9 +321,9 @@ public:
 
 	C
 	operator [] (size_t i) const {
-		size_t tailLength = m_state->m_tail.getDataLength();
+		size_t tailLength = m_state->getTailLength();
 		return i < tailLength ?
-			m_state->m_tail[IsReverse ? tailLength - i - 1 : i] :
+			m_state->getTailChar(IsReverse ? tailLength - i - 1 : i) :
 			*PtrIterator<const C, IsReverse>::inc(m_p, i - tailLength);
 	}
 };
