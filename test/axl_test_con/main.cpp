@@ -550,7 +550,7 @@ testCharSet() {
 }
 
 #define _AXL_RE_TEST_SIMPLE_MATCH    0
-#define _AXL_RE_TEST_STREAM    0
+#define _AXL_RE_TEST_STREAM    1
 #define _AXL_RE_TEST_SWITCH    1
 #define _AXL_RE_TEST_LOAD_SAVE 1
 #define _AXL_RE_TEST_FULL_DFA  1
@@ -645,7 +645,7 @@ testUsbRegex() {
 
 		const re::Match* match = state.getMatch();
 		printf(
-			"match-%d: @%d(%dB) '%s'\n",
+			"match-%d: @%lld(%dB) '%s'\n",
 			state.getMatchAcceptId(),
 			match->getOffset(),
 			match->getSize(),
@@ -692,7 +692,7 @@ testRegex() {
 		ASSERT(result == re::ExecResult_Match);
 
 		printf(
-			"match(%d): %d..%d (%s)\n",
+			"match(%d): %lld..%lld (%s)\n",
 			state.getMatchAcceptId(),
 			state.getMatch()->getOffset(),
 			state.getMatch()->getEndOffset(),
@@ -725,7 +725,7 @@ testRegex() {
 		ASSERT(result == re::ExecResult_Match);
 
 		printf(
-			"match(%d): %d..%d (%s)\n",
+			"match(%d): %lld..%lld (%s)\n",
 			state.getMatchAcceptId(),
 			state.getMatch()->getOffset(),
 			state.getMatch()->getEndOffset(),
@@ -736,7 +736,7 @@ testRegex() {
 		ASSERT(result == re::ExecResult_Match);
 
 		printf(
-			"match(%d): %d..%d (%s)\n",
+			"match(%d): %lld..%lld (%s)\n",
 			state.getMatchAcceptId(),
 			state.getMatch()->getOffset(),
 			state.getMatch()->getEndOffset(),
@@ -763,7 +763,7 @@ testRegex() {
 		ASSERT(result == re::ExecResult_Match);
 
 		printf(
-			"match(%d): %d..%d (%s)\n",
+			"match(%d): %lld..%lld (%s)\n",
 			state.getMatchAcceptId(),
 			state.getMatch()->getOffset(),
 			state.getMatch()->getEndOffset(),
@@ -798,7 +798,7 @@ testRegex() {
 		ASSERT(result == re::ExecResult_MatchOffsetsOnly);
 
 		printf(
-			"match(%d): %d..%d\n",
+			"match(%d): %lld..%lld\n",
 			state.getMatchAcceptId(),
 			state.getMatch()->getOffset(),
 			state.getMatch()->getEndOffset()
@@ -829,7 +829,7 @@ testRegex() {
 		ASSERT(result == re::ExecResult_Match);
 
 		printf(
-			"match: %d..%d: '%s'\n",
+			"match: %lld..%lld: '%s'\n",
 			state.getMatch()->getOffset(),
 			state.getMatch()->getEndOffset(),
 			state.getMatch()->getText().sz()
@@ -868,7 +868,7 @@ testRegex() {
 		ASSERT(result == re::ExecResult_Match);
 
 		printf(
-			"match: %d..%d: '%s'\n",
+			"match: %lld..%lld: '%s'\n",
 			state.getMatch()->getOffset(),
 			state.getMatch()->getEndOffset(),
 			state.getMatch()->getText().sz()
@@ -915,7 +915,7 @@ testRegex() {
 		ASSERT(result == re::ExecResult_Match);
 
 		printf(
-			"match: %d..%d: '%s'\n",
+			"match: %lld..%lld: '%s'\n",
 			state.getMatch()->getOffset(),
 			state.getMatch()->getEndOffset(),
 			state.getMatch()->getText().sz()
@@ -942,7 +942,7 @@ testRegex() {
 		re::State state(re::ExecFlag_Stream | re::ExecFlag_DisableCapture);
 		re::ExecResult result = regex.exec(&state, "abc\n\n");
 		ASSERT(result == re::ExecResult_Match);
-		printf("match: %d..%d\n", state.getMatch()->getOffset(), state.getMatch()->getEndOffset());
+		printf("match: %lld..%lld\n", state.getMatch()->getOffset(), state.getMatch()->getEndOffset());
 
 		result = regex.exec(&state, "\n\n");
 		ASSERT(result == re::ExecResult_Continue);
@@ -952,7 +952,7 @@ testRegex() {
 
 		result = regex.exec(&state, "abc\n\n");
 		ASSERT(result == re::ExecResult_MatchOffsetsOnly);
-		printf("match: %d..%d\n", state.getMatch()->getOffset(), state.getMatch()->getEndOffset());
+		printf("match: %lld..%lld\n", state.getMatch()->getOffset(), state.getMatch()->getEndOffset());
 		return;
 	} while (0);
 
@@ -980,7 +980,7 @@ testRegex() {
 
 		const re::Match* match = state.getMatch();
 		if (match)
-			printf("match: %d..%d\n", match->getOffset(), match->getEndOffset());
+			printf("match: %lld..%lld\n", match->getOffset(), match->getEndOffset());
 		else
 			printf("mismatch\n");
 
@@ -1006,7 +1006,7 @@ testRegex() {
 		re::State state = regex.exec("...ba...");
 		const re::Match* match = state.getMatch();
 		if (match)
-			printf("match: %d..%d '%s'\n", match->getOffset(), match->getEndOffset(), match->getText().sz());
+			printf("match: %lld..%lld '%s'\n", match->getOffset(), match->getEndOffset(), match->getText().sz());
 		else
 			printf("mismatch\n");
 
@@ -1027,7 +1027,7 @@ testRegex() {
 		re::State state(re::StateInit(re::ExecFlag_AnchorDataBegin | re::ExecFlag_Stream, 1000));
 
 		result = regex.exec(&state, "\r123456\r");
-		printf("regex result: %d, match offset: %d, match length: %d, match: %s\n", result, state.getMatch()->getOffset(), state.getMatch()->getSize(), state.getMatch()->getText().sz());
+		printf("regex result: %d, match offset: %lld, match length: %d, match: %s\n", result, state.getMatch()->getOffset(), state.getMatch()->getSize(), state.getMatch()->getText().sz());
 		ASSERT(result == re::ExecResult_Match && state.getMatchAcceptId() == 1 && state.getMatch()->getSize() == 1);
 
 		result = regex.exec(&state, "123456");
@@ -1035,17 +1035,16 @@ testRegex() {
 		ASSERT(result == re::ExecResult_Continue);
 
 		result = regex.exec(&state, "\x2e");
-		printf("regex result: %d, match offset: %d, match length: %d\n", result, state.getMatch()->getOffset(), state.getMatch()->getSize());
+		printf("regex result: %d, match offset: %lld, match length: %d\n", result, state.getMatch()->getOffset(), state.getMatch()->getSize());
 		ASSERT(result == re::ExecResult_MatchOffsetsOnly && state.getMatchAcceptId() == 0 && state.getMatch()->getSize() == 6);
 
 		result = regex.exec(&state, "123456");
 		result = regex.eof(&state, true);
-		printf("regex result: %d, match offset: %d, match length: %d, match: %s\n", result, state.getMatch()->getOffset(), state.getMatch()->getSize(), state.getMatch()->getText().sz());
+		printf("regex result: %d, match offset: %lld, match length: %d, match: %s\n", result, state.getMatch()->getOffset(), state.getMatch()->getSize(), state.getMatch()->getText().sz());
 		ASSERT(result == re::ExecResult_Match && state.getMatchAcceptId() == 0 && state.getMatch()->getSize() == 6);
 
 		return;
 	} while (0);
-
 
 	// const char src[] = "[\xd0\xb1-\xd0\xb3]+";
 	// const char src[] = "a|[a-z]+1";
@@ -1162,7 +1161,7 @@ testRegex() {
 	}
 
 	printf(
-		"$0: %p(%d)\n",
+		"$0: %llx(%d)\n",
 		match->getOffset(),
 		match->getSize()
 	);
@@ -1238,7 +1237,7 @@ testRegex() {
 		match = state.getMatch();
 		ASSERT(match);
 
-		printf("#%d %s: %p(%d) '%s'\n",
+		printf("#%d %s: %llx(%d) '%s'\n",
 			id,
 			caseNameMap[id],
 			match->getOffset(),
@@ -7326,7 +7325,7 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	testBoyerMoore();
+	testRegex();
 	return 0;
 }
 
