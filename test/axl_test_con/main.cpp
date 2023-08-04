@@ -7394,7 +7394,9 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
+#if (_AXL_IO_HID)
 	testHid();
+#endif
 	return 0;
 }
 
