@@ -85,6 +85,13 @@ if(BUILD_AXL_IO_USBMON)
 	endif()
 endif()
 
+if (BUILD_AXL_IO_HID)
+	include_directories(${HIDAPI_INC_DIR})
+	link_directories(${HIDAPI_LIB_DIR})
+	add_definitions(-D_AXL_IO_HID=1)
+	list(APPEND OPT_LIB_LIST axl_io_hid hidapi)
+endif()
+
 if(BUILD_AXL_IO_PCAP)
 	include_directories(${PCAP_INC_DIR})
 	link_directories(${PCAP_LIB_DIR})

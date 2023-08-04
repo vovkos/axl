@@ -7297,6 +7297,75 @@ testUsbEnum2() {
 
 #endif // _AXL_IO_USB
 
+#if (_AXL_IO_HID)
+
+void
+testHid() {
+	io::hidInit();
+
+	printf("Enumerating HID devices...\n");
+	io::HidDeviceInfoList enumerator;
+	bool result = enumerator.enumerate();
+	if (!result) {
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	sl::String strings[4];
+
+	io::HidDeviceInfoIterator it = enumerator.getHead();
+	for (; it; it++) {
+		printf(
+			"%s\n"
+			"    Bus:          %s\n"
+			"    VID:          %04x\n"
+			"    PID:          %04x\n"
+			"    Manufacturer: %s\n"
+			"    Prorduct:     %s\n"
+			"    Serial:       %s\n"
+			"    Release:      %x\n"
+			"    Usage page:   %d\n"
+			"    Usage:        %d\n"
+			"    Interface:    %d\n"
+			"\n",
+			it->path,
+			io::getHidBusTypeString(it->bus_type),
+			it->vendor_id,
+			it->product_id,
+			(strings[0] = it->manufacturer_string).sz(),
+			(strings[1] = it->product_string).sz(),
+			(strings[2] = it->serial_number).sz(),
+			it->release_number,
+			it->usage_page,
+			it->usage,
+			it->interface_number
+		);
+
+		printf("    Opening the device...\n");
+		io::HidDevice device;
+		result = device.open(it->path);
+		if (!result) {
+			printf("    error: %s\n", err::getLastErrorDescription().sz());
+			continue;
+		}
+
+		device.getManufacturerString(&strings[0]);
+		device.getProductString(&strings[1]);
+		device.getSerialNumberString(&strings[2]);
+
+		printf(
+			"    Manufacturer: %s\n"
+			"    Prorduct:     %s\n"
+			"    Serial:       %s\n",
+			strings[0].sz(),
+			strings[1].sz(),
+			strings[2].sz()
+		);
+	}
+}
+
+#endif
+
 //..............................................................................
 
 #if (_AXL_OS_WIN)
@@ -7325,7 +7394,7 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	testRegex();
+	testHid();
 	return 0;
 }
 

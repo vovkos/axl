@@ -21,6 +21,8 @@ set(
 	LIBSSH2_LIB_DIR
 	LIBUSB_INC_DIR
 	LIBUSB_LIB_DIR
+	HIDAPI_INC_DIR
+	HIDAPI_LIB_DIR
 	USBSDK_INC_PATH
 	OPENSSL_INC_DIR
 	OPENSSL_LIB_DIR
@@ -43,6 +45,7 @@ set(
 		lua
 		pcap
 		libusb
+		hidapi
 		openssl
 		expat
 		qt
