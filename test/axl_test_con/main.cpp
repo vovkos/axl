@@ -7311,6 +7311,7 @@ testHid() {
 		return;
 	}
 
+	const char* path = NULL;
 	sl::String strings[4];
 
 	io::HidDeviceInfoIterator it = enumerator.getHead();
@@ -7341,27 +7342,44 @@ testHid() {
 			it->interface_number
 		);
 
-		printf("    Opening the device...\n");
-		io::HidDevice device;
-		result = device.open(it->path);
-		if (!result) {
-			printf("    error: %s\n", err::getLastErrorDescription().sz());
-			continue;
-		}
-
-		device.getManufacturerString(&strings[0]);
-		device.getProductString(&strings[1]);
-		device.getSerialNumberString(&strings[2]);
-
-		printf(
-			"    Manufacturer: %s\n"
-			"    Prorduct:     %s\n"
-			"    Serial:       %s\n",
-			strings[0].sz(),
-			strings[1].sz(),
-			strings[2].sz()
-		);
+		if (it->vendor_id == 0x14a5)
+			path = it->path;
 	}
+
+	if (!path)
+		return;
+
+	printf("Opening device %s...\n", path);
+	io::HidDevice device;
+	result = device.open(path);
+	if (!result) {
+		printf("Error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	device.getManufacturerString(&strings[0]);
+	device.getProductString(&strings[1]);
+	device.getSerialNumberString(&strings[2]);
+
+	printf(
+		"Manufacturer: %s\n"
+		"Prorduct:     %s\n"
+		"Serial:       %s\n",
+		strings[0].sz(),
+		strings[1].sz(),
+		strings[2].sz()
+	);
+
+	printf("Reading from device...\n");
+
+	char buffer[4096];
+	size_t readResult = device.read(buffer, sizeof(buffer));
+	if (readResult == -1) {
+		printf("Error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	printf("Result: %zd\n", readResult);
 }
 
 #endif
