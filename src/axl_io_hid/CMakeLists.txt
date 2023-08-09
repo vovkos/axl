@@ -17,11 +17,15 @@ set(
 	LIB_H_LIST
 	${AXL_INC_DIR}/axl_io_hid/axl_io_HidDevice.h
 	${AXL_INC_DIR}/axl_io_hid/axl_io_HidEnumerator.h
+	${AXL_INC_DIR}/axl_io_hid/axl_io_HidReportDescriptor.h
+	${AXL_INC_DIR}/axl_io_hid/axl_io_HidUsage.h
 )
 
 set(
 	LIB_CPP_LIST
 	axl_io_HidDevice.cpp
+	axl_io_HidReportDescriptor.cpp
+	axl_io_HidUsage.cpp
 )
 
 source_group(

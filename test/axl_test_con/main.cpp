@@ -7370,16 +7370,34 @@ testHid() {
 		strings[2].sz()
 	);
 
-	printf("Reading from device...\n");
+	printf("Reading report descriptor...\n");
 
 	char buffer[4096];
-	size_t readResult = device.read(buffer, sizeof(buffer));
+	size_t readResult = device.getReportDescriptor(buffer, sizeof(buffer));
 	if (readResult == -1) {
 		printf("Error: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
-	printf("Result: %zd\n", readResult);
+	enc::HexEncoding::encode(&strings[0], buffer, readResult, enc::HexEncodingFlag_Multiline);
+	printf("%s\n", strings[0].sz());
+
+	io::parseHidRd(buffer, readResult);
+
+	/*
+	printf("Reading from device...\n");
+
+	for (;;) {
+		size_t readResult = device.read(buffer, sizeof(buffer));
+		if (readResult == -1) {
+			printf("Error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		enc::HexEncoding::encode(&strings[0], buffer, readResult, enc::HexEncodingFlag_Multiline);
+		printf("%s\n", strings[0].sz());
+	}
+	*/
 }
 
 #endif

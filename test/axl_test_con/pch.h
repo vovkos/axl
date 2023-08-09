@@ -105,6 +105,7 @@
 #ifdef _AXL_IO_HID
 #	include "axl_io_HidDevice.h"
 #	include "axl_io_HidEnumerator.h"
+#	include "axl_io_HidReportDescriptor.h"
 #endif
 
 #ifdef _AXL_SPY
