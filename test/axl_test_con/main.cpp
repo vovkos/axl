@@ -7311,7 +7311,6 @@ testHid() {
 		return;
 	}
 
-	const char* path = NULL;
 	sl::String strings[4];
 
 	io::HidDeviceInfoIterator it = enumerator.getHead();
@@ -7342,53 +7341,31 @@ testHid() {
 			it->interface_number
 		);
 
-		if (it->vendor_id == 0x14a5)
-			path = it->path;
-	}
+		printf("Opening device %s...\n", it->path);
+		io::HidDevice device;
+		result = device.open(it->path);
+		if (!result) {
+			printf("Error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
 
-	if (!path)
-		return;
+		device.getManufacturerString(&strings[0]);
+		device.getProductString(&strings[1]);
+		device.getSerialNumberString(&strings[2]);
 
-	printf("Opening device %s...\n", path);
-	io::HidDevice device;
-	result = device.open(path);
-	if (!result) {
-		printf("Error: %s\n", err::getLastErrorDescription().sz());
-		return;
-	}
+		printf(
+			"Manufacturer: %s\n"
+			"Prorduct:     %s\n"
+			"Serial:       %s\n",
+			strings[0].sz(),
+			strings[1].sz(),
+			strings[2].sz()
+		);
 
-	device.getManufacturerString(&strings[0]);
-	device.getProductString(&strings[1]);
-	device.getSerialNumberString(&strings[2]);
+		printf("Reading report descriptor...\n");
 
-	printf(
-		"Manufacturer: %s\n"
-		"Prorduct:     %s\n"
-		"Serial:       %s\n",
-		strings[0].sz(),
-		strings[1].sz(),
-		strings[2].sz()
-	);
-
-	printf("Reading report descriptor...\n");
-
-	char buffer[4096];
-	size_t readResult = device.getReportDescriptor(buffer, sizeof(buffer));
-	if (readResult == -1) {
-		printf("Error: %s\n", err::getLastErrorDescription().sz());
-		return;
-	}
-
-	enc::HexEncoding::encode(&strings[0], buffer, readResult, enc::HexEncodingFlag_Multiline);
-	printf("%s\n", strings[0].sz());
-
-	io::parseHidRd(buffer, readResult);
-
-	/*
-	printf("Reading from device...\n");
-
-	for (;;) {
-		size_t readResult = device.read(buffer, sizeof(buffer));
+		char buffer[4096];
+		size_t readResult = device.getReportDescriptor(buffer, sizeof(buffer));
 		if (readResult == -1) {
 			printf("Error: %s\n", err::getLastErrorDescription().sz());
 			return;
@@ -7396,8 +7373,10 @@ testHid() {
 
 		enc::HexEncoding::encode(&strings[0], buffer, readResult, enc::HexEncodingFlag_Multiline);
 		printf("%s\n", strings[0].sz());
+
+		io::HidRdParser parser;
+		parser.parse(buffer, readResult);
 	}
-	*/
 }
 
 #endif

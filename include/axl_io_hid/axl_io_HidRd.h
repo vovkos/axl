@@ -11,10 +11,10 @@
 
 #pragma once
 
-#define _AXL_IO_HIDREPORTDESCRIPTOR_H
+#define _AXL_IO_HIDRD_H
 
 #include "axl_io_HidPch.h"
-#include "axl_sl_StringHashTable.h"
+#include "axl_sl_String.h"
 
 namespace axl {
 namespace io {
@@ -66,38 +66,39 @@ getHidRdItemTagString(HidRdItemTag tag);
 
 //..............................................................................
 
-enum HidRdMainValueFlag {
-	HidRdMainValueFlag_Constant      = 0x0001, // otherwise, variable data
-	HidRdMainValueFlag_Variable      = 0x0002, // otherwise, array
-	HidRdMainValueFlag_Relative      = 0x0004, // otherwise, absolute
-	HidRdMainValueFlag_Wrap          = 0x0008, // otherwise, no wrap
-	HidRdMainValueFlag_Nonlinear     = 0x0010, // otherwise, linear
-	HidRdMainValueFlag_NoPreferred   = 0x0020, // otherwise, preferred state
-	HidRdMainValueFlag_NullState     = 0x0040, // otherwise, no null
-	HidRdMainValueFlag_Volatile      = 0x0080, // otherwise, non-volatile
-	HidRdMainValueFlag_BufferedBytes = 0x0100, // otherwise, bit field
-};
-
-//..............................................................................
-
-struct HidRdItem: sl::ListLink {
-	uint8_t m_tag;
-	uint32_t m_value;
+enum HidRdValueFlag {
+	HidRdValueFlag_Constant      = 0x0001, // otherwise, variable data
+	HidRdValueFlag_Variable      = 0x0002, // otherwise, array
+	HidRdValueFlag_Relative      = 0x0004, // otherwise, absolute
+	HidRdValueFlag_Wrap          = 0x0008, // otherwise, no wrap
+	HidRdValueFlag_Nonlinear     = 0x0010, // otherwise, linear
+	HidRdValueFlag_NoPreferred   = 0x0020, // otherwise, preferred state
+	HidRdValueFlag_NullState     = 0x0040, // otherwise, no null
+	HidRdValueFlag_Volatile      = 0x0080, // otherwise, non-volatile
+	HidRdValueFlag_BufferedBytes = 0x0100, // otherwise, bit field
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class HidRd {
-protected:
+sl::String
+getHidRdValueFlagsString(uint_t flags);
 
+//..............................................................................
 
+enum HidRdCollectionKind {
+	HidRdCollectionKind_Physical      = 0x00,
+	HidRdCollectionKind_Application   = 0x01,
+	HidRdCollectionKind_Logical       = 0x02,
+	HidRdCollectionKind_Report        = 0x03,
+	HidRdCollectionKind_NamedArray    = 0x04,
+	HidRdCollectionKind_UsageSwitch   = 0x05,
+	HidRdCollectionKind_UsageModifier = 0x06,
 };
 
-bool
-parseHidRd(
-	const void* p,
-	size_t size
-);
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+const char*
+getHidRdCollectionKindString(HidRdCollectionKind kind);
 
 //..............................................................................
 

@@ -10,7 +10,8 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_io_HidReportDescriptor.h"
+#include "axl_io_HidRd.h"
+#include "axl_sl_CallOnce.h"
 
 namespace axl {
 namespace io {
@@ -21,6 +22,9 @@ class InitHidRdItemTagStringTable {
 public:
 	void
 	operator () (const char* stringTable[]) const {
+		for (size_t i = 0; i < 256 >> 2; i++)
+			stringTable[i] = "Unknown";
+
 		// main
 
 		stringTable[HidRdItemTag_Input >> 2]         =  "Input";
@@ -63,33 +67,60 @@ const char*
 getHidRdItemTagString(HidRdItemTag tag) {
 	static const char* stringTable[256 >> 2] = { 0 };
 	sl::callOnce(InitHidRdItemTagStringTable(), stringTable);
-	const char* string = stringTable[(uint8_t)tag >> 2];
-	return string ? string : "?";
+	return (size_t)tag < 256 ?
+		stringTable[(uint8_t)tag >> 2] :
+		"Unknown";
 }
 
 //..............................................................................
 
-bool
-parseHidRd(
-	const void* p0,
-	size_t size
-) {
-	static const size_t sizeTable[] = { 0, 1, 2, 4 };
+sl::String
+getHidRdValueFlagsString(uint_t flags) {
+	static const char* stringTable[] = {
+		"Constant",       // HidRdValueFlag_Constant      = 0x0001,
+		"Variable",       // HidRdValueFlag_Variable      = 0x0002,
+		"Relative",       // HidRdValueFlag_Relative      = 0x0004,
+		"Wrap",           // HidRdValueFlag_Wrap          = 0x0008,
+		"Nonlinear",      // HidRdValueFlag_Nonlinear     = 0x0010,
+		"NoPreferred",    // HidRdValueFlag_NoPreferred   = 0x0020,
+		"NullState",      // HidRdValueFlag_NullState     = 0x0040,
+		"Volatile",       // HidRdValueFlag_Volatile      = 0x0080,
+		"BufferedBytes",  // HidRdValueFlag_BufferedBytes = 0x0100,
+	};
 
-	const uchar_t* p = (uchar_t*)p0;
-	const uchar_t* end = p + size;
-	while (p < end) {
-		uchar_t a = *p++;
-		HidRdItemTag tag = (HidRdItemTag)(a & ~0x03);
-		size_t size = sizeTable[a & 0x03];
-		uint32_t data = 0;
-		memcpy(&data, p, size);
+	sl::String string;
 
-		printf("%s -> %d\n", getHidRdItemTagString(tag), data);
-		p += size;
+	while (flags) {
+		size_t i = sl::getLoBitIdx(flags);
+		if (i < countof(stringTable)) {
+			string += stringTable[i];
+			string += ' ';
+		}
+
+		flags &= ~(1 << i);
 	}
 
-	return true;
+	string.trimRight();
+	return string;
+}
+
+//..............................................................................
+
+const char*
+getHidRdCollectionKindString(HidRdCollectionKind kind) {
+	static const char* stringTable[] = {
+		"Physical",       // HidRdCollectionKind_Physical      = 0x00,
+		"Application",    // HidRdCollectionKind_Application   = 0x01,
+		"Logical",        // HidRdCollectionKind_Logical       = 0x02,
+		"Report",         // HidRdCollectionKind_Report        = 0x03,
+		"NamedArray",     // HidRdCollectionKind_NamedArray    = 0x04,
+		"UsageSwitch",    // HidRdCollectionKind_UsageSwitch   = 0x05,
+		"UsageModifier",  // HidRdCollectionKind_UsageModifier = 0x06,
+	};
+
+	return (size_t)kind < countof(stringTable) ?
+		stringTable[kind] :
+		"Unknown";
 }
 
 //..............................................................................
