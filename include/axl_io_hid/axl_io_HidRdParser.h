@@ -14,8 +14,7 @@
 #define _AXL_IO_HIDRDPARSER_H
 
 #include "axl_io_HidRd.h"
-#include "axl_io_HidUsage.h"
-#include "axl_sl_Array.h"
+#include "axl_io_HidUsageDb.h"
 
 namespace axl {
 namespace io {
@@ -23,19 +22,21 @@ namespace io {
 //..............................................................................
 
 struct HidRdParserGlobalState {
-	HidUsagePage m_usagePage;
+	const HidUsagePage* m_usagePage;
+	uint_t m_usagePageId;
 	int m_logicalMinimum;
 	int m_logicalMaximum;
 	int m_physicalMinimum;
 	int m_physicalMaximum;
 	int m_unitExponent;
-	int m_unit;
+	uint_t m_unit;
 	uint_t m_reportSize;
 	uint_t m_reportId;
 	uint_t m_reportCount;
 
 	HidRdParserGlobalState() {
-		m_usagePage = HidUsagePage_Undefined;
+		m_usagePage = NULL;
+		m_usagePageId = 0;
 		m_logicalMinimum = 0;
 		m_logicalMaximum = 0;
 		m_physicalMinimum = 0;
@@ -51,9 +52,9 @@ struct HidRdParserGlobalState {
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 struct HidRdParserLocalState {
-	int m_usage;
-	int m_usageMinimum;
-	int m_usageMaximum;
+	uint_t m_usage;
+	uint_t m_usageMinimum;
+	uint_t m_usageMaximum;
 	int m_designatorIndex;
 	int m_designatorMinimum;
 	int m_designatorMaximum;
@@ -104,10 +105,16 @@ protected:
 	};
 
 protected:
+	HidUsageDb* m_db;
 	sl::Array<HidRdItemState> m_stack;
 	sl::String m_indent;
 
 public:
+	HidRdParser(HidUsageDb* db) {
+		ASSERT(db);
+		m_db = db;
+	}
+
 	bool
 	parse(
 		const void* p,

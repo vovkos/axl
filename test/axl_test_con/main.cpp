@@ -7374,7 +7374,10 @@ testHid() {
 		enc::HexEncoding::encode(&strings[0], buffer, readResult, enc::HexEncodingFlag_Multiline);
 		printf("%s\n", strings[0].sz());
 
-		io::HidRdParser parser;
+		io::HidUsageDb db;
+		db.load("C:/Projects/repos/ioninja/axl/src/axl_io_hid/db/hid-00-usage-page-dir.ini");
+
+		io::HidRdParser parser(&db);
 		parser.parse(buffer, readResult);
 	}
 }

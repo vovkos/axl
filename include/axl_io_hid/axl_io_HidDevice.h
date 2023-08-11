@@ -14,8 +14,6 @@
 #define _AXL_IO_HIDDEVICE_H
 
 #include "axl_io_HidPch.h"
-#include "axl_sl_Handle.h"
-#include "axl_err_Error.h"
 
 namespace axl {
 namespace io {

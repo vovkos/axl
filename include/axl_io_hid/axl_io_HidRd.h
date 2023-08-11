@@ -14,7 +14,6 @@
 #define _AXL_IO_HIDRD_H
 
 #include "axl_io_HidPch.h"
-#include "axl_sl_String.h"
 
 namespace axl {
 namespace io {
@@ -61,7 +60,7 @@ enum HidRdItemTag {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-const char*
+sl::StringRef
 getHidRdItemTagString(HidRdItemTag tag);
 
 //..............................................................................
@@ -80,7 +79,7 @@ enum HidRdValueFlag {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-sl::String
+sl::StringRef
 getHidRdValueFlagsString(uint_t flags);
 
 //..............................................................................
@@ -97,7 +96,7 @@ enum HidRdCollectionKind {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-const char*
+sl::StringRef
 getHidRdCollectionKindString(HidRdCollectionKind kind);
 
 //..............................................................................

@@ -22,9 +22,6 @@ class InitHidRdItemTagStringTable {
 public:
 	void
 	operator () (const char* stringTable[]) const {
-		for (size_t i = 0; i < 256 >> 2; i++)
-			stringTable[i] = "Unknown";
-
 		// main
 
 		stringTable[HidRdItemTag_Input >> 2]         =  "Input";
@@ -63,18 +60,19 @@ public:
 	}
 };
 
-const char*
+sl::StringRef
 getHidRdItemTagString(HidRdItemTag tag) {
 	static const char* stringTable[256 >> 2] = { 0 };
 	sl::callOnce(InitHidRdItemTagStringTable(), stringTable);
-	return (size_t)tag < 256 ?
-		stringTable[(uint8_t)tag >> 2] :
-		"Unknown";
+	const char* tagString = (size_t)tag < 256 ? stringTable[(uint8_t)tag >> 2] : NULL;
+	return tagString ?
+		sl::StringRef(tagString) :
+		sl::formatString("Item 0x%x", tag);
 }
 
 //..............................................................................
 
-sl::String
+sl::StringRef
 getHidRdValueFlagsString(uint_t flags) {
 	static const char* stringTable[] = {
 		"Constant",       // HidRdValueFlag_Constant      = 0x0001,
@@ -106,7 +104,7 @@ getHidRdValueFlagsString(uint_t flags) {
 
 //..............................................................................
 
-const char*
+sl::StringRef
 getHidRdCollectionKindString(HidRdCollectionKind kind) {
 	static const char* stringTable[] = {
 		"Physical",       // HidRdCollectionKind_Physical      = 0x00,
@@ -119,8 +117,8 @@ getHidRdCollectionKindString(HidRdCollectionKind kind) {
 	};
 
 	return (size_t)kind < countof(stringTable) ?
-		stringTable[kind] :
-		"Unknown";
+		sl::StringRef(stringTable[kind]) :
+		sl::formatString("Collection 0x%x", kind);
 }
 
 //..............................................................................

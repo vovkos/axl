@@ -16,3 +16,10 @@
 #if (_AXL_OS_WIN)
 #	include <hidapi/hidapi_winapi.h>
 #endif
+
+#include "axl_sl_String.h"
+#include "axl_sl_List.h"
+#include "axl_sl_Array.h"
+#include "axl_sl_HashTable.h"
+#include "axl_sl_Handle.h"
+#include "axl_err_Error.h"

@@ -11,7 +11,6 @@
 
 #include "pch.h"
 #include "axl_io_HidRdParser.h"
-#include "axl_io_HidUsage.h"
 #include "axl_sl_CallOnce.h"
 
 namespace axl {
@@ -67,7 +66,7 @@ HidRdParser::parse(
 		uchar_t a = *p++;
 		HidRdItemTag tag = (HidRdItemTag)(a & ~0x03);
 		size_t size = sizeTable[a & 0x03];
-		int data = size && (p[size - 1] & 0x80) ? -1 : 0;
+		int data = 0;
 		memcpy(&data, p, size);
 
 		ParseItemFunc func = getParseItemFunc(tag);
@@ -84,12 +83,12 @@ HidRdParser::parseItem_default(
 	int data,
 	size_t size
 ) {
-	const char* tagString = getHidRdItemTagString(tag);
+	sl::StringRef tagString = getHidRdItemTagString(tag);
 
 	printf(
-		size ? "%s%s (%d)\n" : "%s%s\n",
+		size ? "%s%s 0x%x\n" : "%s%s\n",
 		m_indent.sz(),
-		tagString,
+		tagString.sz(),
 		data
 	);
 }
@@ -100,7 +99,8 @@ HidRdParser::parseItem_collection(
 	int data,
 	size_t size
 ) {
-	printf("%sCollection (%s)\n", m_indent.sz(), getHidRdCollectionKindString((HidRdCollectionKind)data));
+	sl::StringRef collectionString = getHidRdCollectionKindString((HidRdCollectionKind)data);
+	printf("%sCollection (%s)\n", m_indent.sz(), collectionString.sz());
 	m_indent += "    ";
 }
 
@@ -123,9 +123,9 @@ HidRdParser::parseItem_value(
 	int data,
 	size_t size
 ) {
-	const char* tagString = getHidRdItemTagString(tag);
+	sl::StringRef tagString = getHidRdItemTagString(tag);
 	sl::String valueFlagsString = getHidRdValueFlagsString(data);
-	printf("%s%s (%s)\n", m_indent.sz(), tagString, valueFlagsString.sz());
+	printf("%s%s (%s)\n", m_indent.sz(), tagString.sz(), valueFlagsString.sz());
 }
 
 void
@@ -134,9 +134,9 @@ HidRdParser::parseItem_usagePage(
 	int data,
 	size_t size
 ) {
-	const char* pageString = getHidUsagePageString((HidUsagePage)data);
-	m_usagePage = (HidUsagePage)data;
-	printf("%sUsagePage (%s)\n", m_indent.sz(), pageString);
+	m_usagePageId = data;
+	m_usagePage = m_db->getUsagePage(data);
+	printf("%sUsagePage (%s)\n", m_indent.sz(), m_usagePage->getName().sz());
 }
 
 void
@@ -145,9 +145,12 @@ HidRdParser::parseItem_usage(
 	int data,
 	size_t size
 ) {
-	const char* tagString = getHidRdItemTagString(tag);
-	sl::String usageString = getHidUsageString(m_usagePage, data);
-	printf("%s%s (%s)\n", m_indent.sz(), tagString, usageString.sz());
+	if (!m_usagePage)
+		m_usagePage = m_db->getUsagePage(m_usagePageId);
+
+	sl::StringRef tagString = getHidRdItemTagString(tag);
+	sl::StringRef usageString = m_usagePage->getUsageName(data);
+	printf("%s%s (%s)\n", m_indent.sz(), tagString.sz(), usageString.sz());
 }
 
 void
