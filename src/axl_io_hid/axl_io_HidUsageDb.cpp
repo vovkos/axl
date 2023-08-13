@@ -35,7 +35,7 @@ HidUsagePage::getUsageName(uint_t usage) const {
 		return it->m_value;
 
 	if (m_format.isEmpty())
-		mutableSelf->m_format.format("%s 0x%%x", m_name.sz());
+		mutableSelf->m_format.format("%s 0x%%02x", m_name.sz());
 
 	return sl::formatString(m_format.sz(), usage);
 }
@@ -79,6 +79,15 @@ HidUsageDb::load(const sl::StringRef& fileName) {
 		return false;
 
 	m_dir = io::getDir(io::getFullFilePath(fileName));
+
+#if (_AXL_OS_WIN)
+	if (m_dir.isSuffix('\\'))
+		m_dir[m_dir.getLength() - 1] = '/';
+#endif
+
+	if (!m_dir.isSuffix('/'))
+		m_dir += '/';
+
 	return true;
 }
 

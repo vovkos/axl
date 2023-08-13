@@ -67,7 +67,7 @@ getHidRdItemTagString(HidRdItemTag tag) {
 	const char* tagString = (size_t)tag < 256 ? stringTable[(uint8_t)tag >> 2] : NULL;
 	return tagString ?
 		sl::StringRef(tagString) :
-		sl::formatString("Item 0x%x", tag);
+		sl::formatString("Item 0x%02x", tag);
 }
 
 //..............................................................................
@@ -118,7 +118,140 @@ getHidRdCollectionKindString(HidRdCollectionKind kind) {
 
 	return (size_t)kind < countof(stringTable) ?
 		sl::StringRef(stringTable[kind]) :
-		sl::formatString("Collection 0x%x", kind);
+		sl::formatString("Collection 0x%02x", kind);
+}
+
+
+//..............................................................................
+
+sl::StringRef
+getHidRdUnitSystemString(HidRdUnitSystem system) {
+	static const char* stringTable[] = {
+		"None",              // HidRdUnitSystem_None             = 0x00,
+		"SI Linear",         // HidRdUnitSystem_SiLinear         = 0x01,
+		"SI Rotation",       // HidRdUnitSystem_SiRotation       = 0x02,
+		"English Linear",    // HidRdUnitSystem_EnglishLinear    = 0x03,
+		"English Rotation",  // HidRdUnitSystem_EnglishRotation  = 0x04,
+	};
+
+	return (size_t)system < countof(stringTable) ?
+		sl::StringRef(stringTable[system]) :
+		sl::formatString("Unit System 0x%x", system);
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+HidRdUnit
+getHidRdUnit(
+	HidRdUnitNibbleRole role,
+	HidRdUnitSystem system
+) {
+	HidRdUnit unitTable[7][5] = {
+		//     None       SI Linear             SI Rotation        English Linear       English Rotation
+		{ HidRdUnit_None, HidRdUnit_None,       HidRdUnit_None,    HidRdUnit_None,      HidRdUnit_None },      // nibble 0 (system)
+		{ HidRdUnit_None, HidRdUnit_Centimiter, HidRdUnit_Radian,  HidRdUnit_Inch,      HidRdUnit_Degree },    // nibble 1 (length)
+		{ HidRdUnit_None, HidRdUnit_Gram,       HidRdUnit_Gram,    HidRdUnit_Slug,      HidRdUnit_Slug },      // nibble 2 (mass)
+		{ HidRdUnit_None, HidRdUnit_Second,     HidRdUnit_Second,  HidRdUnit_Second,    HidRdUnit_Second },    // nibble 3 (time)
+		{ HidRdUnit_None, HidRdUnit_Kelvin,     HidRdUnit_Kelvin,  HidRdUnit_Farenheit, HidRdUnit_Farenheit }, // nibble 4 (temperature)
+		{ HidRdUnit_None, HidRdUnit_Ampere,     HidRdUnit_Ampere,  HidRdUnit_Ampere,    HidRdUnit_Ampere },    // nibble 5 (current)
+		{ HidRdUnit_None, HidRdUnit_Candela,    HidRdUnit_Candela, HidRdUnit_Candela,   HidRdUnit_Candela },   // nibble 6 (luminous intensity)
+	};
+
+	return (size_t)role < countof(unitTable) && (size_t)system <= countof(unitTable[0]) ?
+		unitTable[role][system] :
+		HidRdUnit_None;
+}
+
+sl::StringRef
+getHidRdUnitNameString(HidRdUnit unit) {
+	static const char* stringTable[] = {
+		"None",        // HidRdUnit_None,
+		"Centimiter",  // HidRdUnit_Centimiter,
+		"Radian",      // HidRdUnit_Radian,
+		"Inch",        // HidRdUnit_Inch,
+		"Degree",      // HidRdUnit_Degree,
+		"Gram",        // HidRdUnit_Gram,
+		"Slug",        // HidRdUnit_Slug,
+		"Second",      // HidRdUnit_Second,
+		"Kelvin",      // HidRdUnit_Kelvin,
+		"Farenheit",   // HidRdUnit_Farenheit,
+		"Ampere",      // HidRdUnit_Ampere,
+		"Candela",     // HidRdUnit_Candela,
+	};
+
+	return (size_t)unit < countof(stringTable) ?
+		sl::StringRef(stringTable[unit]) :
+		sl::formatString("Unit 0x%x", unit);
+}
+
+sl::StringRef
+getHidRdUnitAbbrString(HidRdUnit unit) {
+	static const char* stringTable[] = {
+		"none",  // HidRdUnit_None,
+		"cm",    // HidRdUnit_Centimiter,
+		"rad",   // HidRdUnit_Radian,
+		"in",    // HidRdUnit_Inch,
+		"deg",   // HidRdUnit_Degree,
+		"g",     // HidRdUnit_Gram,
+		"slug",  // HidRdUnit_Slug,
+		"s",     // HidRdUnit_Second,
+		"K",     // HidRdUnit_Kelvin,
+		"F",     // HidRdUnit_Farenheit,
+		"A",     // HidRdUnit_Ampere,
+		"cd",    // HidRdUnit_Candela,
+	};
+
+	return (size_t)unit < countof(stringTable) ?
+		sl::StringRef(stringTable[unit]) :
+		sl::formatString("unit 0x%x", unit);
+}
+
+sl::StringRef
+getHidRdComplexUnitString(uint32_t unit) {
+	HidRdUnitSystem system = (HidRdUnitSystem)(unit & 0x0000000f);
+
+	sl::String string;
+	sl::StringRef stringRef;
+
+	for (uint_t i = 1, j = 0, shift = 4; i < HidRdUnitNibbleRole__Count; i++, shift += 4) {
+		uint_t nibble = (unit & (0xf << shift)) >> shift;
+		HidRdUnit unit = getHidRdUnit((HidRdUnitNibbleRole)i, system);
+		int exponent = getHidRdUnitExponent(nibble);
+		if (!exponent)
+			continue;
+
+		if (j == 0 && exponent == 1) // first simple unit
+			stringRef = getHidRdUnitAbbrString(unit);
+		else {
+			if (string.isEmpty())
+				string = stringRef;
+
+			stringRef = getHidRdUnitAbbrString(unit);
+			if (exponent < 0) {
+				if (string.isEmpty())
+					string = '1';
+
+				string.appendFormat(
+					exponent == -1 ? "/%s" : "/%s%d",
+					stringRef.sz(),
+					-exponent
+				);
+			} else {
+				if (!string.isEmpty())
+					string += '*';
+
+				string.appendFormat(
+					exponent == 1 ? "%s" : "%s%d",
+					stringRef.sz(),
+					exponent
+				);
+			}
+		}
+
+		j++;
+	}
+
+	return string.isEmpty() ? stringRef : string;
 }
 
 //..............................................................................

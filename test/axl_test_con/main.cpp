@@ -7301,11 +7301,46 @@ testUsbEnum2() {
 
 void
 testHid() {
+	bool result;
+
 	io::hidInit();
+
+	printf("Loading HID DB...\n");
+
+	io::HidUsageDb db;
+	result = db.load("C:/Projects/repos/ioninja/axl/src/axl_io_hid/db/hid-00-usage-page-dir.ini");
+	if (!result) {
+		printf("Error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	for (uint_t i = 0; i <= 0xf; i++)
+		printf("exponent(0x%x): %d\n", i, io::getHidRdUnitExponent(i));
+
+	uint32_t units[] = {
+		0x0011,
+		0x0101,
+		0x1001,
+		0xF011,
+		0xF111,
+		0xE011,
+		0xE111,
+		0xE121,
+		0xE012,
+		0x00F0D121,
+	};
+
+	for (size_t i = 0; i < countof(units); i++) {
+		uint32_t unit = units[i];
+		sl::StringRef string = io::getHidRdComplexUnitString(unit);
+		printf("0x%04x: %s\n", unit, string.sz());
+	}
+
+	return;
 
 	printf("Enumerating HID devices...\n");
 	io::HidDeviceInfoList enumerator;
-	bool result = enumerator.enumerate();
+	result = enumerator.enumerate();
 	if (!result) {
 		printf("error: %s\n", err::getLastErrorDescription().sz());
 		return;
@@ -7373,9 +7408,6 @@ testHid() {
 
 		enc::HexEncoding::encode(&strings[0], buffer, readResult, enc::HexEncodingFlag_Multiline);
 		printf("%s\n", strings[0].sz());
-
-		io::HidUsageDb db;
-		db.load("C:/Projects/repos/ioninja/axl/src/axl_io_hid/db/hid-00-usage-page-dir.ini");
 
 		io::HidRdParser parser(&db);
 		parser.parse(buffer, readResult);

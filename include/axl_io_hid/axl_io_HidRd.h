@@ -101,5 +101,93 @@ getHidRdCollectionKindString(HidRdCollectionKind kind);
 
 //..............................................................................
 
+enum HidRdUnitSystem {
+	HidRdUnitSystem_None             = 0x00,
+	HidRdUnitSystem_SiLinear         = 0x01,
+	HidRdUnitSystem_SiRotation       = 0x02,
+	HidRdUnitSystem_EnglishLinear    = 0x03,
+	HidRdUnitSystem_EnglishRotation  = 0x04,
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+sl::StringRef
+getHidRdUnitSystemString(HidRdUnitSystem system);
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+enum HidRdUnitNibbleRole {
+	HidRdUnitNibbleRole_System,             // nibble 0
+	HidRdUnitNibbleRole_Length,             // nibble 1
+	HidRdUnitNibbleRole_Mass,               // nibble 2
+	HidRdUnitNibbleRole_Time,               // nibble 3
+	HidRdUnitNibbleRole_Temperature,        // nibble 4
+	HidRdUnitNibbleRole_Current,            // nibble 5
+	HidRdUnitNibbleRole_LuminousIntensity,  // nibble 6
+	HidRdUnitNibbleRole__Count              // 7 total
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+enum HidRdUnit {
+	HidRdUnit_None,
+
+	// nibble 1: length
+
+	HidRdUnit_Centimiter,
+	HidRdUnit_Radian,
+	HidRdUnit_Inch,
+	HidRdUnit_Degree,
+
+	// nibble 2: mass
+
+	HidRdUnit_Gram,
+	HidRdUnit_Slug,
+
+	// nibble 3: time
+
+	HidRdUnit_Second,
+
+	// nibble 4: temperature
+
+	HidRdUnit_Kelvin,
+	HidRdUnit_Farenheit,
+
+	// nibble 5: current
+
+	HidRdUnit_Ampere,
+
+	// nibble 6: luminous intensity
+
+	HidRdUnit_Candela,
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+HidRdUnit
+getHidRdUnit(
+	HidRdUnitNibbleRole role,
+	HidRdUnitSystem system
+);
+
+sl::StringRef
+getHidRdUnitNameString(HidRdUnit unit);
+
+sl::StringRef
+getHidRdUnitAbbrString(HidRdUnit unit);
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+int
+getHidRdUnitExponent(uint_t nibble) {
+	return (((nibble & 0x8) ? -1 : 0) & ~0xf) | (nibble & 0xf);
+}
+
+sl::StringRef
+getHidRdComplexUnitString(uint32_t unit);
+
+//..............................................................................
+
 } // namespace io
 } // namespace axl

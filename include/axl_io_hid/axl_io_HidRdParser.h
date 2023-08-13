@@ -35,17 +35,7 @@ struct HidRdParserGlobalState {
 	uint_t m_reportCount;
 
 	HidRdParserGlobalState() {
-		m_usagePage = NULL;
-		m_usagePageId = 0;
-		m_logicalMinimum = 0;
-		m_logicalMaximum = 0;
-		m_physicalMinimum = 0;
-		m_physicalMaximum = 0;
-		m_unitExponent = 0;
-		m_unit = 0;
-		m_reportSize = 0;
-		m_reportId = 0;
-		m_reportCount = 0;
+		memset(this, 0, sizeof(HidRdParserGlobalState));
 	}
 };
 
@@ -64,16 +54,7 @@ struct HidRdParserLocalState {
 	int m_delimiter;
 
 	HidRdParserLocalState() {
-		m_usage = 0;
-		m_usageMinimum = 0;
-		m_usageMaximum = 0;
-		m_designatorIndex = 0;
-		m_designatorMinimum = 0;
-		m_designatorMaximum = 0;
-		m_string = 0;
-		m_stringMinimum = 0;
-		m_stringMaximum = 0;
-		m_delimiter = 0;
+		memset(this, 0, sizeof(HidRdParserLocalState));
 	}
 };
 
@@ -94,7 +75,7 @@ protected:
 	void
 	(HidRdParser::*ParseItemFunc)(
 		HidRdItemTag tag,
-		int data,
+		uint32_t data,
 		size_t size
 	);
 
@@ -129,56 +110,56 @@ protected:
 	void
 	parseItem_default(
 		HidRdItemTag tag,
-		int data,
+		uint32_t data,
 		size_t size
 	);
 
 	void
 	parseItem_collection(
 		HidRdItemTag tag,
-		int data,
+		uint32_t data,
 		size_t size
 	);
 
 	void
 	parseItem_collectionEnd(
 		HidRdItemTag tag,
-		int data,
+		uint32_t data,
 		size_t size
 	);
 
 	void
 	parseItem_value(
 		HidRdItemTag tag,
-		int data,
+		uint32_t data,
 		size_t size
 	);
 
 	void
 	parseItem_usagePage(
 		HidRdItemTag tag,
-		int data,
+		uint32_t data,
 		size_t size
 	);
 
 	void
 	parseItem_usage(
 		HidRdItemTag tag,
-		int data,
+		uint32_t data,
 		size_t size
 	);
 
 	void
 	parseItem_push(
 		HidRdItemTag tag,
-		int data,
+		uint32_t data,
 		size_t size
 	);
 
 	void
 	parseItem_pop(
 		HidRdItemTag tag,
-		int data,
+		uint32_t data,
 		size_t size
 	);
 };
