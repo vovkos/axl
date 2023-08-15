@@ -51,6 +51,8 @@ source_group(
 include_directories(${AXL_INC_DIR})
 link_directories(${AXL_LIB_DIR})
 
+add_definitions(-DAXL_ROOT_DIR="${AXL_ROOT_DIR}")
+
 set(OPT_LIB_LIST)
 
 if(BUILD_AXL_IO_SHMT)

@@ -7301,14 +7301,27 @@ testUsbEnum2() {
 
 void
 testHid() {
+	enum {
+		UsagePage_GenericDesktop     = 0x01,
+
+		Usage_GenericDesktop_Pointer = 0x01,
+		Usage_GenericDesktop_Mouse   = 0x02,
+		Usage_GenericDesktop_Keyboad = 0x06,
+		Usage_GenericDesktop_Keypad  = 0x07,
+	};
+
 	bool result;
 
 	io::hidInit();
 
-	printf("Loading HID DB...\n");
+	printf("HidRdItemMask_AllGlobals: 0x%x\n", io::HidRdItemMask_AllGlobals);
+	printf("HidRdItemMask_AllLocals:  0x%x\n", io::HidRdItemMask_AllLocals);
+
+    const char* dbFilePath = AXL_ROOT_DIR "/src/axl_io_hid/db/hid-00-usage-page-dir.ini";
+	printf("Loading HID DB: %s\n", dbFilePath);
 
 	io::HidUsageDb db;
-	result = db.load("C:/Projects/repos/ioninja/axl/src/axl_io_hid/db/hid-00-usage-page-dir.ini");
+	result = db.load(dbFilePath);
 	if (!result) {
 		printf("Error: %s\n", err::getLastErrorDescription().sz());
 		return;
@@ -7336,8 +7349,6 @@ testHid() {
 		printf("0x%04x: %s\n", unit, string.sz());
 	}
 
-	return;
-
 	printf("Enumerating HID devices...\n");
 	io::HidDeviceInfoList enumerator;
 	result = enumerator.enumerate();
@@ -7348,8 +7359,12 @@ testHid() {
 
 	sl::String strings[4];
 
+    const char* path = "/dev/hidraw2";
+/*
 	io::HidDeviceInfoIterator it = enumerator.getHead();
 	for (; it; it++) {
+		const io::HidUsagePage* page = db.getUsagePage(it->usage_page);
+
 		printf(
 			"%s\n"
 			"    Bus:          %s\n"
@@ -7359,8 +7374,8 @@ testHid() {
 			"    Prorduct:     %s\n"
 			"    Serial:       %s\n"
 			"    Release:      %x\n"
-			"    Usage page:   %d\n"
-			"    Usage:        %d\n"
+			"    Usage page:   %s\n"
+			"    Usage:        %s\n"
 			"    Interface:    %d\n"
 			"\n",
 			it->path,
@@ -7371,10 +7386,15 @@ testHid() {
 			(strings[1] = it->product_string).sz(),
 			(strings[2] = it->serial_number).sz(),
 			it->release_number,
-			it->usage_page,
-			it->usage,
+			page->getName().sz(),
+			page->getUsageName(it->usage).sz(),
 			it->interface_number
 		);
+
+		if (it->usage_page == UsagePage_GenericDesktop &&
+			it->usage == Usage_GenericDesktop_Mouse
+		)
+			path = it->path;
 
 		printf("Opening device %s...\n", it->path);
 		io::HidDevice device;
@@ -7409,9 +7429,84 @@ testHid() {
 		enc::HexEncoding::encode(&strings[0], buffer, readResult, enc::HexEncodingFlag_Multiline);
 		printf("%s\n", strings[0].sz());
 
-		io::HidRdParser parser(&db);
+		io::HidRd rd;
+		io::HidRdParser parser(&db, &rd);
 		parser.parse(buffer, readResult);
+
+		printf("<<<\n");
+		rd.print();
+		printf(">>>\n");
 	}
+*/
+    if (!path)
+        return;
+
+	printf("..............................................................................\n");
+    printf("Opening %s...\n", path);
+
+    io::HidDevice device;
+    result = device.open(path);
+    if (!result) {
+        printf("Error: %s\n", err::getLastErrorDescription().sz());
+        return;
+    }
+
+	char buffer[4096];
+	size_t readResult = device.getReportDescriptor(buffer, sizeof(buffer));
+	if (readResult == -1) {
+		printf("Error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	enc::HexEncoding::encode(&strings[0], buffer, readResult, enc::HexEncodingFlag_Multiline);
+	printf("%s\n", strings[0].sz());
+
+	io::HidRd rd;
+	io::HidRdParser parser(&db, &rd);
+	parser.parse(buffer, readResult);
+	rd.print();
+
+    for (;;) {
+        char buffer[256];
+        size_t readResult;
+
+		readResult = device.read(buffer, sizeof(buffer));
+		if (readResult == -1) {
+			printf("Error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		ASSERT(readResult); // we use blocking read
+
+        enc::HexEncoding::encode(&strings[0], buffer, readResult, enc::HexEncodingFlag_Multiline);
+        printf("read: %s\n", strings[0].sz());
+
+		uint_t reportId;
+		const char* p;
+		size_t size;
+		if (rd.getFlags() & io::HidRdFlag_HasReportId) {
+			reportId = (uchar_t)buffer[0];
+			p = &buffer[1];
+			size = readResult - 1;
+		} else {
+			reportId = 0;
+			p = buffer;
+			size = readResult;
+		}
+
+		const io::HidReport* report = rd.findReport(io::HidReportKind_Input, 0);
+		if (!report) {
+			printf("    *** report unknown\n");
+			continue;
+		}
+
+		if (report->getSize() > size) {
+			printf("    *** report too small\n");
+			continue;
+		}
+
+		report->decode(p);
+    }
 }
 
 #endif

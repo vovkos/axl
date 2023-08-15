@@ -25,27 +25,27 @@ HidRdParser::InitParseItemFuncTable::operator () (ParseItemFunc funcTable[]) con
 
 	// main
 
-	funcTable[HidRdItemTag_Input >> 2]         = &HidRdParser::parseItem_value;
-	funcTable[HidRdItemTag_Output >> 2]        = &HidRdParser::parseItem_value;
-	funcTable[HidRdItemTag_Feature >> 2]       = &HidRdParser::parseItem_value;
-	funcTable[HidRdItemTag_Collection >> 2]    = &HidRdParser::parseItem_collection;
-	funcTable[HidRdItemTag_CollectionEnd >> 2] = &HidRdParser::parseItem_collectionEnd;
+	funcTable[HidRdTag_Input >> 2]         = &HidRdParser::parseItem_input;
+	funcTable[HidRdTag_Output >> 2]        = &HidRdParser::parseItem_output;
+	funcTable[HidRdTag_Feature >> 2]       = &HidRdParser::parseItem_feature;
+	funcTable[HidRdTag_Collection >> 2]    = &HidRdParser::parseItem_collection;
+	funcTable[HidRdTag_CollectionEnd >> 2] = &HidRdParser::parseItem_collectionEnd;
 
 	// global
 
-	funcTable[HidRdItemTag_UsagePage >> 2]       = &HidRdParser::parseItem_usagePage;
-	funcTable[HidRdItemTag_Push >> 2]            = &HidRdParser::parseItem_push;
-	funcTable[HidRdItemTag_Pop >> 2]             = &HidRdParser::parseItem_pop;
+	funcTable[HidRdTag_UsagePage >> 2] = &HidRdParser::parseItem_usagePage;
+	funcTable[HidRdTag_Push >> 2]      = &HidRdParser::parseItem_push;
+	funcTable[HidRdTag_Pop >> 2]       = &HidRdParser::parseItem_pop;
 
 	// local
 
-	funcTable[HidRdItemTag_Usage >> 2]             = &HidRdParser::parseItem_usage;
-	funcTable[HidRdItemTag_UsageMinimum >> 2]      = &HidRdParser::parseItem_usage;
-	funcTable[HidRdItemTag_UsageMaximum >> 2]      = &HidRdParser::parseItem_usage;
+	funcTable[HidRdTag_Usage >> 2]        = &HidRdParser::parseItem_usage;
+	funcTable[HidRdTag_UsageMinimum >> 2] = &HidRdParser::parseItem_usage;
+	funcTable[HidRdTag_UsageMaximum >> 2] = &HidRdParser::parseItem_usage;
 }
 
 HidRdParser::ParseItemFunc
-HidRdParser::getParseItemFunc(HidRdItemTag tag) {
+HidRdParser::getParseItemFunc(HidRdTag tag) {
 	static ParseItemFunc funcTable[256 >> 2] = { 0 };
 	sl::callOnce(InitParseItemFuncTable(), funcTable);
 	return (size_t)tag < 256 ?
@@ -64,26 +64,31 @@ HidRdParser::parse(
 	const uchar_t* end = p + size;
 	while (p < end) {
 		uchar_t a = *p++;
-		HidRdItemTag tag = (HidRdItemTag)(a & ~0x03);
+		HidRdTag tag = (HidRdTag)(a & ~0x03);
 		size_t size = sizeTable[a & 0x03];
 		uint32_t data = 0;
 		memcpy(&data, p, size);
+
+		HidRdItemId id = getHidRdTagItemId(tag);
+		if (id != HidRdItemId_Invalid)
+			m_itemTable.set(id, data);
 
 		ParseItemFunc func = getParseItemFunc(tag);
 		(this->*func)(tag, data, size);
 		p += size;
 	}
 
+	m_rd->finalize();
 	return true;
 }
 
 void
 HidRdParser::parseItem_default(
-	HidRdItemTag tag,
+	HidRdTag tag,
 	uint32_t data,
 	size_t size
 ) {
-	sl::StringRef tagString = getHidRdItemTagString(tag);
+	sl::StringRef tagString = getHidRdTagString(tag);
 
 	if (!size) {
 		printf("%s%s\n", m_indent.sz(), tagString.sz());
@@ -97,7 +102,7 @@ HidRdParser::parseItem_default(
 
 void
 HidRdParser::parseItem_collection(
-	HidRdItemTag tag,
+	HidRdTag tag,
 	uint32_t data,
 	size_t size
 ) {
@@ -108,7 +113,7 @@ HidRdParser::parseItem_collection(
 
 void
 HidRdParser::parseItem_collectionEnd(
-	HidRdItemTag tag,
+	HidRdTag tag,
 	uint32_t data,
 	size_t size
 ) {
@@ -120,58 +125,82 @@ HidRdParser::parseItem_collectionEnd(
 }
 
 void
-HidRdParser::parseItem_value(
-	HidRdItemTag tag,
-	uint32_t data,
-	size_t size
-) {
-	sl::StringRef tagString = getHidRdItemTagString(tag);
-	sl::String valueFlagsString = getHidRdValueFlagsString(data);
-	printf("%s%s: %s\n", m_indent.sz(), tagString.sz(), valueFlagsString.sz());
-}
-
-void
 HidRdParser::parseItem_usagePage(
-	HidRdItemTag tag,
+	HidRdTag tag,
 	uint32_t data,
 	size_t size
 ) {
-	m_usagePageId = data;
 	m_usagePage = m_db->getUsagePage(data);
+	m_itemTable.resetUsages();
 	printf("%sUsagePage: %s\n", m_indent.sz(), m_usagePage->getName().sz());
 }
 
 void
 HidRdParser::parseItem_usage(
-	HidRdItemTag tag,
+	HidRdTag tag,
 	uint32_t data,
 	size_t size
 ) {
-	if (!m_usagePage)
-		m_usagePage = m_db->getUsagePage(m_usagePageId);
-
-	sl::StringRef tagString = getHidRdItemTagString(tag);
-	sl::StringRef usageString = m_usagePage->getUsageName(data);
+	sl::StringRef tagString = getHidRdTagString(tag);
+	sl::StringRef usageString = getUsagePage()->getUsageName(data);
 	printf("%s%s: %s\n", m_indent.sz(), tagString.sz(), usageString.sz());
 }
 
 void
 HidRdParser::parseItem_push(
-	HidRdItemTag tag,
+	HidRdTag tag,
 	uint32_t data,
 	size_t size
 ) {
-	m_stack.append(*this);
+	m_stack.append(m_itemTable);
 }
 
 void
 HidRdParser::parseItem_pop(
-	HidRdItemTag tag,
+	HidRdTag tag,
 	uint32_t data,
 	size_t size
 ) {
-	if (!m_stack.isEmpty())
-		*(HidRdItemState*)this = m_stack.getBackAndPop();
+	if (!m_stack.isEmpty()) {
+		m_itemTable = m_stack.getBackAndPop();
+		m_usagePage = NULL;
+	}
+}
+
+void
+HidRdParser::finalizeReportField(
+	HidReportKind reportKind,
+	uint_t valueFlags
+) {
+	sl::StringRef reportKindString = getHidReportKindString(reportKind);
+	sl::String valueFlagsString = getHidRdValueFlagsString(valueFlags);
+	printf("%s%s: %s\n", m_indent.sz(), reportKindString.sz(), valueFlagsString.sz());
+
+	if (m_itemTable.isSet(HidRdItemId_ReportId))
+		m_rd->m_flags |= HidRdFlag_HasReportId;
+
+	if (!m_itemTable.isSet(HidRdItemId_ReportSize))
+		m_itemTable.set(HidRdItemId_ReportSize, 1);
+
+	if (!m_itemTable.isSet(HidRdItemId_ReportCount))
+		m_itemTable.set(HidRdItemId_ReportCount, 1);
+
+	if (!m_report ||
+		m_report->m_reportKind != reportKind ||
+		m_report->m_reportId != m_itemTable[HidRdItemId_ReportId]
+	)
+		m_report = m_rd->getReport(reportKind, m_itemTable[HidRdItemId_ReportId]);
+
+	HidReportField* field = new HidReportField;
+	*(HidRdItemTable*)field = m_itemTable;
+	field->m_usagePage = getUsagePage();
+	field->m_valueFlags = valueFlags;
+	field->m_bitOffset = m_report->m_bitCount;
+	field->finalize();
+
+	m_report->m_fieldList.insertTail(field);
+	m_report->m_bitCount += field->getBitCount();
+	m_itemTable.resetLocals();
 }
 
 //..............................................................................

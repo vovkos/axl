@@ -21,60 +21,14 @@ namespace io {
 
 //..............................................................................
 
-struct HidRdParserGlobalState {
-	const HidUsagePage* m_usagePage;
-	uint_t m_usagePageId;
-	int m_logicalMinimum;
-	int m_logicalMaximum;
-	int m_physicalMinimum;
-	int m_physicalMaximum;
-	int m_unitExponent;
-	uint_t m_unit;
-	uint_t m_reportSize;
-	uint_t m_reportId;
-	uint_t m_reportCount;
-
-	HidRdParserGlobalState() {
-		memset(this, 0, sizeof(HidRdParserGlobalState));
-	}
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-struct HidRdParserLocalState {
-	uint_t m_usage;
-	uint_t m_usageMinimum;
-	uint_t m_usageMaximum;
-	int m_designatorIndex;
-	int m_designatorMinimum;
-	int m_designatorMaximum;
-	int m_string;
-	int m_stringMinimum;
-	int m_stringMaximum;
-	int m_delimiter;
-
-	HidRdParserLocalState() {
-		memset(this, 0, sizeof(HidRdParserLocalState));
-	}
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-struct HidRdItemState:
-	HidRdParserGlobalState,
-	HidRdParserLocalState {
-};
-
-//..............................................................................
-
-struct HidRdParser: HidRdItemState {
+struct HidRdParser {
 	friend class InitParseItemFuncTable;
 
 protected:
 	typedef
 	void
 	(HidRdParser::*ParseItemFunc)(
-		HidRdItemTag tag,
+		HidRdTag tag,
 		uint32_t data,
 		size_t size
 	);
@@ -87,14 +41,18 @@ protected:
 
 protected:
 	HidUsageDb* m_db;
-	sl::Array<HidRdItemState> m_stack;
+	HidRd* m_rd;
+	HidReport* m_report;
+	mutable const HidUsagePage* m_usagePage;
+	HidRdItemTable m_itemTable;
+	sl::Array<HidRdItemTable> m_stack;
 	sl::String m_indent;
 
 public:
-	HidRdParser(HidUsageDb* db) {
-		ASSERT(db);
-		m_db = db;
-	}
+	HidRdParser(
+		HidUsageDb* db,
+		HidRd* rd
+	);
 
 	bool
 	parse(
@@ -105,64 +63,109 @@ public:
 protected:
 	static
 	ParseItemFunc
-	getParseItemFunc(HidRdItemTag tag);
+	getParseItemFunc(HidRdTag tag);
 
 	void
 	parseItem_default(
-		HidRdItemTag tag,
+		HidRdTag tag,
 		uint32_t data,
 		size_t size
 	);
 
 	void
 	parseItem_collection(
-		HidRdItemTag tag,
+		HidRdTag tag,
 		uint32_t data,
 		size_t size
 	);
 
 	void
 	parseItem_collectionEnd(
-		HidRdItemTag tag,
+		HidRdTag tag,
 		uint32_t data,
 		size_t size
 	);
 
 	void
-	parseItem_value(
-		HidRdItemTag tag,
+	parseItem_input(
+		HidRdTag tag,
 		uint32_t data,
 		size_t size
-	);
+	) {
+		finalizeReportField(HidReportKind_Input, data);
+	}
+
+	void
+	parseItem_output(
+		HidRdTag tag,
+		uint32_t data,
+		size_t size
+	) {
+		finalizeReportField(HidReportKind_Output, data);
+	}
+
+	void
+	parseItem_feature(
+		HidRdTag tag,
+		uint32_t data,
+		size_t size
+	) {
+		finalizeReportField(HidReportKind_Feature, data);
+	}
 
 	void
 	parseItem_usagePage(
-		HidRdItemTag tag,
+		HidRdTag tag,
 		uint32_t data,
 		size_t size
 	);
 
 	void
 	parseItem_usage(
-		HidRdItemTag tag,
+		HidRdTag tag,
 		uint32_t data,
 		size_t size
 	);
 
 	void
 	parseItem_push(
-		HidRdItemTag tag,
+		HidRdTag tag,
 		uint32_t data,
 		size_t size
 	);
 
 	void
 	parseItem_pop(
-		HidRdItemTag tag,
+		HidRdTag tag,
 		uint32_t data,
 		size_t size
 	);
+
+	void
+	finalizeReportField(
+		HidReportKind reportKind,
+		uint_t valueFlags
+	);
+
+	const HidUsagePage*
+	getUsagePage() const {
+		return m_usagePage ? m_usagePage : (m_usagePage = m_db->getUsagePage(m_itemTable[HidRdItemId_UsagePage]));
+	}
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+HidRdParser::HidRdParser(
+	HidUsageDb* db,
+	HidRd* rd
+) {
+	ASSERT(db);
+	m_db = db;
+	m_rd = rd;
+	m_report = NULL;
+	m_usagePage = NULL;
+}
 
 //..............................................................................
 
