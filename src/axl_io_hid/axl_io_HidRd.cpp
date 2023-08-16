@@ -12,6 +12,7 @@
 #include "pch.h"
 #include "axl_io_HidRd.h"
 #include "axl_io_HidUsageDb.h"
+#include "axl_io_HidRdParser.h"
 #include "axl_sl_CallOnce.h"
 
 namespace axl {
@@ -19,21 +20,37 @@ namespace io {
 
 //..............................................................................
 
-void
-HidRdItemTable::set(
-	HidRdItemId id,
-	uint32_t data
-) {
-	ASSERT((size_t)id < countof(m_table));
+sl::StringRef
+getHidRdItemString(HidRdItemId id) {
+	static const char* stringTable[] = {
+		"UsagePage",          // HidRdItemId_UsagePage = 0,
+		"LogicalMinimum",     // HidRdItemId_LogicalMinimum,
+		"LogicalMaximum",     // HidRdItemId_LogicalMaximum,
+		"PhysicalMinimum",    // HidRdItemId_PhysicalMinimum,
+		"PhysicalMaximum",    // HidRdItemId_PhysicalMaximum,
+		"UnitExponent",       // HidRdItemId_UnitExponent,
+		"Unit",               // HidRdItemId_Unit,
+		"ReportSize",         // HidRdItemId_ReportSize,
+		"ReportId",           // HidRdItemId_ReportId,
+		"ReportCount",        // HidRdItemId_ReportCount,
 
-	// special handling for multi-usage is required
+		// local
 
-	if (id == HidRdItemId_Usage && (m_mask & HidRdItemMask_Usage))
-		m_auxUsageTable.append(data);
-	else {
-		m_table[id] = data;
-		m_mask |= 1 << id;
-	}
+		"Usage",             // HidRdItemId_Usage,
+		"UsageMinimum",      // HidRdItemId_UsageMinimum,
+		"UsageMaximum",      // HidRdItemId_UsageMaximum,
+		"DesignatorIndex",   // HidRdItemId_DesignatorIndex,
+		"DesignatorMinimum", // HidRdItemId_DesignatorMinimum,
+		"DesignatorMaximum", // HidRdItemId_DesignatorMaximum,
+		"String",            // HidRdItemId_String,
+		"StringMinimum",     // HidRdItemId_StringMinimum,
+		"StringMaximum",     // HidRdItemId_StringMaximum,
+		"Delimiter",         // HidRdItemId_Delimiter,
+	};
+
+	return (size_t)id < countof(stringTable) ?
+		sl::StringRef(stringTable[id]) :
+		sl::formatString("Item 0x%02x", id);
 }
 
 //..............................................................................
@@ -133,6 +150,25 @@ getHidRdTagString(HidRdTag tag) {
 	return tagString ?
 		sl::StringRef(tagString) :
 		sl::formatString("Item 0x%02x", tag);
+}
+
+//..............................................................................
+
+void
+HidRdItemTable::set(
+	HidRdItemId id,
+	uint32_t data
+) {
+	ASSERT((size_t)id < countof(m_table));
+
+	// special handling for multi-usage is required
+
+	if (id == HidRdItemId_Usage && (m_mask & HidRdItemMask_Usage))
+		m_auxUsageTable.append(data);
+	else {
+		m_table[id] = data;
+		m_mask |= 1 << id;
+	}
 }
 
 //..............................................................................
@@ -397,9 +433,9 @@ void
 HidReport::decode(const void* p) const {
 	size_t bitOffset = 0;
 
-	sl::ConstIterator<HidReportField> it = m_fieldList.getHead();
-	for (; it; it++) {
-		const HidReportField& field = **it;
+	size_t count = m_fieldArray.getCount();
+	for (size_t i = 0; i < count; i++) {
+		const HidReportField& field = *m_fieldArray[i];
 		if (field.isPadding()) {
 			bitOffset += field.getBitCount();
 			continue;
@@ -435,7 +471,27 @@ HidRd::getReport(
 }
 
 void
-HidRd::finalize() {
+HidRd::clear() {
+	m_rootCollection.clear();
+	m_fieldList.clear();
+
+	for (size_t i = 0; i < countof(m_reportMapTable); i++)
+		m_reportMapTable[i].clear();
+
+	m_flags = 0;
+}
+
+void
+HidRd::parse(
+	HidUsageDb* db,
+	const void* p,
+	size_t size
+) {
+	clear();
+
+	HidRdParser parser(db, this);
+	parser.parse(p, size);
+
 	for (uint_t i = 0; i < HidReportKind__Count; i++) {
 		sl::MapIterator<uint_t, HidReport> it = m_reportMapTable[i].getHead();
 		for (; it; it++)
@@ -443,16 +499,140 @@ HidRd::finalize() {
 	}
 }
 
+inline
 void
-HidRd::print() {
-	printf("HID RD (flags: 0x%x)\n", m_flags);
+incIndent(sl::String* indent) {
+	indent->append(' ', 4);
+}
 
-	sl::String indent;
+inline
+void
+decIndent(sl::String* indent) {
+	ASSERT(indent->getLength() >= 4);
+	indent->overrideLength(indent->getLength() - 4);
+}
+
+
+inline
+void
+printItem(
+	const sl::StringRef& indent,
+	const HidReportField& field,
+	HidRdItemId id
+) {
+	if (field.isSet(id))
+		printf(
+			"%s%s: %d\n",
+			indent.sz(),
+			getHidRdItemString(id).sz(),
+			(int)field[id]
+		);
+}
+
+void
+printFieldArray(
+	sl::String* indent,
+	const sl::ArrayRef<const HidReportField*>& fieldArray
+) {
+	size_t count = fieldArray.getCount();
+	for (size_t i = 0; i < count; i++) {
+		const HidReportField& field = *fieldArray[i];
+		const HidUsagePage* page = field.getUsagePage();
+
+		if (field.isPadding()) {
+			printf(
+				"%sPadding (offset: %d bits, size: %d bits)\n",
+		    	indent->sz(),
+				field.getBitOffset(),
+				field.getBitCount()
+			);
+
+			continue;
+		}
+
+		printf(
+			"%sField (%s, offset: %d bits, size: %d bits)\n",
+	    	indent->sz(),
+			page->getName().sz(),
+			field.getBitOffset(),
+			field.getBitCount()
+		);
+
+		incIndent(indent);
+
+		if (field.isSet(HidRdItemId_Usage)) {
+			size_t auxUsageCount = field.getAuxUsageCount();
+			for (size_t i = 0; i <= auxUsageCount; i++) {
+				uint_t usage = field.getUsage(i);
+				printf(
+					"%sUsage: %s\n",
+					indent->sz(),
+					page->getUsageName(usage).sz()
+				);
+			}
+		}
+
+		if (field.isSet(HidRdItemId_UsageMinimum))
+			printf(
+				"%sUsageMinimum: %s\n",
+				indent->sz(),
+				page->getUsageName(field[HidRdItemId_UsageMinimum]).sz()
+			);
+
+		if (field.isSet(HidRdItemId_UsageMaximum))
+			printf(
+				"%sUsageMaximum: %s\n",
+				indent->sz(),
+				page->getUsageName(field[HidRdItemId_UsageMaximum]).sz()
+			);
+
+		printItem(*indent, field, HidRdItemId_LogicalMinimum);
+		printItem(*indent, field, HidRdItemId_LogicalMaximum);
+		printItem(*indent, field, HidRdItemId_PhysicalMinimum);
+		printItem(*indent, field, HidRdItemId_PhysicalMaximum);
+		printItem(*indent, field, HidRdItemId_ReportSize);
+		printItem(*indent, field, HidRdItemId_ReportCount);
+
+		decIndent(indent);
+	}
+}
+
+void
+printCollection(
+	sl::String* indent,
+	const HidRdCollection* collection
+) {
+	printf(
+		"%sCollection (%s)\n",
+		indent->sz(),
+		getHidRdCollectionKindString(collection->getCollectionKind()).sz()
+	);
+
+	incIndent(indent);
+
+	const HidUsagePage* page = collection->getUsagePage();
+	uint_t usage = collection->getUsage();
+	printf("%sUsagePage: %s\n", indent->sz(), page->getName().sz());
+	printf("%sUsage: %s\n", indent->sz(), page->getUsageName(usage).sz());
+	printFieldArray(indent, collection->getFieldArray());
+
+	sl::ConstIterator<HidRdCollection> it = collection->getCollectionList().getHead();
+	for (; it; it++)
+		printCollection(indent, *it);
+
+	decIndent(indent);
+}
+
+void
+HidRd::printReports() const {
+	printf("HID RD (flags: 0x%x) Reports:\n", m_flags);
+
+	sl::String indent(' ', 4);
 	for (uint_t i = 0; i < HidReportKind__Count; i++) {
 		sl::ConstMapIterator<uint_t, HidReport> it = m_reportMapTable[i].getHead();
 		for (; it; it++) {
 			const HidReport& report = it->m_value;
-			indent.copy(' ', 4);
+
 			printf(
 				"%s%s (id: %d, size: %d bits / %d bytes)\n",
 				indent.sz(),
@@ -462,73 +642,23 @@ HidRd::print() {
 				report.m_size
 			);
 
-			sl::ConstIterator<HidReportField> it2 = report.m_fieldList.getHead();
-			for (; it2; it2++) {
-				const HidReportField& field = **it2;
-				const HidUsagePage* page = field.getUsagePage();
-				indent.copy(' ', 8);
-
-				if (field.isPadding()) {
-					printf(
-						"%sPadding (offset: %d bits, size: %d bits)\n",
-				    	indent.sz(),
-						field.getBitOffset(),
-						field.getBitCount()
-					);
-
-					continue;
-				}
-
-				printf(
-					"%sField (%s, offset: %d bits, size: %d bits)\n",
-			    	indent.sz(),
-					page->getName().sz(),
-					field.getBitOffset(),
-					field.getBitCount()
-				);
-
-				indent.copy(' ', 12);
-
-				if (it2->isSet(HidRdItemId_Usage)) {
-					size_t auxUsageCount = field.getAuxUsageCount();
-					for (size_t i = 0; i <= auxUsageCount; i++) {
-						uint_t usage = field.getUsage(i);
-						printf(
-							"%sUsage: %s\n",
-							indent.sz(),
-							page->getUsageName(usage).sz()
-						);
-					}
-				}
-
-				if (it2->isSet(HidRdItemId_UsageMinimum))
-					printf(
-						"%sUsage Min: %s\n",
-						indent.sz(),
-						page->getUsageName(field[HidRdItemId_UsageMinimum]).sz()
-					);
-
-				if (it2->isSet(HidRdItemId_UsageMaximum))
-					printf(
-						"%sUsage Max: %s\n",
-						indent.sz(),
-						page->getUsageName(field[HidRdItemId_UsageMaximum]).sz()
-					);
-
-				printf(
-					"%sReport Size: %d\n",
-					indent.sz(),
-					field[HidRdItemId_ReportSize]
-				);
-
-				printf(
-					"%sReport Count: %d\n",
-					indent.sz(),
-					field[HidRdItemId_ReportCount]
-				);
-			}
+			incIndent(&indent);
+			printFieldArray(&indent, report.m_fieldArray);
+			decIndent(&indent);
 		}
 	}
+}
+
+void
+HidRd::printCollections() const {
+	printf("HID RD (flags: 0x%x) Collections\n", m_flags);
+
+	sl::String indent(' ', 4);
+	sl::ConstIterator it = m_rootCollection.m_collectionList.getHead();
+	for (; it; it++)
+		printCollection(&indent, *it);
+
+	printFieldArray(&indent, m_rootCollection.m_fieldArray);
 }
 
 //..............................................................................

@@ -18,7 +18,6 @@ set(
 	${AXL_INC_DIR}/axl_io_hid/axl_io_HidDevice.h
 	${AXL_INC_DIR}/axl_io_hid/axl_io_HidEnumerator.h
 	${AXL_INC_DIR}/axl_io_hid/axl_io_HidRd.h
-	${AXL_INC_DIR}/axl_io_hid/axl_io_HidRdParser.h
 	${AXL_INC_DIR}/axl_io_hid/axl_io_HidUsageDb.h
 )
 
@@ -26,6 +25,7 @@ set(
 	LIB_CPP_LIST
 	axl_io_HidDevice.cpp
 	axl_io_HidRd.cpp
+	axl_io_HidRdParser.h
 	axl_io_HidRdParser.cpp
 	axl_io_HidUsageDb.cpp
 	axl_io_HidUsageDbParser.h

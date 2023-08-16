@@ -53,7 +53,7 @@ HidRdParser::getParseItemFunc(HidRdTag tag) {
 		&HidRdParser::parseItem_default;
 }
 
-bool
+void
 HidRdParser::parse(
 	const void* p0,
 	size_t size
@@ -66,69 +66,67 @@ HidRdParser::parse(
 		uchar_t a = *p++;
 		HidRdTag tag = (HidRdTag)(a & ~0x03);
 		size_t size = sizeTable[a & 0x03];
-		uint32_t data = 0;
-		memcpy(&data, p, size);
+		uint32_t data;
 
 		HidRdItemId id = getHidRdTagItemId(tag);
-		if (id != HidRdItemId_Invalid)
+		if (id == HidRdItemId_Invalid) {
+			data = 0;
+			memcpy(&data, p, size);
+		} else {
+			data = isHidRdItemSigned(id) && (p[size - 1] & 0x80) ? -1 : 0;
+			memcpy(&data, p, size);
 			m_itemTable.set(id, data);
+		}
 
 		ParseItemFunc func = getParseItemFunc(tag);
-		(this->*func)(tag, data, size);
+		(this->*func)(tag, data);
 		p += size;
 	}
-
-	m_rd->finalize();
-	return true;
 }
 
 void
 HidRdParser::parseItem_default(
 	HidRdTag tag,
-	uint32_t data,
-	size_t size
+	uint32_t data
 ) {
 	sl::StringRef tagString = getHidRdTagString(tag);
-
-	if (!size) {
-		printf("%s%s\n", m_indent.sz(), tagString.sz());
-		return;
-	}
-
-	int value = size < sizeof(int) && (data & (0x80 << (size - 1) * 8)) ? -1 : 0;
-	memcpy(&value, &data, size);
-	printf("%s%s: %d\n", m_indent.sz(), tagString.sz(), value);
+	printf("%s%s: %d\n", m_indent.sz(), tagString.sz(), data);
 }
 
 void
 HidRdParser::parseItem_collection(
 	HidRdTag tag,
-	uint32_t data,
-	size_t size
+	uint32_t data
 ) {
 	sl::StringRef collectionString = getHidRdCollectionKindString((HidRdCollectionKind)data);
 	printf("%sCollection: %s\n", m_indent.sz(), collectionString.sz());
 	m_indent += "    ";
+
+	HidRdCollection* collection = new HidRdCollection;
+	collection->m_collectionKind = (HidRdCollectionKind)data;
+	collection->m_usagePage = getUsagePage();
+	collection->m_usage = m_itemTable[HidRdItemId_Usage];
+	getCollection()->m_collectionList.insertTail(collection);
+	m_collectionStack.append(collection);
 }
 
 void
 HidRdParser::parseItem_collectionEnd(
 	HidRdTag tag,
-	uint32_t data,
-	size_t size
+	uint32_t data
 ) {
 	size_t length = m_indent.getLength();
 	if (length >= 4)
 		m_indent.overrideLength(length - 4);
 
 	printf("%sCollectionEnd\n", m_indent.sz());
+	m_collectionStack.pop();
 }
 
 void
 HidRdParser::parseItem_usagePage(
 	HidRdTag tag,
-	uint32_t data,
-	size_t size
+	uint32_t data
 ) {
 	m_usagePage = m_db->getUsagePage(data);
 	m_itemTable.resetUsages();
@@ -138,8 +136,7 @@ HidRdParser::parseItem_usagePage(
 void
 HidRdParser::parseItem_usage(
 	HidRdTag tag,
-	uint32_t data,
-	size_t size
+	uint32_t data
 ) {
 	sl::StringRef tagString = getHidRdTagString(tag);
 	sl::StringRef usageString = getUsagePage()->getUsageName(data);
@@ -149,8 +146,7 @@ HidRdParser::parseItem_usage(
 void
 HidRdParser::parseItem_push(
 	HidRdTag tag,
-	uint32_t data,
-	size_t size
+	uint32_t data
 ) {
 	m_stack.append(m_itemTable);
 }
@@ -158,8 +154,7 @@ HidRdParser::parseItem_push(
 void
 HidRdParser::parseItem_pop(
 	HidRdTag tag,
-	uint32_t data,
-	size_t size
+	uint32_t data
 ) {
 	if (!m_stack.isEmpty()) {
 		m_itemTable = m_stack.getBackAndPop();
@@ -193,13 +188,17 @@ HidRdParser::finalizeReportField(
 
 	HidReportField* field = new HidReportField;
 	*(HidRdItemTable*)field = m_itemTable;
+	field->m_report = m_report;
 	field->m_usagePage = getUsagePage();
 	field->m_valueFlags = valueFlags;
 	field->m_bitOffset = m_report->m_bitCount;
 	field->m_bitCount = m_itemTable[HidRdItemId_ReportSize] * m_itemTable[HidRdItemId_ReportCount];
+	m_rd->m_fieldList.insertTail(field);
 
-	m_report->m_fieldList.insertTail(field);
+	getCollection()->m_fieldArray.append(field);
+	m_report->m_fieldArray.append(field);
 	m_report->m_bitCount += field->getBitCount();
+
 	m_itemTable.resetLocals();
 }
 

@@ -7431,12 +7431,13 @@ testHid() {
 		printf("%s\n", strings[0].sz());
 
 		io::HidRd rd;
-		io::HidRdParser parser(&db, &rd);
-		parser.parse(buffer, readResult);
+		rd.parse(&db, buffer, readResult);
 
-		printf("<<<\n");
-		rd.print();
-		printf(">>>\n");
+		printf("<<<<<\n");
+		rd.printCollections();
+		printf("-----\n");
+		rd.printReports();
+		printf(">>>>>\n");
 	}
 
 	if (!path)
@@ -7463,9 +7464,12 @@ testHid() {
 	printf("%s\n", strings[0].sz());
 
 	io::HidRd rd;
-	io::HidRdParser parser(&db, &rd);
-	parser.parse(buffer, readResult);
-	rd.print();
+	rd.parse(&db,buffer, readResult);
+	printf("<<<<<\n");
+	rd.printCollections();
+	printf("-----\n");
+	rd.printReports();
+	printf(">>>>>\n");
 
     for (;;) {
         char buffer[256];

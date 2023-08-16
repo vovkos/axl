@@ -29,8 +29,7 @@ protected:
 	void
 	(HidRdParser::*ParseItemFunc)(
 		HidRdTag tag,
-		uint32_t data,
-		size_t size
+		uint32_t data
 	);
 
 	class InitParseItemFuncTable {
@@ -43,6 +42,7 @@ protected:
 	HidUsageDb* m_db;
 	HidRd* m_rd;
 	HidReport* m_report;
+	sl::Array<HidRdCollection*> m_collectionStack;
 	mutable const HidUsagePage* m_usagePage;
 	HidRdItemTable m_itemTable;
 	sl::Array<HidRdItemTable> m_stack;
@@ -54,13 +54,18 @@ public:
 		HidRd* rd
 	);
 
-	bool
+	void
 	parse(
 		const void* p,
 		size_t size
 	);
 
 protected:
+	HidRdCollection*
+	getCollection() {
+		return !m_collectionStack.isEmpty() ? m_collectionStack.getBack() : &m_rd->m_rootCollection;
+	}
+
 	static
 	ParseItemFunc
 	getParseItemFunc(HidRdTag tag);
@@ -68,29 +73,25 @@ protected:
 	void
 	parseItem_default(
 		HidRdTag tag,
-		uint32_t data,
-		size_t size
+		uint32_t data
 	);
 
 	void
 	parseItem_collection(
 		HidRdTag tag,
-		uint32_t data,
-		size_t size
+		uint32_t data
 	);
 
 	void
 	parseItem_collectionEnd(
 		HidRdTag tag,
-		uint32_t data,
-		size_t size
+		uint32_t data
 	);
 
 	void
 	parseItem_input(
 		HidRdTag tag,
-		uint32_t data,
-		size_t size
+		uint32_t data
 	) {
 		finalizeReportField(HidReportKind_Input, data);
 	}
@@ -98,8 +99,7 @@ protected:
 	void
 	parseItem_output(
 		HidRdTag tag,
-		uint32_t data,
-		size_t size
+		uint32_t data
 	) {
 		finalizeReportField(HidReportKind_Output, data);
 	}
@@ -107,8 +107,7 @@ protected:
 	void
 	parseItem_feature(
 		HidRdTag tag,
-		uint32_t data,
-		size_t size
+		uint32_t data
 	) {
 		finalizeReportField(HidReportKind_Feature, data);
 	}
@@ -116,29 +115,25 @@ protected:
 	void
 	parseItem_usagePage(
 		HidRdTag tag,
-		uint32_t data,
-		size_t size
+		uint32_t data
 	);
 
 	void
 	parseItem_usage(
 		HidRdTag tag,
-		uint32_t data,
-		size_t size
+		uint32_t data
 	);
 
 	void
 	parseItem_push(
 		HidRdTag tag,
-		uint32_t data,
-		size_t size
+		uint32_t data
 	);
 
 	void
 	parseItem_pop(
 		HidRdTag tag,
-		uint32_t data,
-		size_t size
+		uint32_t data
 	);
 
 	void
@@ -160,7 +155,7 @@ HidRdParser::HidRdParser(
 	HidUsageDb* db,
 	HidRd* rd
 ) {
-	ASSERT(db);
+	ASSERT(db && rd);
 	m_db = db;
 	m_rd = rd;
 	m_report = NULL;

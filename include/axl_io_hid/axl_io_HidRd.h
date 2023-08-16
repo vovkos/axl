@@ -13,33 +13,33 @@
 
 #define _AXL_IO_HIDRD_H
 
-#include "axl_io_HidPch.h"
+#include "axl_io_HidUsageDb.h"
 
 namespace axl {
 namespace io {
 
-class HidUsagePage;
 class HidRdParser;
+class HidReport;
 
 //..............................................................................
 
 enum HidRdItemId {
 	HidRdItemId_Invalid = -1,
 
-	// global
+	// globals
 
 	HidRdItemId_UsagePage = 0,
-	HidRdItemId_LogicalMinimum,
-	HidRdItemId_LogicalMaximum,
-	HidRdItemId_PhysicalMinimum,
-	HidRdItemId_PhysicalMaximum,
-	HidRdItemId_UnitExponent,
+	HidRdItemId_LogicalMinimum,  // signed
+	HidRdItemId_LogicalMaximum,  // signed
+	HidRdItemId_PhysicalMinimum, // signed
+	HidRdItemId_PhysicalMaximum, // signed
+	HidRdItemId_UnitExponent,    // signed
 	HidRdItemId_Unit,
 	HidRdItemId_ReportSize,
 	HidRdItemId_ReportId,
 	HidRdItemId_ReportCount,
 
-	// local
+	// locals (unsigned)
 
 	HidRdItemId_Usage,
 	HidRdItemId_UsageMinimum,
@@ -54,6 +54,17 @@ enum HidRdItemId {
 
 	HidRdItemId__Count,
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+sl::StringRef
+getHidRdItemString(HidRdItemId id);
+
+inline
+bool
+isHidRdItemSigned(HidRdItemId id) {
+	return id >= HidRdItemId_LogicalMinimum && id <= HidRdItemId_UnitExponent;
+}
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -92,7 +103,55 @@ enum HidRdItemMask {
 		HidRdItemMask_UsageMaximum,
 };
 
+//..............................................................................
+
+enum HidRdTag {
+	// main
+
+	HidRdTag_Input             = 0x80, // 1000 00 nn
+	HidRdTag_Output            = 0x90, // 1001 00 nn
+	HidRdTag_Feature           = 0xB0, // 1011 00 nn
+	HidRdTag_Collection        = 0xA0, // 1010 00 nn
+	HidRdTag_CollectionEnd     = 0xC0, // 1100 00 nn
+
+	// global
+
+	HidRdTag_UsagePage         = 0x04, // 0000 01 nn
+	HidRdTag_LogicalMinimum    = 0x14, // 0001 01 nn
+	HidRdTag_LogicalMaximum    = 0x24, // 0010 01 nn
+	HidRdTag_PhysicalMinimum   = 0x34, // 0011 01 nn
+	HidRdTag_PhysicalMaximum   = 0x44, // 0100 01 nn
+	HidRdTag_UnitExponent      = 0x54, // 0101 01 nn
+	HidRdTag_Unit              = 0x64, // 0110 01 nn
+	HidRdTag_ReportSize        = 0x74, // 0111 01 nn
+	HidRdTag_ReportId          = 0x84, // 1000 01 nn
+	HidRdTag_ReportCount       = 0x94, // 1001 01 nn
+	HidRdTag_Push              = 0xA4, // 1010 01 nn
+	HidRdTag_Pop               = 0xB4, // 1011 01 nn
+
+	// local
+
+	HidRdTag_Usage             = 0x08, // 0000 10 nn
+	HidRdTag_UsageMinimum      = 0x18, // 0001 10 nn
+	HidRdTag_UsageMaximum      = 0x28, // 0010 10 nn
+	HidRdTag_DesignatorIndex   = 0x38, // 0011 10 nn
+	HidRdTag_DesignatorMinimum = 0x48, // 0100 10 nn
+	HidRdTag_DesignatorMaximum = 0x58, // 0101 10 nn
+	HidRdTag_String            = 0x78, // 0111 10 nn
+	HidRdTag_StringMinimum     = 0x88, // 1000 10 nn
+	HidRdTag_StringMaximum     = 0x98, // 1001 10 nn
+	HidRdTag_Delimiter         = 0xA8, // 1010 10 nn
+};
+
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+HidRdItemId
+getHidRdTagItemId(HidRdTag tag);
+
+sl::StringRef
+getHidRdTagString(HidRdTag tag);
+
+//..............................................................................
 
 class HidRdItemTable {
 protected:
@@ -184,54 +243,6 @@ HidRdItemTable::resetUsages() {
 
 //..............................................................................
 
-enum HidRdTag {
-	// main
-
-	HidRdTag_Input             = 0x80, // 1000 00 nn
-	HidRdTag_Output            = 0x90, // 1001 00 nn
-	HidRdTag_Feature           = 0xB0, // 1011 00 nn
-	HidRdTag_Collection        = 0xA0, // 1010 00 nn
-	HidRdTag_CollectionEnd     = 0xC0, // 1100 00 nn
-
-	// global
-
-	HidRdTag_UsagePage         = 0x04, // 0000 01 nn
-	HidRdTag_LogicalMinimum    = 0x14, // 0001 01 nn
-	HidRdTag_LogicalMaximum    = 0x24, // 0010 01 nn
-	HidRdTag_PhysicalMinimum   = 0x34, // 0011 01 nn
-	HidRdTag_PhysicalMaximum   = 0x44, // 0100 01 nn
-	HidRdTag_UnitExponent      = 0x54, // 0101 01 nn
-	HidRdTag_Unit              = 0x64, // 0110 01 nn
-	HidRdTag_ReportSize        = 0x74, // 0111 01 nn
-	HidRdTag_ReportId          = 0x84, // 1000 01 nn
-	HidRdTag_ReportCount       = 0x94, // 1001 01 nn
-	HidRdTag_Push              = 0xA4, // 1010 01 nn
-	HidRdTag_Pop               = 0xB4, // 1011 01 nn
-
-	// local
-
-	HidRdTag_Usage             = 0x08, // 0000 10 nn
-	HidRdTag_UsageMinimum      = 0x18, // 0001 10 nn
-	HidRdTag_UsageMaximum      = 0x28, // 0010 10 nn
-	HidRdTag_DesignatorIndex   = 0x38, // 0011 10 nn
-	HidRdTag_DesignatorMinimum = 0x48, // 0100 10 nn
-	HidRdTag_DesignatorMaximum = 0x58, // 0101 10 nn
-	HidRdTag_String            = 0x78, // 0111 10 nn
-	HidRdTag_StringMinimum     = 0x88, // 1000 10 nn
-	HidRdTag_StringMaximum     = 0x98, // 1001 10 nn
-	HidRdTag_Delimiter         = 0xA8, // 1010 10 nn
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-HidRdItemId
-getHidRdTagItemId(HidRdTag tag);
-
-sl::StringRef
-getHidRdTagString(HidRdTag tag);
-
-//..............................................................................
-
 enum HidRdValueFlag {
 	HidRdValueFlag_Constant      = 0x0001, // otherwise, variable data
 	HidRdValueFlag_Variable      = 0x0002, // otherwise, array
@@ -248,23 +259,6 @@ enum HidRdValueFlag {
 
 sl::StringRef
 getHidRdValueFlagsString(uint_t flags);
-
-//..............................................................................
-
-enum HidRdCollectionKind {
-	HidRdCollectionKind_Physical      = 0x00,
-	HidRdCollectionKind_Application   = 0x01,
-	HidRdCollectionKind_Logical       = 0x02,
-	HidRdCollectionKind_Report        = 0x03,
-	HidRdCollectionKind_NamedArray    = 0x04,
-	HidRdCollectionKind_UsageSwitch   = 0x05,
-	HidRdCollectionKind_UsageModifier = 0x06,
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-sl::StringRef
-getHidRdCollectionKindString(HidRdCollectionKind kind);
 
 //..............................................................................
 
@@ -360,6 +354,7 @@ class HidReportField:
 	friend class HidRdParser;
 
 protected:
+	const HidReport* m_report;
 	const HidUsagePage* m_usagePage;
 	size_t m_bitOffset;
 	size_t m_bitCount;
@@ -373,6 +368,16 @@ public:
 		return !isSet(HidRdItemMask_AllUsages);
 	}
 
+	const HidReport*
+	getReport() const {
+		return m_report;
+	}
+
+	const HidUsagePage*
+	getUsagePage() const {
+		return m_usagePage;
+	}
+
 	size_t
 	getBitOffset() const {
 		return m_bitOffset;
@@ -381,11 +386,6 @@ public:
 	size_t
 	getBitCount() const {
 		return m_bitCount;
-	}
-
-	const HidUsagePage*
-	getUsagePage() const {
-		return m_usagePage;
 	}
 
 	uint_t
@@ -398,6 +398,7 @@ public:
 
 inline
 HidReportField::HidReportField() {
+	m_report = NULL;
 	m_usagePage = NULL;
 	m_bitOffset = 0;
 	m_bitCount = 0;
@@ -421,20 +422,34 @@ getHidReportKindString(HidReportKind reportKind);
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class HidReport: public sl::ListLink {
+class HidReport {
 	friend class HidRd;
 	friend class HidRdParser;
 
 protected:
 	HidReportKind m_reportKind;
 	uint_t m_reportId;
-
-	sl::List<HidReportField> m_fieldList;
+	sl::Array<const HidReportField*> m_fieldArray;
 	size_t m_bitCount; // size of all fields in bits
 	size_t m_size;     // size of all fields in bytes
 
 public:
 	HidReport();
+
+	HidReportKind
+	getReportKind() const {
+		return m_reportKind;
+	}
+
+	uint_t
+	getReportId() const {
+		return m_reportId;
+	}
+
+	const sl::Array<const HidReportField*>&
+	getFieldArray() const {
+		return m_fieldArray;
+	}
 
 	size_t
 	getBitCount() const {
@@ -467,6 +482,88 @@ HidReport::HidReport() {
 
 //..............................................................................
 
+enum HidRdCollectionKind {
+	HidRdCollectionKind_Invalid       = -1,
+	HidRdCollectionKind_Physical      = 0x00,
+	HidRdCollectionKind_Application   = 0x01,
+	HidRdCollectionKind_Logical       = 0x02,
+	HidRdCollectionKind_Report        = 0x03,
+	HidRdCollectionKind_NamedArray    = 0x04,
+	HidRdCollectionKind_UsageSwitch   = 0x05,
+	HidRdCollectionKind_UsageModifier = 0x06,
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+sl::StringRef
+getHidRdCollectionKindString(HidRdCollectionKind kind);
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class HidRdCollection: public sl::ListLink {
+	friend class HidRd;
+	friend class HidRdParser;
+
+protected:
+	HidRdCollectionKind m_collectionKind;
+	const HidUsagePage* m_usagePage;
+	uint_t m_usage;
+	sl::List<HidRdCollection> m_collectionList;
+	sl::Array<const HidReportField*> m_fieldArray;
+
+public:
+	HidRdCollection();
+
+	HidRdCollectionKind
+	getCollectionKind() const {
+		return m_collectionKind;
+	}
+
+	const HidUsagePage*
+	getUsagePage() const {
+		return m_usagePage;
+	}
+
+	uint_t
+	getUsage() const {
+		return m_usage;
+	}
+
+	const sl::List<HidRdCollection>&
+	getCollectionList() const {
+		return m_collectionList;
+	}
+
+	const sl::Array<const HidReportField*>&
+	getFieldArray() const {
+		return m_fieldArray;
+	}
+
+	void
+	clear();
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+HidRdCollection::HidRdCollection() {
+	m_collectionKind = HidRdCollectionKind_Invalid;
+	m_usagePage = NULL;
+	m_usage = 0;
+}
+
+inline
+void
+HidRdCollection::clear() {
+	m_collectionKind = HidRdCollectionKind_Invalid;
+	m_usagePage = NULL;
+	m_usage = 0;
+	m_collectionList.clear();
+	m_fieldArray.clear();
+}
+
+//..............................................................................
+
 enum HidRdFlag {
 	HidRdFlag_HasReportId = 0x01,
 };
@@ -480,6 +577,8 @@ protected:
 	typedef sl::SimpleHashTable<uint_t, HidReport> ReportMap;
 
 protected:
+	HidRdCollection m_rootCollection;
+	sl::List<HidReportField> m_fieldList;
 	ReportMap m_reportMapTable[HidReportKind__Count];
 	uint_t m_flags;
 
@@ -493,6 +592,11 @@ public:
 		return m_flags;
 	}
 
+	const HidRdCollection*
+	getRootCollection() const {
+		return &m_rootCollection;
+	}
+
 	const HidReport*
 	findReport(
 		HidReportKind reportKind,
@@ -500,10 +604,20 @@ public:
 	) const;
 
 	void
-	finalize();
+	clear();
 
 	void
-	print();
+	parse(
+		HidUsageDb* db,
+		const void* p,
+		size_t size
+	); // never fails
+
+	void
+	printReports() const;
+
+	void
+	printCollections() const;
 
 protected:
 	HidReport*
