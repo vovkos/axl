@@ -7304,13 +7304,13 @@ testHid() {
 	enum {
 		UsagePage_GenericDesktop = 0x01,
 
-		Usage_GenericDesktop_Pointer = 0x01,
-		Usage_GenericDesktop_Mouse = 0x02,
-		Usage_GenericDesktop_Keyboad = 0x06,
-		Usage_GenericDesktop_Keypad = 0x07,
+		Usage_GenericDesktop_Pointer  = 0x01,
+		Usage_GenericDesktop_Mouse    = 0x02,
+		Usage_GenericDesktop_Keyboard = 0x06,
+		Usage_GenericDesktop_Keypad   = 0x07,
 
 		TargetUsagePage = UsagePage_GenericDesktop,
-		TargetUsage     = Usage_GenericDesktop_Pointer,
+		TargetUsage     = Usage_GenericDesktop_Keyboard,
 	};
 
 	bool result;
