@@ -97,7 +97,7 @@ enum HidRdItemMask {
 class HidRdItemTable {
 protected:
 	uint32_t m_table[HidRdItemId__Count];
-	sl::Array<uint32_t> m_usageTable;
+	sl::Array<uint32_t> m_auxUsageTable;
 	uint_t m_mask;
 
 public:
@@ -121,6 +121,14 @@ public:
 		return m_table[id];
 	}
 
+	size_t
+	getAuxUsageCount() const {
+		return m_auxUsageTable.getCount();
+	}
+
+	uint32_t
+	getUsage(size_t i) const;
+
 	void
 	set(
 		HidRdItemId id,
@@ -128,23 +136,51 @@ public:
 	);
 
 	void
-	reset() {
-		memset(m_table, 0, sizeof(m_table));
-		m_mask = 0;
-	}
+	reset();
 
 	void
-	resetLocals() {
-		memset(&m_table[HidRdItemId_Usage], 0, sizeof(uint32_t) * (HidRdItemId__Count - HidRdItemId_Usage));
-		m_mask &= ~HidRdItemMask_AllLocals;
-	}
+	resetLocals();
 
 	void
-	resetUsages() {
-		memset(&m_table[HidRdItemId_Usage], 0, sizeof(uint32_t) * (HidRdItemId_UsageMaximum + 1 - HidRdItemId_Usage));
-		m_mask &= ~HidRdItemMask_AllUsages;
-	}
+	resetUsages();
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+uint32_t
+HidRdItemTable::getUsage(size_t i) const {
+	return
+		!(m_mask & HidRdItemMask_Usage) ?
+			m_table[HidRdItemId_UsageMinimum] + i :
+		i > 0 && i <= m_auxUsageTable.getCount() ?
+			m_auxUsageTable[i - 1] :
+			m_table[HidRdItemId_Usage];
+}
+
+inline
+void
+HidRdItemTable::reset() {
+	memset(m_table, 0, sizeof(m_table));
+	m_auxUsageTable.clear();
+	m_mask = 0;
+}
+
+inline
+void
+HidRdItemTable::resetLocals() {
+	memset(&m_table[HidRdItemId_Usage], 0, sizeof(uint32_t) * (HidRdItemId__Count - HidRdItemId_Usage));
+	m_auxUsageTable.clear();
+	m_mask &= ~HidRdItemMask_AllLocals;
+}
+
+inline
+void
+HidRdItemTable::resetUsages() {
+	memset(&m_table[HidRdItemId_Usage], 0, sizeof(uint32_t) * (HidRdItemId_UsageMaximum + 1 - HidRdItemId_Usage));
+	m_auxUsageTable.clear();
+	m_mask &= ~HidRdItemMask_AllUsages;
+}
 
 //..............................................................................
 
@@ -307,8 +343,6 @@ getHidRdUnitNameString(HidRdUnit unit);
 sl::StringRef
 getHidRdUnitAbbrString(HidRdUnit unit);
 
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 inline
 int
 getHidRdUnitExponent(uint_t nibble) {
@@ -339,7 +373,6 @@ public:
 		return !isSet(HidRdItemMask_AllUsages);
 	}
 
-
 	size_t
 	getBitOffset() const {
 		return m_bitOffset;
@@ -356,17 +389,9 @@ public:
 	}
 
 	uint_t
-	getUsage(size_t i) const {
-		return m_usageTable[i];
-	}
-
-	uint_t
 	getValueFlags() const {
 		return m_valueFlags;
 	}
-
-	void
-	finalize();
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -379,7 +404,7 @@ HidReportField::HidReportField() {
 	m_valueFlags = 0;
 }
 
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//..............................................................................
 
 enum HidReportKind {
 	HidReportKind_Invalid = -1,

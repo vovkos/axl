@@ -28,15 +28,11 @@ HidRdItemTable::set(
 
 	// special handling for multi-usage is required
 
-	if (id != HidRdItemId_Usage || !(m_mask & HidRdItemMask_Usage)) {
+	if (id == HidRdItemId_Usage && (m_mask & HidRdItemMask_Usage))
+		m_auxUsageTable.append(data);
+	else {
 		m_table[id] = data;
 		m_mask |= 1 << id;
-	} else if (!m_usageTable.isEmpty())
-		m_usageTable.append(data);
-	else {
-		m_usageTable.setCount(2);
-		m_usageTable[0] = m_table[HidRdItemId_Usage];
-		m_usageTable[1] = data;
 	}
 }
 
@@ -340,34 +336,6 @@ getHidReportKindString(HidReportKind reportKind) {
 
 //..............................................................................
 
-void
-HidReportField::finalize() {
-	size_t reportSize = (*this)[HidRdItemId_ReportSize];
-	size_t reportCount = (*this)[HidRdItemId_ReportCount];
-	m_bitCount = reportSize * reportCount;
-
-	if (isPadding() || !(m_valueFlags & HidRdValueFlag_Variable)) // arrays don't need usage tables
-		return;
-
-	size_t usageCount = m_usageTable.getCount();
-	m_usageTable.setCount(reportCount);
-
-	if (isSet(HidRdItemId_Usage)) {
-		uint32_t usage = (*this)[HidRdItemId_Usage];
-		for (size_t i = usageCount; i < reportCount; i++)
-			m_usageTable[i] = usage;
-	} else {
-		uint32_t usage = isSet(HidRdItemMask_UsageMinimum) ?
-			(*this)[HidRdItemId_UsageMinimum] :
-			(*this)[HidRdItemId_UsageMaximum] - reportCount + 1;
-
-		for (size_t i = 0; i < reportCount; i++, usage++)
-			m_usageTable[i] = usage;
-	}
-}
-
-//..............................................................................
-
 int
 extractValue(
 	const uchar_t* p,
@@ -478,6 +446,7 @@ HidRd::finalize() {
 void
 HidRd::print() {
 	printf("HID RD (flags: 0x%x)\n", m_flags);
+
 	sl::String indent;
 	for (uint_t i = 0; i < HidReportKind__Count; i++) {
 		sl::ConstMapIterator<uint_t, HidReport> it = m_reportMapTable[i].getHead();
@@ -520,12 +489,17 @@ HidRd::print() {
 
 				indent.copy(' ', 12);
 
-				if (it2->isSet(HidRdItemId_Usage))
-					printf(
-						"%sUsage: %s\n",
-						indent.sz(),
-						page->getUsageName(field[HidRdItemId_Usage]).sz()
-					);
+				if (it2->isSet(HidRdItemId_Usage)) {
+					size_t auxUsageCount = field.getAuxUsageCount();
+					for (size_t i = 0; i <= auxUsageCount; i++) {
+						uint_t usage = field.getUsage(i);
+						printf(
+							"%sUsage: %s\n",
+							indent.sz(),
+							page->getUsageName(usage).sz()
+						);
+					}
+				}
 
 				if (it2->isSet(HidRdItemId_UsageMinimum))
 					printf(

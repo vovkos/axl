@@ -196,7 +196,7 @@ HidRdParser::finalizeReportField(
 	field->m_usagePage = getUsagePage();
 	field->m_valueFlags = valueFlags;
 	field->m_bitOffset = m_report->m_bitCount;
-	field->finalize();
+	field->m_bitCount = m_itemTable[HidRdItemId_ReportSize] * m_itemTable[HidRdItemId_ReportCount];
 
 	m_report->m_fieldList.insertTail(field);
 	m_report->m_bitCount += field->getBitCount();

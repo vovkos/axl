@@ -7302,12 +7302,15 @@ testUsbEnum2() {
 void
 testHid() {
 	enum {
-		UsagePage_GenericDesktop     = 0x01,
+		UsagePage_GenericDesktop = 0x01,
 
 		Usage_GenericDesktop_Pointer = 0x01,
-		Usage_GenericDesktop_Mouse   = 0x02,
+		Usage_GenericDesktop_Mouse = 0x02,
 		Usage_GenericDesktop_Keyboad = 0x06,
-		Usage_GenericDesktop_Keypad  = 0x07,
+		Usage_GenericDesktop_Keypad = 0x07,
+
+		TargetUsagePage = UsagePage_GenericDesktop,
+		TargetUsage     = Usage_GenericDesktop_Pointer,
 	};
 
 	bool result;
@@ -7317,7 +7320,7 @@ testHid() {
 	printf("HidRdItemMask_AllGlobals: 0x%x\n", io::HidRdItemMask_AllGlobals);
 	printf("HidRdItemMask_AllLocals:  0x%x\n", io::HidRdItemMask_AllLocals);
 
-    const char* dbFilePath = AXL_ROOT_DIR "/src/axl_io_hid/db/hid-00-usage-page-dir.ini";
+	const char* dbFilePath = AXL_ROOT_DIR "/src/axl_io_hid/db/hid-00-usage-page-dir.ini";
 	printf("Loading HID DB: %s\n", dbFilePath);
 
 	io::HidUsageDb db;
@@ -7359,8 +7362,8 @@ testHid() {
 
 	sl::String strings[4];
 
-    const char* path = "/dev/hidraw2";
-/*
+	const char* path = NULL;
+
 	io::HidDeviceInfoIterator it = enumerator.getHead();
 	for (; it; it++) {
 		const io::HidUsagePage* page = db.getUsagePage(it->usage_page);
@@ -7371,7 +7374,7 @@ testHid() {
 			"    VID:          %04x\n"
 			"    PID:          %04x\n"
 			"    Manufacturer: %s\n"
-			"    Prorduct:     %s\n"
+			"    Product:      %s\n"
 			"    Serial:       %s\n"
 			"    Release:      %x\n"
 			"    Usage page:   %s\n"
@@ -7391,9 +7394,7 @@ testHid() {
 			it->interface_number
 		);
 
-		if (it->usage_page == UsagePage_GenericDesktop &&
-			it->usage == Usage_GenericDesktop_Mouse
-		)
+		if (it->usage_page == TargetUsagePage && it->usage == TargetUsage)
 			path = it->path;
 
 		printf("Opening device %s...\n", it->path);
@@ -7410,7 +7411,7 @@ testHid() {
 
 		printf(
 			"Manufacturer: %s\n"
-			"Prorduct:     %s\n"
+			"Product:      %s\n"
 			"Serial:       %s\n",
 			strings[0].sz(),
 			strings[1].sz(),
@@ -7437,19 +7438,19 @@ testHid() {
 		rd.print();
 		printf(">>>\n");
 	}
-*/
-    if (!path)
-        return;
+
+	if (!path)
+		return;
 
 	printf("..............................................................................\n");
-    printf("Opening %s...\n", path);
+	printf("Opening %s...\n", path);
 
-    io::HidDevice device;
-    result = device.open(path);
-    if (!result) {
-        printf("Error: %s\n", err::getLastErrorDescription().sz());
-        return;
-    }
+	io::HidDevice device;
+	result = device.open(path);
+	if (!result) {
+		printf("Error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
 
 	char buffer[4096];
 	size_t readResult = device.getReportDescriptor(buffer, sizeof(buffer));
@@ -7494,7 +7495,7 @@ testHid() {
 			size = readResult;
 		}
 
-		const io::HidReport* report = rd.findReport(io::HidReportKind_Input, 0);
+		const io::HidReport* report = rd.findReport(io::HidReportKind_Input, reportId);
 		if (!report) {
 			printf("    *** report unknown\n");
 			continue;
