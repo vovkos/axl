@@ -18,7 +18,7 @@ set(
 	${AXL_INC_DIR}/axl_io_hid/axl_io_HidDevice.h
 	${AXL_INC_DIR}/axl_io_hid/axl_io_HidEnumerator.h
 	${AXL_INC_DIR}/axl_io_hid/axl_io_HidRd.h
-	${AXL_INC_DIR}/axl_io_hid/axl_io_HidUsageDb.h
+	${AXL_INC_DIR}/axl_io_hid/axl_io_HidDb.h
 )
 
 set(
@@ -27,9 +27,9 @@ set(
 	axl_io_HidRd.cpp
 	axl_io_HidRdParser.h
 	axl_io_HidRdParser.cpp
-	axl_io_HidUsageDb.cpp
-	axl_io_HidUsageDbParser.h
-	axl_io_HidUsageDbParser.cpp
+	axl_io_HidDb.cpp
+	axl_io_HidDbParser.h
+	axl_io_HidDbParser.cpp
 )
 
 source_group(

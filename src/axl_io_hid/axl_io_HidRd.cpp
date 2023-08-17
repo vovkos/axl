@@ -11,7 +11,7 @@
 
 #include "pch.h"
 #include "axl_io_HidRd.h"
-#include "axl_io_HidUsageDb.h"
+#include "axl_io_HidDb.h"
 #include "axl_io_HidRdParser.h"
 #include "axl_sl_CallOnce.h"
 
@@ -483,7 +483,7 @@ HidRd::clear() {
 
 void
 HidRd::parse(
-	HidUsageDb* db,
+	HidDb* db,
 	const void* p,
 	size_t size
 ) {

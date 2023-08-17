@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "axl_io_HidUsageDb.h"
+#include "axl_io_HidDb.h"
 #include "axl_ini_Parser.h"
 
 namespace axl {
@@ -47,11 +47,11 @@ protected:
 	AXL_SL_END_HASH_TABLE()
 
 protected:
-	HidUsageDb* m_db;
+	HidDb* m_db;
 	HidUsagePage* m_page;
 
 public:
-	HidUsagePageDirIniParser(HidUsageDb* db) {
+	HidUsagePageDirIniParser(HidDb* db) {
 		m_db = db;
 		m_page = NULL;
 	}

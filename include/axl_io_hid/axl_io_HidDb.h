@@ -18,7 +18,7 @@
 namespace axl {
 namespace io {
 
-class HidUsageDb;
+class HidDb;
 class HidUsagePageDirIniParser;
 class HidUsageIniParser;
 
@@ -27,10 +27,10 @@ class HidUsageIniParser;
 class HidUsagePage: public sl::ListLink {
 	friend class HidUsagePageDirIniParser;
 	friend class HidUsageIniParser;
-	friend class HidUsageDb;
+	friend class HidDb;
 
 protected:
-	const HidUsageDb* m_db;
+	const HidDb* m_db;
 
 	union {
 		uint_t m_flags;
@@ -47,7 +47,7 @@ protected:
 	sl::SimpleHashTable<uint_t, sl::String> m_usageNameMap;
 
 public:
-	HidUsagePage(const HidUsageDb* db) {
+	HidUsagePage(const HidDb* db) {
 		m_db = db;
 		m_flags = 0;
 	}
@@ -82,7 +82,7 @@ protected:
 
 //..............................................................................
 
-class HidUsageDb {
+class HidDb {
 	friend class HidUsagePageDirIniParser;
 	friend class HidUsageIniParser;
 

@@ -10,8 +10,8 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_io_HidUsageDb.h"
-#include "axl_io_HidUsageDbParser.h"
+#include "axl_io_HidDb.h"
+#include "axl_io_HidDbParser.h"
 #include "axl_io_MappedFile.h"
 #include "axl_io_FilePathUtils.h"
 
@@ -59,14 +59,14 @@ HidUsagePage::load() {
 //..............................................................................
 
 void
-HidUsageDb::clear() {
+HidDb::clear() {
 	m_dir.clear();
 	m_usagePageList.clear();
 	m_usagePageMap.clear();
 }
 
 bool
-HidUsageDb::load(const sl::StringRef& fileName) {
+HidDb::load(const sl::StringRef& fileName) {
 	io::SimpleMappedFile file;
 	bool result =
 		file.open(fileName, io::FileFlag_ReadOnly) &&
@@ -92,12 +92,12 @@ HidUsageDb::load(const sl::StringRef& fileName) {
 }
 
 const HidUsagePage*
-HidUsageDb::getUsagePage(uint_t pageId) const {
+HidDb::getUsagePage(uint_t pageId) const {
 	sl::ConstMapIterator<uint_t, const HidUsagePage*> it = m_usagePageMap.find(pageId);
 	if (it)
 		return it->m_value;
 
-	HidUsageDb* mutableSelf = (HidUsageDb*)this;
+	HidDb* mutableSelf = (HidDb*)this;
 	HidUsagePage* page = new HidUsagePage(this);
 	page->m_id = pageId;
 	page->m_name.format("Page 0x%02x", pageId);

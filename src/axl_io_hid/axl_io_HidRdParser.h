@@ -14,7 +14,7 @@
 #define _AXL_IO_HIDRDPARSER_H
 
 #include "axl_io_HidRd.h"
-#include "axl_io_HidUsageDb.h"
+#include "axl_io_HidDb.h"
 
 namespace axl {
 namespace io {
@@ -39,7 +39,7 @@ protected:
 	};
 
 protected:
-	HidUsageDb* m_db;
+	HidDb* m_db;
 	HidRd* m_rd;
 	HidReport* m_report;
 	sl::Array<HidRdCollection*> m_collectionStack;
@@ -49,7 +49,7 @@ protected:
 
 public:
 	HidRdParser(
-		HidUsageDb* db,
+		HidDb* db,
 		HidRd* rd
 	);
 
@@ -146,7 +146,7 @@ protected:
 
 inline
 HidRdParser::HidRdParser(
-	HidUsageDb* db,
+	HidDb* db,
 	HidRd* rd
 ) {
 	ASSERT(db && rd);

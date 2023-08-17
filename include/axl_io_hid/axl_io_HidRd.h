@@ -13,7 +13,7 @@
 
 #define _AXL_IO_HIDRD_H
 
-#include "axl_io_HidUsageDb.h"
+#include "axl_io_HidDb.h"
 
 namespace axl {
 namespace io {
@@ -611,7 +611,7 @@ public:
 
 	void
 	parse(
-		HidUsageDb* db,
+		HidDb* db,
 		const void* p,
 		size_t size
 	); // never fails
