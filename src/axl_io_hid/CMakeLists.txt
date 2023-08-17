@@ -89,4 +89,14 @@ install(
 	DESTINATION ${AXL_INSTALL_LIB_SUBDIR}
 )
 
+install(
+	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/db/
+	DESTINATION ${AXL_INSTALL_MISC_SUBDIR}/hid
+)
+
+file(
+	COPY ${CMAKE_CURRENT_LIST_DIR}/db/
+	DESTINATION ${AXL_SHARE_DIR}/hid
+)
+
 #...............................................................................

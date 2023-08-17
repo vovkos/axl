@@ -7317,7 +7317,7 @@ testHid() {
 
 	io::hidInit();
 
-	const char* dbFilePath = AXL_ROOT_DIR "/src/axl_io_hid/db/hid-00-usage-page-dir.ini";
+	const char* dbFilePath = AXL_SHARE_DIR "/hid/hid-00-usage-page-dir.ini";
 	printf("Loading HID DB: %s\n", dbFilePath);
 
 	io::HidDb db;

@@ -51,7 +51,10 @@ source_group(
 include_directories(${AXL_INC_DIR})
 link_directories(${AXL_LIB_DIR})
 
-add_definitions(-DAXL_ROOT_DIR="${AXL_ROOT_DIR}")
+add_definitions(
+	-DAXL_ROOT_DIR="${AXL_ROOT_DIR}"
+	-DAXL_SHARE_DIR="${AXL_SHARE_DIR}"
+)
 
 set(OPT_LIB_LIST)
 

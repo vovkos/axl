@@ -11,7 +11,7 @@
 
 #pragma once
 
-#define _AXL_IO_HIDUSAGEDB_H
+#define _AXL_IO_HIDDB_H
 
 #include "axl_io_HidPch.h"
 
