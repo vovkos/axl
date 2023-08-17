@@ -27,15 +27,15 @@ struct HidRdParser {
 protected:
 	typedef
 	void
-	(HidRdParser::*ParseItemFunc)(
+	(HidRdParser::*ProcessItemFunc)(
 		HidRdTag tag,
 		uint32_t data
 	);
 
-	class InitParseItemFuncTable {
+	class InitProcessItemFuncTable {
 	public:
 		void
-		operator () (ParseItemFunc funcTable[]) const;
+		operator () (ProcessItemFunc funcTable[]) const;
 	};
 
 protected:
@@ -46,7 +46,6 @@ protected:
 	mutable const HidUsagePage* m_usagePage;
 	HidRdItemTable m_itemTable;
 	sl::Array<HidRdItemTable> m_stack;
-	sl::String m_indent;
 
 public:
 	HidRdParser(
@@ -67,29 +66,25 @@ protected:
 	}
 
 	static
-	ParseItemFunc
-	getParseItemFunc(HidRdTag tag);
+	ProcessItemFunc
+	getProcessItemFunc(HidRdTag tag);
 
 	void
-	parseItem_default(
+	processItem_collection(
 		HidRdTag tag,
 		uint32_t data
 	);
 
 	void
-	parseItem_collection(
+	processItem_collectionEnd(
 		HidRdTag tag,
 		uint32_t data
-	);
+	) {
+		m_collectionStack.pop();
+	}
 
 	void
-	parseItem_collectionEnd(
-		HidRdTag tag,
-		uint32_t data
-	);
-
-	void
-	parseItem_input(
+	processItem_input(
 		HidRdTag tag,
 		uint32_t data
 	) {
@@ -97,7 +92,7 @@ protected:
 	}
 
 	void
-	parseItem_output(
+	processItem_output(
 		HidRdTag tag,
 		uint32_t data
 	) {
@@ -105,7 +100,7 @@ protected:
 	}
 
 	void
-	parseItem_feature(
+	processItem_feature(
 		HidRdTag tag,
 		uint32_t data
 	) {
@@ -113,25 +108,24 @@ protected:
 	}
 
 	void
-	parseItem_usagePage(
+	processItem_usagePage(
 		HidRdTag tag,
 		uint32_t data
-	);
+	) {
+		m_usagePage = m_db->getUsagePage(data);
+		m_itemTable.resetUsages();
+	}
 
 	void
-	parseItem_usage(
+	processItem_push(
 		HidRdTag tag,
 		uint32_t data
-	);
+	) {
+		m_stack.append(m_itemTable);
+	}
 
 	void
-	parseItem_push(
-		HidRdTag tag,
-		uint32_t data
-	);
-
-	void
-	parseItem_pop(
+	processItem_pop(
 		HidRdTag tag,
 		uint32_t data
 	);
@@ -160,6 +154,18 @@ HidRdParser::HidRdParser(
 	m_rd = rd;
 	m_report = NULL;
 	m_usagePage = NULL;
+}
+
+inline
+void
+HidRdParser::processItem_pop(
+	HidRdTag tag,
+	uint32_t data
+) {
+	if (!m_stack.isEmpty()) {
+		m_itemTable = m_stack.getBackAndPop();
+		m_usagePage = NULL;
+	}
 }
 
 //..............................................................................

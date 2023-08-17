@@ -574,12 +574,9 @@ class HidRd {
 	friend class HidRdParser;
 
 protected:
-	typedef sl::SimpleHashTable<uint_t, HidReport> ReportMap;
-
-protected:
 	HidRdCollection m_rootCollection;
 	sl::List<HidReportField> m_fieldList;
-	ReportMap m_reportMapTable[HidReportKind__Count];
+	sl::SimpleHashTable<uint_t, HidReport> m_reportMapTable[HidReportKind__Count];
 	uint_t m_flags;
 
 public:
@@ -592,9 +589,15 @@ public:
 		return m_flags;
 	}
 
-	const HidRdCollection*
+	const HidRdCollection&
 	getRootCollection() const {
-		return &m_rootCollection;
+		return m_rootCollection;
+	}
+
+	const sl::SimpleHashTable<uint_t, HidReport>&
+	getReportMap(HidReportKind reportKind) const {
+		ASSERT((size_t)reportKind < countof(m_reportMapTable));
+		return m_reportMapTable[reportKind];
 	}
 
 	const HidReport*

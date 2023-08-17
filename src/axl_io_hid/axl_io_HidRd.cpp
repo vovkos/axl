@@ -499,6 +499,8 @@ HidRd::parse(
 	}
 }
 
+//..............................................................................
+
 inline
 void
 incIndent(sl::String* indent) {
@@ -511,7 +513,6 @@ decIndent(sl::String* indent) {
 	ASSERT(indent->getLength() >= 4);
 	indent->overrideLength(indent->getLength() - 4);
 }
-
 
 inline
 void
@@ -529,10 +530,17 @@ printItem(
 		);
 }
 
+enum PrintFieldFlag {
+	PrintFieldFlag_Padding   = 0x01,
+	PrintFieldFlag_Report    = 0x02,
+	PrintFieldFlag_BitOffset = 0x04,
+};
+
 void
 printFieldArray(
 	sl::String* indent,
-	const sl::ArrayRef<const HidReportField*>& fieldArray
+	const sl::ArrayRef<const HidReportField*>& fieldArray,
+	uint_t flags
 ) {
 	size_t count = fieldArray.getCount();
 	for (size_t i = 0; i < count; i++) {
@@ -540,25 +548,29 @@ printFieldArray(
 		const HidUsagePage* page = field.getUsagePage();
 
 		if (field.isPadding()) {
-			printf(
-				"%sPadding (offset: %d bits, size: %d bits)\n",
-		    	indent->sz(),
-				field.getBitOffset(),
-				field.getBitCount()
-			);
+			if (flags & PrintFieldFlag_Padding)
+				printf("%sPadding: %d-bit\n", indent->sz(), field.getBitCount());
 
 			continue;
 		}
 
 		printf(
-			"%sField (%s, offset: %d bits, size: %d bits)\n",
+			(flags & PrintFieldFlag_BitOffset) ?
+				"%sField: %s %d-bit (offset: %d bits)\n" :
+				"%sField: %s %d-bit\n",
 	    	indent->sz(),
-			page->getName().sz(),
-			field.getBitOffset(),
-			field.getBitCount()
+			getHidReportKindString(field.getReport()->getReportKind()).sz(),
+			field.getBitCount(),
+			field.getBitOffset()
 		);
 
 		incIndent(indent);
+
+		printf(
+			"%sUsagePage: %s\n",
+			indent->sz(),
+			page->getName().sz()
+		);
 
 		if (field.isSet(HidRdItemId_Usage)) {
 			size_t auxUsageCount = field.getAuxUsageCount();
@@ -590,6 +602,10 @@ printFieldArray(
 		printItem(*indent, field, HidRdItemId_LogicalMaximum);
 		printItem(*indent, field, HidRdItemId_PhysicalMinimum);
 		printItem(*indent, field, HidRdItemId_PhysicalMaximum);
+
+		if (flags & PrintFieldFlag_Report)
+			printItem(*indent, field, HidRdItemId_ReportId);
+
 		printItem(*indent, field, HidRdItemId_ReportSize);
 		printItem(*indent, field, HidRdItemId_ReportCount);
 
@@ -602,20 +618,19 @@ printCollection(
 	sl::String* indent,
 	const HidRdCollection* collection
 ) {
+	const HidUsagePage* page = collection->getUsagePage();
+	uint_t usage = collection->getUsage();
+
 	printf(
-		"%sCollection (%s)\n",
+		"%sCollection: %s (%s: %s)\n",
 		indent->sz(),
-		getHidRdCollectionKindString(collection->getCollectionKind()).sz()
+		getHidRdCollectionKindString(collection->getCollectionKind()).sz(),
+		page->getName().sz(),
+		page->getUsageName(usage).sz()
 	);
 
 	incIndent(indent);
-
-	const HidUsagePage* page = collection->getUsagePage();
-	uint_t usage = collection->getUsage();
-	printf("%sUsagePage: %s\n", indent->sz(), page->getName().sz());
-	printf("%sUsage: %s\n", indent->sz(), page->getUsageName(usage).sz());
-	printFieldArray(indent, collection->getFieldArray());
-
+	printFieldArray(indent, collection->getFieldArray(), PrintFieldFlag_Report);
 	sl::ConstIterator<HidRdCollection> it = collection->getCollectionList().getHead();
 	for (; it; it++)
 		printCollection(indent, *it);
@@ -625,7 +640,7 @@ printCollection(
 
 void
 HidRd::printReports() const {
-	printf("HID RD (flags: 0x%x) Reports:\n", m_flags);
+	printf("HID RD Reports%s\n", (m_flags & HidRdFlag_HasReportId) ? " (with IDs)" : "");
 
 	sl::String indent(' ', 4);
 	for (uint_t i = 0; i < HidReportKind__Count; i++) {
@@ -634,16 +649,23 @@ HidRd::printReports() const {
 			const HidReport& report = it->m_value;
 
 			printf(
-				"%s%s (id: %d, size: %d bits / %d bytes)\n",
+				"%sReport: %s %d-bit (%d bytes)\n",
 				indent.sz(),
-				getHidReportKindString(report.m_reportKind).sz(),
-				report.m_reportId,
-				report.m_bitCount,
-				report.m_size
+				getHidReportKindString(report.getReportKind()).sz(),
+				report.getBitCount(),
+				report.getSize()
 			);
 
 			incIndent(&indent);
-			printFieldArray(&indent, report.m_fieldArray);
+
+			if (m_flags & HidRdFlag_HasReportId)
+				printf(
+					"%sReportId: %d\n",
+					indent.sz(),
+					report.getReportId()
+				);
+
+			printFieldArray(&indent, report.getFieldArray(), PrintFieldFlag_BitOffset | PrintFieldFlag_Padding);
 			decIndent(&indent);
 		}
 	}
@@ -651,14 +673,14 @@ HidRd::printReports() const {
 
 void
 HidRd::printCollections() const {
-	printf("HID RD (flags: 0x%x) Collections\n", m_flags);
+	printf("HID RD Collections%s\n", (getFlags() & HidRdFlag_HasReportId) ? " (with IDs)" : "");
 
 	sl::String indent(' ', 4);
-	sl::ConstIterator it = m_rootCollection.m_collectionList.getHead();
+	sl::ConstIterator it = m_rootCollection.getCollectionList().getHead();
 	for (; it; it++)
 		printCollection(&indent, *it);
 
-	printFieldArray(&indent, m_rootCollection.m_fieldArray);
+	printFieldArray(&indent, m_rootCollection.getFieldArray(), PrintFieldFlag_Report);
 }
 
 //..............................................................................

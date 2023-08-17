@@ -19,38 +19,29 @@ namespace io {
 //..............................................................................
 
 void
-HidRdParser::InitParseItemFuncTable::operator () (ParseItemFunc funcTable[]) const {
-	for (size_t i = 0; i < 256 >> 2; i++)
-		funcTable[i] = &HidRdParser::parseItem_default;
-
+HidRdParser::InitProcessItemFuncTable::operator () (ProcessItemFunc funcTable[]) const {
 	// main
 
-	funcTable[HidRdTag_Input >> 2]         = &HidRdParser::parseItem_input;
-	funcTable[HidRdTag_Output >> 2]        = &HidRdParser::parseItem_output;
-	funcTable[HidRdTag_Feature >> 2]       = &HidRdParser::parseItem_feature;
-	funcTable[HidRdTag_Collection >> 2]    = &HidRdParser::parseItem_collection;
-	funcTable[HidRdTag_CollectionEnd >> 2] = &HidRdParser::parseItem_collectionEnd;
+	funcTable[HidRdTag_Input >> 2]         = &HidRdParser::processItem_input;
+	funcTable[HidRdTag_Output >> 2]        = &HidRdParser::processItem_output;
+	funcTable[HidRdTag_Feature >> 2]       = &HidRdParser::processItem_feature;
+	funcTable[HidRdTag_Collection >> 2]    = &HidRdParser::processItem_collection;
+	funcTable[HidRdTag_CollectionEnd >> 2] = &HidRdParser::processItem_collectionEnd;
 
 	// global
 
-	funcTable[HidRdTag_UsagePage >> 2] = &HidRdParser::parseItem_usagePage;
-	funcTable[HidRdTag_Push >> 2]      = &HidRdParser::parseItem_push;
-	funcTable[HidRdTag_Pop >> 2]       = &HidRdParser::parseItem_pop;
-
-	// local
-
-	funcTable[HidRdTag_Usage >> 2]        = &HidRdParser::parseItem_usage;
-	funcTable[HidRdTag_UsageMinimum >> 2] = &HidRdParser::parseItem_usage;
-	funcTable[HidRdTag_UsageMaximum >> 2] = &HidRdParser::parseItem_usage;
+	funcTable[HidRdTag_UsagePage >> 2] = &HidRdParser::processItem_usagePage;
+	funcTable[HidRdTag_Push >> 2]      = &HidRdParser::processItem_push;
+	funcTable[HidRdTag_Pop >> 2]       = &HidRdParser::processItem_pop;
 }
 
-HidRdParser::ParseItemFunc
-HidRdParser::getParseItemFunc(HidRdTag tag) {
-	static ParseItemFunc funcTable[256 >> 2] = { 0 };
-	sl::callOnce(InitParseItemFuncTable(), funcTable);
+HidRdParser::ProcessItemFunc
+HidRdParser::getProcessItemFunc(HidRdTag tag) {
+	static ProcessItemFunc funcTable[256 >> 2] = { 0 };
+	sl::callOnce(InitProcessItemFuncTable(), funcTable);
 	return (size_t)tag < 256 ?
 		funcTable[(uint8_t)tag >> 2] :
-		&HidRdParser::parseItem_default;
+		NULL;
 }
 
 void
@@ -66,6 +57,7 @@ HidRdParser::parse(
 		uchar_t a = *p++;
 		HidRdTag tag = (HidRdTag)(a & ~0x03);
 		size_t size = sizeTable[a & 0x03];
+
 		uint32_t data;
 
 		HidRdItemId id = getHidRdTagItemId(tag);
@@ -78,30 +70,19 @@ HidRdParser::parse(
 			m_itemTable.set(id, data);
 		}
 
-		ParseItemFunc func = getParseItemFunc(tag);
-		(this->*func)(tag, data);
+		ProcessItemFunc func = getProcessItemFunc(tag);
+		if (func)
+			(this->*func)(tag, data);
+
 		p += size;
 	}
 }
 
 void
-HidRdParser::parseItem_default(
+HidRdParser::processItem_collection(
 	HidRdTag tag,
 	uint32_t data
 ) {
-	sl::StringRef tagString = getHidRdTagString(tag);
-	printf("%s%s: %d\n", m_indent.sz(), tagString.sz(), data);
-}
-
-void
-HidRdParser::parseItem_collection(
-	HidRdTag tag,
-	uint32_t data
-) {
-	sl::StringRef collectionString = getHidRdCollectionKindString((HidRdCollectionKind)data);
-	printf("%sCollection: %s\n", m_indent.sz(), collectionString.sz());
-	m_indent += "    ";
-
 	HidRdCollection* collection = new HidRdCollection;
 	collection->m_collectionKind = (HidRdCollectionKind)data;
 	collection->m_usagePage = getUsagePage();
@@ -111,66 +92,10 @@ HidRdParser::parseItem_collection(
 }
 
 void
-HidRdParser::parseItem_collectionEnd(
-	HidRdTag tag,
-	uint32_t data
-) {
-	size_t length = m_indent.getLength();
-	if (length >= 4)
-		m_indent.overrideLength(length - 4);
-
-	printf("%sCollectionEnd\n", m_indent.sz());
-	m_collectionStack.pop();
-}
-
-void
-HidRdParser::parseItem_usagePage(
-	HidRdTag tag,
-	uint32_t data
-) {
-	m_usagePage = m_db->getUsagePage(data);
-	m_itemTable.resetUsages();
-	printf("%sUsagePage: %s\n", m_indent.sz(), m_usagePage->getName().sz());
-}
-
-void
-HidRdParser::parseItem_usage(
-	HidRdTag tag,
-	uint32_t data
-) {
-	sl::StringRef tagString = getHidRdTagString(tag);
-	sl::StringRef usageString = getUsagePage()->getUsageName(data);
-	printf("%s%s: %s\n", m_indent.sz(), tagString.sz(), usageString.sz());
-}
-
-void
-HidRdParser::parseItem_push(
-	HidRdTag tag,
-	uint32_t data
-) {
-	m_stack.append(m_itemTable);
-}
-
-void
-HidRdParser::parseItem_pop(
-	HidRdTag tag,
-	uint32_t data
-) {
-	if (!m_stack.isEmpty()) {
-		m_itemTable = m_stack.getBackAndPop();
-		m_usagePage = NULL;
-	}
-}
-
-void
 HidRdParser::finalizeReportField(
 	HidReportKind reportKind,
 	uint_t valueFlags
 ) {
-	sl::StringRef reportKindString = getHidReportKindString(reportKind);
-	sl::String valueFlagsString = getHidRdValueFlagsString(valueFlags);
-	printf("%s%s: %s\n", m_indent.sz(), reportKindString.sz(), valueFlagsString.sz());
-
 	if (m_itemTable.isSet(HidRdItemId_ReportId))
 		m_rd->m_flags |= HidRdFlag_HasReportId;
 
