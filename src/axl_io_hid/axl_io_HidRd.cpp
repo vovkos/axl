@@ -510,8 +510,7 @@ incIndent(sl::String* indent) {
 inline
 void
 decIndent(sl::String* indent) {
-	ASSERT(indent->getLength() >= 4);
-	indent->overrideLength(indent->getLength() - 4);
+	indent->chop(4);
 }
 
 inline
