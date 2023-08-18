@@ -676,7 +676,7 @@ HidRd::printCollections() const {
 	printf("HID RD Collections%s\n", (getFlags() & HidRdFlag_HasReportId) ? " (with IDs)" : "");
 
 	sl::String indent(' ', 4);
-	sl::ConstIterator it = m_rootCollection.getCollectionList().getHead();
+	sl::ConstIterator<HidRdCollection> it = m_rootCollection.getCollectionList().getHead();
 	for (; it; it++)
 		printCollection(&indent, *it);
 
