@@ -483,7 +483,7 @@ HidRd::clear() {
 
 void
 HidRd::parse(
-	HidDb* db,
+	const HidDb* db,
 	const void* p,
 	size_t size
 ) {

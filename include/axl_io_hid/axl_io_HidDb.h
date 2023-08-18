@@ -62,16 +62,6 @@ public:
 		return m_name;
 	}
 
-	const sl::String&
-	getFileName() const {
-		return m_fileName;
-	}
-
-	const sl::String&
-	getFormat() const {
-		return m_format;
-	}
-
 	sl::String
 	getUsageName(uint_t usage) const;
 

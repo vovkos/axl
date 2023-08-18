@@ -164,6 +164,11 @@ public:
 		reset();
 	}
 
+	uint_t
+	getMask() const {
+		return m_mask;
+	}
+
 	bool
 	isSet(HidRdItemId id) const {
 		return (m_mask & (1 << id)) != 0;
@@ -611,7 +616,7 @@ public:
 
 	void
 	parse(
-		HidDb* db,
+		const HidDb* db,
 		const void* p,
 		size_t size
 	); // never fails

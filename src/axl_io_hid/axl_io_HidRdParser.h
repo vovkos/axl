@@ -39,7 +39,7 @@ protected:
 	};
 
 protected:
-	HidDb* m_db;
+	const HidDb* m_db;
 	HidRd* m_rd;
 	HidReport* m_report;
 	sl::Array<HidRdCollection*> m_collectionStack;
@@ -49,7 +49,7 @@ protected:
 
 public:
 	HidRdParser(
-		HidDb* db,
+		const HidDb* db,
 		HidRd* rd
 	);
 
@@ -146,7 +146,7 @@ protected:
 
 inline
 HidRdParser::HidRdParser(
-	HidDb* db,
+	const HidDb* db,
 	HidRd* rd
 ) {
 	ASSERT(db && rd);
