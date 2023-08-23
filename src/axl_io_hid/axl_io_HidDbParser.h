@@ -48,13 +48,14 @@ protected:
 
 protected:
 	HidDb* m_db;
+	HidDbLoader* m_loader;
 	HidUsagePage* m_page;
 
 public:
-	HidUsagePageDirIniParser(HidDb* db) {
-		m_db = db;
-		m_page = NULL;
-	}
+	HidUsagePageDirIniParser(
+		HidDb* db,
+		HidDbLoader* loader
+	);
 
 	~HidUsagePageDirIniParser() {
 		delete m_page;
@@ -78,6 +79,18 @@ protected:
 	bool
 	finalizePage();
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+HidUsagePageDirIniParser::HidUsagePageDirIniParser(
+	HidDb* db,
+	HidDbLoader* loader
+) {
+	m_db = db;
+	m_loader = loader;
+	m_page = NULL;
+}
 
 //..............................................................................
 

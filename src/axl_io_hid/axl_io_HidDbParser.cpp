@@ -29,7 +29,7 @@ HidUsagePageDirIniParser::onSection(const sl::StringRef& sectionName) {
 			return false;
 	}
 
-	m_page = new HidUsagePage(m_db);
+	m_page = new HidUsagePage(m_loader);
 	return true;
 }
 
