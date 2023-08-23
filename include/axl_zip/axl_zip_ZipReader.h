@@ -53,7 +53,7 @@ public:
 	}
 
 	bool
-	isOpen() {
+	isOpen() const {
 		return m_zip != NULL;
 	}
 
@@ -70,39 +70,39 @@ public:
 	);
 
 	size_t
-	getFileCount();
+	getFileCount() const;
 
 	sl::String
-	getFileName(size_t index);
+	getFileName(size_t index) const;
 
 	bool
 	getFileInfo(
 		size_t index,
 		ZipFileInfo* fileInfo,
 		sl::String* comment = NULL
-	);
+	) const;
 
 	bool
-	isDirectoryFile(size_t index);
+	isDirectoryFile(size_t index) const;
 
 	bool
-	isFileEncrypted(size_t index);
+	isFileEncrypted(size_t index) const;
 
 	bool
 	extractFileToMem(
 		size_t index,
 		void* p,
 		size_t size
-	);
+	) const;
 
 	bool
 	extractFileToMem(
 		size_t index,
 		sl::Array<char>* buffer
-	);
+	) const;
 
 	sl::Array<char>
-	extractFileToMem(size_t index) {
+	extractFileToMem(size_t index) const {
 		sl::Array<char> buffer;
 		extractFileToMem(index, &buffer);
 		return buffer;
@@ -112,7 +112,7 @@ public:
 	extractFileToFile(
 		size_t index,
 		const sl::StringRef& fileName
-	);
+	) const;
 };
 
 //..............................................................................

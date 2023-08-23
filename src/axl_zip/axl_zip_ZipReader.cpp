@@ -89,13 +89,13 @@ ZipReader::openMem(
 }
 
 size_t
-ZipReader::getFileCount() {
+ZipReader::getFileCount() const {
 	ASSERT(isOpen());
 	return mz_zip_reader_get_num_files(m_zip);
 }
 
 sl::String
-ZipReader::getFileName(size_t index) {
+ZipReader::getFileName(size_t index) const {
 	ASSERT(isOpen());
 	size_t size = mz_zip_reader_get_filename(m_zip, index, NULL, 0);
 
@@ -111,7 +111,7 @@ ZipReader::getFileInfo(
 	size_t index,
 	ZipFileInfo* fileInfo,
 	sl::String* comment
-) {
+) const {
 	ASSERT(isOpen());
 
 	mz_zip_archive_file_stat stat;
@@ -139,13 +139,13 @@ ZipReader::getFileInfo(
 }
 
 bool
-ZipReader::isDirectoryFile(size_t index) {
+ZipReader::isDirectoryFile(size_t index) const {
 	ASSERT(isOpen());
 	return mz_zip_reader_is_file_a_directory(m_zip, index) != 0;
 }
 
 bool
-ZipReader::isFileEncrypted(size_t index) {
+ZipReader::isFileEncrypted(size_t index) const {
 	ASSERT(isOpen());
 	return mz_zip_reader_is_file_encrypted(m_zip, index) != 0;
 }
@@ -155,7 +155,7 @@ ZipReader::extractFileToMem(
 	size_t index,
 	void* p,
 	size_t size
-) {
+) const {
 	ASSERT(isOpen());
 
 	char readBuffer[1024];
@@ -176,7 +176,7 @@ bool
 ZipReader::extractFileToMem(
 	size_t index,
 	sl::Array<char>* buffer
-) {
+) const {
 	ASSERT(isOpen());
 
 	mz_zip_archive_file_stat stat;
@@ -197,7 +197,7 @@ bool
 ZipReader::extractFileToFile(
 	size_t index,
 	const sl::StringRef& fileName
-) {
+) const {
 	ASSERT(isOpen());
 
 	mz_bool result = mz_zip_reader_extract_to_file(
