@@ -111,18 +111,19 @@ HidRdParser::finalizeReportField(
 	)
 		m_report = m_rd->getReport(reportKind, m_itemTable[HidRdItemId_ReportId]);
 
+	size_t bitCount = m_itemTable[HidRdItemId_ReportSize] * m_itemTable[HidRdItemId_ReportCount];
+
 	HidReportField* field = new HidReportField;
 	*(HidRdItemTable*)field = m_itemTable;
 	field->m_report = m_report;
 	field->m_usagePage = getUsagePage();
 	field->m_valueFlags = valueFlags;
-	field->m_bitOffset = m_report->m_bitCount;
-	field->m_bitCount = m_itemTable[HidRdItemId_ReportSize] * m_itemTable[HidRdItemId_ReportCount];
+	field->m_bitCount = bitCount;
 	m_rd->m_fieldList.insertTail(field);
 
 	getCollection()->m_fieldArray.append(field);
 	m_report->m_fieldArray.append(field);
-	m_report->m_bitCount += field->getBitCount();
+	m_report->m_bitCount += bitCount;
 
 	m_itemTable.resetLocals();
 }

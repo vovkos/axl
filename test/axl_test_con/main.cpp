@@ -7314,6 +7314,8 @@ testHid() {
 	};
 
 	bool result;
+	sl::Array<char> reportBuffer;
+	sl::String strings[4];
 
 	io::hidInit();
 
@@ -7408,15 +7410,26 @@ testHid() {
 	do {
 		io::HidRd rd;
 		rd.parse(&db, data, sizeof(data));
-
-		printf("<<<<<\n");
 		rd.printCollections();
-		printf("-----\n");
 		rd.printReports();
-		printf(">>>>>\n");
-	} while (0);
 
-	return;
+		printf("serializing/deserializing reports...\n");
+
+		for (size_t i = 0; i < io::HidReportKind__Count; i++) {
+			const sl::SimpleHashTable<uint_t, io::HidReport>& map = rd.getReportMap((io::HidReportKind)i);
+			sl::ConstMapIterator<uint_t, io::HidReport> it = map.getHead();
+			for (; it; it++) {
+				it->m_value.saveDecodeInfo(&reportBuffer);
+				enc::HexEncoding::encode(&strings[0], reportBuffer, reportBuffer.getCount(), enc::HexEncodingFlag_Multiline);
+				printf("%s\n", strings[0].sz());
+
+				io::HidStandaloneReport report;
+				report.loadDecodeInfo(&db, reportBuffer, reportBuffer.getCount());
+				report.print();
+			}
+		}
+
+	} while (0);
 
 	uint32_t units[] = {
 		0x0011,
@@ -7444,8 +7457,6 @@ testHid() {
 		printf("error: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
-
-	sl::String strings[4];
 
 	const char* path = NULL;
 
@@ -7517,12 +7528,26 @@ testHid() {
 
 		io::HidRd rd;
 		rd.parse(&db, buffer, readResult);
-
-		printf("<<<<<\n");
 		rd.printCollections();
-		printf("-----\n");
 		rd.printReports();
-		printf(">>>>>\n");
+
+		printf("serializing/deserializing reports...\n");
+
+		for (size_t i = 0; i < io::HidReportKind__Count; i++) {
+			const sl::SimpleHashTable<uint_t, io::HidReport>& map = rd.getReportMap((io::HidReportKind)i);
+			sl::ConstMapIterator<uint_t, io::HidReport> it = map.getHead();
+			for (; it; it++) {
+				it->m_value.saveDecodeInfo(&reportBuffer);
+				enc::HexEncoding::encode(&strings[0], reportBuffer, reportBuffer.getCount(), enc::HexEncodingFlag_Multiline);
+				printf("%s\n", strings[0].sz());
+
+				io::HidStandaloneReport report;
+				report.loadDecodeInfo(&db, reportBuffer, reportBuffer.getCount());
+				report.print();
+			}
+		}
+
+		printf(". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .\n");
 	}
 
 	if (!path)

@@ -21,7 +21,7 @@ namespace io {
 
 //..............................................................................
 
-struct HidRdParser {
+class HidRdParser {
 	friend class InitParseItemFuncTable;
 
 protected:

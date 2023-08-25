@@ -12,6 +12,7 @@
 #pragma once
 
 #include "axl_io_HidPch.h"
+#include "axl_enc_Leb128.h"
 
 #if (_AXL_OS_WIN)
 #	include "axl_sys_win_DeviceInfo.h"

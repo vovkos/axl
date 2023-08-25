@@ -18,8 +18,9 @@
 namespace axl {
 namespace io {
 
-class HidRdParser;
 class HidReport;
+class HidReportSerializer;
+class HidRdParser;
 
 //..............................................................................
 
@@ -356,12 +357,13 @@ getHidRdComplexUnitString(uint32_t unit);
 class HidReportField:
 	public sl::ListLink,
 	public HidRdItemTable {
+
 	friend class HidRdParser;
+	friend class HidReportSerializer;
 
 protected:
 	const HidReport* m_report;
 	const HidUsagePage* m_usagePage;
-	size_t m_bitOffset;
 	size_t m_bitCount;
 	uint_t m_valueFlags;
 
@@ -384,11 +386,6 @@ public:
 	}
 
 	size_t
-	getBitOffset() const {
-		return m_bitOffset;
-	}
-
-	size_t
 	getBitCount() const {
 		return m_bitCount;
 	}
@@ -405,7 +402,6 @@ inline
 HidReportField::HidReportField() {
 	m_report = NULL;
 	m_usagePage = NULL;
-	m_bitOffset = 0;
 	m_bitCount = 0;
 	m_valueFlags = 0;
 }
@@ -471,6 +467,15 @@ public:
 		return m_size = (m_bitCount + 7) / 8;
 	}
 
+	size_t
+	saveDecodeInfo(sl::Array<char>* buffer) const;
+
+	void
+	print() const;
+
+	void
+	print(sl::String* indent) const;
+
 	void
 	decode(const void* p) const; // at least m_size bytes expected
 };
@@ -484,6 +489,32 @@ HidReport::HidReport() {
 	m_bitCount = 0;
 	m_size = 0;
 }
+
+inline
+void
+HidReport::print() const {
+	char buffer[256];
+	sl::String indent(rc::BufKind_Stack, buffer, sizeof(buffer));
+	print(&indent);
+}
+
+
+//..............................................................................
+
+class HidStandaloneReport: public HidReport {
+	friend class HidReportSerializer;
+
+protected:
+	sl::List<HidReportField> m_fieldList;
+
+public:
+	void
+	loadDecodeInfo(
+		const HidDb* db,
+		const void* p,
+		size_t size
+	);
+};
 
 //..............................................................................
 

@@ -30,6 +30,8 @@ set(
 	axl_io_HidDb.cpp
 	axl_io_HidDbParser.h
 	axl_io_HidDbParser.cpp
+	axl_io_HidReportSerializer.h
+	axl_io_HidReportSerializer.cpp
 )
 
 source_group(
