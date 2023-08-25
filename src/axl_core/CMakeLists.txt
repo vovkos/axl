@@ -126,6 +126,7 @@ source_group(
 set(
 	SL_H_LIST
 	${AXL_INC_DIR}/axl_sl/axl_sl_ArgType.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_UnsignedType.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_Operator.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_Construct.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_Cmp.h
@@ -233,7 +234,6 @@ set(
 	axl_enc_EscapeEncoding.cpp
 	axl_enc_HexEncoding.cpp
 	axl_enc_Unicode.cpp
-	axl_enc_Leb128.cpp
 )
 
 source_group(
