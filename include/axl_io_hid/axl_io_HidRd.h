@@ -508,7 +508,7 @@ protected:
 	sl::List<HidReportField> m_fieldList;
 
 public:
-	void
+	size_t
 	loadDecodeInfo(
 		const HidDb* db,
 		const void* p,

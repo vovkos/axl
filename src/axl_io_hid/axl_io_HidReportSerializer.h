@@ -32,7 +32,7 @@ public:
 	);
 
 	static
-	void
+	size_t
 	loadReportDecodeInfo(
 		HidStandaloneReport* report,
 		const HidDb* db,

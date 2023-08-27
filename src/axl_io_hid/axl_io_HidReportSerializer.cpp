@@ -29,6 +29,7 @@ HidReportSerializer::saveReportDecodeInfo(
 	char* threshold = p + sizeof(block) / 2;
 
 	buffer->clear();
+	buffer->setCount(sizeof(uint16_t)); // max size of HID RD is 4096
 
 	p = enc::encodeUleb128(p, report.getReportKind());
 	p = enc::encodeUleb128(p, report.getReportId());
@@ -72,22 +73,34 @@ HidReportSerializer::saveReportDecodeInfo(
 		}
 	}
 
-	return buffer->append(block, p - block);
+	size_t size = buffer->append(block, p - block);
+	if (size > 0xffff) // can't fit, something wrong with HID RD
+		return err::fail<size_t>(-1, "invalid HID report descriptor size");
+
+	*(uint16_t*)buffer->p() = (uint16_t)size;
+	return size;
 }
 
-void
+size_t
 HidReportSerializer::loadReportDecodeInfo(
 	HidStandaloneReport* report,
 	const HidDb* db,
 	const void* p0,
 	size_t size
 ) {
-	const char* p = (char*)p0;
-	const char* end = p + size;
-
 	report->m_fieldArray.clear();
 	report->m_fieldList.clear();
 	report->m_bitCount = 0;
+
+	if (size < sizeof(uint16_t))
+		return err::fail<size_t>(-1, "invalid HID report decode info size");
+
+	size_t decodeInfoSize = *(const uint16_t*)p0;
+	if (decodeInfoSize > size)
+		return err::fail<size_t>(-1, "invalid HID report decode info");
+
+	const char* p = (char*)p0 + sizeof(uint16_t);
+	const char* end = (char*)p0 + decodeInfoSize;
 
 	p = enc::decodeUleb128(&report->m_reportKind, p, end);
 	p = enc::decodeUleb128(&report->m_reportId, p, end);
@@ -154,6 +167,9 @@ HidReportSerializer::loadReportDecodeInfo(
 	}
 
 	report->updateSize();
+
+	ASSERT(p - (char*)p0 == decodeInfoSize);
+	return decodeInfoSize;
 }
 
 //..............................................................................

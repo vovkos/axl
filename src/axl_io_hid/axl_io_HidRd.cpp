@@ -548,13 +548,13 @@ HidReport::saveDecodeInfo(sl::Array<char>* buffer) const {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-void
+size_t
 HidStandaloneReport::loadDecodeInfo(
 	const HidDb* db,
 	const void* p,
 	size_t size
 ) {
-	HidReportSerializer::loadReportDecodeInfo(this, db, p, size);
+	return HidReportSerializer::loadReportDecodeInfo(this, db, p, size);
 }
 
 void
