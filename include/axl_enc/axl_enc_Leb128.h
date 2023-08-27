@@ -26,7 +26,7 @@ encodeUleb128(
 	char* p,
 	T value0
 ) {
-	typedef sl::UnsignedType<T>::Type U;
+	typedef typename sl::UnsignedType<T>::Type U;
 
 	U value = value0; // should be an implicit lossless conversion
 
@@ -52,7 +52,7 @@ decodeUleb128(
 	const char* p,
 	const char* end
 ) {
-	typedef sl::UnsignedType<T>::Type U;
+	typedef typename sl::UnsignedType<T>::Type U;
 
 	U value = 0;
 	uint_t shift = 0;
@@ -77,7 +77,7 @@ decodeSleb128(
 	const char* p,
 	const char* end
 ) {
-	typedef sl::UnsignedType<T>::Type U;
+	typedef typename sl::UnsignedType<T>::Type U;
 
 	U value = 0;
 	uint_t shift = 0;
