@@ -41,6 +41,7 @@ HidReportSerializer::saveReportDecodeInfo(
 
 		uint_t mask = field.getMask();
 		p = enc::encodeUleb128(p, mask);
+		p = enc::encodeUleb128(p, field.getValueFlags());
 		p = enc::encodeUleb128(p, field[HidRdItemId_ReportSize]);
 		p = enc::encodeUleb128(p, field[HidRdItemId_ReportCount]);
 
@@ -107,10 +108,12 @@ HidReportSerializer::loadReportDecodeInfo(
 
 	while (p < end) {
 		uint_t mask;
+		uint_t valueFlags;
 		size_t reportSize;
 		size_t reportCount;
 
 		p = enc::decodeUleb128(&mask, p, end);
+		p = enc::decodeUleb128(&valueFlags, p, end);
 		p = enc::decodeUleb128(&reportSize, p, end);
 		p = enc::decodeUleb128(&reportCount, p, end);
 
@@ -125,6 +128,7 @@ HidReportSerializer::loadReportDecodeInfo(
 		field->m_table[HidRdItemId_ReportSize] = reportSize;
 		field->m_table[HidRdItemId_ReportCount] = reportCount;
 		field->m_bitCount = reportSize * reportCount;
+		field->m_valueFlags = valueFlags;
 		field->m_mask = mask & (
 			HidRdItemMask_ReportSize |
 			HidRdItemMask_ReportCount |
