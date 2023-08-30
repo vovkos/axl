@@ -72,7 +72,7 @@ HidUsagePage::getUsageName(uint_t usage) const {
 		return it->m_value;
 
 	if (m_format.isEmpty())
-		mutableSelf->m_format.format("%s 0x%%02x", m_name.sz());
+		mutableSelf->m_format = "Usage 0x%02x";
 
 	return sl::formatString(m_format.sz(), usage);
 }
