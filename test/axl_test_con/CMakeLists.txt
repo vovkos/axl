@@ -231,6 +231,15 @@ if(UNIX)
 			${IOKIT_FRAMEWORK}
 			${SECURITY_FRAMEWORK}
 		)
+
+		if(BUILD_AXL_IO_HID)
+			find_library(APPKIT_FRAMEWORK AppKit)
+			
+			target_link_libraries(
+				axl_test_con 
+				${APPKIT_FRAMEWORK}
+			)
+		endif()
 	else()
 		target_link_libraries(
 			axl_test_con
