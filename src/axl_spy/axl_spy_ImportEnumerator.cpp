@@ -535,7 +535,7 @@ ImportIterator::next() {
 				break;
 
 			case BIND_OPCODE_SET_DYLIB_ORDINAL_ULEB:
-				m_p += enc::uleb128(m_p, m_end - m_p, &uleb);
+				m_p = enc::decodeUleb128(&uleb, m_p, m_end);
 				m_moduleName = getDylibName(uleb);
 				break;
 
@@ -552,17 +552,17 @@ ImportIterator::next() {
 				break;
 
 			case BIND_OPCODE_SET_ADDEND_SLEB:
-				m_p += enc::sleb128(m_p, m_end - m_p, &sleb);
+				m_p = enc::decodeSleb128(&sleb, m_p, m_end);
 				break;
 
 			case BIND_OPCODE_SET_SEGMENT_AND_OFFSET_ULEB:
-				m_p += enc::uleb128(m_p, m_end - m_p, &uleb);
+				m_p = enc::decodeUleb128(&uleb, m_p, m_end);
 				m_segmentIdx = imm;
 				m_segmentOffset = uleb;
 				break;
 
 			case BIND_OPCODE_ADD_ADDR_ULEB:
-				m_p += enc::uleb128(m_p, m_end - m_p, &uleb);
+				m_p = enc::decodeUleb128(&uleb, m_p, m_end);
 				m_segmentOffset += uleb;
 				break;
 
@@ -572,7 +572,7 @@ ImportIterator::next() {
 				break;
 
 			case BIND_OPCODE_DO_BIND_ADD_ADDR_ULEB:
-				m_p += enc::uleb128(m_p, m_end - m_p, &uleb);
+				m_p = enc::decodeUleb128(&uleb, m_p, m_end);
 				bind();
 				m_segmentOffset += uleb + bindOffsetDelta;
 				break;
@@ -583,8 +583,8 @@ ImportIterator::next() {
 				break;
 
 			case BIND_OPCODE_DO_BIND_ULEB_TIMES_SKIPPING_ULEB:
-				m_p += enc::uleb128(m_p, m_end - m_p, &uleb);
-				m_p += enc::uleb128(m_p, m_end - m_p, &skip);
+				m_p = enc::decodeUleb128(&uleb, m_p, m_end);
+				m_p = enc::decodeUleb128(&skip, m_p, m_end);
 				skip += bindOffsetDelta;
 
 				for (uint64_t i = 0; i < uleb; i++) {
