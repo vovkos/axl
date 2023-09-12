@@ -49,6 +49,8 @@
 #include <QTableView>
 #include <QItemDelegate>
 #include <QLineEdit>
+#include <QSslSocket>
+#include <QSslCertificate>
 
 //..............................................................................
 
@@ -61,3 +63,5 @@
 using namespace axl;
 
 //..............................................................................
+
+#include <openssl/x509.h>

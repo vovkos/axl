@@ -83,10 +83,14 @@ source_group(
 
 include_directories(
 	${AXL_INC_DIR}
+	${OPENSSL_INC_DIR}
 	${GEN_DIR}
 )
 
-link_directories(${AXL_LIB_DIR})
+link_directories(
+	${AXL_LIB_DIR}
+	${OPENSSL_LIB_DIR}
+)
 
 add_definitions(
 	-DQT_COMPILING_QSTRING_COMPAT_CPP
@@ -101,7 +105,11 @@ add_executable(
 	${GEN_MOC_CPP_LIST}
 )
 
-qt5_use_modules_alt(axl_test_qt Widgets)
+qt5_use_modules_alt(
+	axl_test_qt
+	Widgets
+	Network
+)
 
 target_precompile_headers(
 	axl_test_qt
@@ -120,6 +128,7 @@ target_link_libraries(
 	axl_io
 	axl_mem_new
 	axl_core
+	${OPENSSL_CRYPTO_LIB_NAME}
 )
 
 if(UNIX)
