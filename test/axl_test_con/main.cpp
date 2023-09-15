@@ -6986,6 +6986,10 @@ enum {
 	PidSerialTap = 0x0e26,
 	VidCamera    = 0x046d,
 	PidCamera    = 0x092e,
+	VidMouse     = 0x14a5,
+	PidMouse     = 0xa011,
+	Vid = VidMouse,
+	Pid = PidMouse,
 };
 
 bool
@@ -7027,15 +7031,14 @@ testUsbMon() {
 		if (!it->m_serialNumberDescriptor.isEmpty())
 			printf("  serial number*: %s\n", it->m_serialNumberDescriptor.sz());
 
-		if (it->m_vendorId == VidSerialTap && it->m_productId == PidSerialTap ||
-			it->m_vendorId == VidCamera && it->m_productId == PidCamera)
+		if (it->m_vendorId == Vid && it->m_productId == Pid)
 			captureDevice = *it;
 
 		printf("\n");
 	}
 
 	if (!captureDevice) {
-		printf("Serial Tap or Logitech camera not found\n");
+		printf("Source device not found\n");
 		return false;
 	}
 
@@ -7654,8 +7657,8 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-#if (_AXL_IO_HID)
-	testHid();
+#if (_AXL_IO_USBMON)
+	testUsbMon();
 #endif
 	return 0;
 }
