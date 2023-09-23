@@ -7631,6 +7631,347 @@ testHid() {
 
 //..............................................................................
 
+#if (_AXL_OS_WIN && _AXL_IO_HID && _AXL_IO_USBMON)
+
+#include <initguid.h>
+#include <hidclass.h>
+
+void testSyncHidUsbMon() {
+	bool result;
+
+	do {
+		printf(
+			"---------------------------------------\n"
+			"Enumerating HIDAPI devices\n"
+			"---------------------------------------\n"
+		);
+
+		io::hidInit();
+
+		const char* dbFilePath = AXL_SHARE_DIR "/hid/hid-00-usage-page-dir.ini";
+		printf("Loading HID DB: %s\n", dbFilePath);
+
+		io::HidDb db;
+		result = db.load(dbFilePath);
+		if (!result) {
+			printf("Error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		printf("Enumerating HID devices...\n");
+		io::HidDeviceInfoList enumerator;
+		result = enumerator.enumerate();
+		if (!result) {
+			printf("error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		char buffer[4 * 1024];
+		sl::String strings[4];
+
+		io::HidDeviceInfoIterator it = enumerator.getHead();
+		for (; it; it++) {
+			const io::HidUsagePage* page = db.getUsagePage(it->usage_page);
+
+			printf(
+				"%s\n"
+				"    Bus:          %s\n"
+				"    VID:          %04x\n"
+				"    PID:          %04x\n"
+				"    Manufacturer: %s\n"
+				"    Product:      %s\n"
+				"    Serial:       %s\n"
+				"    Release:      %x\n"
+				"    Usage page:   %s\n"
+				"    Usage:        %s\n"
+				"    Interface:    %d\n"
+				"\n",
+				it->path,
+				io::getHidBusTypeString(it->bus_type),
+				it->vendor_id,
+				it->product_id,
+				(strings[0] = it->manufacturer_string).sz(),
+				(strings[1] = it->product_string).sz(),
+				(strings[2] = it->serial_number).sz(),
+				it->release_number,
+				page->getName().sz(),
+				page->getUsageName(it->usage).sz(),
+				it->interface_number
+			);
+
+			io::HidDevice device;
+			result = device.open(it->path);
+			if (!result)
+				continue;
+
+			size_t size = device.getReportDescriptor(buffer, sizeof(buffer));
+			printf("    Report descriptor:\n%s\n", enc::HexEncoding::encode(buffer, size, enc::HexEncodingFlag_Multiline).sz());
+		}
+	} while (0);
+
+	printf(
+		"---------------------------------------\n"
+		"Enumerating USBPCAP devices\n"
+		"---------------------------------------\n"
+	);
+
+	struct CaptureDevice {
+		io::UsbMonDeviceDesc m_deviceDesc;
+		sl::SimpleHashTable<uint_t, uint_t> m_ifaceToEpMap;
+	};
+
+	sl::SimpleHashTable<uint32_t, CaptureDevice> captureDeviceMap;
+
+	do {
+		sl::List<io::UsbMonDeviceDesc> deviceList;
+		io::enumerateUsbMonDevices(&deviceList, io::UsbDeviceStringId_All);
+		sl::ConstIterator<io::UsbMonDeviceDesc> it = deviceList.getHead();
+		for (size_t i = 0; it; it++, i++) {
+			printf("device #%d\n", i);
+			printf("  capture:        %s\n", it->m_captureDeviceName.sz());
+			printf("  address:        %d\n", it->m_address);
+			printf("  VID:            %04x\n", it->m_vendorId);
+			printf("  PID:            %04x\n", it->m_productId);
+			printf("  class:          %d\n", it->m_class);
+			printf("  subclass:       %d\n", it->m_subClass);
+			printf("  speed:          %s\n", io::getUsbSpeedString((libusb_speed)it->m_speed));
+
+			if (!it->m_description.isEmpty())
+				printf("  description:    %s\n", it->m_description.sz());
+
+			if (!it->m_manufacturer.isEmpty())
+				printf("  manufacturer:   %s\n", it->m_manufacturer.sz());
+
+			if (!it->m_driver.isEmpty())
+				printf("  driver:         %s\n", it->m_driver.sz());
+
+			if (!it->m_manufacturerDescriptor.isEmpty())
+				printf("  manufacturer*:  %s\n", it->m_manufacturerDescriptor.sz());
+
+			if (!it->m_productDescriptor.isEmpty())
+				printf("  product*:       %s\n", it->m_productDescriptor.sz());
+
+			if (!it->m_serialNumberDescriptor.isEmpty())
+				printf("  serial number*: %s\n", it->m_serialNumberDescriptor.sz());
+
+			printf("  devInst:        0x%04x\n", it->m_devInst);
+
+			CaptureDevice* captureDevice = &captureDeviceMap[it->m_devInst];
+			captureDevice->m_deviceDesc = **it;
+
+			printf(
+				"  Configuration descriptor:\n%s\n",
+				enc::HexEncoding::encode(
+					it->m_configDescriptor.cp(),
+					it->m_configDescriptor.getCount(),
+					enc::HexEncodingFlag_Multiline
+				).sz()
+			);
+
+			const char* p = it->m_configDescriptor.cp();
+			const char* end = it->m_configDescriptor.getEnd();
+
+			uint_t ifaceId = 0;
+
+			while (p < end) {
+				uchar_t length = p[0];
+				uchar_t descriptorType = p[1];
+
+				union {
+					const void* m_p;
+					const USB_CONFIGURATION_DESCRIPTOR* m_configDesc;
+					const USB_INTERFACE_DESCRIPTOR* m_ifaceDesc;
+					const USB_ENDPOINT_DESCRIPTOR* m_epDesc;
+				} desc = { p };
+
+				switch (descriptorType) {
+				case USB_INTERFACE_DESCRIPTOR_TYPE:
+					printf("iface #%d\n", desc.m_ifaceDesc->bInterfaceNumber);
+					ifaceId = desc.m_ifaceDesc->bInterfaceNumber;
+					break;
+
+				case USB_ENDPOINT_DESCRIPTOR_TYPE:
+					printf(
+						"  ep 0x%02x (type %d)\n", desc.m_epDesc->bEndpointAddress, (desc.m_epDesc->bmAttributes & USB_ENDPOINT_TYPE_MASK));
+
+					if ((desc.m_epDesc->bEndpointAddress & 0x80) &&
+						(desc.m_epDesc->bmAttributes & USB_ENDPOINT_TYPE_MASK) == USB_ENDPOINT_TYPE_INTERRUPT
+					) {
+						sl::MapIterator<uint_t, uint_t> it2 = captureDevice->m_ifaceToEpMap.visit(ifaceId);
+						if (!it2->m_value)
+							it2->m_value = desc.m_epDesc->bEndpointAddress;
+					}
+
+					break;
+				}
+
+				p += length;
+			}
+
+			printf("\n");
+		}
+	} while (0);
+
+	printf(
+		"---------------------------------------\n"
+		"Enumerating HID devices\n"
+		"---------------------------------------\n"
+	);
+
+	sys::win::DeviceInfoSet allDeviceInfoSet;
+	allDeviceInfoSet.create();
+
+	sys::win::DeviceInfoSet deviceInfoSet;
+	deviceInfoSet.create(GUID_DEVINTERFACE_HID, DIGCF_DEVICEINTERFACE | DIGCF_PRESENT);
+
+	sl::String indent;
+	sl::String string;
+	sl::String_w instanceId;
+	sl::String_w hardwareId;
+	sl::String_w interfacePath;
+
+	for (size_t i = 0;; i++) {
+		sys::win::DeviceInfo deviceInfo;
+		result = deviceInfoSet.getDeviceInfo(i, &deviceInfo);
+		if (!result)
+			break;
+
+		instanceId.clear();
+		deviceInfo.getDeviceInstanceId(&instanceId);
+		printf("Instance: %S\n", instanceId.sz());
+
+		string.clear();
+		deviceInfo.getDeviceRegistryProperty(SPDRP_MFG, &string);
+		printf("Vendor: %s\n", string.sz());
+
+		string.clear();
+		deviceInfo.getDeviceRegistryProperty(SPDRP_FRIENDLYNAME, &string);
+		if (string.isEmpty())
+			deviceInfo.getDeviceRegistryProperty(SPDRP_DEVICEDESC, &string);
+
+		printf("Product: %s\n", string.sz());
+
+		string.clear();
+		deviceInfo.getDeviceDriverPath(&string);
+		printf("Driver: %s\n", string.sz());
+
+		hardwareId.clear();
+		deviceInfo.getDeviceRegistryProperty(SPDRP_HARDWAREID, &hardwareId);
+
+		uchar_t interfaceId = 0;
+		bool hasInterfaceId = false;
+
+		printf("Hardware IDs\n", string.sz());
+		const wchar_t* p = hardwareId.cp();
+		while (p < hardwareId.getEnd() && *p) {
+			if (!hasInterfaceId) {
+				static const wchar_t token[] = L"&MI_";
+				const wchar_t* p2 = wcsstr(p, token);
+				if (p2) {
+					interfaceId = wcstoul(p2 + lengthof(token), NULL, 16);
+					hasInterfaceId = true;
+				}
+			}
+
+			printf("    %S\n", p);
+			p += wcslen(p) + 1;
+		}
+
+		SP_DEVICE_INTERFACE_DATA ifaceData = { 0 };
+		ifaceData.cbSize = sizeof(SP_DEVICE_INTERFACE_DATA);
+
+		result =
+			deviceInfo.enumDeviceInterfaces(GUID_DEVINTERFACE_HID, 0, &ifaceData) &&
+			deviceInfo.getDeviceInterfacePath(&ifaceData, &interfacePath);
+
+		printf("USB interface: #%d\n", interfaceId);
+		printf("HID interface: %S\n", interfacePath.sz());
+
+		DEVINST devInst = deviceInfo.getDevInfoData()->DevInst;
+		printf("DEVINST: 0x%04x\n", devInst);
+
+		indent = "    ";
+
+		::CM_Get_Parent(&devInst, devInst, 0);
+		while (devInst) {
+			printf("%sDEVINST: 0x%04x\n", indent.sz(), devInst);
+			sys::win::DeviceInfo deviceInfo2;
+			result = allDeviceInfoSet.findDeviceInfoByDevInst(devInst, &deviceInfo2);
+			if (result) {
+				string.clear();
+				deviceInfo2.getDeviceInstanceId(&string);
+				printf("%sInstance: %s\n", indent.sz(), string.sz());
+
+				string.clear();
+				deviceInfo2.getDeviceRegistryProperty(SPDRP_MFG, &string);
+				printf("%sVendor: %s\n", indent.sz(), string.sz());
+
+				string.clear();
+				deviceInfo2.getDeviceRegistryProperty(SPDRP_FRIENDLYNAME, &string);
+				if (string.isEmpty())
+					deviceInfo2.getDeviceRegistryProperty(SPDRP_DEVICEDESC, &string);
+
+				printf("%sProduct: %s\n", indent.sz(), string.sz());
+
+				string.clear();
+				deviceInfo2.getDeviceDriverPath(&string);
+				printf("%sDriver: %s\n", indent.sz(), string.sz());
+			}
+
+			sl::ConstMapIterator<uint32_t, CaptureDevice> it = captureDeviceMap.find(devInst);
+			if (it) {
+				printf("%sCapture device: %s\n", indent.sz(), it->m_value.m_deviceDesc.m_captureDeviceName.sz());
+				uint_t ep = it->m_value.m_ifaceToEpMap.findValue(interfaceId, 0);
+				if (ep)
+					printf("%sEP filter: 0x%02x\n", indent.sz(), ep);
+				else
+					printf("%sNO EP filter\n", indent.sz());
+
+				break;
+			}
+
+			::CM_Get_Parent(&devInst, devInst, 0);
+			indent += "    ";
+		}
+
+		io::win::File file;
+		result = file.create(interfacePath, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING);
+		if (!result) {
+			printf("Can't open: %s\n", err::getLastErrorDescription().sz());
+			continue;
+		}
+
+		_HIDP_PREPARSED_DATA* preparsedData = NULL;
+		HidD_GetPreparsedData(file, &preparsedData);
+		if (!preparsedData) {
+			printf("Can't open: %s\n", err::getLastErrorDescription().sz());
+			continue;
+		}
+
+		char buffer[4 * 1024];
+		int size = hid_winapi_descriptor_reconstruct_pp_data(preparsedData, (uchar_t*)buffer, sizeof(buffer));
+		HidD_FreePreparsedData(preparsedData);
+
+		if (size == -1) {
+			printf("Can't restore preparsed data: %s\n", err::getLastErrorDescription().sz());
+			continue;
+		}
+
+		printf(
+			"Report descriptor:\n%s\n\n",
+			enc::HexEncoding::encode(
+				buffer,
+				size,
+				enc::HexEncodingFlag_Multiline
+			).sz()
+		);
+	}
+}
+
+#endif
+
+//..............................................................................
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -7657,9 +7998,10 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-#if (_AXL_IO_USBMON)
-	testUsbMon();
+#if (_AXL_OS_WIN && _AXL_IO_HID && _AXL_IO_USBMON)
+	testSyncHidUsbMon();
 #endif
+
 	return 0;
 }
 

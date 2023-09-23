@@ -148,6 +148,10 @@ using namespace axl;
 #if (_AXL_OS_WIN)
 #	include <ws2tcpip.h>
 #	include <iphlpapi.h>
+#	include <cfgmgr32.h>
+#	include <usbioctl.h>
+#	include <usb.h>
+
 #	pragma comment(lib, "ws2_32.lib")
 #	pragma comment(lib, "iphlpapi.lib")
 #	pragma comment(lib, "wintrust.lib")
@@ -167,6 +171,11 @@ using namespace axl;
 extern "C" {
 #	include <libusb-1.0/libusb.h>
 } // extern "C" {
+#endif
+
+#if (_AXL_IO_HID && _AXL_OS_WIN)
+#	include <hidsdi.h>
+#	pragma comment(lib, "hid.lib")
 #endif
 
 //..............................................................................

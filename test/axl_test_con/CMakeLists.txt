@@ -234,9 +234,9 @@ if(UNIX)
 
 		if(BUILD_AXL_IO_HID)
 			find_library(APPKIT_FRAMEWORK AppKit)
-			
+
 			target_link_libraries(
-				axl_test_con 
+				axl_test_con
 				${APPKIT_FRAMEWORK}
 			)
 		endif()
