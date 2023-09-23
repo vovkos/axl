@@ -341,6 +341,7 @@ UsbPcapDeviceEnumerator::createDevice(
 	device->m_manufacturerDescriptorId = connectionInfo.DeviceDescriptor.iManufacturer;
 	device->m_productDescriptorId = connectionInfo.DeviceDescriptor.iProduct;
 	device->m_serialNumberDescriptorId = connectionInfo.DeviceDescriptor.iSerialNumber;
+	device->m_devInst = deviceInfo.getDevInfoData()->DevInst;
 
 	device->queryStrings(
 		&m_hubDb,

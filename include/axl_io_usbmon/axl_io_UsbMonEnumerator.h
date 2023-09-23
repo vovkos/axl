@@ -21,7 +21,7 @@ namespace io {
 //..............................................................................
 
 enum UsbMonEnumFlag {
-	UsbMonEnumFlag_Hubs = UsbEnumFlag_Hubs
+	UsbMonEnumFlag_Hubs = UsbEnumFlag_Hubs,
 
 	// can be or-ed with UsbDeviceStringId
 };
@@ -46,6 +46,10 @@ struct UsbMonDeviceDesc:
 	uint8_t m_manufacturerDescriptorId;
 	uint8_t m_productDescriptorId;
 	uint8_t m_serialNumberDescriptorId;
+
+#if (_AXL_OS_WIN)
+	dword_t m_devInst;
+#endif
 };
 
 //..............................................................................
