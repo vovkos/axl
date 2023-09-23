@@ -69,6 +69,8 @@ DeviceInfo::getDeviceInterfacePath(
 ) {
 	dword_t size = 0;
 	::SetupDiGetDeviceInterfaceDetailW(m_devInfoSet, ifaceData, NULL, 0, &size, &m_devInfoData);
+	if (size < sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA_W))
+		return err::failWithLastSystemError();
 
 	sl::Array<char> buffer;
 	bool_t result = buffer.setCount(size);

@@ -276,8 +276,8 @@ DeviceInfo::getDeviceInterfacePath(
 	sl::StringBase<T>* path
 ) {
 	sl::String_w driverPath;
-	getDeviceInterfacePath(&driverPath);
-	*string = driverPath;
+	getDeviceInterfacePath(ifaceData, &driverPath);
+	*path = driverPath;
 	return true;
 }
 
