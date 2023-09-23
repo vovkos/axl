@@ -35,11 +35,27 @@ class UsbHub:
 	public io::win::File {
 public:
 	bool
+	getConfigurationDescriptor(
+		sl::Array<char>* descriptor,
+		uint_t port
+	);
+
+	bool
 	getStringDescriptor(
 		sl::String_w* string,
 		uint_t port,
 		uchar_t descriptorId,
 		ushort_t languageId
+	);
+
+protected:
+	size_t
+	getDescriptorImpl(
+		void* p, // at least sizeof(USB_DESCRIPTOR_REQUEST) + length
+		uint_t port,
+		ushort_t value,
+		ushort_t index,
+		ushort_t length
 	);
 };
 

@@ -76,6 +76,7 @@ enum UsbDeviceStringId {
 	UsbDeviceStringId_ManufacturerDescriptor = 0x08,
 	UsbDeviceStringId_ProductDescriptor      = 0x10,
 	UsbDeviceStringId_SerialNumberDescriptor = 0x20,
+	UsbDeviceStringId_ConfigDescriptor       = 0x40,
 
 	UsbDeviceStringId_Database =
 		UsbDeviceStringId_Description |
@@ -85,7 +86,8 @@ enum UsbDeviceStringId {
 	UsbDeviceStringId_Descriptors =
 		UsbDeviceStringId_ManufacturerDescriptor |
 		UsbDeviceStringId_ProductDescriptor |
-		UsbDeviceStringId_SerialNumberDescriptor,
+		UsbDeviceStringId_SerialNumberDescriptor |
+		UsbDeviceStringId_ConfigDescriptor,
 
 	UsbDeviceStringId_All =
 		UsbDeviceStringId_Database |
@@ -101,6 +103,7 @@ struct UsbDeviceStrings {
 	sl::String m_manufacturerDescriptor;
 	sl::String m_productDescriptor;
 	sl::String m_serialNumberDescriptor;
+	sl::Array<char> m_configDescriptor;
 
 #if (_AXL_OS_WIN)
 	bool

@@ -25,6 +25,81 @@ namespace win {
 
 //..............................................................................
 
+size_t
+UsbHub::getDescriptorImpl(
+	void* p, // must be big enough
+	uint_t port,
+	ushort_t value,
+	ushort_t index,
+	ushort_t length
+) {
+	USB_DESCRIPTOR_REQUEST* req = (USB_DESCRIPTOR_REQUEST*)p;
+	req->SetupPacket.wValue = value;
+	req->SetupPacket.wIndex = index;
+	req->SetupPacket.wLength = length;
+	req->ConnectionIndex = port;
+
+	dword_t offset = offsetof(USB_DESCRIPTOR_REQUEST, Data);
+	dword_t size = offset + length;
+	dword_t actualSize;
+
+	bool result = ioctl(
+		IOCTL_USB_GET_DESCRIPTOR_FROM_NODE_CONNECTION,
+		p,
+		size,
+		p,
+		size,
+		&actualSize
+	);
+
+	return result ? actualSize : -1;
+}
+
+bool
+UsbHub::getConfigurationDescriptor(
+	sl::Array<char>* descriptor,
+	uint_t port
+) {
+	char buffer0[sizeof(USB_DESCRIPTOR_REQUEST) + sizeof(USB_CONFIGURATION_DESCRIPTOR)] = { 0 };
+
+	size_t result = getDescriptorImpl(
+		buffer0,
+		port,
+		USB_CONFIGURATION_DESCRIPTOR_TYPE << 8,
+		0,
+		sizeof(USB_CONFIGURATION_DESCRIPTOR)
+	);
+
+	if (result == -1)
+		return false;
+
+	USB_CONFIGURATION_DESCRIPTOR* configDesc = (USB_CONFIGURATION_DESCRIPTOR*)(((USB_DESCRIPTOR_REQUEST*)buffer0)->Data);
+	if (result < offsetof(USB_DESCRIPTOR_REQUEST, Data) + sizeof(USB_CONFIGURATION_DESCRIPTOR) ||
+		configDesc->bDescriptorType != USB_CONFIGURATION_DESCRIPTOR_TYPE ||
+		configDesc->wTotalLength < sizeof(USB_CONFIGURATION_DESCRIPTOR)
+	)
+		return err::fail("invalid USB_CONFIGURATION_DESCRIPTOR");
+
+	size_t size = offsetof(USB_DESCRIPTOR_REQUEST, Data) + configDesc->wTotalLength;
+	descriptor->setCount(size + 1);
+
+	result = getDescriptorImpl(
+		descriptor->p(),
+		port,
+		USB_CONFIGURATION_DESCRIPTOR_TYPE << 8,
+		0,
+		descriptor->getCount()
+	);
+
+	if (result == -1)
+		return false;
+
+	ASSERT(result == size);
+	descriptor->setCount(result);
+	descriptor->remove(0, offsetof(USB_DESCRIPTOR_REQUEST, Data));
+	return true;
+}
+
 bool
 UsbHub::getStringDescriptor(
 	sl::String_w* string,
@@ -38,34 +113,37 @@ UsbHub::getStringDescriptor(
 		MAXIMUM_USB_STRING_LENGTH
 	] = { 0 };
 
-	USB_DESCRIPTOR_REQUEST* req = (USB_DESCRIPTOR_REQUEST*)buffer;
-	USB_STRING_DESCRIPTOR* desc = (USB_STRING_DESCRIPTOR*)req->Data;
-
-	req->SetupPacket.wValue = (USB_STRING_DESCRIPTOR_TYPE << 8) | descriptorId;
-	req->SetupPacket.wIndex = languageId;
-	req->SetupPacket.wLength = sizeof(buffer) - sizeof(USB_DESCRIPTOR_REQUEST);
-	req->ConnectionIndex = port;
-
-	dword_t actualSize;
-	bool result = ioctl(
-		IOCTL_USB_GET_DESCRIPTOR_FROM_NODE_CONNECTION,
+	size_t result = getDescriptorImpl(
 		buffer,
-		sizeof(buffer),
-		buffer,
-		sizeof(buffer),
-		&actualSize
+		port,
+		(USB_STRING_DESCRIPTOR_TYPE << 8) | descriptorId,
+		languageId,
+		sizeof(USB_STRING_DESCRIPTOR)
 	);
 
-	if (!result)
+	if (result == -1)
 		return false;
 
-	if (desc->bDescriptorType != USB_STRING_DESCRIPTOR_TYPE ||
-		desc->bLength + sizeof(USB_DESCRIPTOR_REQUEST) > actualSize ||
-		(desc->bLength & 1)
+	USB_STRING_DESCRIPTOR* stringDesc = (USB_STRING_DESCRIPTOR*)(((USB_DESCRIPTOR_REQUEST*)buffer)->Data);
+	if (stringDesc->bDescriptorType != USB_STRING_DESCRIPTOR_TYPE ||
+		stringDesc->bLength < offsetof(USB_STRING_DESCRIPTOR, bString)
 	)
-		return err::fail(err::SystemErrorCode_InvalidDeviceState);
+		return err::fail("invalid USB_CONFIGURATION_DESCRIPTOR");
 
-	string->copy(desc->bString, desc->bLength / sizeof(wchar_t));
+	size_t length = (stringDesc->bLength - offsetof(USB_STRING_DESCRIPTOR, bString)) / sizeof(wchar_t);
+
+	result = getDescriptorImpl(
+		buffer,
+		port,
+		(USB_STRING_DESCRIPTOR_TYPE << 8) | descriptorId,
+		languageId,
+		offsetof(USB_DESCRIPTOR_REQUEST, Data) + stringDesc->bLength
+	);
+
+	if (result == -1)
+		return false;
+
+	string->copy(stringDesc->bString, length);
 	return true;
 }
 

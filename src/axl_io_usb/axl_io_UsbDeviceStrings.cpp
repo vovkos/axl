@@ -205,6 +205,9 @@ UsbDeviceStrings::queryStrings(
 			if (result)
 				m_serialNumberDescriptor = *string;
 		}
+
+		if (mask & UsbDeviceStringId_ConfigDescriptor)
+			hub->getConfigurationDescriptor(&m_configDescriptor, port);
 	}
 
 	return true;
