@@ -13,6 +13,7 @@
 
 #define _AXL_SYS_WIN_DEVICEINFO_H
 
+#include "axl_sys_win_SetupApiPch.h"
 #include "axl_sys_win_Registry.h"
 #include "axl_err_Error.h"
 

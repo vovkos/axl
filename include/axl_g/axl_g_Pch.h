@@ -220,7 +220,6 @@
 #	include <winsock2.h>
 #	include <oleauto.h>
 #	include <shellapi.h>
-#	include <setupapi.h>
 #	include <crtdbg.h>
 #	include <intrin.h>
 #elif (_AXL_OS_POSIX)

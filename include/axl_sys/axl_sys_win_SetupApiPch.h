@@ -11,21 +11,8 @@
 
 #pragma once
 
+#define _AXL_SYS_SETUPAPIPCH_H
+
 #include "axl_g_Pch.h"
 
-#if (_AXL_OS_WIN)
-#	include "axl_sys_win_SetupApiPch.h"
-#	include "axl_sys_win_CfgMgrPch.h"
-#	include <sddl.h>
-#	include <wintrust.h>
-#	include <wincrypt.h>
-#	include <softpub.h>
-#elif (_AXL_OS_DARWIN)
-#	include <mach/mach.h>
-#	include <mach/mach_time.h>
-#	include <CoreFoundation/CoreFoundation.h>
-#	include <IOKit/IOBSD.h>
-#	include <IOKit/IOKitLib.h>
-#	include <IOKit/serial/IOSerialKeys.h>
-#	include <IOKit/serial/ioss.h>
-#endif
+#include <setupapi.h>
