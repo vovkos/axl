@@ -1668,8 +1668,8 @@ getUsbStringDescriptorText(
 	sl::String text;
 	bool result = device->getStringDescriptorAscii(&text, index) != -1;
 	return result ?
-		sl::formatString("%d - %s", index, text.sz()) :
-		sl::formatString("%d - error: %s", index, err::getLastErrorDescription().sz());
+		sl::formatString("%s", text.sz()) :
+		sl::formatString("error: %s", err::getLastErrorDescription().sz());
 }
 
 void
@@ -8065,8 +8065,8 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-#if (0 && _AXL_OS_WIN && _AXL_IO_HID && _AXL_IO_USBMON)
-	testSyncHidUsbMon();
+#if (_AXL_OS_WIN && _AXL_IO_HID && _AXL_IO_USBMON)
+//	testSyncHidUsbMon();
 #endif
 
 #if (_AXL_IO_USB)
