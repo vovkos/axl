@@ -61,20 +61,6 @@ WinErrorProvider::getErrorDescription(dword_t code) {
 
 //..............................................................................
 
-size_t
-WinError::create(dword_t code) {
-	err::ErrorHdr* error = createBuffer(sizeof(err::ErrorHdr));
-	if (!error)
-		return -1;
-
-	error->m_size = sizeof(err::ErrorHdr);
-	error->m_guid = g_winErrorGuid;
-	error->m_code = code;
-	return sizeof(err::ErrorHdr);
-}
-
-//..............................................................................
-
 } // namespace win
 } // namespace err
 } // namespace axl

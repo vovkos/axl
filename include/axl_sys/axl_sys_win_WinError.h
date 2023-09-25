@@ -53,7 +53,9 @@ public:
 	}
 
 	size_t
-	create(dword_t code);
+	create(dword_t code) {
+		return createSimpleError(g_winErrorGuid, code);
+	}
 };
 
 //..............................................................................
