@@ -17,6 +17,7 @@
 #if (_AXL_OS_WIN)
 #	include "axl_sys_win_WinError.h"
 #	include "axl_sys_win_NtStatus.h"
+#	include "axl_sys_win_CfgMgrError.h"
 #elif (_AXL_OS_DARWIN)
 #	include "axl_sys_drw_MachError.h"
 #endif
@@ -36,6 +37,7 @@ ErrorMgr::ErrorMgr() {
 #if (_AXL_OS_WIN)
 	registerProvider(sys::win::g_winErrorGuid, sl::getSimpleSingleton<sys::win::WinErrorProvider> ());
 	registerProvider(sys::win::g_ntStatusGuid, sl::getSimpleSingleton<sys::win::NtStatusProvider> ());
+	registerProvider(sys::win::g_cfgMgrErrorGuid, sl::getSimpleSingleton<sys::win::CfgMgrErrorProvider> ());
 #elif (_AXL_OS_DARWIN)
 	registerProvider(sys::drw::g_MachErrorGuid, sl::getSimpleSingleton<sys::drw::MachErrorProvider> ());
 #endif

@@ -317,6 +317,8 @@ set(
 	${AXL_INC_DIR}/axl_sys/axl_sys_win_Service.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_win_ServiceMgr.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_win_DeviceInfo.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_CfgMgr.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_CfgMgrError.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_win_Process.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_win_AccessToken.h
 	${AXL_INC_DIR}/axl_sys/axl_sys_win_Sid.h
@@ -342,6 +344,8 @@ set(
 	axl_sys_win_Service.cpp
 	axl_sys_win_ServiceMgr.cpp
 	axl_sys_win_DeviceInfo.cpp
+	axl_sys_win_CfgMgr.cpp
+	axl_sys_win_CfgMgrError.cpp
 	axl_sys_win_Process.cpp
 	axl_sys_win_AccessToken.cpp
 	axl_sys_win_Sid.cpp
@@ -469,6 +473,8 @@ set(
 	PCH_H_LIST
 	${PCH_H}
 	${AXL_INC_DIR}/axl_g/axl_g_Pch.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_SetupApiPch.h
+	${AXL_INC_DIR}/axl_sys/axl_sys_win_CfgMgrPch.h
 )
 
 source_group(
