@@ -130,6 +130,7 @@
 #	include "axl_sys_win_NtStatus.h"
 #	include "axl_sys_win_Authenticode.h"
 #	include "axl_sys_win_DeviceInfo.h"
+#	include <axl_sys_win_CfgMgr.h>
 #elif (_AXL_OS_POSIX)
 #	include "axl_io_psx_Mapping.h"
 #	include "axl_io_psx_Pty.h"
@@ -148,7 +149,6 @@ using namespace axl;
 #if (_AXL_OS_WIN)
 #	include <ws2tcpip.h>
 #	include <iphlpapi.h>
-#	include <cfgmgr32.h>
 #	include <usbioctl.h>
 #	include <usb.h>
 
@@ -156,6 +156,7 @@ using namespace axl;
 #	pragma comment(lib, "iphlpapi.lib")
 #	pragma comment(lib, "wintrust.lib")
 #	pragma comment(lib, "crypt32.lib")
+#	pragma comment(lib, "cfgmgr32.lib")
 #elif (_AXL_OS_POSIX)
 #	include <netdb.h>
 #	include <signal.h>

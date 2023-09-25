@@ -7210,6 +7210,50 @@ testUsbEnum2() {
 	io::registerUsbErrorProvider();
 	io::getUsbDefaultContext()->createDefault();
 
+	printf("ENUMERATING WITH LIBUSB\n");
+	printf("=======================\n");
+
+	do {
+		io::UsbDeviceList list;
+		list.enumerateDevices();
+
+		libusb_device** pp = list;
+		for (size_t i = 0; *pp; pp++) {
+			bool result;
+
+			io::UsbDevice device;
+			device.setDevice(*pp);
+
+			libusb_device_descriptor deviceDescriptor;
+			result = device.getDeviceDescriptor(&deviceDescriptor);
+
+			if (deviceDescriptor.bDeviceClass == 9) // hub
+				continue;
+
+			printf("device #%d\n", i++);
+			printf("  bus:            %d\n", device.getBusNumber());
+			printf("  address:        %d\n", device.getDeviceAddress());
+			printf("  port:           %d\n", device.getPortNumber());
+			printf("  VID:            0x%04x\n", deviceDescriptor.idVendor);
+			printf("  PID:            0x%04x\n", deviceDescriptor.idProduct);
+			printf("  class:          0x%02x - %s\n", deviceDescriptor.bDeviceClass, io::getUsbClassString(deviceDescriptor.bDeviceClass));
+			printf("  subclass:       0x%02x\n", deviceDescriptor.bDeviceSubClass);
+			printf("  speed:          %s\n", io::getUsbSpeedString(device.getDeviceSpeed()));
+
+			result = device.open();
+			if (!result)
+				printf("  cannot open device (%s)\n", err::getLastErrorDescription().sz());
+			else {
+				printf("  manufacturer*:  %s\n", getUsbStringDescriptorText(&device, deviceDescriptor.iManufacturer).sz());
+				printf("  product*:       %s\n", getUsbStringDescriptorText(&device, deviceDescriptor.iProduct).sz());
+				printf("  serial number*: %s\n", getUsbStringDescriptorText(&device, deviceDescriptor.iSerialNumber).sz());
+			}
+
+			printf("\n");
+		}
+
+	} while (0);
+
 	printf("ENUMERATING WITH AXL_IO_USB\n");
 	printf("===========================\n");
 
@@ -7635,6 +7679,7 @@ testHid() {
 
 #include <initguid.h>
 #include <hidclass.h>
+#include <devpkey.h>
 
 void testSyncHidUsbMon() {
 	bool result;
@@ -7668,6 +7713,7 @@ void testSyncHidUsbMon() {
 
 		char buffer[4 * 1024];
 		sl::String strings[4];
+		sl::String_w strings_w[4];
 
 		io::HidDeviceInfoIterator it = enumerator.getHead();
 		for (; it; it++) {
@@ -7684,8 +7730,7 @@ void testSyncHidUsbMon() {
 				"    Release:      %x\n"
 				"    Usage page:   %s\n"
 				"    Usage:        %s\n"
-				"    Interface:    %d\n"
-				"\n",
+				"    Interface:    %d\n",
 				it->path,
 				io::getHidBusTypeString(it->bus_type),
 				it->vendor_id,
@@ -7698,6 +7743,23 @@ void testSyncHidUsbMon() {
 				page->getUsageName(it->usage).sz(),
 				it->interface_number
 			);
+
+			result = sys::win::getDeviceInterfaceStringProperty(
+				&strings_w[0],
+				strings_w[1] = it->path,
+				DEVPKEY_Device_InstanceId
+			);
+
+			if (!result)
+				printf("    can't find instance: %s\n", err::getLastErrorDescription().sz());
+			else {
+				uint_t devInst = 0;
+				sys::win::locateDevInst(&devInst, strings_w[0]);
+				printf("    Instance: %S\n", strings_w[0].sz());
+				printf("    DEVINST:  0x%04x\n", devInst);
+			}
+
+			printf("\n");
 
 			io::HidDevice device;
 			result = device.open(it->path);
@@ -7887,13 +7949,19 @@ void testSyncHidUsbMon() {
 		printf("USB interface: #%d\n", interfaceId);
 		printf("HID interface: %S\n", interfacePath.sz());
 
-		DEVINST devInst = deviceInfo.getDevInfoData()->DevInst;
+		uint_t devInst = deviceInfo.getDevInfoData()->DevInst;
 		printf("DEVINST: 0x%04x\n", devInst);
+
+		sys::win::getDeviceInterfaceStringProperty(&instanceId, interfacePath, DEVPKEY_Device_InstanceId);
+		printf("Instance (from iface): %S\n", instanceId.sz());
 
 		indent = "    ";
 
-		::CM_Get_Parent(&devInst, devInst, 0);
-		while (devInst) {
+		for (;;) {
+			result = sys::win::getParentDevInst(&devInst, devInst);
+			if (!result)
+				break;
+
 			printf("%sDEVINST: 0x%04x\n", indent.sz(), devInst);
 			sys::win::DeviceInfo deviceInfo2;
 			result = allDeviceInfoSet.findDeviceInfoByDevInst(devInst, &deviceInfo2);
@@ -7930,7 +7998,6 @@ void testSyncHidUsbMon() {
 				break;
 			}
 
-			::CM_Get_Parent(&devInst, devInst, 0);
 			indent += "    ";
 		}
 
@@ -7998,8 +8065,12 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-#if (_AXL_OS_WIN && _AXL_IO_HID && _AXL_IO_USBMON)
+#if (0 && _AXL_OS_WIN && _AXL_IO_HID && _AXL_IO_USBMON)
 	testSyncHidUsbMon();
+#endif
+
+#if (_AXL_IO_USB)
+	testUsbEnum2();
 #endif
 
 	return 0;

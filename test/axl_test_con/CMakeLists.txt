@@ -253,6 +253,10 @@ if(WIN32)
 		list(APPEND _DLL_LIST ${LIBUSB_DLL_DIR}/libusb-1.0.dll)
 	endif()
 
+	if(BUILD_AXL_IO_HID AND HIDAPI_DLL_DIR)
+		list(APPEND _DLL_LIST ${HIDAPI_DLL_DIR}/hidapi.dll)
+	endif()
+
 	if(BUILD_AXL_IO_SSL AND OPENSSL_DLL_DIR)
 		list(
 			APPEND _DLL_LIST
