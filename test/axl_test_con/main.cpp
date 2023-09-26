@@ -7721,7 +7721,6 @@ void testSyncHidUsbMon() {
 
 			printf(
 				"%s\n"
-				"    Bus:          %s\n"
 				"    VID:          %04x\n"
 				"    PID:          %04x\n"
 				"    Manufacturer: %s\n"
@@ -7730,9 +7729,9 @@ void testSyncHidUsbMon() {
 				"    Release:      %x\n"
 				"    Usage page:   %s\n"
 				"    Usage:        %s\n"
+				"    Bus:          %s\n"
 				"    Interface:    %d\n",
 				it->path,
-				io::getHidBusTypeString(it->bus_type),
 				it->vendor_id,
 				it->product_id,
 				(strings[0] = it->manufacturer_string).sz(),
@@ -7741,6 +7740,7 @@ void testSyncHidUsbMon() {
 				it->release_number,
 				page->getName().sz(),
 				page->getUsageName(it->usage).sz(),
+				io::getHidBusTypeString(it->bus_type),
 				it->interface_number
 			);
 
@@ -7755,8 +7755,8 @@ void testSyncHidUsbMon() {
 			else {
 				uint_t devInst = 0;
 				sys::win::locateDevInst(&devInst, strings_w[0]);
-				printf("    Instance: %S\n", strings_w[0].sz());
-				printf("    DEVINST:  0x%04x\n", devInst);
+				printf("    Instance:     %S\n", strings_w[0].sz());
+				printf("    DEVINST:      0x%04x\n", devInst);
 			}
 
 			printf("\n");
@@ -7767,7 +7767,7 @@ void testSyncHidUsbMon() {
 				continue;
 
 			size_t size = device.getReportDescriptor(buffer, sizeof(buffer));
-			printf("    Report descriptor:\n%s\n", enc::HexEncoding::encode(buffer, size, enc::HexEncodingFlag_Multiline).sz());
+			printf("Report descriptor:\n%s\n\n", enc::HexEncoding::encode(buffer, size, enc::HexEncodingFlag_Multiline).sz());
 		}
 	} while (0);
 
@@ -8066,11 +8066,11 @@ main(
 #endif
 
 #if (_AXL_OS_WIN && _AXL_IO_HID && _AXL_IO_USBMON)
-//	testSyncHidUsbMon();
+	testSyncHidUsbMon();
 #endif
 
 #if (_AXL_IO_USB)
-	testUsbEnum2();
+//	testUsbEnum2();
 #endif
 
 	return 0;
