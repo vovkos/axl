@@ -63,12 +63,16 @@ getSiblingDevInst(
 	return completeWithCfgMgrError(cret);
 }
 
+#if (_AXL_SYS_WIN_GETDEVICEINTERFACESTRINGPROPERTY) // hide it for now
+
 bool
 getDeviceInterfaceStringProperty(
 	sl::String_w* string,
 	const sl::StringRef_w& interfacePath,
 	const DEVPROPKEY& key
 );
+
+#endif
 
 //..............................................................................
 

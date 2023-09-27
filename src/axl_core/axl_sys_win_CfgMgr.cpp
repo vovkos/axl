@@ -22,6 +22,8 @@ namespace win {
 
 //..............................................................................
 
+#if (_AXL_SYS_WIN_GETDEVICEINTERFACESTRINGPROPERTY)
+
 bool
 getDeviceInterfaceStringProperty(
 	sl::String_w* string,
@@ -64,6 +66,8 @@ getDeviceInterfaceStringProperty(
 
 	return completeWithCfgMgrError(cret);
 }
+
+#endif
 
 //..............................................................................
 

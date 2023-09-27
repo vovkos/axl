@@ -7744,6 +7744,7 @@ void testSyncHidUsbMon() {
 				it->interface_number
 			);
 
+#if (_AXL_SYS_WIN_GETDEVICEINTERFACESTRINGPROPERTY)
 			result = sys::win::getDeviceInterfaceStringProperty(
 				&strings_w[0],
 				strings_w[1] = it->path,
@@ -7758,7 +7759,7 @@ void testSyncHidUsbMon() {
 				printf("    Instance:     %S\n", strings_w[0].sz());
 				printf("    DEVINST:      0x%04x\n", devInst);
 			}
-
+#endif
 			printf("\n");
 
 			io::HidDevice device;
