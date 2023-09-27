@@ -7677,9 +7677,16 @@ testHid() {
 
 #if (_AXL_OS_WIN && _AXL_IO_HID && _AXL_IO_USBMON)
 
+extern "C" {
+
 #include <initguid.h>
 #include <hidclass.h>
+#include <hidsdi.h>
 #include <devpkey.h>
+
+} // extern "C"
+
+#pragma comment(lib, "hid.lib")
 
 void testSyncHidUsbMon() {
 	bool result;
@@ -7953,8 +7960,10 @@ void testSyncHidUsbMon() {
 		uint_t devInst = deviceInfo.getDevInfoData()->DevInst;
 		printf("DEVINST: 0x%04x\n", devInst);
 
+#if (_AXL_SYS_WIN_GETDEVICEINTERFACESTRINGPROPERTY)
 		sys::win::getDeviceInterfaceStringProperty(&instanceId, interfacePath, DEVPKEY_Device_InstanceId);
 		printf("Instance (from iface): %S\n", instanceId.sz());
+#endif
 
 		indent = "    ";
 

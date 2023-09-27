@@ -114,7 +114,7 @@ include_directories(
 )
 
 if(WIN32)
-	include_directories(${USBSDK_INC_PATH})
+	include_directories(${USBSDK_INC_DIR})
 endif()
 
 add_library(

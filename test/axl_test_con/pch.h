@@ -156,7 +156,6 @@ using namespace axl;
 #	pragma comment(lib, "iphlpapi.lib")
 #	pragma comment(lib, "wintrust.lib")
 #	pragma comment(lib, "crypt32.lib")
-#	pragma comment(lib, "cfgmgr32.lib")
 #elif (_AXL_OS_POSIX)
 #	include <netdb.h>
 #	include <signal.h>
@@ -172,11 +171,6 @@ using namespace axl;
 extern "C" {
 #	include <libusb-1.0/libusb.h>
 } // extern "C" {
-#endif
-
-#if (_AXL_IO_HID && _AXL_OS_WIN)
-#	include <hidsdi.h>
-#	pragma comment(lib, "hid.lib")
 #endif
 
 //..............................................................................

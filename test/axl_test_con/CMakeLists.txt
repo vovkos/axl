@@ -71,8 +71,16 @@ if(BUILD_AXL_IO_USB)
 endif()
 
 if(BUILD_AXL_IO_USBMON)
+	if(${CMAKE_GENERATOR} MATCHES "Visual Studio 10")
+		include_directories(
+			${USBSDK_INC_DIR}
+			${HIDSDK_INC_DIR}
+		)
+
+		link_directories(${HIDSDK_LIB_DIR})
+	endif()
+
 	include_directories(
-		${USBSDK_INC_PATH}
 		${PCAP_INC_PATH}
 		${AXL_ROOT_DIR}/src/axl_io_usbmon/include
 	)
@@ -80,7 +88,7 @@ if(BUILD_AXL_IO_USBMON)
 	add_definitions(-D_AXL_IO_USBMON=1)
 	list(APPEND OPT_LIB_LIST axl_io_usbmon)
 
-	if (LINUX)
+	if(LINUX)
 		list(
 			APPEND OPT_LIB_LIST
 			axl_io_pcap
@@ -90,7 +98,7 @@ if(BUILD_AXL_IO_USBMON)
 	endif()
 endif()
 
-if (BUILD_AXL_IO_HID)
+if(BUILD_AXL_IO_HID)
 	include_directories(${HIDAPI_INC_DIR})
 	link_directories(${HIDAPI_LIB_DIR})
 	add_definitions(-D_AXL_IO_HID=1)
