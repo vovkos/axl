@@ -375,6 +375,11 @@ public:
 		return !isSet(HidRdItemMask_AllUsages);
 	}
 
+	bool
+	isUnsigned() const {
+		return (int32_t)m_table[HidRdItemId_LogicalMinimum] >= 0;
+	}
+
 	const HidReport*
 	getReport() const {
 		return m_report;
