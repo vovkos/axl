@@ -9,18 +9,23 @@
 //
 //..............................................................................
 
-#pragma once
+#include "pch.h"
+#include "axl_io_UsbMonHidEnumerator.h"
 
-#include "axl_g_Pch.h"
-#include <hidapi/hidapi.h>
+namespace axl {
+namespace io {
 
-#if (_AXL_OS_WIN)
-#	include <hidapi/hidapi_winapi.h>
-#endif
+//..............................................................................
 
-#include "axl_sl_String.h"
-#include "axl_sl_List.h"
-#include "axl_sl_Array.h"
-#include "axl_sl_HashTable.h"
-#include "axl_sl_Handle.h"
-#include "axl_err_Error.h"
+size_t
+enumerateUsbMonHidDevices(
+	sl::List<UsbMonHidDeviceDesc>* deviceList,
+	uint_t flags
+) {
+	return 0; // not yet
+}
+
+//..............................................................................
+
+} // namespace io
+} // namespace axl

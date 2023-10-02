@@ -17,6 +17,7 @@ set(
 	LIB_H_LIST
 	${AXL_INC_DIR}/axl_io_hid/axl_io_HidDevice.h
 	${AXL_INC_DIR}/axl_io_hid/axl_io_HidEnumerator.h
+	${AXL_INC_DIR}/axl_io_hid/axl_io_HidMonEnumerator.h
 	${AXL_INC_DIR}/axl_io_hid/axl_io_HidRd.h
 	${AXL_INC_DIR}/axl_io_hid/axl_io_HidDb.h
 )
@@ -40,6 +41,40 @@ source_group(
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
 )
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+set(
+	LIB_WIN_CPP_LIST
+	axl_io_win_HidMonEnumerator.cpp
+)
+
+source_group(
+	lib_win
+	FILES
+	${LIB_WIN_CPP_LIST}
+)
+
+if(NOT WIN32 OR NOT BUILD_AXL_IO_USBMON)
+	axl_exclude_from_build(${LIB_WIN_CPP_LIST})
+endif()
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+set(
+	LIB_LNX_CPP_LIST
+	axl_io_lnx_HidMonEnumerator.cpp
+)
+
+source_group(
+	lib_lnx
+	FILES
+	${LIB_LNX_CPP_LIST}
+)
+
+if(NOT LINUX OR NOT BUILD_AXL_IO_USBMON)
+	axl_exclude_from_build(${LIB_LNX_CPP_LIST})
+endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -68,6 +103,7 @@ source_group(
 
 include_directories(
 	${HIDAPI_INC_DIR}
+	${LIBUSB_INC_DIR}
 	${AXL_INC_DIR}
 )
 
@@ -76,6 +112,8 @@ add_library(
 	${PCH_H_LIST}
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
+	${LIB_WIN_CPP_LIST}
+	${LIB_LNX_CPP_LIST}
 )
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
