@@ -72,6 +72,9 @@
 
 #ifdef _AXL_IO_USBMON
 #	include "axl_io_UsbMonEnumerator.h"
+#	ifdef _AXL_IO_HID
+#		include "axl_io_HidMonEnumerator.h"
+#	endif
 #	if (_AXL_OS_WIN)
 #		include "axl_io_win_UsbPcap.h"
 #		include "axl_io_win_UsbPcapTransferParser.h"

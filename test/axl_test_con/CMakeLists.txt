@@ -103,6 +103,10 @@ if(BUILD_AXL_IO_HID)
 	link_directories(${HIDAPI_LIB_DIR})
 	add_definitions(-D_AXL_IO_HID=1)
 	list(APPEND OPT_LIB_LIST axl_io_hid ${HIDAPI_LIB_NAME})
+
+	if(BUILD_AXL_IO_USBMON AND WIN32)
+		list(APPEND OPT_LIB_LIST hid.lib)
+	endif()
 endif()
 
 if(BUILD_AXL_IO_PCAP)
