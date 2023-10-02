@@ -7680,24 +7680,24 @@ testHid() {
 void testSyncHidUsbMon() {
 	bool result;
 
+	io::hidInit();
+
+	const char* dbFilePath = AXL_SHARE_DIR "/hid/hid-00-usage-page-dir.ini";
+	printf("Loading HID DB: %s\n", dbFilePath);
+
+	io::HidDb db;
+	result = db.load(dbFilePath);
+	if (!result) {
+		printf("Error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
 	do {
 		printf(
 			"---------------------------------------\n"
 			"Enumerating HIDAPI devices\n"
 			"---------------------------------------\n"
 		);
-
-		io::hidInit();
-
-		const char* dbFilePath = AXL_SHARE_DIR "/hid/hid-00-usage-page-dir.ini";
-		printf("Loading HID DB: %s\n", dbFilePath);
-
-		io::HidDb db;
-		result = db.load(dbFilePath);
-		if (!result) {
-			printf("Error: %s\n", err::getLastErrorDescription().sz());
-			return;
-		}
 
 		printf("Enumerating HID devices...\n");
 		io::HidDeviceInfoList enumerator;
@@ -7723,7 +7723,7 @@ void testSyncHidUsbMon() {
 				"    manufacturer: %s\n"
 				"    product:      %s\n"
 				"    serial:       %s\n"
-				"    release:      %x\n"
+				"    release:      %d\n"
 				"    usage page:   %s\n"
 				"    usage:        %s\n"
 				"    bus:          %s\n"
@@ -7823,6 +7823,8 @@ void testSyncHidUsbMon() {
 		io::enumerateHidMonDevices(&deviceList, io::UsbDeviceStringId_All);
 		sl::ConstIterator<io::HidMonDeviceDesc> it = deviceList.getHead();
 		for (size_t i = 0; it; it++, i++) {
+			const io::HidUsagePage* page = db.getUsagePage(it->m_usagePage);
+
 			printf("device #%d\n", i);
 			printf("  HID:            %s\n", it->m_hidDeviceName.sz());
 			printf("  capture:        %s\n", it->m_captureDeviceName.sz());
@@ -7851,9 +7853,12 @@ void testSyncHidUsbMon() {
 			if (!it->m_serialNumberDescriptor.isEmpty())
 				printf("  serial number*: %s\n", it->m_serialNumberDescriptor.sz());
 
+			printf("  release:        %d\n", it->m_releaseNumber);
+			printf("  usage page:     %s\n", page->getName().sz());
+			printf("  usage:          %s\n", page->getUsageName(it->m_usage).sz());
 			printf("  devInst:        0x%04x\n", it->m_devInst);
 			printf("  interfaceId:    %d\n", it->m_interfaceId);
-			printf("  endpointId:     0x%02x\n", it->m_endpointId);
+			printf("  endpointId:     0x%02x\n\n", it->m_endpointId);
 
 			printf(
 				"Report descriptor:\n%s\n\n",

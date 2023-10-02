@@ -23,6 +23,9 @@ namespace io {
 struct HidMonDeviceDesc: UsbMonDeviceDesc {
 	sl::String m_hidDeviceName;
 	sl::Array<char> m_reportDescriptor;
+	uint_t m_usagePage;
+	uint_t m_usage;
+	uint_t m_releaseNumber;
 	uint_t m_interfaceId;
 	uint_t m_endpointId;
 };

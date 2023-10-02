@@ -22,6 +22,7 @@ extern "C" {
 #include <initguid.h>
 #include <hidclass.h>
 #include <hidsdi.h>
+#include <hidpi.h>
 #include <usbioctl.h>
 #include <usb.h>
 
@@ -113,14 +114,8 @@ enumerateHidMonDevices(
 		if (!result)
 			continue;
 
-		io::win::File file2;
-		result = file2.create(hidInterfacePath, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING);
-		ASSERT(result);
-
 		_HIDP_PREPARSED_DATA* preparsedData;
 		result = HidD_GetPreparsedData(file, &preparsedData) != 0;
-		file.close();
-
 		if (!result)
 			continue;
 
@@ -130,7 +125,13 @@ enumerateHidMonDevices(
 			sizeof(reportDescriptorBuffer)
 		);
 
+		HIDP_CAPS caps = { 0 };
+		HidP_GetCaps(preparsedData, &caps);
 		HidD_FreePreparsedData(preparsedData);
+
+		HIDD_ATTRIBUTES attr = { sizeof(attr) };
+		HidD_GetAttributes(file, &attr);
+		file.close();
 
 		if (reportDescriptorSize == -1)
 			continue;
@@ -197,6 +198,9 @@ enumerateHidMonDevices(
 		HidMonDeviceDesc* deviceDesc = new HidMonDeviceDesc;
 		*(UsbMonDeviceDesc*)deviceDesc = *captureDeviceDesc;
 		deviceDesc->m_hidDeviceName = hidInterfacePath;
+		deviceDesc->m_usagePage = caps.UsagePage;
+		deviceDesc->m_usage = caps.Usage;
+		deviceDesc->m_releaseNumber = attr.VersionNumber;
 		deviceDesc->m_interfaceId = interfaceId;
 		deviceDesc->m_endpointId = endpointId;
 		deviceDesc->m_reportDescriptor.copy((char*)reportDescriptorBuffer, reportDescriptorSize);
