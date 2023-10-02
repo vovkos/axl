@@ -30,6 +30,7 @@ class DeviceInfo;
 namespace io {
 namespace win {
 
+class UsbHub;
 class UsbHubDb;
 
 } // namespace win
@@ -77,8 +78,14 @@ enum UsbDeviceStringId {
 	UsbDeviceStringId_ProductDescriptor      = 0x10,
 	UsbDeviceStringId_SerialNumberDescriptor = 0x20,
 	UsbDeviceStringId_ConfigDescriptor       = 0x40,
+#if (_AXL_OS_WIN)
+	UsbDeviceStringId_HubInterfacePath       = 0x80,
+#endif
 
 	UsbDeviceStringId_Database =
+#if (_AXL_OS_WIN)
+		UsbDeviceStringId_HubInterfacePath |
+#endif
 		UsbDeviceStringId_Description |
 		UsbDeviceStringId_Manufacturer |
 		UsbDeviceStringId_Driver,
@@ -104,9 +111,10 @@ struct UsbDeviceStrings {
 	sl::String m_productDescriptor;
 	sl::String m_serialNumberDescriptor;
 	sl::Array<char> m_configDescriptor;
-
 #if (_AXL_OS_WIN)
-	bool
+	sl::String_w m_hubInterfacePath;
+
+	void
 	queryStrings(
 		win::UsbHubDb* hubDb,
 		sys::win::DeviceInfo* deviceInfo,
@@ -117,8 +125,20 @@ struct UsbDeviceStrings {
 		sl::String_w* string,
 		uint_t mask // UsbDeviceStringId-s
 	);
+
+	void
+	queryStrings(
+		const win::UsbHub* hub,
+		sys::win::DeviceInfo* deviceInfo,
+		uint_t port,
+		uint_t manufacturerDescriptorId,
+		uint_t productDescriptorId,
+		uint_t serialNumberDescriptorId,
+		sl::String_w* string,
+		uint_t mask // UsbDeviceStringId-s
+	);
 #elif (_AXL_OS_LINUX)
-	bool
+	void
 	queryStrings(
 		const sys::lnx::UdevHwdb& hwdb,
 		io::UsbDevice* device,
@@ -129,7 +149,7 @@ struct UsbDeviceStrings {
 		uint_t mask // UsbDeviceStringId-s
 	);
 #elif (_AXL_OS_DARWIN)
-	bool
+	void
 	queryStrings(
 		const cf::MutableDictionary& usbDeviceDict,
 		cf::MutableDictionary* propertyMatchDict,

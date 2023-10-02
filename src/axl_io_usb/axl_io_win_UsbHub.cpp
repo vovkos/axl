@@ -11,6 +11,7 @@
 
 #include "pch.h"
 #include "axl_io_win_UsbHub.h"
+#include "axl_sys_win_CfgMgr.h"
 
 #include <initguid.h>
 
@@ -32,7 +33,7 @@ UsbHub::getDescriptorImpl(
 	ushort_t value,
 	ushort_t index,
 	ushort_t length
-) {
+) const {
 	USB_DESCRIPTOR_REQUEST* req = (USB_DESCRIPTOR_REQUEST*)p;
 	req->SetupPacket.wValue = value;
 	req->SetupPacket.wIndex = index;
@@ -43,7 +44,7 @@ UsbHub::getDescriptorImpl(
 	dword_t size = offset + length;
 	dword_t actualSize;
 
-	bool result = ioctl(
+	bool result = ((File*)this)->ioctl(
 		IOCTL_USB_GET_DESCRIPTOR_FROM_NODE_CONNECTION,
 		p,
 		size,
@@ -59,7 +60,7 @@ bool
 UsbHub::getConfigurationDescriptor(
 	sl::Array<char>* descriptor,
 	uint_t port
-) {
+) const {
 	char buffer0[sizeof(USB_DESCRIPTOR_REQUEST) + sizeof(USB_CONFIGURATION_DESCRIPTOR)] = { 0 };
 
 	size_t result = getDescriptorImpl(
@@ -106,7 +107,7 @@ UsbHub::getStringDescriptor(
 	uint_t port,
 	uchar_t descriptorId,
 	ushort_t languageId
-) {
+) const {
 	char buffer[
 		sizeof(USB_DESCRIPTOR_REQUEST) +
 		sizeof(USB_STRING_DESCRIPTOR) +
@@ -151,21 +152,19 @@ UsbHub::getStringDescriptor(
 
 UsbHub*
 UsbHubDb::getUsbHub(sys::win::DeviceInfo* deviceInfo) {
-	DEVINST parentDevInst = 0;
-	CONFIGRET cr = ::CM_Get_Parent(&parentDevInst, deviceInfo->getDevInfoData()->DevInst, 0);
-	if (cr != CR_SUCCESS) {
-		err::setError("can't get DEVINST of the device's parent");
+	uint_t parentDevInst = 0;
+	bool result = sys::win::getParentDevInst(&parentDevInst, deviceInfo->getDevInfoData()->DevInst);
+	if (!result)
 		return NULL;
-	}
 
-	UsbHub* hub = m_hubMap.findValue(parentDevInst, NULL);
-	if (hub)
+	UsbHub* hub = &m_hubMap.visit(parentDevInst)->m_value;
+	if (hub->isOpen())
 		return hub;
 
 	sys::win::DeviceInfo parentDeviceInfo;
 	sys::win::DeviceInfoSet deviceInfoSet;
 	deviceInfoSet.attach(deviceInfo->getDevInfoSet());
-	bool result = deviceInfoSet.findDeviceInfoByDevInst(parentDevInst, &parentDeviceInfo);
+	result = deviceInfoSet.findDeviceInfoByDevInst(parentDevInst, &parentDeviceInfo);
 	deviceInfoSet.detach();
 
 	if (!result) {
@@ -180,28 +179,10 @@ UsbHubDb::getUsbHub(sys::win::DeviceInfo* deviceInfo) {
 
 	result =
 		parentDeviceInfo.enumDeviceInterfaces(GUID_DEVINTERFACE_USB_HUB, 0, &ifaceData) &&
-		parentDeviceInfo.getDeviceInterfacePath(&ifaceData, &path);
+		parentDeviceInfo.getDeviceInterfacePath(&ifaceData, &path) &&
+		hub->open(path);
 
-	if (!result)
-		return NULL;
-
-	hub = new UsbHub;
-	result = hub->create(
-		path,
-		GENERIC_READ,
-		FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-		NULL,
-		OPEN_EXISTING
-	);
-
-	if (!result) {
-		delete hub;
-		return NULL;
-	}
-
-	m_hubList.insertTail(hub);
-	m_hubMap[parentDevInst] = hub;
-	return hub;
+	return result ? hub : NULL;
 }
 
 //..............................................................................

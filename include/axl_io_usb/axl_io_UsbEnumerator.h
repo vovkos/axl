@@ -33,6 +33,9 @@ struct UsbDeviceEntry:
 	sl::ListLink,
 	UsbDeviceStrings {
 	libusb_device* m_device;
+#if (_AXL_OS_WIN)
+	uint_t m_devInst;
+#endif
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

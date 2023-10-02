@@ -31,14 +31,24 @@ namespace win {
 //..............................................................................
 
 class UsbHub:
-	public sl::ListLink,
 	public io::win::File {
+protected:
+	sl::String_w m_path;
+
 public:
+	const sl::String_w&
+	getPath() const {
+		return m_path;
+	}
+
+	bool
+	open(const sl::StringRef_w& path);
+
 	bool
 	getConfigurationDescriptor(
 		sl::Array<char>* descriptor,
 		uint_t port
-	);
+	) const;
 
 	bool
 	getStringDescriptor(
@@ -46,7 +56,7 @@ public:
 		uint_t port,
 		uchar_t descriptorId,
 		ushort_t languageId
-	);
+	) const;
 
 protected:
 	size_t
@@ -56,25 +66,43 @@ protected:
 		ushort_t value,
 		ushort_t index,
 		ushort_t length
-	);
+	) const;
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+bool
+UsbHub::open(const sl::StringRef_w& path) {
+	bool result = create(
+		path,
+		GENERIC_READ,
+		FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+		NULL,
+		OPEN_EXISTING
+	);
+
+	if (!result)
+		return false;
+
+	m_path = path;
+	return true;
+}
 
 //..............................................................................
 
 class UsbHubDb {
 protected:
-	sl::List<UsbHub> m_hubList;
-	sl::SimpleHashTable<dword_t, UsbHub*> m_hubMap; // DEVINST -> HUB
+	sl::SimpleHashTable<dword_t, UsbHub> m_hubMap; // DEVINST -> HUB
 
 public:
 	bool
 	isEmpty() const {
-		return m_hubList.isEmpty();
+		return m_hubMap.isEmpty();
 	}
 
 	void
 	clear() {
-		m_hubList.clear();
 		m_hubMap.clear();
 	}
 

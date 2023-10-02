@@ -36,7 +36,7 @@ enumerateUsbDevices(
 	sl::String_w string;
 	win::UsbHubDb hubDb;
 	sys::win::DeviceInfoSet deviceInfoSet;
-	deviceInfoSet.create(DIGCF_DEVICEINTERFACE);
+	deviceInfoSet.create(DIGCF_DEVICEINTERFACE | DIGCF_PRESENT);
 #elif (_AXL_OS_LINUX)
 	sl::String sysFsPrefix;
 	sl::String string;
@@ -77,7 +77,8 @@ enumerateUsbDevices(
 #if (_AXL_OS_WIN)
 #	if (_AXL_IO_USBDEVICE_GETSESSIONDATA)
 		sys::win::DeviceInfo deviceInfo;
-		result = deviceInfoSet.findDeviceInfoByDevInst(device.getSessionData(), &deviceInfo);
+		deviceEntry->m_devInst = device.getSessionData();
+		result = deviceInfoSet.findDeviceInfoByDevInst(deviceEntry->m_devInst, &deviceInfo);
 		if (result)
 			deviceEntry->queryStrings(
 				&hubDb,
@@ -89,6 +90,8 @@ enumerateUsbDevices(
 				&string,
 				flags
 			);
+#	else
+		deviceEntry->m_devInst = 0;
 #	endif
 #elif (_AXL_OS_LINUX)
 		deviceEntry->queryStrings(

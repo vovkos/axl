@@ -117,7 +117,7 @@ UsbPcapDeviceEnumerator::enumerate(
 ) {
 	deviceList->clear();
 
-	bool result = m_deviceInfoSet.create(DIGCF_DEVICEINTERFACE);
+	bool result = m_deviceInfoSet.create(DIGCF_DEVICEINTERFACE | DIGCF_PRESENT);
 	if (!result)
 		return -1;
 

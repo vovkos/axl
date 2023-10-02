@@ -125,9 +125,34 @@ chooseUsbStringDescriptorLangId(
 
 #if (_AXL_OS_WIN)
 
-bool
+void
 UsbDeviceStrings::queryStrings(
 	win::UsbHubDb* hubDb,
+	sys::win::DeviceInfo* deviceInfo,
+	uint_t port,
+	uint_t manufacturerDescriptorId,
+	uint_t productDescriptorId,
+	uint_t serialNumberDescriptorId,
+	sl::String_w* string,
+	uint_t mask // UsbDeviceStringId-s
+) {
+	queryStrings(
+		(mask & (UsbDeviceStringId_HubInterfacePath | UsbDeviceStringId_Descriptors)) ?
+			hubDb->getUsbHub(deviceInfo) :
+			NULL,
+		deviceInfo,
+		port,
+		manufacturerDescriptorId,
+		productDescriptorId,
+		serialNumberDescriptorId,
+		string,
+		mask
+	);
+}
+
+void
+UsbDeviceStrings::queryStrings(
+	const win::UsbHub* hub,
 	sys::win::DeviceInfo* deviceInfo,
 	uint_t port,
 	uint_t manufacturerDescriptorId,
@@ -159,11 +184,13 @@ UsbDeviceStrings::queryStrings(
 			m_driver = *string;
 	}
 
-	if (mask & UsbDeviceStringId_Descriptors) {
-		win::UsbHub* hub = hubDb->getUsbHub(deviceInfo);
-		if (!hub)
-			return false; // can't fetch descriptors without a hub
+	if (!hub)
+		return; // the further strings require a hub
 
+	if (mask & UsbDeviceStringId_HubInterfacePath)
+		m_hubInterfacePath = hub->getPath();
+
+	if (mask & UsbDeviceStringId_Descriptors) {
 		result = hub->getStringDescriptor(string, port, 0, 0);
 		ushort_t langId = result ?
 			chooseUsbStringDescriptorLangId(
@@ -209,8 +236,6 @@ UsbDeviceStrings::queryStrings(
 		if (mask & UsbDeviceStringId_ConfigDescriptor)
 			hub->getConfigurationDescriptor(&m_configDescriptor, port);
 	}
-
-	return true;
 }
 
 #elif (_AXL_OS_LINUX)
@@ -287,7 +312,7 @@ readSysFsProperty(
 	return true;
 }
 
-bool
+void
 UsbDeviceStrings::queryStrings(
 	const sys::lnx::UdevHwdb& hwdb,
 	io::UsbDevice* device,
@@ -344,13 +369,11 @@ UsbDeviceStrings::queryStrings(
 		string->append("serial");
 		readSysFsProperty(&m_serialNumberDescriptor, *string);
 	}
-
-	return true;
 }
 
 #elif (_AXL_OS_DARWIN)
 
-bool
+void
 UsbDeviceStrings::queryStrings(
 	const cf::MutableDictionary& usbDeviceDict,
 	cf::MutableDictionary* propertyMatchDict,
@@ -393,12 +416,12 @@ UsbDeviceStrings::queryStrings(
 				m_serialNumberDescriptor = prop.toString();
 		}
 
-		return true;
+		return;
 	}
 #endif
 
 	if (!(mask & UsbDeviceStringId_Descriptors))
-		return true;
+		return;
 
 	// fallback to fetching descriptors directly from the device
 
@@ -407,7 +430,7 @@ UsbDeviceStrings::queryStrings(
 		device->getStringDescriptor(string_utf16, 0, 0) != -1;
 
 	if (!result)
-		return false;
+		return;
 
 	ushort_t langId = chooseUsbStringDescriptorLangId(*string_utf16);
 
@@ -428,8 +451,6 @@ UsbDeviceStrings::queryStrings(
 		if (result)
 			m_serialNumberDescriptor = *string_utf16;
 	}
-
-	return true;
 }
 
 #endif
