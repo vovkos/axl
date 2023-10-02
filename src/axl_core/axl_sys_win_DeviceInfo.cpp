@@ -20,7 +20,7 @@ namespace win {
 //..............................................................................
 
 bool
-DeviceInfo::getDeviceInstanceId(sl::String_w* string) {
+DeviceInfo::getDeviceInstanceId(sl::String_w* string) const {
 	dword_t length = 0;
 	getDeviceInstanceId(NULL, 0, &length);
 
@@ -35,7 +35,7 @@ DeviceInfo::getDeviceInstanceId(sl::String_w* string) {
 }
 
 bool
-DeviceInfo::getDeviceDriverPath(sl::String_w* string) {
+DeviceInfo::getDeviceDriverPath(sl::String_w* string) const {
 	sl::String_w serviceName;
 	bool result = getDeviceRegistryProperty(SPDRP_SERVICE, &serviceName);
 	if (!result)
@@ -54,7 +54,7 @@ bool
 DeviceInfo::getDeviceRegistryProperty(
 	uint_t propId,
 	sl::Array<char>* buffer
-) {
+) const {
 	dword_t requiredSize = 0;
 	getDeviceRegistryProperty(propId, NULL, 0, &requiredSize);
 
@@ -66,7 +66,7 @@ bool
 DeviceInfo::getDeviceInterfacePath(
 	SP_DEVICE_INTERFACE_DATA* ifaceData,
 	sl::String_w* path
-) {
+) const {
 	dword_t size = 0;
 	::SetupDiGetDeviceInterfaceDetailW(m_devInfoSet, ifaceData, NULL, 0, &size, &m_devInfoData);
 	if (size < sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA_W))
@@ -97,7 +97,7 @@ DeviceInfo::getDeviceInterfacePath(
 }
 
 bool
-DeviceInfo::getClassInstallParams(sl::Array<char>* buffer) {
+DeviceInfo::getClassInstallParams(sl::Array<char>* buffer) const {
 	dword_t requiredSize = 0;
 	getClassInstallParams(NULL, 0, &requiredSize);
 

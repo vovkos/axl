@@ -34,7 +34,7 @@ class DeviceInfo {
 
 protected:
 	HDEVINFO m_devInfoSet;
-	SP_DEVINFO_DATA m_devInfoData;
+	mutable SP_DEVINFO_DATA m_devInfoData; // all SetupDixxx functions need SP_DEVINFO_DATA*
 
 public:
 	DeviceInfo() {
@@ -51,12 +51,12 @@ public:
 	}
 
 	HDEVINFO
-	getDevInfoSet() {
+	getDevInfoSet() const {
 		return m_devInfoSet;
 	}
 
-	SP_DEVINFO_DATA*
-	getDevInfoData() {
+	const SP_DEVINFO_DATA*
+	getDevInfoData() const {
 		return &m_devInfoData;
 	}
 
@@ -65,30 +65,30 @@ public:
 		wchar_t* buffer,
 		size_t length,
 		dword_t* requiredLength
-	) {
+	) const {
 		bool_t result = ::SetupDiGetDeviceInstanceId(m_devInfoSet, &m_devInfoData, buffer, (dword_t)length, requiredLength);
 		return err::complete(result != 0);
 	}
 
 	bool
-	getDeviceInstanceId(sl::String_w* string);
+	getDeviceInstanceId(sl::String_w* string) const;
 
 	template <typename T>
 	bool
-	getDeviceInstanceId(sl::StringBase<T>* string);
+	getDeviceInstanceId(sl::StringBase<T>* string) const;
 
 	sl::String_w
-	getDeviceInstanceId();
+	getDeviceInstanceId() const;
 
 	bool
-	getDeviceDriverPath(sl::String_w* string);
+	getDeviceDriverPath(sl::String_w* string) const;
 
 	template <typename T>
 	bool
-	getDeviceDriverPath(sl::StringBase<T>* string);
+	getDeviceDriverPath(sl::StringBase<T>* string) const;
 
 	sl::String_w
-	getDeviceDriverPath();
+	getDeviceDriverPath() const;
 
 	bool
 	getDeviceRegistryProperty(
@@ -96,7 +96,7 @@ public:
 		void* buffer,
 		size_t size,
 		dword_t* requiredSize
-	) {
+	) const {
 		bool_t result = ::SetupDiGetDeviceRegistryPropertyW(m_devInfoSet, &m_devInfoData, propId, NULL, (byte_t*)buffer, (dword_t)size, requiredSize);
 		return err::complete(result != 0);
 	}
@@ -105,17 +105,17 @@ public:
 	getDeviceRegistryProperty(
 		uint_t propId,
 		sl::Array<char>* buffer
-	);
+	) const;
 
 	template <typename T>
 	bool
 	getDeviceRegistryProperty(
 		uint_t propId,
 		sl::StringBase<T>* string
-	);
+	) const;
 
 	sl::String_w
-	getDeviceRegistryProperty(uint_t propId);
+	getDeviceRegistryProperty(uint_t propId) const;
 
 	bool
 	setDeviceRegistryProperty(
@@ -132,7 +132,7 @@ public:
 		const GUID& guid,
 		size_t index,
 		SP_DEVICE_INTERFACE_DATA* ifaceData
-	) {
+	) const {
 		bool_t result = ::SetupDiEnumDeviceInterfaces(m_devInfoSet, &m_devInfoData, &guid, (dword_t)index, ifaceData);
 		return err::complete(result != 0);
 	}
@@ -141,29 +141,29 @@ public:
 	getDeviceInterfacePath(
 		SP_DEVICE_INTERFACE_DATA* ifaceData,
 		sl::String_w* path
-	);
+	) const;
 
 	template <typename T>
 	bool
 	getDeviceInterfacePath(
 		SP_DEVICE_INTERFACE_DATA* ifaceData,
 		sl::StringBase<T>* path
-	);
+	) const;
 
 	sl::String_w
-	getDeviceInterfacePath(SP_DEVICE_INTERFACE_DATA* ifaceData);
+	getDeviceInterfacePath(SP_DEVICE_INTERFACE_DATA* ifaceData) const;
 
 	bool
 	openDeviceRegistryKey(
 		RegKey* regKey,
 		REGSAM keyAccess = KEY_ALL_ACCESS
-	);
+	) const;
 
 	HKEY
-	openDeviceRegistryKey(REGSAM keyAccess = KEY_ALL_ACCESS);
+	openDeviceRegistryKey(REGSAM keyAccess = KEY_ALL_ACCESS) const;
 
 	bool
-	getDeviceInstallParams(SP_DEVINSTALL_PARAMS_W* params) {
+	getDeviceInstallParams(SP_DEVINSTALL_PARAMS_W* params) const {
 		bool_t result = ::SetupDiGetDeviceInstallParamsW(m_devInfoSet, &m_devInfoData, params);
 		return err::complete(result != 0);
 	}
@@ -179,13 +179,13 @@ public:
 		void* buffer,
 		size_t size,
 		dword_t* requiredSize
-	) {
+	) const {
 		bool_t result = ::SetupDiGetClassInstallParamsW(m_devInfoSet, &m_devInfoData, (SP_CLASSINSTALL_HEADER*)buffer, (dword_t)size, requiredSize);
 		return err::complete(result != 0);
 	}
 
 	bool
-	getClassInstallParams(sl::Array<char>* buffer);
+	getClassInstallParams(sl::Array<char>* buffer) const;
 
 	bool
 	setClassInstallParams(
@@ -210,7 +210,7 @@ public:
 
 template <typename T>
 bool
-DeviceInfo::getDeviceInstanceId(sl::StringBase<T>* string) {
+DeviceInfo::getDeviceInstanceId(sl::StringBase<T>* string) const {
 	sl::String_w instanceId;
 	getDeviceInstanceId(&instanceId);
 	*string = instanceId;
@@ -219,7 +219,7 @@ DeviceInfo::getDeviceInstanceId(sl::StringBase<T>* string) {
 
 inline
 sl::String_w
-DeviceInfo::getDeviceInstanceId() {
+DeviceInfo::getDeviceInstanceId() const {
 	sl::String_w string;
 	getDeviceInstanceId(&string);
 	return string;
@@ -227,7 +227,7 @@ DeviceInfo::getDeviceInstanceId() {
 
 template <typename T>
 bool
-DeviceInfo::getDeviceDriverPath(sl::StringBase<T>* string) {
+DeviceInfo::getDeviceDriverPath(sl::StringBase<T>* string) const {
 	sl::String_w driverPath;
 	getDeviceDriverPath(&driverPath);
 	*string = driverPath;
@@ -236,7 +236,7 @@ DeviceInfo::getDeviceDriverPath(sl::StringBase<T>* string) {
 
 inline
 sl::String_w
-DeviceInfo::getDeviceDriverPath() {
+DeviceInfo::getDeviceDriverPath() const {
 	sl::String_w string;
 	getDeviceDriverPath(&string);
 	return string;
@@ -247,7 +247,7 @@ bool
 DeviceInfo::getDeviceRegistryProperty(
 	uint_t propId,
 	sl::StringBase<T>* string
-) {
+) const {
 	sl::Array<char> buffer;
 	bool result = getDeviceRegistryProperty(propId, &buffer);
 	if (!result)
@@ -264,7 +264,7 @@ DeviceInfo::getDeviceRegistryProperty(
 
 inline
 sl::String_w
-DeviceInfo::getDeviceRegistryProperty(uint_t propId) {
+DeviceInfo::getDeviceRegistryProperty(uint_t propId) const {
 	sl::String_w string;
 	getDeviceRegistryProperty(propId, &string);
 	return string;
@@ -275,7 +275,7 @@ bool
 DeviceInfo::getDeviceInterfacePath(
 	SP_DEVICE_INTERFACE_DATA* ifaceData,
 	sl::StringBase<T>* path
-) {
+) const {
 	sl::String_w driverPath;
 	getDeviceInterfacePath(ifaceData, &driverPath);
 	*path = driverPath;
@@ -284,7 +284,7 @@ DeviceInfo::getDeviceInterfacePath(
 
 inline
 sl::String_w
-DeviceInfo::getDeviceInterfacePath(SP_DEVICE_INTERFACE_DATA* ifaceData) {
+DeviceInfo::getDeviceInterfacePath(SP_DEVICE_INTERFACE_DATA* ifaceData) const {
 	sl::String_w string;
 	getDeviceInterfacePath(ifaceData, &string);
 	return string;
@@ -292,7 +292,7 @@ DeviceInfo::getDeviceInterfacePath(SP_DEVICE_INTERFACE_DATA* ifaceData) {
 
 inline
 HKEY
-DeviceInfo::openDeviceRegistryKey(REGSAM keyAccess) {
+DeviceInfo::openDeviceRegistryKey(REGSAM keyAccess) const {
 	HKEY h = ::SetupDiOpenDevRegKey(m_devInfoSet, &m_devInfoData, DICS_FLAG_GLOBAL, 0, DIREG_DEV, keyAccess);
 	if (h == INVALID_HANDLE_VALUE)
 		err::setLastSystemError();
@@ -305,7 +305,7 @@ bool
 DeviceInfo::openDeviceRegistryKey(
 	RegKey* regKey,
 	REGSAM keyAccess
-) {
+) const {
 	HKEY h = openDeviceRegistryKey(keyAccess);
 	regKey->attach(h);
 	return regKey->isOpen();
