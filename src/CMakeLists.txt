@@ -137,22 +137,6 @@ endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-if(HIDAPI_FOUND)
-	option(
-		BUILD_AXL_IO_HID
-		"Build axl_io_hid library (HIDAPI wrappers)"
-		ON
-	)
-else()
-	unset(BUILD_AXL_IO_HID CACHE)
-endif()
-
-if(BUILD_AXL_IO_HID)
-	add_subdirectory(axl_io_hid)
-endif()
-
-#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 if((WIN32 OR LINUX) AND LIBUSB_FOUND)
 	option(
 		BUILD_AXL_IO_USBMON
@@ -165,6 +149,22 @@ endif()
 
 if(BUILD_AXL_IO_USBMON)
 	add_subdirectory(axl_io_usbmon)
+endif()
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+if(HIDAPI_FOUND)
+	option(
+		BUILD_AXL_IO_HID
+		"Build axl_io_hid library (HIDAPI wrappers)"
+		ON
+	)
+else()
+	unset(BUILD_AXL_IO_HID CACHE)
+endif()
+
+if(BUILD_AXL_IO_HID)
+	add_subdirectory(axl_io_hid)
 endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
