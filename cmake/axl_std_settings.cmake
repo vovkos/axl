@@ -304,13 +304,33 @@ axl_create_gcc_settings)
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_C_STANDARD
 		DESCRIPTION "Specify the C standard to use"
-		"-std=c90" "-std=c99" "-std=c11" "-std=gnu90" "-std=gnu99" "-std=gnu11"
+		"-std=c90"
+		"-std=c99"
+		"-std=c11"
+		"-std=c17"
+		"-std=c18"
+		"-std=gnu90"
+		"-std=gnu99"
+		"-std=gnu11"
+		"-std=gnu17"
+		"-std=gnu18"
 	)
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_CPP_STANDARD
 		DESCRIPTION "Specify the C++ standard to use"
-		"-std=c++98" "-std=c++11" "-std=c++14" "-std=gnu++98" "-std=gnu++11" "-std=gnu++14"
+		"-std=c++98"
+		"-std=c++11"
+		"-std=c++14"
+		"-std=c++17"
+		"-std=c++20"
+		"-std=c++23"
+		"-std=gnu++98"
+		"-std=gnu++11"
+		"-std=gnu++14"
+		"-std=gnu++17"
+		"-std=gnu++20"
+		"-std=gnu++26"
 	)
 
 	if(CLANG)
