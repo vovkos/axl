@@ -33,10 +33,25 @@ if(EXISTS ${LLVM_CMAKE_DIR}/LLVMConfig.cmake)
 		string(REGEX MATCH "[0-9]+$" LLVM_VERSION_PATCH ${LLVM_VERSION})
 	endif()
 
+	if(NOT LLVM_CONFIG_EXE)
+		find_program(
+			LLVM_CONFIG_EXE
+			llvm-config
+			PATHS ${LLVM_INSTALL_PREFIX}/bin
+			NO_CACHE
+			NO_DEFAULT_PATH
+		)
+	endif()
+
 	axl_message("LLVM ${LLVM_VERSION} paths:")
+	axl_message("    Prefix:"      "${LLVM_INSTALL_PREFIX}")
 	axl_message("    CMake files:" "${LLVM_CMAKE_DIR}")
 	axl_message("    Includes:"    "${LLVM_INC_DIR}")
 	axl_message("    Libraries:"   "${LLVM_LIB_DIR}")
+
+	if(LLVM_CONFIG_EXE)
+		axl_message("    llvm-config:" "${LLVM_CONFIG_EXE}")
+	endif()
 
 	set(LLVM_FOUND TRUE)
 endif()
@@ -50,11 +65,24 @@ target_link_llvm_libraries
 )
 
 	set(_COMPONENT_LIST ${ARGN})
+	unset(_LIB_LIST)
 
-	if(${LLVM_VERSION} VERSION_LESS 3.5)
-		llvm_map_components_to_libraries(_LIB_LIST ${_COMPONENT_LIST})
-	else()
-		llvm_map_components_to_libnames(_LIB_LIST ${_COMPONENT_LIST})
+	if(LLVM_CONFIG_EXE)
+		execute_process(
+			COMMAND ${LLVM_CONFIG_EXE} --libs ${_COMPONENT_LIST}
+			ERROR_FILE "NUL"
+			OUTPUT_VARIABLE _OUTPUT
+		)
+
+		separate_arguments(_LIB_LIST UNIX_COMMAND ${_OUTPUT})
+	endif()
+
+	if(NOT _LIB_LIST)
+		if(${LLVM_VERSION} VERSION_LESS 3.5)
+			llvm_map_components_to_libraries(_LIB_LIST ${_COMPONENT_LIST})
+		else()
+			llvm_map_components_to_libnames(_LIB_LIST ${_COMPONENT_LIST})
+		endif()
 	endif()
 
 	target_link_libraries(${_TARGET} ${_LIB_LIST})
