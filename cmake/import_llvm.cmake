@@ -74,6 +74,10 @@ target_link_llvm_libraries
 			OUTPUT_VARIABLE _OUTPUT
 		)
 
+		if(WIN32)
+			string(REPLACE "\\" "/" _OUTPUT ${_OUTPUT})
+		endif()
+
 		separate_arguments(_LIB_LIST UNIX_COMMAND ${_OUTPUT})
 	endif()
 
