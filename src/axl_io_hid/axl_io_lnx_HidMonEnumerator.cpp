@@ -10,7 +10,7 @@
 //..............................................................................
 
 #include "pch.h"
-#include "axl_io_UsbMonHidEnumerator.h"
+#include "axl_io_HidMonEnumerator.h"
 
 namespace axl {
 namespace io {
@@ -19,7 +19,7 @@ namespace io {
 
 size_t
 enumerateUsbMonHidDevices(
-	sl::List<UsbMonHidDeviceDesc>* deviceList,
+	sl::List<HidMonDeviceDesc>* deviceList,
 	uint_t flags
 ) {
 	return 0; // not yet
