@@ -107,6 +107,13 @@ include_directories(
 	${AXL_INC_DIR}
 )
 
+if(${CMAKE_GENERATOR} MATCHES "Visual Studio 10")
+	include_directories(
+		${USBSDK_INC_DIR}
+		${HIDSDK_INC_DIR}
+	)
+endif()
+
 add_library(
 	axl_io_hid
 	${PCH_H_LIST}

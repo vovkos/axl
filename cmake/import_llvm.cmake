@@ -33,7 +33,7 @@ if(EXISTS ${LLVM_CMAKE_DIR}/LLVMConfig.cmake)
 		string(REGEX MATCH "[0-9]+$" LLVM_VERSION_PATCH ${LLVM_VERSION})
 	endif()
 
-	if(NOT LLVM_CONFIG_EXE)
+	if("${LLVM_CONFIG_EXE}" STREQUAL "") # use NOTFOUND to disable llvm-config
 		find_program(
 			LLVM_CONFIG_EXE
 			llvm-config
@@ -70,9 +70,14 @@ target_link_llvm_libraries
 	if(LLVM_CONFIG_EXE)
 		execute_process(
 			COMMAND ${LLVM_CONFIG_EXE} --libs ${_COMPONENT_LIST}
-			ERROR_FILE "NUL"
 			OUTPUT_VARIABLE _OUTPUT
+			ERROR_VARIABLE _ERROR
 		)
+
+		if(WIN32)
+			string(REPLACE "-l" "" _OUTPUT ${_OUTPUT})
+			string(REPLACE "\\" "/" _OUTPUT ${_OUTPUT})
+		endif()
 
 		if(WIN32)
 			string(REPLACE "\\" "/" _OUTPUT ${_OUTPUT})
