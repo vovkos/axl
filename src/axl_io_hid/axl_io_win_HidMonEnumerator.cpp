@@ -168,7 +168,6 @@ enumerateHidMonDevices(
 
 			union {
 				const void* m_p;
-				const USB_CONFIGURATION_DESCRIPTOR* m_configDesc;
 				const USB_INTERFACE_DESCRIPTOR* m_ifaceDesc;
 				const USB_ENDPOINT_DESCRIPTOR* m_epDesc;
 			} desc = { p };
