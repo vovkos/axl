@@ -7675,12 +7675,13 @@ testHid() {
 
 //..............................................................................
 
-#if (_AXL_OS_WIN && _AXL_IO_HID && _AXL_IO_USBMON)
+#if (_AXL_IO_HID && _AXL_IO_USBMON)
 
 void testSyncHidUsbMon() {
 	bool result;
 
 	io::hidInit();
+	io::getUsbDefaultContext()->createDefault();
 
 	const char* dbFilePath = AXL_SHARE_DIR "/hid/hid-00-usage-page-dir.ini";
 	printf("Loading HID DB: %s\n", dbFilePath);
@@ -7767,12 +7768,17 @@ void testSyncHidUsbMon() {
 
 			size_t size = device.getReportDescriptor(buffer, sizeof(buffer));
 			printf("Report descriptor:\n%s\n\n", enc::HexEncoding::encode(buffer, size, enc::HexEncodingFlag_Multiline).sz());
+
+			io::HidRd rd;
+			rd.parse(&db, buffer, size);
+			rd.printCollections();
+			printf("\n");
 		}
 	} while (0);
 
 	printf(
 		"---------------------------------------\n"
-		"Enumerating USBPCAP devices\n"
+		"Enumerating USBMON devices\n"
 		"---------------------------------------\n"
 	);
 
@@ -7808,13 +7814,17 @@ void testSyncHidUsbMon() {
 			if (!it->m_serialNumberDescriptor.isEmpty())
 				printf("  serial number*: %s\n", it->m_serialNumberDescriptor.sz());
 
-			printf("  devInst:        0x%04x\n\n", it->m_devInst);
+#if (_AXL_OS_WIN)
+			printf("  devInst:        0x%04x\n", it->m_devInst);
+#endif
 		}
+
+		printf("\n");
 	} while (0);
 
 	printf(
 		"---------------------------------------\n"
-		"Enumerating USBMON HID devices\n"
+		"Enumerating HIDMON devices\n"
 		"---------------------------------------\n"
 	);
 
@@ -7856,7 +7866,9 @@ void testSyncHidUsbMon() {
 			printf("  release:        %d\n", it->m_releaseNumber);
 			printf("  usage page:     %s\n", page->getName().sz());
 			printf("  usage:          %s\n", page->getUsageName(it->m_usage).sz());
+#if (_AXL_OS_WIN)
 			printf("  devInst:        0x%04x\n", it->m_devInst);
+#endif
 			printf("  interfaceId:    %d\n", it->m_interfaceId);
 			printf("  endpointId:     0x%02x\n\n", it->m_endpointId);
 
@@ -7869,6 +7881,9 @@ void testSyncHidUsbMon() {
 				).sz()
 			);
 
+			io::HidRd rd;
+			rd.parse(&db, it->m_reportDescriptor.cp(), it->m_reportDescriptor.getCount());
+			rd.printCollections();
 			printf("\n");
 		}
 	} while (0);
@@ -7904,7 +7919,7 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-#if (_AXL_OS_WIN && _AXL_IO_HID && _AXL_IO_USBMON)
+#if (_AXL_IO_HID && _AXL_IO_USBMON)
 	testSyncHidUsbMon();
 #endif
 
