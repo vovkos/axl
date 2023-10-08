@@ -58,8 +58,7 @@ enumerateUsbMonDevices(
 		if (!result)
 			continue;
 
-		bool isHub = deviceDescriptor.bDeviceClass == 0x09;
-		if (isHub && !(flags & UsbMonEnumFlag_Hubs))
+		if (deviceDescriptor.bDeviceClass == LIBUSB_CLASS_HUB && !(flags & UsbMonEnumFlag_Hubs))
 			continue;
 
 		UsbMonDeviceDesc* deviceDesc = new UsbMonDeviceDesc;
