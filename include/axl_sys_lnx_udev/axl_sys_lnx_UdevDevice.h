@@ -112,7 +112,7 @@ public:
 	}
 
 	sl::StringRef
-	getSysNum() {
+	getSysNum() const {
 		return udev_device_get_sysnum(m_h);
 	}
 
@@ -152,11 +152,16 @@ public:
 	}
 
 	udev_device*
+	getParentWithSubsystemDevType(const sl::StringRef& subSystem) const {
+		return udev_device_get_parent_with_subsystem_devtype(m_h, subSystem.szn(), NULL);
+	}
+
+	udev_device*
 	getParentWithSubsystemDevType(
 		const sl::StringRef& subSystem,
 		const sl::StringRef& devType
 	) const {
-		return udev_device_get_parent_with_subsystem_devtype(m_h, subSystem.sz(), devType.sz());
+		return udev_device_get_parent_with_subsystem_devtype(m_h, subSystem.szn(), devType.szn());
 	}
 
 	bool
