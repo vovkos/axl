@@ -24,18 +24,24 @@ namespace io {
 class HidRdParser {
 	friend class InitParseItemFuncTable;
 
-protected:
-	typedef
+	template <typename Parser>
+	friend
 	void
-	(HidRdParser::*ProcessItemFunc)(
-		HidRdTag tag,
-		uint32_t data
+	parseHidRd(
+		Parser* parser,
+		const void* p0,
+		size_t size
 	);
 
-	class InitProcessItemFuncTable {
+ protected:
+	typedef
+	void
+	(HidRdParser::*ProcessTagFunc)(uint32_t data);
+
+	class InitProcessTagFuncTable {
 	public:
 		void
-		operator () (ProcessItemFunc funcTable[]) const;
+		operator () (ProcessTagFunc funcTable[]) const;
 	};
 
 protected:
@@ -59,6 +65,15 @@ public:
 		size_t size
 	);
 
+	static
+	bool
+	findFirstUsage(
+		uint_t* usagePage,
+		uint_t* usage,
+		const void* p,
+		size_t size
+	);
+
 protected:
 	HidRdCollection*
 	getCollection() {
@@ -66,69 +81,55 @@ protected:
 	}
 
 	static
-	ProcessItemFunc
-	getProcessItemFunc(HidRdTag tag);
+	ProcessTagFunc
+	getProcessTagFunc(HidRdTag tag);
 
-	void
-	processItem_collection(
+	bool
+	processTag(
 		HidRdTag tag,
+		HidRdItemId id,
 		uint32_t data
 	);
 
 	void
-	processItem_collectionEnd(
-		HidRdTag tag,
-		uint32_t data
-	) {
+	processTag_collection(uint32_t data);
+
+	void
+	processTag_collectionEnd(uint32_t data) {
 		m_collectionStack.pop();
 	}
 
 	void
-	processItem_input(
-		HidRdTag tag,
-		uint32_t data
-	) {
+	processTag_input(uint32_t data) {
 		finalizeReportField(HidReportKind_Input, data);
 	}
 
 	void
-	processItem_output(
-		HidRdTag tag,
-		uint32_t data
-	) {
+	processTag_output(uint32_t data) {
 		finalizeReportField(HidReportKind_Output, data);
 	}
 
 	void
-	processItem_feature(
-		HidRdTag tag,
-		uint32_t data
-	) {
+	processTag_feature(uint32_t data) {
 		finalizeReportField(HidReportKind_Feature, data);
 	}
 
 	void
-	processItem_usagePage(
-		HidRdTag tag,
-		uint32_t data
-	) {
+	processTag_usagePage(uint32_t data) {
 		m_usagePage = m_db->getUsagePage(data);
 		m_itemTable.resetUsages();
 	}
 
 	void
-	processItem_push(
-		HidRdTag tag,
-		uint32_t data
-	) {
+	processTag_usage(uint32_t data);
+
+	void
+	processTag_push(uint32_t data) {
 		m_stack.append(m_itemTable);
 	}
 
 	void
-	processItem_pop(
-		HidRdTag tag,
-		uint32_t data
-	);
+	processTag_pop(uint32_t data);
 
 	void
 	finalizeReportField(
@@ -158,10 +159,7 @@ HidRdParser::HidRdParser(
 
 inline
 void
-HidRdParser::processItem_pop(
-	HidRdTag tag,
-	uint32_t data
-) {
+HidRdParser::processTag_pop(uint32_t data) {
 	if (!m_stack.isEmpty()) {
 		m_itemTable = m_stack.getBackAndPop();
 		m_usagePage = NULL;
