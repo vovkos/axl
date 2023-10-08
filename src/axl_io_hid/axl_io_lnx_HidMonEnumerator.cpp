@@ -166,7 +166,8 @@ enumerateHidMonDevices(
 		deviceDesc->m_vendorId = strtoul(usbDevice.getSysAttrValue("idVendor").sz(), NULL, 16);
 		deviceDesc->m_productId = strtoul(usbDevice.getSysAttrValue("idProduct").sz(), NULL, 16);
 		deviceDesc->m_releaseNumber = strtoul(usbDevice.getSysAttrValue("bcdDevice").sz(), NULL, 16);
-		deviceDesc->m_address = strtoul(usbDevice.getSysNum().sz(), NULL, 10);
+		deviceDesc->m_address = strtoul(usbDevice.getSysAttrValue("devnum").sz(), NULL, 10);
+		deviceDesc->m_port = strtoul(usbDevice.getSysNum().sz(), NULL, 10);
 		deviceDesc->m_class = strtoul(ifaceDevice.getSysAttrValue("bInterfaceClass").sz(), NULL, 10);
 		deviceDesc->m_subClass = strtoul(ifaceDevice.getSysAttrValue("bInterfaceSubClass").sz(), NULL, 10);
 		deviceDesc->m_interfaceId = strtoul(ifaceDevice.getSysAttrValue("bInterfaceNumber").sz(), NULL, 10);

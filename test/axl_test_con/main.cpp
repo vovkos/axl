@@ -7790,6 +7790,7 @@ void testSyncHidUsbMon() {
 			printf("device #%d\n", i);
 			printf("  capture:        %s\n", it->m_captureDeviceName.sz());
 			printf("  address:        %d\n", it->m_address);
+			printf("  port:           %d\n", it->m_port);
 			printf("  VID:            %04x\n", it->m_vendorId);
 			printf("  PID:            %04x\n", it->m_productId);
 			printf("  class:          %d\n", it->m_class);
@@ -7817,9 +7818,8 @@ void testSyncHidUsbMon() {
 #if (_AXL_OS_WIN)
 			printf("  devInst:        0x%04x\n", it->m_devInst);
 #endif
+			printf("\n");
 		}
-
-		printf("\n");
 	} while (0);
 
 	printf(
@@ -7839,6 +7839,7 @@ void testSyncHidUsbMon() {
 			printf("  HID:            %s\n", it->m_hidDeviceName.sz());
 			printf("  capture:        %s\n", it->m_captureDeviceName.sz());
 			printf("  address:        %d\n", it->m_address);
+			printf("  port:           %d\n", it->m_port);
 			printf("  VID:            %04x\n", it->m_vendorId);
 			printf("  PID:            %04x\n", it->m_productId);
 			printf("  class:          %d\n", it->m_class);
