@@ -18,6 +18,10 @@
 #include "axl_sys_lnx_UdevListEntry.h"
 #include "axl_sys_lnx_UdevDevice.h"
 
+#if (_AXL_DEBUG)
+#	define _AXL_IO_LNX_PRINT_DEVICE_PROPERTIES 0
+#endif
+
 namespace axl {
 namespace io {
 
@@ -143,7 +147,7 @@ SerialPortEnumerator::createPortList(
 			portDesc->m_location = !path.isEmpty() ? path : device.getDevPath();
 		}
 
-#	if (_AXL_OS_DEBUG)
+#if (_AXL_IO_LNX_PRINT_DEVICE_PROPERTIES)
 		printf("----------------------\n");
 		printf("getSysPath: %s\n", device.getSysPath().sz());
 		printf("getSysName: %s\n", device.getSysName().sz());
@@ -165,12 +169,12 @@ SerialPortEnumerator::createPortList(
 
 		it = device.getSysAttrList();
 		for (; it; it++)
-			printf("sysattr[%s] = '%s'\n", it.getName().sz(), udev_device_get_sysattr_value(device, it.getName().sz()));
+			printf("sysattr[%s] = '%s'\n", it.getName().sz(), device.getSysAttrValue(it.getName()).sz());
 
 		it = device.getDevLinkList();
 		for (; it; it++)
 			printf("devlink: %s\n", it.getName().sz());
-#	endif
+#endif
 
 		portList->insertTail(portDesc);
 	}

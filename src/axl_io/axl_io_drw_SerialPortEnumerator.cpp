@@ -14,7 +14,7 @@
 #include "axl_iok_RegistryEntry.h"
 
 #if (_AXL_DEBUG)
-#define _AXL_IO_DRW_PRINT_DEVICE_PROPERTIES 1
+#	define _AXL_IO_DRW_PRINT_DEVICE_PROPERTIES 0
 #endif
 
 namespace axl {
