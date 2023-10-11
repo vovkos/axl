@@ -56,6 +56,18 @@ HidReportSerializer::saveReportDecodeInfo(
 		uint_t usagePage = field.getUsagePage()->getId();
 		p = enc::encodeUleb128(p, usagePage);
 
+		if (field.isSet(HidRdItemId_LogicalMinimum))
+		 	p = enc::encodeUleb128(p, field[HidRdItemId_LogicalMinimum]);
+
+		if (field.isSet(HidRdItemId_LogicalMaximum))
+		 	p = enc::encodeUleb128(p, field[HidRdItemId_LogicalMaximum]);
+
+		if (field.isSet(HidRdItemId_UnitExponent))
+		 	p = enc::encodeUleb128(p, field[HidRdItemId_UnitExponent]);
+
+		if (field.isSet(HidRdItemId_Unit))
+		 	p = enc::encodeUleb128(p, field[HidRdItemId_Unit]);
+
 		if (!field.isSet(HidRdItemId_Usage)) {
 			p = enc::encodeUleb128(p, field[HidRdItemId_UsageMinimum]);
 			p = enc::encodeUleb128(p, field[HidRdItemId_UsageMaximum]);
@@ -133,7 +145,11 @@ HidReportSerializer::loadReportDecodeInfo(
 			HidRdItemMask_ReportSize |
 			HidRdItemMask_ReportCount |
 			HidRdItemMask_UsagePage |
-			HidRdItemMask_AllUsages
+			HidRdItemMask_AllUsages |
+			HidRdItemMask_LogicalMinimum |
+			HidRdItemMask_LogicalMaximum |
+			HidRdItemMask_UnitExponent |
+			HidRdItemMask_Unit
 		);
 
 		report->m_bitCount += field->m_bitCount;
@@ -148,25 +164,29 @@ HidReportSerializer::loadReportDecodeInfo(
 		field->m_usagePage = db->getUsagePage(usagePage);
 		field->m_table[HidRdItemId_UsagePage] = usagePage;
 
+		if (field->isSet(HidRdItemId_LogicalMinimum))
+		 	p = enc::decodeUleb128(&field->m_table[HidRdItemId_LogicalMinimum], p, end);
+
+		if (field->isSet(HidRdItemId_LogicalMaximum))
+		 	p = enc::decodeUleb128(&field->m_table[HidRdItemId_LogicalMaximum], p, end);
+
+		if (field->isSet(HidRdItemId_UnitExponent))
+		 	p = enc::decodeUleb128(&field->m_table[HidRdItemId_UnitExponent], p, end);
+
+		if (field->isSet(HidRdItemId_Unit))
+		 	p = enc::decodeUleb128(&field->m_table[HidRdItemId_Unit], p, end);
+
 		if (!field->isSet(HidRdItemId_Usage)) {
-			uint_t usageMinimum;
-			uint_t usageMaximum;
-			p = enc::decodeUleb128(&usageMinimum, p, end);
-			p = enc::decodeUleb128(&usageMaximum, p, end);
-			field->m_table[HidRdItemId_UsageMinimum] = usageMinimum;
-			field->m_table[HidRdItemId_UsageMaximum] = usageMaximum;
+			p = enc::decodeUleb128(&field->m_table[HidRdItemId_UsageMinimum], p, end);
+			p = enc::decodeUleb128(&field->m_table[HidRdItemId_UsageMaximum], p, end);
 		} else {
-			uint_t usage;
-			p = enc::decodeUleb128(&usage, p, end);
-			field->m_table[HidRdItemId_Usage] = usage;
+			p = enc::decodeUleb128(&field->m_table[HidRdItemId_Usage], p, end);
 
 			size_t auxUsageCount;
 			p = enc::decodeUleb128(&auxUsageCount, p, end);
 			field->m_auxUsageTable.setCount(auxUsageCount);
-			for (size_t i = 0; i < auxUsageCount; i++) {
-				p = enc::decodeUleb128(&usage, p, end);
-				field->m_auxUsageTable[i] = usage;
-			}
+			for (size_t i = 0; i < auxUsageCount; i++)
+				p = enc::decodeUleb128(&field->m_auxUsageTable[i], p, end);
 		}
 	}
 

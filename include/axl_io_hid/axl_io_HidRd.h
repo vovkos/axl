@@ -503,7 +503,6 @@ HidReport::print() const {
 	print(&indent);
 }
 
-
 //..............................................................................
 
 class HidStandaloneReport: public HidReport {

@@ -7920,12 +7920,8 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-#if (_AXL_IO_HID && _AXL_IO_USBMON)
-	testSyncHidUsbMon();
-#endif
-
-#if (_AXL_IO_USB)
-//	testUsbEnum2();
+#if (_AXL_IO_HID)
+	testHid();
 #endif
 
 	return 0;
