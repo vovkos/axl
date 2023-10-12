@@ -97,8 +97,11 @@ axl_trace_va(
 	// send it both to the debugger and to the trace file
 
 	::OutputDebugStringA(string);
-	fwrite(string, length, 1, axl_g_traceFile);
-	fflush(axl_g_traceFile);
+
+	if (axl_g_traceFile) {
+		fwrite(string, length, 1, axl_g_traceFile);
+		fflush(axl_g_traceFile);
+	}
 }
 #endif
 

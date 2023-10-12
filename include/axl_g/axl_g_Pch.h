@@ -608,8 +608,10 @@ axl_trace_va(
 	const char* formatString,
 	axl_va_list va
 ) {
-	vfprintf(axl_g_traceFile, formatString, va);
-	fflush(axl_g_traceFile);
+	if (axl_g_traceFile) {
+		vfprintf(axl_g_traceFile, formatString, va);
+		fflush(axl_g_traceFile);
+	}
 }
 #	endif
 
