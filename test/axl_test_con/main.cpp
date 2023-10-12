@@ -7454,6 +7454,12 @@ testHid() {
 		0xC0,              // End Collection
 	};
 
+	static io::HidReportType reportTypeTable[] = {
+		io::HidReportType_Input,
+		io::HidReportType_Output,
+		io::HidReportType_Feature
+	};
+
 	do {
 		io::HidRd rd;
 		rd.parse(&db, data, sizeof(data));
@@ -7462,8 +7468,8 @@ testHid() {
 
 		printf("serializing/deserializing reports...\n");
 
-		for (size_t i = 0; i < io::HidReportKind__Count; i++) {
-			const sl::SimpleHashTable<uint_t, io::HidReport>& map = rd.getReportMap((io::HidReportKind)i);
+		for (size_t i = 0; i < countof(reportTypeTable); i++) {
+			const sl::SimpleHashTable<uint_t, io::HidReport>& map = rd.getReportMap(reportTypeTable[i]);
 			sl::ConstMapIterator<uint_t, io::HidReport> it = map.getHead();
 			for (; it; it++) {
 				it->m_value.saveDecodeInfo(&reportBuffer);
@@ -7580,8 +7586,8 @@ testHid() {
 
 		printf("serializing/deserializing reports...\n");
 
-		for (size_t i = 0; i < io::HidReportKind__Count; i++) {
-			const sl::SimpleHashTable<uint_t, io::HidReport>& map = rd.getReportMap((io::HidReportKind)i);
+		for (size_t i = 0; i < countof(reportTypeTable); i++) {
+			const sl::SimpleHashTable<uint_t, io::HidReport>& map = rd.getReportMap(reportTypeTable[i]);
 			sl::ConstMapIterator<uint_t, io::HidReport> it = map.getHead();
 			for (; it; it++) {
 				it->m_value.saveDecodeInfo(&reportBuffer);
@@ -7656,7 +7662,7 @@ testHid() {
 			size = readResult;
 		}
 
-		const io::HidReport* report = rd.findReport(io::HidReportKind_Input, reportId);
+		const io::HidReport* report = rd.findReport(io::HidReportType_Input, reportId);
 		if (!report) {
 			printf("    *** report unknown\n");
 			continue;

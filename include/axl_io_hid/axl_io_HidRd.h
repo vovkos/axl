@@ -413,18 +413,17 @@ HidReportField::HidReportField() {
 
 //..............................................................................
 
-enum HidReportKind {
-	HidReportKind_Invalid = -1,
-	HidReportKind_Input,
-	HidReportKind_Output,
-	HidReportKind_Feature,
-	HidReportKind__Count,
+enum HidReportType {
+	HidReportType_Undefined = 0x00,
+	HidReportType_Input     = 0x01,
+	HidReportType_Output    = 0x02,
+	HidReportType_Feature   = 0x03,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 sl::StringRef
-getHidReportKindString(HidReportKind reportKind);
+getHidReportTypeString(HidReportType reportType);
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -433,7 +432,7 @@ class HidReport {
 	friend class HidRdParser;
 
 protected:
-	HidReportKind m_reportKind;
+	HidReportType m_reportType;
 	uint_t m_reportId;
 	sl::Array<const HidReportField*> m_fieldArray;
 	size_t m_bitCount; // size of all fields in bits
@@ -442,9 +441,9 @@ protected:
 public:
 	HidReport();
 
-	HidReportKind
-	getReportKind() const {
-		return m_reportKind;
+	HidReportType
+	getReportType() const {
+		return m_reportType;
 	}
 
 	uint_t
@@ -489,7 +488,7 @@ public:
 
 inline
 HidReport::HidReport() {
-	m_reportKind = HidReportKind_Invalid;
+	m_reportType = HidReportType_Undefined;
 	m_reportId = 0;
 	m_bitCount = 0;
 	m_size = 0;
@@ -616,7 +615,7 @@ class HidRd {
 protected:
 	HidRdCollection m_rootCollection;
 	sl::List<HidReportField> m_fieldList;
-	sl::SimpleHashTable<uint_t, HidReport> m_reportMapTable[HidReportKind__Count];
+	sl::SimpleHashTable<uint_t, HidReport> m_reportMapTable[3]; // input, output, feature
 	uint_t m_flags;
 
 public:
@@ -635,14 +634,14 @@ public:
 	}
 
 	const sl::SimpleHashTable<uint_t, HidReport>&
-	getReportMap(HidReportKind reportKind) const {
-		ASSERT((size_t)reportKind < countof(m_reportMapTable));
-		return m_reportMapTable[reportKind];
+	getReportMap(HidReportType reportType) const {
+		ASSERT((size_t)(reportType - 1) < countof(m_reportMapTable));
+		return m_reportMapTable[reportType - 1];
 	}
 
 	const HidReport*
 	findReport(
-		HidReportKind reportKind,
+		HidReportType reportType,
 		uint_t reportId
 	) const;
 
@@ -665,7 +664,7 @@ public:
 protected:
 	HidReport*
 	getReport(
-		HidReportKind reportKind,
+		HidReportType reportType,
 		uint_t reportId
 	);
 };
@@ -675,11 +674,11 @@ protected:
 inline
 const HidReport*
 HidRd::findReport(
-	HidReportKind reportKind,
+	HidReportType reportType,
 	uint_t reportId
 ) const {
-	ASSERT((size_t)reportKind < countof(m_reportMapTable));
-	sl::ConstMapIterator<uint_t, HidReport> it = m_reportMapTable[reportKind].find(reportId);
+	ASSERT((size_t)(reportType - 1) < countof(m_reportMapTable));
+	sl::ConstMapIterator<uint_t, HidReport> it = m_reportMapTable[reportType - 1].find(reportId);
 	return it ? &it->m_value : NULL;
 }
 

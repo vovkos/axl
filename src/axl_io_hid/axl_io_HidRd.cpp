@@ -246,7 +246,7 @@ printFieldArray(
 		printf(
 			"%sField: %s %d-bit\n",
 	    	indent->sz(),
-			getHidReportKindString(field.getReport()->getReportKind()).sz(),
+			getHidReportTypeString(field.getReport()->getReportType()).sz(),
 			field.getBitCount()
 		);
 
@@ -527,16 +527,17 @@ getHidRdComplexUnitString(uint32_t unit) {
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 sl::StringRef
-getHidReportKindString(HidReportKind reportKind) {
+getHidReportTypeString(HidReportType reportType) {
 	static const char* stringTable[] = {
-		"Input",     // HidReportKind_Input,
-		"Output",    // HidReportKind_Output,
-		"Feature",   // HidReportKind_Feature,
+		"Undefined", // HidReportType_Undefined,
+		"Input",     // HidReportType_Input,
+		"Output",    // HidReportType_Output,
+		"Feature",   // HidReportType_Feature,
 	};
 
-	return (size_t)reportKind < countof(stringTable) ?
-		sl::StringRef(stringTable[reportKind]) :
-		sl::formatString("Report 0x%x", reportKind);
+	return (size_t)reportType < countof(stringTable) ?
+		sl::StringRef(stringTable[reportType]) :
+		sl::formatString("Report 0x%x", reportType);
 }
 
 //..............................................................................
@@ -562,7 +563,7 @@ HidReport::print(sl::String* indent) const {
 	printf(
 		"%sReport: %s %d-bit (%d bytes)\n",
 		indent->sz(),
-		getHidReportKindString(m_reportKind).sz(),
+		getHidReportTypeString(m_reportType).sz(),
 		m_bitCount,
 		m_size
 	);
@@ -601,19 +602,19 @@ HidReport::decode(const void* p) const {
 
 HidReport*
 HidRd::getReport(
-	HidReportKind reportKind,
+	HidReportType reportType,
 	uint_t reportId
 ) {
-	ASSERT((size_t)reportKind < countof(m_reportMapTable));
+	ASSERT((size_t)(reportType - 1) < countof(m_reportMapTable));
 
-	sl::MapIterator<uint_t, HidReport> it = m_reportMapTable[reportKind].visit(reportId);
+	sl::MapIterator<uint_t, HidReport> it = m_reportMapTable[reportType - 1].visit(reportId);
 	HidReport* report = &it->m_value;
-	if (report->m_reportKind == HidReportKind_Invalid) {
-		report->m_reportKind = reportKind;
+	if (report->m_reportType == HidReportType_Undefined) {
+		report->m_reportType = reportType;
 		report->m_reportId = reportId;
 	} else
 		ASSERT(
-			report->m_reportKind == reportKind &&
+			report->m_reportType == reportType &&
 			report->m_reportId == reportId
 		);
 
@@ -642,7 +643,7 @@ HidRd::parse(
 	HidRdParser parser(db, this);
 	parser.parse(p, size);
 
-	for (uint_t i = 0; i < HidReportKind__Count; i++) {
+	for (uint_t i = 0; i < countof(m_reportMapTable); i++) {
 		sl::MapIterator<uint_t, HidReport> it = m_reportMapTable[i].getHead();
 		for (; it; it++)
 			it->m_value.updateSize();
@@ -656,7 +657,7 @@ HidRd::printReports() const {
 	printf("HID RD Reports%s\n", (m_flags & HidRdFlag_HasReportId) ? " (with IDs)" : "");
 
 	sl::String indent(' ', 4);
-	for (uint_t i = 0; i < HidReportKind__Count; i++) {
+	for (uint_t i = 0; i < countof(m_reportMapTable); i++) {
 		sl::ConstMapIterator<uint_t, HidReport> it = m_reportMapTable[i].getHead();
 		for (; it; it++) {
 			const HidReport& report = it->m_value;

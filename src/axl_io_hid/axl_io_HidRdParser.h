@@ -101,17 +101,17 @@ protected:
 
 	void
 	processTag_input(uint32_t data) {
-		finalizeReportField(HidReportKind_Input, data);
+		finalizeReportField(HidReportType_Input, data);
 	}
 
 	void
 	processTag_output(uint32_t data) {
-		finalizeReportField(HidReportKind_Output, data);
+		finalizeReportField(HidReportType_Output, data);
 	}
 
 	void
 	processTag_feature(uint32_t data) {
-		finalizeReportField(HidReportKind_Feature, data);
+		finalizeReportField(HidReportType_Feature, data);
 	}
 
 	void
@@ -133,7 +133,7 @@ protected:
 
 	void
 	finalizeReportField(
-		HidReportKind reportKind,
+		HidReportType reportType,
 		uint_t valueFlags
 	);
 

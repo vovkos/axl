@@ -197,7 +197,7 @@ HidRdParser::processTag_usage(uint32_t data) {
 
 void
 HidRdParser::finalizeReportField(
-	HidReportKind reportKind,
+	HidReportType reportType,
 	uint_t valueFlags
 ) {
 	if (m_itemTable.isSet(HidRdItemId_ReportId))
@@ -210,10 +210,10 @@ HidRdParser::finalizeReportField(
 		m_itemTable.set(HidRdItemId_ReportCount, 1);
 
 	if (!m_report ||
-		m_report->m_reportKind != reportKind ||
+		m_report->m_reportType != reportType ||
 		m_report->m_reportId != m_itemTable[HidRdItemId_ReportId]
 	)
-		m_report = m_rd->getReport(reportKind, m_itemTable[HidRdItemId_ReportId]);
+		m_report = m_rd->getReport(reportType, m_itemTable[HidRdItemId_ReportId]);
 
 	size_t bitCount = m_itemTable[HidRdItemId_ReportSize] * m_itemTable[HidRdItemId_ReportCount];
 

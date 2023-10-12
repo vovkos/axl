@@ -31,7 +31,7 @@ HidReportSerializer::saveReportDecodeInfo(
 	buffer->clear();
 	buffer->setCount(sizeof(uint16_t)); // max size of HID RD is 4096
 
-	p = enc::encodeUleb128(p, report.getReportKind());
+	p = enc::encodeUleb128(p, report.getReportType());
 	p = enc::encodeUleb128(p, report.getReportId());
 
 	const sl::Array<const HidReportField*> fieldArray = report.getFieldArray();
@@ -115,7 +115,7 @@ HidReportSerializer::loadReportDecodeInfo(
 	const char* p = (char*)p0 + sizeof(uint16_t);
 	const char* end = (char*)p0 + decodeInfoSize;
 
-	p = enc::decodeUleb128(&report->m_reportKind, p, end);
+	p = enc::decodeUleb128(&report->m_reportType, p, end);
 	p = enc::decodeUleb128(&report->m_reportId, p, end);
 
 	while (p < end) {
