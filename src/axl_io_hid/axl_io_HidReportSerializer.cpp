@@ -74,7 +74,7 @@ HidReportSerializer::saveReportDecodeInfo(
 		} else {
 			p = enc::encodeUleb128(p, field[HidRdItemId_Usage]);
 
-			size_t auxUsageCount = field.getAuxUsageCount();
+			size_t auxUsageCount = field.m_auxUsageTable.getCount();
 			p = enc::encodeUleb128(p, auxUsageCount);
 			for (size_t i = 0; i < auxUsageCount; i++) {
 				p = enc::encodeUleb128(p, field.m_auxUsageTable[i]);

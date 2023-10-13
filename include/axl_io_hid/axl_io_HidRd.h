@@ -187,8 +187,9 @@ public:
 	}
 
 	size_t
-	getAuxUsageCount() const {
-		return m_auxUsageTable.getCount();
+	getUsageCount() const {
+		size_t auxUsageCount = m_auxUsageTable.getCount();
+		return auxUsageCount ? auxUsageCount + 1 : isSet(HidRdItemId_Usage);
 	}
 
 	uint32_t
@@ -215,12 +216,14 @@ public:
 inline
 uint32_t
 HidRdItemTable::getUsage(size_t i) const {
+	if (!(m_mask & HidRdItemMask_Usage))
+		return m_table[HidRdItemId_UsageMinimum] + i;
+
+	size_t auxUsageCount = m_auxUsageTable.getCount();
 	return
-		!(m_mask & HidRdItemMask_Usage) ?
-			m_table[HidRdItemId_UsageMinimum] + i :
-		i > 0 && i <= m_auxUsageTable.getCount() ?
-			m_auxUsageTable[i - 1] :
-			m_table[HidRdItemId_Usage];
+		i == 0 || !auxUsageCount ? m_table[HidRdItemId_Usage] :
+		i <= auxUsageCount ? m_auxUsageTable[i - 1] :
+		m_auxUsageTable.getBack();
 }
 
 inline

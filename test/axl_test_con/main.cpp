@@ -7454,6 +7454,66 @@ testHid() {
 		0xC0,              // End Collection
 	};
 
+	uchar_t data2[] = {
+		0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
+		0x09, 0x05,        // Usage (Game Pad)
+		0xA1, 0x01,        // Collection (Application)
+		0x09, 0x00,        //   Usage (Undefined)
+		0xA1, 0x00,        //   Collection (Physical)
+		0x09, 0x30,        //     Usage (X)
+		0x09, 0x31,        //     Usage (Y)
+		0x15, 0x00,        //     Logical Minimum (0)
+		0x25, 0xFF,        //     Logical Maximum (-1)
+		0x35, 0x00,        //     Physical Minimum (0)
+		0x45, 0xFF,        //     Physical Maximum (-1)
+		0x75, 0x10,        //     Report Size (16)
+		0x95, 0x02,        //     Report Count (2)
+		0x81, 0x02,        //     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+		0xC0,              //   End Collection
+		0x09, 0x00,        //   Usage (Undefined)
+		0xA1, 0x00,        //   Collection (Physical)
+		0x09, 0x33,        //     Usage (Rx)
+		0x09, 0x34,        //     Usage (Ry)
+		0x15, 0x00,        //     Logical Minimum (0)
+		0x25, 0xFF,        //     Logical Maximum (-1)
+		0x75, 0x10,        //     Report Size (16)
+		0x95, 0x02,        //     Report Count (2)
+		0x81, 0x02,        //     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+		0xC0,              //   End Collection
+		0x09, 0x00,        //   Usage (Undefined)
+		0xA1, 0x00,        //   Collection (Physical)
+		0x09, 0x32,        //     Usage (Z)
+		0x15, 0x00,        //     Logical Minimum (0)
+		0x25, 0xFF,        //     Logical Maximum (-1)
+		0x75, 0x10,        //     Report Size (16)
+		0x95, 0x01,        //     Report Count (1)
+		0x81, 0x02,        //     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+		0xC0,              //   End Collection
+		0x05, 0x09,        //   Usage Page (Button)
+		0x19, 0x01,        //   Usage Minimum (0x01)
+		0x29, 0x0A,        //   Usage Maximum (0x0A)
+		0x15, 0x00,        //   Logical Minimum (0)
+		0x25, 0x01,        //   Logical Maximum (1)
+		0x75, 0x01,        //   Report Size (1)
+		0x95, 0x0A,        //   Report Count (10)
+		0x45, 0x00,        //   Physical Maximum (0)
+		0x81, 0x02,        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+		0x05, 0x01,        //   Usage Page (Generic Desktop Ctrls)
+		0x09, 0x39,        //   Usage (Hat switch)
+		0x15, 0x01,        //   Logical Minimum (1)
+		0x25, 0x08,        //   Logical Maximum (8)
+		0x35, 0x00,        //   Physical Minimum (0)
+		0x46, 0x3B, 0x10,  //   Physical Maximum (4155)
+		0x65, 0x0E,        //   Unit (None)
+		0x75, 0x04,        //   Report Size (4)
+		0x95, 0x01,        //   Report Count (1)
+		0x81, 0x42,        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,Null State)
+		0x75, 0x02,        //   Report Size (2)
+		0x95, 0x01,        //   Report Count (1)
+		0x81, 0x03,        //   Input (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+		0xC0,              // End Collection
+	};
+
 	static io::HidReportType reportTypeTable[] = {
 		io::HidReportType_Input,
 		io::HidReportType_Output,
@@ -7462,9 +7522,10 @@ testHid() {
 
 	do {
 		io::HidRd rd;
-		rd.parse(&db, data, sizeof(data));
+		rd.parse(&db, data2, sizeof(data2));
 		rd.printCollections();
 		rd.printReports();
+		return;
 
 		printf("serializing/deserializing reports...\n");
 

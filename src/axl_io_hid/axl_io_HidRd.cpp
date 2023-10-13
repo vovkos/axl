@@ -259,8 +259,8 @@ printFieldArray(
 		);
 
 		if (field.isSet(HidRdItemId_Usage)) {
-			size_t auxUsageCount = field.getAuxUsageCount();
-			for (size_t i = 0; i <= auxUsageCount; i++) {
+			size_t usageCount = field.getUsageCount();
+			for (size_t i = 0; i < usageCount; i++) {
 				uint_t usage = field.getUsage(i);
 				printf(
 					"%sUsage: %s\n",
@@ -313,11 +313,11 @@ printCollection(
 	);
 
 	indent->append(' ', 4);
-	printFieldArray(indent, collection->getFieldArray());
 	sl::ConstIterator<HidRdCollection> it = collection->getCollectionList().getHead();
 	for (; it; it++)
 		printCollection(indent, *it);
 
+	printFieldArray(indent, collection->getFieldArray());
 	indent->chop(4);
 }
 
