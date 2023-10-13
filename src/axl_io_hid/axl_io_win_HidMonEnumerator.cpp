@@ -158,6 +158,7 @@ enumerateHidMonDevices(
 
 		uchar_t currentInterfaceId = 0;
 		uchar_t endpointId = 0;
+		bool isNonHidProto = false;
 
 		const char* p = captureDeviceDesc->m_configDescriptor.cp();
 		const char* end = captureDeviceDesc->m_configDescriptor.getEnd();
@@ -175,6 +176,11 @@ enumerateHidMonDevices(
 			switch (descriptorType) {
 			case USB_INTERFACE_DESCRIPTOR_TYPE:
 				currentInterfaceId = desc.m_ifaceDesc->bInterfaceNumber;
+				if (currentInterfaceId == interfaceId && (desc.m_ifaceDesc->bInterfaceClass != LIBUSB_CLASS_HID)) {
+					isNonHidProto = true; // a HID device, but uses a vendor-specific USB protocol (e.g., Xbox 360 Controller)
+					p = end;
+				}
+
 				break;
 
 			case USB_ENDPOINT_DESCRIPTOR_TYPE:
@@ -191,6 +197,9 @@ enumerateHidMonDevices(
 
 			p += length;
 		}
+
+		if (isNonHidProto)
+			continue;
 
 		// step 2.4 -- create the resulting HID device desc
 
