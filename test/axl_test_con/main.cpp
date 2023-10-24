@@ -7938,7 +7938,10 @@ void testSyncHidUsbMon() {
 			printf("  devInst:        0x%04x\n", it->m_devInst);
 #endif
 			printf("  interfaceId:    %d\n", it->m_interfaceId);
-			printf("  endpointId:     0x%02x\n\n", it->m_endpointId);
+			printf("  inEndpointId:     0x%02x\n\n", it->m_inEndpointId);
+
+			if (it->m_outEndpointId)
+				printf("  inEndpointId:     0x%02x\n\n", it->m_outEndpointId);
 
 			printf(
 				"Report descriptor:\n%s\n\n",

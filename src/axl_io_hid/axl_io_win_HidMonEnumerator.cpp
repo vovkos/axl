@@ -154,10 +154,11 @@ enumerateHidMonDevices(
 			}
 		}
 
-		// step 2.3 -- find the endpoint ID for this interface ID
+		// step 2.3 -- find the endpoint IDs for this interface ID
 
 		uchar_t currentInterfaceId = 0;
-		uchar_t endpointId = 0;
+		uchar_t inEndpointId = 0;
+		uchar_t outEndpointId = 0;
 		bool isNonHidProto = false;
 
 		const char* p = captureDeviceDesc->m_configDescriptor.cp();
@@ -181,15 +182,22 @@ enumerateHidMonDevices(
 					p = end;
 				}
 
+				if (inEndpointId) // shortcut, we are done
+					p = end;
+
 				break;
 
 			case USB_ENDPOINT_DESCRIPTOR_TYPE:
 				if (currentInterfaceId == interfaceId &&
-					(desc.m_epDesc->bEndpointAddress & 0x80) &&
 					(desc.m_epDesc->bmAttributes & USB_ENDPOINT_TYPE_MASK) == USB_ENDPOINT_TYPE_INTERRUPT
 				) {
-					endpointId = desc.m_epDesc->bEndpointAddress;
-					p = end; // we are done
+					if (desc.m_epDesc->bEndpointAddress & 0x80)
+						inEndpointId = desc.m_epDesc->bEndpointAddress;
+					else
+						outEndpointId = desc.m_epDesc->bEndpointAddress;
+
+					if (inEndpointId && outEndpointId) // shortcut, we are done
+						p = end;
 				}
 
 				break;
@@ -210,7 +218,8 @@ enumerateHidMonDevices(
 		deviceDesc->m_usage = caps.Usage;
 		deviceDesc->m_releaseNumber = attr.VersionNumber;
 		deviceDesc->m_interfaceId = interfaceId;
-		deviceDesc->m_endpointId = endpointId;
+		deviceDesc->m_inEndpointId = inEndpointId;
+		deviceDesc->m_outEndpointId = outEndpointId;
 		deviceDesc->m_reportDescriptor.copy((char*)reportDescriptorBuffer, reportDescriptorSize);
 		deviceList->insertTail(deviceDesc);
 

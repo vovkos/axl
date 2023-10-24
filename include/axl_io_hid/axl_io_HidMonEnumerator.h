@@ -27,7 +27,8 @@ struct HidMonDeviceDesc: UsbMonDeviceDesc {
 	uint_t m_usage;
 	uint_t m_releaseNumber;
 	uint_t m_interfaceId;
-	uint_t m_endpointId;
+	uint_t m_inEndpointId;
+	uint_t m_outEndpointId; // could be zero
 };
 
 //..............................................................................
