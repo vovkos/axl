@@ -127,7 +127,7 @@ protected:
 		size_t i = i0 + last;
 		while (i < length) {
 			intptr_t j = last;
-			uchar_t c;
+			C c;
 			for (;;) {
 				c = accessor[i];
 				if (c != m_pattern[j])
