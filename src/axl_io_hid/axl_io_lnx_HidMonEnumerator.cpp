@@ -171,7 +171,6 @@ enumerateHidMonDevices(
 		deviceDesc->m_class = strtoul(ifaceDevice.getSysAttrValue("bInterfaceClass").sz(), NULL, 10);
 		deviceDesc->m_subClass = strtoul(ifaceDevice.getSysAttrValue("bInterfaceSubClass").sz(), NULL, 10);
 		deviceDesc->m_interfaceId = strtoul(ifaceDevice.getSysAttrValue("bInterfaceNumber").sz(), NULL, 10);
-		deviceDesc->m_endpointId = 0;
 
 		uint_t speed = strtoul(usbDevice.getSysAttrValue("speed").sz(), NULL, 10);
 		switch (speed) {
@@ -209,6 +208,9 @@ enumerateHidMonDevices(
 			deviceDesc->m_driver = hidDevice.getDriver();
 
 		uint_t currentInterfaceId = -1;
+		uchar_t inEndpointId = 0;
+		uchar_t outEndpointId = 0;
+
 		const uchar_t* p = (uchar_t*)descriptors.cp();
 		const uchar_t* end = (uchar_t*)descriptors.getEnd();
 
@@ -226,15 +228,22 @@ enumerateHidMonDevices(
 			switch (descriptorType) {
 			case LIBUSB_DT_INTERFACE:
 				currentInterfaceId = desc.m_ifaceDesc->bInterfaceNumber;
+				if (inEndpointId) // shortcut, we are done
+					p = end;
+
 				break;
 
 			case LIBUSB_DT_ENDPOINT:
 				if (currentInterfaceId == deviceDesc->m_interfaceId &&
-					(desc.m_epDesc->bEndpointAddress & 0x80) &&
 					(desc.m_epDesc->bmAttributes & LIBUSB_TRANSFER_TYPE_MASK) == LIBUSB_TRANSFER_TYPE_INTERRUPT
 				) {
-					deviceDesc->m_endpointId = desc.m_epDesc->bEndpointAddress;
-					p = end; // we are done
+					if (desc.m_epDesc->bEndpointAddress & 0x80)
+						inEndpointId = desc.m_epDesc->bEndpointAddress;
+					else
+						outEndpointId = desc.m_epDesc->bEndpointAddress;
+
+					if (inEndpointId && outEndpointId) // shortcut, we are done
+						p = end;
 				}
 
 				break;
@@ -242,6 +251,9 @@ enumerateHidMonDevices(
 
 			p += length;
 		}
+
+		deviceDesc->m_inEndpointId = inEndpointId;
+		deviceDesc->m_outEndpointId = outEndpointId;
 
 		HidRdParser::findFirstUsage(
 			&deviceDesc->m_usagePage,
