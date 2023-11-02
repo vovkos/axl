@@ -50,6 +50,7 @@ set(
 		hidapi
 		openssl
 		expat
+		re2s
 		qt
 		ragel
 		doxygen

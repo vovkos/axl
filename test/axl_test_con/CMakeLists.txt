@@ -168,6 +168,11 @@ if(BUILD_AXL_RE)
 	list(APPEND OPT_LIB_LIST axl_re axl_lex)
 endif()
 
+if(BUILD_AXL_RE2)
+	add_definitions(-D_AXL_RE2=1)
+	list(APPEND OPT_LIB_LIST axl_re2)
+endif()
+
 if(BUILD_AXL_ZIP)
 	add_definitions(-D_AXL_ZIP=1)
 	list(APPEND OPT_LIB_LIST axl_zip)

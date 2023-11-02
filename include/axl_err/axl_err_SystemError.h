@@ -43,7 +43,7 @@ enum SystemErrorCode {
 	SystemErrorCode_Cancelled                = ERROR_OPERATION_ABORTED,
 	SystemErrorCode_Unsuccessful             = ERROR_GEN_FAILURE,
 	SystemErrorCode_InsufficientResources    = ERROR_NO_SYSTEM_RESOURCES,
-	SystemErrorCode_NotImplemented           = ERROR_INVALID_FUNCTION,
+	SystemErrorCode_NotImplemented           = ERROR_CALL_NOT_IMPLEMENTED,
 	SystemErrorCode_InvalidHandle            = ERROR_INVALID_HANDLE,
 	SystemErrorCode_AddressAlreadyExists     = ERROR_DUP_NAME,
 	SystemErrorCode_InvalidAddress           = ERROR_UNEXP_NET_ERR,

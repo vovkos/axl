@@ -522,6 +522,8 @@ testLongJmpTry() {
 
 #if (_AXL_RE)
 
+namespace test_re {
+
 void
 testCharSet() {
 	re::CharSet charSet;
@@ -1273,6 +1275,33 @@ testRegex2() {
 	regex.printDfa();
 #endif
 }
+
+} // namespace test_re
+
+#endif
+
+//..............................................................................
+
+#if (_AXL_RE2)
+
+namespace test_re2 {
+
+void
+testRegex() {
+	re2::Regex regex;
+	bool result;
+
+	static const char src[] = "[a-b]*c+";
+	printf("REGEX: %s\n\n", src);
+
+	result = regex.compile(src);
+	if (!result) {
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+}
+
+} // namespace test_re2
 
 #endif
 
@@ -7990,8 +8019,8 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-#if (_AXL_IO_HID)
-	testHid();
+#if (_AXL_RE2)
+	test_re2::testRegex();
 #endif
 
 	return 0;

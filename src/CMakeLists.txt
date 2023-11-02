@@ -81,6 +81,22 @@ endif()
 
 #...............................................................................
 
+if(RE2S_FOUND)
+	option(
+		BUILD_AXL_RE2
+		"Build axl_re2 library (re2s wrappers)"
+		ON
+	)
+else()
+	unset(BUILD_AXL_RE2 CACHE)
+endif()
+
+if(BUILD_AXL_RE2)
+	add_subdirectory(axl_re2)
+endif()
+
+#...............................................................................
+
 option(
 	BUILD_AXL_IO
 	"Build axl_io library"

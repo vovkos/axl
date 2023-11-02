@@ -54,6 +54,10 @@
 #	include "axl_re_Regex.h"
 #endif
 
+#ifdef _AXL_RE2
+#	include "axl_re2_Regex.h"
+#endif
+
 #ifdef _AXL_ZIP
 #	include "axl_zip_ZipReader.h"
 #endif

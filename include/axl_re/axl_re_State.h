@@ -11,7 +11,7 @@
 
 #pragma once
 
-#define _AXL_RE_REGEXSTATE_H
+#define _AXL_RE_STATE_H
 
 #include "axl_re_Nfa.h"
 #include "axl_re_Match.h"
