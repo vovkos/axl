@@ -12,5 +12,6 @@
 #pragma once
 
 #include "axl_re_Pch.h"
+#include "axl_sl_Array.h"
 
 #include <re2/sm.h>

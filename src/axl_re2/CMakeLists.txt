@@ -16,11 +16,13 @@
 set(
 	LIB_H_LIST
 	${AXL_INC_DIR}/axl_re2/axl_re2_Regex.h
+	${AXL_INC_DIR}/axl_re2/axl_re2_State.h
 )
 
 set(
 	LIB_CPP_LIST
 	axl_re2_Regex.cpp
+	axl_re2_State.cpp
 )
 
 source_group(

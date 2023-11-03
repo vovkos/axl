@@ -551,16 +551,18 @@ testCharSet() {
 		printf("isSet(%d): %d\n", c, charSet.isSet(c));
 }
 
-#define _AXL_RE_TEST_SIMPLE_MATCH    0
-#define _AXL_RE_TEST_STREAM    1
-#define _AXL_RE_TEST_SWITCH    1
-#define _AXL_RE_TEST_LOAD_SAVE 1
-#define _AXL_RE_TEST_FULL_DFA  1
+#define _AXL_RE_PRINT_NFA         0 // _AXL_DEBUG
+#define _AXL_RE_PRINT_DFA         0 // _AXL_DEBUG
+#define _AXL_RE_TEST_SIMPLE_MATCH 1
+#define _AXL_RE_TEST_STREAM       1
+#define _AXL_RE_TEST_SWITCH       1
+#define _AXL_RE_TEST_LOAD_SAVE    1
+#define _AXL_RE_TEST_FULL_DFA     1
 
 void
 testUsbRegex() {
 	static const char file[] =
-		/* "#\n"
+		"#\n"
 		"#	List of USB ID's\n"
 		"#\n"
 		"#	Maintained by Stephen J. Gowdy <linux.usb.ids@gmail.com>\n"
@@ -581,7 +583,7 @@ testUsbRegex() {
 		"# vendor  vendor_name\n"
 		"#	device  device_name				<-- single tab\n"
 		"#		interface  interface_name		<-- two tabs\n"
-		"\n" */
+		"\n"
 		"0001  Fry's Electronics\n"
 		"	7778  Counterfeit flash drive [Kingston]\n"
 		"0002  Ingram\n"
@@ -668,6 +670,8 @@ testRegex() {
 	const char* p;
 	const char* end;
 
+	printf("--- matching with axl::re::Regex...\n");
+
 	do {
 
 		result = regex.compile("\x91");
@@ -676,11 +680,13 @@ testRegex() {
 			return;
 		}
 
-		regex.buildFullDfa();
-		regex.buildFullReverseDfa();
-#if (_AXL_DEBUG)
+#if (_AXL_RE_PRINT_NFA)
 		printf("\nNFA:\n");
 		regex.printNfa();
+#endif
+#if (_AXL_RE_PRINT_DFA)
+		regex.buildFullDfa();
+		regex.buildFullReverseDfa();
 		printf("\nDFA:\n");
 		regex.printDfa();
 		printf("\nrDFA:\n");
@@ -700,8 +706,6 @@ testRegex() {
 			state.getMatch()->getEndOffset(),
 			state.getMatch()->getText().sz()
 		);
-
-		return;
 	} while (0);
 
 	do {
@@ -711,11 +715,13 @@ testRegex() {
 			return;
 		}
 
-		regex.buildFullDfa();
-		regex.buildFullReverseDfa();
-#if (_AXL_DEBUG)
+#if (_AXL_RE_PRINT_NFA)
 		printf("\nNFA:\n");
 		regex.printNfa();
+#endif
+#if (_AXL_RE_PRINT_DFA)
+		regex.buildFullDfa();
+		regex.buildFullReverseDfa();
 		printf("\nDFA:\n");
 		regex.printDfa();
 		printf("\nrDFA:\n");
@@ -744,8 +750,6 @@ testRegex() {
 			state.getMatch()->getEndOffset(),
 			state.getMatch()->getText().sz()
 		);
-
-		return;
 	} while (0);
 
 	do {
@@ -772,7 +776,6 @@ testRegex() {
 			state.getMatch()->getText().sz()
 		);
 
-		return;
 	} while (0);
 
 	do {
@@ -806,7 +809,6 @@ testRegex() {
 			state.getMatch()->getEndOffset()
 		);
 
-		return;
 	} while (0);
 
 	do {
@@ -816,9 +818,9 @@ testRegex() {
 			return;
 		}
 
+#if (_AXL_RE_PRINT_DFA)
 		regex.buildFullDfa();
 		regex.buildFullReverseDfa();
-#if (_AXL_DEBUG)
 		printf("\nDFA:\n");
 		regex.printDfa();
 		printf("\nrDFA:\n");
@@ -836,7 +838,6 @@ testRegex() {
 			state.getMatch()->getEndOffset(),
 			state.getMatch()->getText().sz()
 		);
-		return;
 	} while (0);
 
 	do {
@@ -846,9 +847,9 @@ testRegex() {
 			return;
 		}
 
+#if (_AXL_RE_PRINT_DFA)
 		regex.buildFullDfa();
 		regex.buildFullReverseDfa();
-#if (_AXL_DEBUG)
 		printf("\nDFA:\n");
 		regex.printDfa();
 		printf("\nrDFA:\n");
@@ -875,19 +876,18 @@ testRegex() {
 			state.getMatch()->getEndOffset(),
 			state.getMatch()->getText().sz()
 		);
-		return;
 	} while (0);
 
 	do {
-		result = regex.compile("[5-9]+");
+		result = regex.compile("[3-9]+");
 		if (!result) {
 			printf("error: %s\n", err::getLastErrorDescription().sz());
 			return;
 		}
 
+#if (_AXL_RE_PRINT_DFA)
 		regex.buildFullDfa();
 		regex.buildFullReverseDfa();
-#if (_AXL_DEBUG)
 		printf("\nDFA:\n");
 		regex.printDfa();
 		printf("\nrDFA:\n");
@@ -905,8 +905,6 @@ testRegex() {
 		result = regex.exec(&state, "78");
 		ASSERT(result == re::ExecResult_Continue);
 
-		printf("state: %d\n", state.getDfaStateId());
-
 		result = regex.eof(&state, false);
 		ASSERT(result == re::ExecResult_ContinueBackward);
 
@@ -922,7 +920,6 @@ testRegex() {
 			state.getMatch()->getEndOffset(),
 			state.getMatch()->getText().sz()
 		);
-		return;
 	} while (0);
 
 	do {
@@ -932,9 +929,9 @@ testRegex() {
 			return;
 		}
 
+#if (_AXL_RE_PRINT_DFA)
 		regex.buildFullDfa();
 		regex.buildFullReverseDfa();
-#if (_AXL_DEBUG)
 		printf("\nDFA:\n");
 		regex.printDfa();
 		printf("\nrDFA:\n");
@@ -955,7 +952,6 @@ testRegex() {
 		result = regex.exec(&state, "abc\n\n");
 		ASSERT(result == re::ExecResult_MatchOffsetsOnly);
 		printf("match: %lld..%lld\n", state.getMatch()->getOffset(), state.getMatch()->getEndOffset());
-		return;
 	} while (0);
 
 	do {
@@ -965,9 +961,9 @@ testRegex() {
 			return;
 		}
 
+#if (_AXL_RE_PRINT_DFA)
 		regex.buildFullDfa();
 		regex.buildFullReverseDfa();
-#if (_AXL_DEBUG)
 		printf("\nDFA:\n");
 		regex.printDfa();
 		printf("\nrDFA:\n");
@@ -977,16 +973,19 @@ testRegex() {
 		re::State state(re::ExecFlag_Stream | re::ExecFlag_DisableCapture);
 
 		re::ExecResult result = regex.exec(&state, "  ");
+		ASSERT(result == re::ExecResult_Continue);
 		result = regex.exec(&state, "  abcdefghijklmnopqrstuvwxyz");
+		ASSERT(result == re::ExecResult_Continue);
 		result = regex.exec(&state, "abcdefghijklmnopqrstuvwxyz");
+		ASSERT(result == re::ExecResult_ContinueBackward);
+		result = regex.exec(&state, "  abcdefghijklmnopqrstuvwxyz");
+		ASSERT(result == re::ExecResult_MatchOffsetsOnly);
 
 		const re::Match* match = state.getMatch();
 		if (match)
 			printf("match: %lld..%lld\n", match->getOffset(), match->getEndOffset());
 		else
 			printf("mismatch\n");
-
-		return;
 	} while (0);
 
 	do {
@@ -996,9 +995,9 @@ testRegex() {
 			return;
 		}
 
+#if (_AXL_RE_PRINT_DFA)
 		regex.buildFullDfa();
 		regex.buildFullReverseDfa();
-#if (_AXL_DEBUG)
 		printf("\nDFA:\n");
 		regex.printDfa();
 		printf("\nrDFA:\n");
@@ -1011,8 +1010,6 @@ testRegex() {
 			printf("match: %lld..%lld '%s'\n", match->getOffset(), match->getEndOffset(), match->getText().sz());
 		else
 			printf("mismatch\n");
-
-		return;
 	} while (0);
 
 	do {
@@ -1044,9 +1041,9 @@ testRegex() {
 		result = regex.eof(&state, true);
 		printf("regex result: %d, match offset: %lld, match length: %d, match: %s\n", result, state.getMatch()->getOffset(), state.getMatch()->getSize(), state.getMatch()->getText().sz());
 		ASSERT(result == re::ExecResult_Match && state.getMatchAcceptId() == 0 && state.getMatch()->getSize() == 6);
-
-		return;
 	} while (0);
+
+	return;
 
 	// const char src[] = "[\xd0\xb1-\xd0\xb3]+";
 	// const char src[] = "a|[a-z]+1";
@@ -1062,11 +1059,11 @@ testRegex() {
 		return;
 	}
 
-#if (_AXL_DEBUG)
+#if (_AXL_RE_PRINT_NFA)
 	printf("NFA:\n");
 	regex.printNfa();
-
-#	if (_AXL_RE_TEST_DFA)
+#endif
+#if (_AXL_RE_PRINT_DFA)
 	regex.buildFullDfa();
 	regex.buildFullReverseDfa();
 	regex.buildFullRollbackDfa();
@@ -1075,7 +1072,6 @@ testRegex() {
 	regex.printDfa();
 	printf("\nrDFA:\n");
 	regex.printReverseDfa();
-#	endif
 #endif
 
 #if (_AXL_RE_TEST_LOAD_SAVE)
@@ -1090,7 +1086,7 @@ testRegex() {
 		return;
 	}
 
-#	if (_AXL_DEBUG)
+#	if (_AXL_RE_PRINT_NFA)
 	regex2.printNfa();
 #	endif
 #endif
@@ -1190,10 +1186,11 @@ testRegex() {
 		"<whitespace>",
 	};
 
-#if (_AXL_DEBUG)
+#if (_AXL_RE_PRINT_NFA)
 	printf("\nNFA:\n");
 	regex.printNfa();
-
+#endif
+#if (_AXL_RE_PRINT_DFA)
 	printf("\nDFA:\n");
 	regex.buildFullDfa();
 	regex.printDfa();
@@ -1209,7 +1206,7 @@ testRegex() {
 		return;
 	}
 
-#	if (_AXL_DEBUG)
+#	if (_AXL_RE_PRINT_NFA)
 	regex2.printNfa();
 #	endif
 #endif
@@ -1266,10 +1263,11 @@ testRegex2() {
 		return;
 	}
 
-#if (_AXL_DEBUG)
+#if (_AXL_RE_PRINT_NFA)
 	printf("NFA:\n");
 	regex.printNfa();
-
+#endif
+#if (_AXL_RE_PRINT_DFA)
 	printf("\nDFA:\n");
 	regex.buildFullDfa();
 	regex.printDfa();
@@ -1289,9 +1287,384 @@ namespace test_re2 {
 void
 testRegex() {
 	re2::Regex regex;
+	re2::State state;
+	size_t count = 0;
 	bool result;
+	const char* p;
+	const char* end;
 
-	static const char src[] = "[a-b]*c+";
+	printf("--- matching with axl::re2::Regex...\n");
+
+	do {
+
+		result = regex.compile(re2::RegexFlag_Latin1, "\x91");
+		if (!result) {
+			printf("error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		const char text[] = "abc\x91ijk\x93lmn";
+
+		re2::State state;
+		re2::ExecResult result = regex.exec(&state, text);
+		ASSERT(result == re2::ExecResult_Match);
+
+		printf(
+			"match(%d): %lld..%lld (%s)\n",
+			state.getMatchId(),
+			state.getMatchOffset(),
+			state.getMatchEndOffset(),
+			sl::StringRef(text + state.getMatchOffset(), state.getMatchSize()).sz()
+		);
+
+	} while (0);
+
+	do {
+		result = regex.compile("^abc");
+		if (!result) {
+			printf("error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		char const text[] = "abcd";
+
+		re2::State state;
+		re2::ExecResult result = regex.exec(&state, text);
+		ASSERT(result == re2::ExecResult_Match);
+
+		size_t baseOffset = state.getMatchEndOffset();
+
+		printf(
+			"match(%d): %lld..%lld (%s)\n",
+			state.getMatchId(),
+			state.getMatchOffset(),
+			state.getMatchEndOffset(),
+			sl::StringRef(text + state.getMatchOffset(), state.getMatchSize()).sz()
+		);
+
+		char const text2[] = "xyz\nabcd";
+
+		result = regex.exec(&state, text2);
+		ASSERT(result == re2::ExecResult_Match);
+
+		printf(
+			"match(%d): %lld..%lld (%s)\n",
+			state.getMatchId(),
+			state.getMatchOffset(),
+			state.getMatchEndOffset(),
+			sl::StringRef(text2 - baseOffset + state.getMatchOffset(), state.getMatchSize()).sz()
+		);
+
+	} while (0);
+
+	do {
+		regex.createSwitch(re2::RegexFlag_AnchorStart);
+
+		result =
+			regex.compileSwitchCase("\\s*(foo\\d*)\\s+(bar\\d*)?\\s*") != -1 &&
+			regex.finalizeSwitch();
+
+		if (!result) {
+			printf("error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		char const text[] = " foo123 bar567 ";
+
+		re2::State state;
+		re2::ExecResult result = regex.exec(&state, text);
+		ASSERT(result == re2::ExecResult_Match);
+
+		printf(
+			"match(%d): %lld..%lld (%s)\n",
+			state.getMatchId(),
+			state.getMatchOffset(),
+			state.getMatchEndOffset(),
+			sl::StringRef(text + state.getMatchOffset(), state.getMatchSize()).sz()
+		);
+	} while (0);
+
+	do {
+		regex.createSwitch(re2::RegexFlag_AnchorStart | re2::RegexFlag_Stream);
+
+		result =
+			regex.compileSwitchCase("open[ \t]*\\d*[\r\n]") != -1 &&
+			regex.compileSwitchCase("close[ \t]*\\d*[\r\n]") != -1 &&
+			regex.compileSwitchCase("connect[ \t]*\\d*[\r\n]") != -1 &&
+			regex.compileSwitchCase("\\s+") != -1 &&
+			regex.finalizeSwitch();
+
+		if (!result) {
+			printf("error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		const char chunk1[] = "op";
+		const char chunk2[] = "en 12\n con";
+
+		re2::State state;
+		re2::ExecResult result = regex.exec(&state, chunk1);
+		ASSERT(result == re2::ExecResult_Continue);
+
+		result = regex.exec(&state, chunk2);
+		ASSERT(result == re2::ExecResult_ContinueBackward);
+
+		result = regex.exec(&state, chunk1);
+		ASSERT(result == re2::ExecResult_Match);
+
+		printf(
+			"match(%d): %lld..%lld\n",
+			state.getMatchId(),
+			state.getMatchOffset(),
+			state.getMatchEndOffset()
+		);
+	} while (0);
+
+	do {
+		result = regex.compile(re2::RegexFlag_Stream, "<[^>]*>");
+		if (!result) {
+			printf("error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		char const text[] = "abc<def>ghi";
+
+		re2::State state;
+		re2::ExecResult result = regex.exec(&state, text);
+		ASSERT(result == re2::ExecResult_Match);
+
+		printf(
+			"match: %lld..%lld: '%s'\n",
+			state.getMatchOffset(),
+			state.getMatchEndOffset(),
+			sl::StringRef(text + state.getMatchOffset(), state.getMatchSize()).sz()
+		);
+	} while (0);
+
+	do {
+		result = regex.compile(re2::RegexFlag_Stream, "char|[a-z]*1");
+		if (!result) {
+			printf("error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		char const text[] = "abcharzzz";
+		char const rchunk1[] = "abcharz";
+		char const rchunk2[] = "zz";
+
+		re2::State state;
+		re2::ExecResult result = regex.exec(&state, text);
+		ASSERT(result == re2::ExecResult_Continue);
+
+		result = regex.eof(&state, false);
+		ASSERT(result == re2::ExecResult_ContinueBackward);
+
+		result = regex.exec(&state, rchunk2);
+		ASSERT(result == re2::ExecResult_ContinueBackward);
+
+		result = regex.exec(&state, rchunk1);
+		ASSERT(result == re2::ExecResult_Match);
+
+		printf(
+			"match: %lld..%lld: '%s'\n",
+			state.getMatchOffset(),
+			state.getMatchEndOffset(),
+			sl::StringRef(text + state.getMatchOffset(), state.getMatchSize()).sz()
+		);
+	} while (0);
+
+
+	do {
+		result = regex.compile(re2::RegexFlag_Stream, "[3-9]+");
+		if (!result) {
+			printf("error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		char const text[] = "5678";
+		char const chunk1[] = "56";
+		char const chunk2[] = "78";
+		char const rchunk[] = "12345678"; // try going beyond base offset
+
+		re2::State state;
+		re2::ExecResult result = regex.exec(&state, chunk1);
+		ASSERT(result == re2::ExecResult_Continue);
+
+		result = regex.exec(&state, "");
+		ASSERT(result == re2::ExecResult_Continue);
+
+		result = regex.exec(&state, chunk2);
+		ASSERT(result == re2::ExecResult_Continue);
+
+		result = regex.eof(&state, false);
+		ASSERT(result == re2::ExecResult_ContinueBackward);
+
+		result = regex.exec(&state, "");
+		ASSERT(result == re2::ExecResult_ContinueBackward);
+
+		result = regex.exec(&state, rchunk);
+		ASSERT(result == re2::ExecResult_Match);
+
+		printf(
+			"match: %lld..%lld: '%s'\n",
+			state.getMatchOffset(),
+			state.getMatchEndOffset(),
+			sl::StringRef(text + state.getMatchOffset(), state.getMatchSize()).sz()
+		);
+	} while (0);
+
+	do {
+		result = regex.compile(re2::RegexFlag_Stream, "[a-z]+");
+		if (!result) {
+			printf("error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		char const chunk1[] = "abc\n\n";
+		char const chunk2[] = "\n\n";
+		char const chunk3[] = "abc\n\n";
+
+		re2::State state;
+		re2::ExecResult result = regex.exec(&state, chunk1);
+		ASSERT(result == re2::ExecResult_Match);
+		printf("match: %lld..%lld\n", state.getMatchOffset(), state.getMatchEndOffset());
+
+		result = regex.exec(&state, chunk2);
+		ASSERT(result == re2::ExecResult_Continue);
+
+		result = regex.exec(&state, chunk3);
+		ASSERT(result == re2::ExecResult_ContinueBackward);
+
+		result = regex.exec(&state, chunk2);
+		ASSERT(result == re2::ExecResult_Match);
+		printf("match: %lld..%lld\n", state.getMatchOffset(), state.getMatchEndOffset());
+	} while (0);
+
+	do {
+		result = regex.compile(re2::RegexFlag_Stream, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
+		if (!result) {
+			printf("error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		char const chunk1[] = "  ";
+		char const chunk2[] = "  abcdefghijklmnopqrstuvwxyz";
+		char const chunk3[] = "abcdefghijklmnopqrstuvwxyz";
+
+		re2::State state;
+		re2::ExecResult result = regex.exec(&state, chunk1);
+		ASSERT(result == re2::ExecResult_Continue);
+		result = regex.exec(&state, chunk2);
+		ASSERT(result == re2::ExecResult_Continue);
+		result = regex.exec(&state, chunk3);
+		ASSERT(result == re2::ExecResult_Continue);
+		result = regex.eof(&state);
+		ASSERT(result == re2::ExecResult_ContinueBackward);
+		result = regex.exec(&state, chunk3);
+		ASSERT(result == re2::ExecResult_ContinueBackward);
+		result = regex.exec(&state, chunk2);
+		ASSERT(result == re2::ExecResult_Match);
+
+		if (state.isMatch())
+			printf("match: %lld..%lld\n", state.getMatchOffset(), state.getMatchEndOffset());
+		else
+			printf("mismatch\n");
+	} while (0);
+
+	do {
+		result = regex.compile("a|ba");
+		if (!result) {
+			printf("error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		char const text[] = "...ba...";
+
+		re2::State state = regex.exec(text);
+		if (state.isMatch())
+			printf(
+				"match: %lld..%lld '%s'\n",
+				state.getMatchOffset(),
+				state.getMatchEndOffset(),
+				sl::StringRef(text + state.getMatchOffset(), state.getMatchSize()).sz()
+			);
+		else
+			printf("mismatch\n");
+	} while (0);
+
+	do {
+		printf("compiling\n");
+
+		regex.createSwitch(re2::RegexFlag_AnchorStart | re2::RegexFlag_Stream);
+		regex.compileSwitchCase("[0-9]+");
+		regex.compileSwitchCase(".");
+		regex.finalizeSwitch();
+
+		printf("matching\n");
+
+		char const text[] = "\r123456\r" "123456" "\x2e" "123456";
+		char const chunk1[] = "\r123456\r";
+		char const chunk2[] = "123456";
+		char const chunk3[] = "\x2e";
+		char const chunk4[] = "123456";
+
+		enum {
+			BaseOffset = 1000
+		};
+
+		re2::ExecResult result;
+		re2::State state(BaseOffset, re2::State::EofChar);
+
+		result = regex.exec(&state, chunk1);
+
+		printf(
+			"regex result: %d, match id: %d, match offset: %lld, match length: %d, match: %s\n",
+			result,
+			state.getMatchId(),
+			state.getMatchOffset(),
+			state.getMatchSize(),
+			sl::StringRef(text + state.getMatchOffset() - BaseOffset, state.getMatchSize()).sz()
+		);
+
+		ASSERT(result == re2::ExecResult_Match && state.getMatchId() == 1 && state.getMatchSize() == 1);
+
+		result = regex.exec(&state, chunk2);
+		printf("regex result: %d\n", result);
+		ASSERT(result == re2::ExecResult_Continue);
+
+		result = regex.exec(&state, chunk3);
+		printf(
+			"regex result: %d, match id: %d, match offset: %lld, match length: %d\n",
+			result,
+			state.getMatchId(),
+			state.getMatchOffset(),
+			state.getMatchSize()
+		);
+		ASSERT(result == re2::ExecResult_Match && state.getMatchId() == 0 && state.getMatchSize() == 6);
+
+		result = regex.exec(&state, chunk4);
+		printf("regex result: %d\n", result);
+
+		result = regex.eof(&state);
+		printf(
+			"regex result: %d, match id: %d, match offset: %lld, match length: %d, match: %s\n",
+			result,
+			state.getMatchId(),
+			state.getMatchOffset(),
+			state.getMatchSize(),
+			sl::StringRef(text + state.getMatchOffset() - BaseOffset, state.getMatchSize()).sz()
+		);
+
+		ASSERT(result == re2::ExecResult_Match && state.getMatchId() == 0 && state.getMatchSize() == 6);
+	} while (0);
+
+/*
+	// const char src[] = "[\xd0\xb1-\xd0\xb3]+";
+	// const char src[] = "a|[a-z]+1";
+	// const char src[] = "x(a*b)*(a*c)*";
+	const char src[] = "\\b([a-c]+)([0-9]+)\\b";
+	// const char src[] = "^$";
+
 	printf("REGEX: %s\n\n", src);
 
 	result = regex.compile(src);
@@ -1299,6 +1672,162 @@ testRegex() {
 		printf("error: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
+
+#if (_AXL_RE_TEST_LOAD_SAVE)
+	sl::Array<char> storage;
+	regex.save(&storage);
+	printf("\nNFA storage: %d B\n", storage.getCount());
+
+	re2::Regex regex2;
+	result = regex2.load(storage) != -1;
+	if (!result) {
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+#endif
+
+//	const char text[] = "suka\xd0\xb0\xd0\xb1\xd0\xb2\xd0\xb3\xd0\xb4\xd0\xb5\xd0\xb6hui";
+//	const char text[] = "ahgbcbcbcdedsdds";
+	const char text[] = "   abc123   ";
+//	const char text[] = "xaaabbbbcd";
+
+#if (_AXL_RE_TEST_SIMPLE_MATCH)
+	printf("\nMATCHING TEXT: '%s'\n", text);
+
+	state = regex.exec(text);
+	if (!state) {
+		printf("NO MATCH!\n");
+		return;
+	}
+
+	match = state.getMatch();
+	ASSERT(match);
+
+	printf(
+		"$0: %p(%d) '%s'\n",
+		match->getOffset(),
+		match->getSize(),
+		match->getText().sz()
+	);
+
+	count = state.getCaptureCount();
+	for (size_t i = 1; i < count; i++) {
+		const re2::Match* capture = state.getCapture(i);
+		if (capture)
+			printf(
+				"$%d: %p(%d) '%s'\n",
+				i,
+				capture->getOffset(),
+				capture->getSize(),
+				capture->getText().sz()
+			);
+	}
+#endif
+
+#if (_AXL_RE_TEST_STREAM)
+	printf("STREAM MATCH: '%s':\n", text);
+
+	state.initialize(re2::RegexFlag_Stream);
+
+	p = text;
+	end = text + lengthof(text);
+	for (; p < end; p++) {
+		re2::ExecResult result = regex.exec(&state, p, 1);
+		if (result != re2::ExecResult_Continue) {
+			if (result != re2::ExecResult_ContinueBackward)
+				break;
+
+			for (p--; p >= text; p--) {
+				result = regex.exec(&state, p, 1);
+				if (result >= 0)
+					break;
+			}
+
+			break;
+		}
+	}
+
+	match = state.getMatch();
+	if (!match) {
+		printf("NO MATCH!\n");
+		return;
+	}
+
+	printf(
+		"$0: %llx(%d)\n",
+		match->getOffset(),
+		match->getSize()
+	);
+#endif
+
+#if (_AXL_RE_TEST_SWITCH)
+	regex.createSwitch();
+	regex.compileSwitchCase("char");
+	regex.compileSwitchCase("int");
+	regex.compileSwitchCase("long");
+	regex.compileSwitchCase("[0-9]+");
+	regex.compileSwitchCase("0x[0-9a-fA-F]+");
+	regex.compileSwitchCase("[a-zA-Z_][a-zA-Z_0-9]*");
+	regex.compileSwitchCase("\\s+");
+	regex.finalizeSwitch();
+
+	static const char* caseNameMap[] = {
+		"<char>",
+		"<int>",
+		"<long>",
+		"<decimal>",
+		"<hexadecimal>",
+		"<identifier>",
+		"<whitespace>",
+	};
+
+#if (_AXL_RE_TEST_LOAD_SAVE)
+	regex.save(&storage);
+	printf("\nNFA storage: %d B\n", storage.getCount());
+
+	result = regex2.load(storage) != -1;
+	if (!result) {
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+#endif
+
+	static const char source[] =
+		"suka\n"
+		" int\n"
+		"  long\n"
+		"12345\n"
+		" 0xabcdef\n"
+		"  0x123abdef\n"
+		"suka\n"
+		" suka_hui_123\n";
+
+	p = source;
+	end = p + lengthof(source);
+
+	state.initialize(re2::ExecFlag_AnchorDataBegin);
+	while (p < end) {
+		re2::ExecResult result = regex.exec(&state, p, end - p);
+		if (!result) {
+			printf("NO MATCH!\n");
+			break;
+		}
+
+		size_t id = state.getMatchId();
+		match = state.getMatch();
+		ASSERT(match);
+
+		printf("#%d %s: %llx(%d) '%s'\n",
+			id,
+			caseNameMap[id],
+			match->getOffset(),
+			match->getSize(),
+			match->getText().sz()
+		);
+
+		p += match->getSize();
+	}
+#endif */
 }
 
 } // namespace test_re2
@@ -8019,7 +8548,9 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
+
 #if (_AXL_RE2)
+	test_re::testRegex();
 	test_re2::testRegex();
 #endif
 
