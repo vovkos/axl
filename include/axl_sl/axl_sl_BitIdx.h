@@ -25,25 +25,25 @@ namespace sl {
 inline
 uint8_t
 geLoBit8(uint8_t x) {
-   return x & -x;
+	return x & -x;
 }
 
 inline
 uint16_t
 getLoBit16(uint16_t x) {
-   return x & -x;
+	return x & -x;
 }
 
 inline
 uint32_t
 getLoBit32(uint32_t x) {
-   return x & -x;
+	return x & -x;
 }
 
 inline
 uint64_t
 getLoBit64(uint64_t x) {
-   return x & -x;
+	return x & -x;
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -53,43 +53,43 @@ getLoBit64(uint64_t x) {
 inline
 uint8_t
 getHiBit8(uint8_t x) {
-   x = x | (x >> 1);
-   x = x | (x >> 2);
-   x = x | (x >> 4);
-   return x - (x >> 1);
+	x = x | (x >> 1);
+	x = x | (x >> 2);
+	x = x | (x >> 4);
+	return x - (x >> 1);
 }
 
 inline
 uint16_t
 getHiBit16(uint16_t x) {
-   x = x | (x >> 1);
-   x = x | (x >> 2);
-   x = x | (x >> 4);
-   x = x | (x >> 8);
-   return x - (x >> 1);
+	x = x | (x >> 1);
+	x = x | (x >> 2);
+	x = x | (x >> 4);
+	x = x | (x >> 8);
+	return x - (x >> 1);
 }
 
 inline
 uint32_t
 getHiBit32(uint32_t x) {
-   x = x | (x >> 1);
-   x = x | (x >> 2);
-   x = x | (x >> 4);
-   x = x | (x >> 8);
-   x = x | (x >> 16);
-   return x - (x >> 1);
+	x = x | (x >> 1);
+	x = x | (x >> 2);
+	x = x | (x >> 4);
+	x = x | (x >> 8);
+	x = x | (x >> 16);
+	return x - (x >> 1);
 }
 
 inline
 uint64_t
 getHiBit64(uint64_t x) {
-   x = x | (x >> 1);
-   x = x | (x >> 2);
-   x = x | (x >> 4);
-   x = x | (x >> 8);
-   x = x | (x >> 16);
-   x = x | (x >> 32);
-   return x - (x >> 1);
+	x = x | (x >> 1);
+	x = x | (x >> 2);
+	x = x | (x >> 4);
+	x = x | (x >> 8);
+	x = x | (x >> 16);
+	x = x | (x >> 32);
+	return x - (x >> 1);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

@@ -96,8 +96,8 @@ const struct ZeroInit_t {} ZeroInit;
 inline
 void*
 operator new (
-    size_t size,
-    const axl::mem::ZeroInit_t& zeroInit
+	size_t size,
+	const axl::mem::ZeroInit_t& zeroInit
 ) {
 	void* p = operator new (size);
 	memset(p, 0, size);
@@ -108,7 +108,7 @@ inline
 void
 operator delete (
 	void* p,
-    const axl::mem::ZeroInit_t& zeroInit
+	const axl::mem::ZeroInit_t& zeroInit
 ) AXL_NOEXCEPT {
 	operator delete (p);
 }
@@ -116,8 +116,8 @@ operator delete (
 inline
 void*
 operator new[] (
-    size_t size,
-    const axl::mem::ZeroInit_t& zeroInit
+	size_t size,
+	const axl::mem::ZeroInit_t& zeroInit
 ) {
 	return operator new (size, zeroInit);
 }
@@ -126,7 +126,7 @@ inline
 void
 operator delete[] (
 	void* p,
-    const axl::mem::ZeroInit_t& zeroInit
+	const axl::mem::ZeroInit_t& zeroInit
 ) AXL_NOEXCEPT {
 	operator delete (p);
 }
@@ -136,9 +136,9 @@ operator delete[] (
 inline
 void*
 operator new (
-    size_t size,
-    const axl::mem::ZeroInit_t& zeroInit,
-    const std::nothrow_t& nothrow
+	size_t size,
+	const axl::mem::ZeroInit_t& zeroInit,
+	const std::nothrow_t& nothrow
 ) AXL_NOEXCEPT {
 	void* p = operator new (size, nothrow);
 	if (p)
@@ -149,9 +149,9 @@ operator new (
 inline
 void*
 operator new[] (
-    size_t size,
-    const axl::mem::ZeroInit_t& zeroInit,
-    const std::nothrow_t& nothrow
+	size_t size,
+	const axl::mem::ZeroInit_t& zeroInit,
+	const std::nothrow_t& nothrow
 ) AXL_NOEXCEPT {
 	return operator new (size, zeroInit, nothrow);
 }
@@ -163,8 +163,8 @@ operator new[] (
 inline
 void*
 operator new (
-    size_t size,
-    axl::mem::ExtraSize extraSize
+	size_t size,
+	axl::mem::ExtraSize extraSize
 ) {
 	return operator new (size + extraSize);
 }
@@ -173,7 +173,7 @@ inline
 void
 operator delete (
 	void* p,
-    axl::mem::ExtraSize extraSize
+	axl::mem::ExtraSize extraSize
 ) AXL_NOEXCEPT {
 	operator delete (p);
 }
@@ -181,8 +181,8 @@ operator delete (
 inline
 void*
 operator new[] (
-    size_t size,
-    axl::mem::ExtraSize extraSize
+	size_t size,
+	axl::mem::ExtraSize extraSize
 ) {
 	return operator new (size + extraSize);
 }
@@ -191,7 +191,7 @@ inline
 void
 operator delete[] (
 	void* p,
-    axl::mem::ExtraSize extraSize
+	axl::mem::ExtraSize extraSize
 ) AXL_NOEXCEPT {
 	operator delete (p);
 }
@@ -201,9 +201,9 @@ operator delete[] (
 inline
 void*
 operator new (
-    size_t size,
-    axl::mem::ExtraSize extraSize,
-    const std::nothrow_t& nothrow
+	size_t size,
+	axl::mem::ExtraSize extraSize,
+	const std::nothrow_t& nothrow
 ) AXL_NOEXCEPT {
 	return operator new (size + extraSize, nothrow);
 }
@@ -211,9 +211,9 @@ operator new (
 inline
 void*
 operator new[] (
-    size_t size,
-    axl::mem::ExtraSize extraSize,
-    const std::nothrow_t& nothrow
+	size_t size,
+	axl::mem::ExtraSize extraSize,
+	const std::nothrow_t& nothrow
 ) AXL_NOEXCEPT {
 	return operator new (size + extraSize, nothrow);
 }
@@ -225,9 +225,9 @@ operator new[] (
 inline
 void*
 operator new (
-    size_t size,
-    axl::mem::ExtraSize extraSize,
-    const axl::mem::ZeroInit_t& zeroInit
+	size_t size,
+	axl::mem::ExtraSize extraSize,
+	const axl::mem::ZeroInit_t& zeroInit
 ) {
 	return operator new (size + extraSize, zeroInit);
 }
@@ -236,8 +236,8 @@ inline
 void
 operator delete (
 	void* p,
-    axl::mem::ExtraSize extraSize,
-    const axl::mem::ZeroInit_t& zeroInit
+	axl::mem::ExtraSize extraSize,
+	const axl::mem::ZeroInit_t& zeroInit
 ) AXL_NOEXCEPT {
 	operator delete (p);
 }
@@ -245,9 +245,9 @@ operator delete (
 inline
 void*
 operator new[] (
-    size_t size,
-    axl::mem::ExtraSize extraSize,
-    const axl::mem::ZeroInit_t& zeroInit
+	size_t size,
+	axl::mem::ExtraSize extraSize,
+	const axl::mem::ZeroInit_t& zeroInit
 ) {
 	return operator new (size + extraSize, zeroInit);
 }
@@ -256,8 +256,8 @@ inline
 void
 operator delete[] (
 	void* p,
-    axl::mem::ExtraSize extraSize,
-    const axl::mem::ZeroInit_t& zeroInit
+	axl::mem::ExtraSize extraSize,
+	const axl::mem::ZeroInit_t& zeroInit
 ) AXL_NOEXCEPT {
 	operator delete (p);
 }
@@ -267,10 +267,10 @@ operator delete[] (
 inline
 void*
 operator new (
-    size_t size,
-    axl::mem::ExtraSize extraSize,
-    const axl::mem::ZeroInit_t& zeroInit,
-    const std::nothrow_t& nothrow
+	size_t size,
+	axl::mem::ExtraSize extraSize,
+	const axl::mem::ZeroInit_t& zeroInit,
+	const std::nothrow_t& nothrow
 ) AXL_NOEXCEPT {
 	return operator new (size + extraSize, zeroInit, nothrow);
 }
@@ -278,10 +278,10 @@ operator new (
 inline
 void*
 operator new[] (
-    size_t size,
-    axl::mem::ExtraSize extraSize,
-    const axl::mem::ZeroInit_t& zeroInit,
-    const std::nothrow_t& nothrow
+	size_t size,
+	axl::mem::ExtraSize extraSize,
+	const axl::mem::ZeroInit_t& zeroInit,
+	const std::nothrow_t& nothrow
 ) AXL_NOEXCEPT {
 	return operator new (size + extraSize, zeroInit, nothrow);
 }
@@ -295,8 +295,8 @@ operator new[] (
 inline
 void*
 operator new (
-    size_t size,
-    const axl::mem::ZeroInit_t& zeroInit,
+	size_t size,
+	const axl::mem::ZeroInit_t& zeroInit,
 	std::align_val_t align
 ) {
 	void* p = operator new (size, align);
@@ -309,7 +309,7 @@ void
 operator delete (
 	void* p,
 	std::align_val_t align,
-    const axl::mem::ZeroInit_t& zeroInit
+	const axl::mem::ZeroInit_t& zeroInit
 ) AXL_NOEXCEPT {
 	operator delete (p);
 }
@@ -317,8 +317,8 @@ operator delete (
 inline
 void*
 operator new[] (
-    size_t size,
-    const axl::mem::ZeroInit_t& zeroInit,
+	size_t size,
+	const axl::mem::ZeroInit_t& zeroInit,
 	std::align_val_t align
 ) {
 	return operator new (size, zeroInit, align);
@@ -328,7 +328,7 @@ inline
 void
 operator delete[] (
 	void* p,
-    const axl::mem::ZeroInit_t& zeroInit,
+	const axl::mem::ZeroInit_t& zeroInit,
 	std::align_val_t align
 ) AXL_NOEXCEPT {
 	operator delete (p);
@@ -339,10 +339,10 @@ operator delete[] (
 inline
 void*
 operator new (
-    size_t size,
-    const axl::mem::ZeroInit_t& zeroInit,
+	size_t size,
+	const axl::mem::ZeroInit_t& zeroInit,
 	std::align_val_t align,
-    const std::nothrow_t& nothrow
+	const std::nothrow_t& nothrow
 ) AXL_NOEXCEPT {
 	void* p = operator new (size, align, nothrow);
 	if (p)
@@ -353,10 +353,10 @@ operator new (
 inline
 void*
 operator new[] (
-    size_t size,
-    const axl::mem::ZeroInit_t& zeroInit,
+	size_t size,
+	const axl::mem::ZeroInit_t& zeroInit,
 	std::align_val_t align,
-    const std::nothrow_t& nothrow
+	const std::nothrow_t& nothrow
 ) AXL_NOEXCEPT {
 	return operator new (size, zeroInit, align, nothrow);
 }
@@ -368,8 +368,8 @@ operator new[] (
 inline
 void*
 operator new (
-    size_t size,
-    axl::mem::ExtraSize extraSize,
+	size_t size,
+	axl::mem::ExtraSize extraSize,
 	std::align_val_t align
 ) {
 	return operator new (size + extraSize, align);
@@ -379,7 +379,7 @@ inline
 void
 operator delete (
 	void* p,
-    axl::mem::ExtraSize extraSize,
+	axl::mem::ExtraSize extraSize,
 	std::align_val_t align
 ) AXL_NOEXCEPT {
 	operator delete (p);
@@ -388,8 +388,8 @@ operator delete (
 inline
 void*
 operator new[] (
-    size_t size,
-    axl::mem::ExtraSize extraSize,
+	size_t size,
+	axl::mem::ExtraSize extraSize,
 	std::align_val_t align
 ) {
 	return operator new (size + extraSize, align);
@@ -399,7 +399,7 @@ inline
 void
 operator delete[] (
 	void* p,
-    axl::mem::ExtraSize extraSize,
+	axl::mem::ExtraSize extraSize,
 	std::align_val_t align
 ) AXL_NOEXCEPT {
 	operator delete (p);
@@ -410,10 +410,10 @@ operator delete[] (
 inline
 void*
 operator new (
-    size_t size,
-    axl::mem::ExtraSize extraSize,
+	size_t size,
+	axl::mem::ExtraSize extraSize,
 	std::align_val_t align,
-    const std::nothrow_t& nothrow
+	const std::nothrow_t& nothrow
 ) AXL_NOEXCEPT {
 	return operator new (size + extraSize, align, nothrow);
 }
@@ -421,10 +421,10 @@ operator new (
 inline
 void*
 operator new[] (
-    size_t size,
-    axl::mem::ExtraSize extraSize,
+	size_t size,
+	axl::mem::ExtraSize extraSize,
 	std::align_val_t align,
-    const std::nothrow_t& nothrow
+	const std::nothrow_t& nothrow
 ) AXL_NOEXCEPT {
 	return operator new (size + extraSize, align, nothrow);
 }
@@ -436,9 +436,9 @@ operator new[] (
 inline
 void*
 operator new (
-    size_t size,
-    axl::mem::ExtraSize extraSize,
-    const axl::mem::ZeroInit_t& zeroInit,
+	size_t size,
+	axl::mem::ExtraSize extraSize,
+	const axl::mem::ZeroInit_t& zeroInit,
 	std::align_val_t align
 ) {
 	return operator new (size + extraSize, zeroInit, align);
@@ -448,8 +448,8 @@ inline
 void
 operator delete (
 	void* p,
-    axl::mem::ExtraSize extraSize,
-    const axl::mem::ZeroInit_t& zeroInit,
+	axl::mem::ExtraSize extraSize,
+	const axl::mem::ZeroInit_t& zeroInit,
 	std::align_val_t align
 ) AXL_NOEXCEPT {
 	operator delete (p);
@@ -458,9 +458,9 @@ operator delete (
 inline
 void*
 operator new[] (
-    size_t size,
-    axl::mem::ExtraSize extraSize,
-    const axl::mem::ZeroInit_t& zeroInit,
+	size_t size,
+	axl::mem::ExtraSize extraSize,
+	const axl::mem::ZeroInit_t& zeroInit,
 	std::align_val_t align
 ) {
 	return operator new (size + extraSize, zeroInit, align);
@@ -470,8 +470,8 @@ inline
 void
 operator delete[] (
 	void* p,
-    axl::mem::ExtraSize extraSize,
-    const axl::mem::ZeroInit_t& zeroInit,
+	axl::mem::ExtraSize extraSize,
+	const axl::mem::ZeroInit_t& zeroInit,
 	std::align_val_t align
 ) AXL_NOEXCEPT {
 	operator delete (p);
@@ -482,11 +482,11 @@ operator delete[] (
 inline
 void*
 operator new (
-    size_t size,
-    axl::mem::ExtraSize extraSize,
-    const axl::mem::ZeroInit_t& zeroInit,
+	size_t size,
+	axl::mem::ExtraSize extraSize,
+	const axl::mem::ZeroInit_t& zeroInit,
 	std::align_val_t align,
-    const std::nothrow_t& nothrow
+	const std::nothrow_t& nothrow
 ) AXL_NOEXCEPT {
 	return operator new (size + extraSize, zeroInit, align, nothrow);
 }
@@ -494,11 +494,11 @@ operator new (
 inline
 void*
 operator new[] (
-    size_t size,
-    axl::mem::ExtraSize extraSize,
-    const axl::mem::ZeroInit_t& zeroInit,
+	size_t size,
+	axl::mem::ExtraSize extraSize,
+	const axl::mem::ZeroInit_t& zeroInit,
 	std::align_val_t align,
-    const std::nothrow_t& nothrow
+	const std::nothrow_t& nothrow
 ) AXL_NOEXCEPT {
 	return operator new (size + extraSize, zeroInit, align, nothrow);
 }

@@ -492,11 +492,11 @@ template <
 	typename GetLink = ImplicitPtrCast<T, ListLink>
 >
 class AuxList: public ListBase<
-    T,
-    GetLink,
+	T,
+	GetLink,
 	Iterator<T, GetLink>,
 	ConstIterator<T, GetLink>
-    > {
+> {
 public:
 	void
 	clear() {

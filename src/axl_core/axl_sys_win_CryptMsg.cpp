@@ -22,12 +22,12 @@ namespace win {
 
 bool
 CryptMsg::openToDecode(
-    dword_t encodingType,
-    dword_t msgFlags,
-    dword_t msgType,
-    HCRYPTPROV_LEGACY hCryptProv,
-    CERT_INFO* recipientInfo,
-    CMSG_STREAM_INFO* streamInfo
+	dword_t encodingType,
+	dword_t msgFlags,
+	dword_t msgType,
+	HCRYPTPROV_LEGACY hCryptProv,
+	CERT_INFO* recipientInfo,
+	CMSG_STREAM_INFO* streamInfo
 	) {
 	close();
 

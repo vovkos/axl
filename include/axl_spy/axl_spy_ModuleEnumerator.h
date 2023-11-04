@@ -16,7 +16,7 @@ protected:
 	size_t m_index;
 
 public:
-    ModuleIterator() {
+	ModuleIterator() {
 		m_index = -1;
 	}
 
@@ -26,8 +26,8 @@ public:
 		return m_index < m_moduleArray.getCount();
 	}
 
-    ModuleIterator&
-    operator ++ ();
+	ModuleIterator&
+	operator ++ ();
 
 	ModuleIterator
 	operator ++ (int);

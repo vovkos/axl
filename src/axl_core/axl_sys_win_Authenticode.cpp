@@ -38,7 +38,7 @@ verifyAuthenticodeSignature(
 	CertStore store;
 	CryptMsg msg;
 
-    dword_t encodingType;
+	dword_t encodingType;
 	dword_t contentType;
 	dword_t formatType;
 

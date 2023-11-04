@@ -31,7 +31,7 @@ public:
 	QtRagelSyntaxHighlighter(QTextDocument* parent):
 		QSyntaxHighlighter(parent) {}
 
-    virtual
+	virtual
 	void
 	highlightBlock(const QString &text) {
 		QByteArray data = text.toUtf8();

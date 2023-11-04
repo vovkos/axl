@@ -88,7 +88,7 @@ void
 MyTreeWidget::drawRow(
 	QPainter *painter,
 	const QStyleOptionViewItem &option,
-    const QModelIndex &index
+	const QModelIndex &index
 ) const {
 	QStyleOptionViewItem option2 = option;
 	// option2.showDecorationSelected = true;

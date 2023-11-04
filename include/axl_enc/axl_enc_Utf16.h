@@ -271,19 +271,19 @@ public:
 
 inline
 bool isHiSurrogate(utf16_t c) {
-    return (c & 0xfc00) == 0xd800;
+	return (c & 0xfc00) == 0xd800;
 }
 
 inline
 bool
 isLoSurrogate(utf16_t c) {
-    return (c & 0xfc00) == 0xdc00;
+	return (c & 0xfc00) == 0xdc00;
 }
 
 inline
 bool
 isSurrogate(utf16_t c) {
-    return ((uint_t)c - 0xd800) < 2048;
+	return ((uint_t)c - 0xd800) < 2048;
 }
 
 //..............................................................................

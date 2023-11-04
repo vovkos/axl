@@ -152,7 +152,7 @@ AXL_VISIBILITY_DEFAULT
 void*
 operator new (
 	size_t size,
-    const std::nothrow_t& nothrow
+	const std::nothrow_t& nothrow
 ) AXL_NOEXCEPT {
 	return axl::mem::trackingAllocate(size);
 }
@@ -170,9 +170,9 @@ AXL_VISIBILITY_DEFAULT
 void*
 operator new[] (
 	size_t size,
-    const std::nothrow_t& nothrow
+	const std::nothrow_t& nothrow
 ) AXL_NOEXCEPT {
-    return operator new (size, nothrow);
+	return operator new (size, nothrow);
 }
 
 AXL_VISIBILITY_DEFAULT
@@ -254,7 +254,7 @@ void*
 operator new (
 	size_t size,
 	std::align_val_t align,
-    const std::nothrow_t& nothrow
+	const std::nothrow_t& nothrow
 ) AXL_NOEXCEPT {
 	return axl::mem::trackingAllocate(size, align);
 }
@@ -274,9 +274,9 @@ void*
 operator new[] (
 	size_t size,
 	std::align_val_t align,
-    const std::nothrow_t& nothrow
+	const std::nothrow_t& nothrow
 ) AXL_NOEXCEPT {
-    return operator new (size, align, nothrow);
+	return operator new (size, align, nothrow);
 }
 
 AXL_VISIBILITY_DEFAULT

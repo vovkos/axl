@@ -27,7 +27,7 @@ cryptQueryObjectFile(
 	dword_t expectedContentTypeFlags,
 	dword_t expectedFormatTypeFlags,
 	dword_t flags,
-    dword_t* encodingType,
+	dword_t* encodingType,
 	dword_t* contentType,
 	dword_t* formatType,
 	HCERTSTORE* certStore,
