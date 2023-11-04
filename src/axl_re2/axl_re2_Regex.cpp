@@ -88,6 +88,21 @@ Regex::getRegexKind() const {
 	return (RegexKind)m_impl->kind();
 }
 
+size_t
+Regex::getSwitchCaseCount() const {
+	return m_impl->switch_case_count();
+}
+
+size_t
+Regex::getCaptureCount() const {
+	return m_impl->capture_count();
+}
+
+size_t
+Regex::getCaptureCount(uint_t switchCaseId) const {
+	return m_impl->capture_count(switchCaseId);
+}
+
 void
 Regex::clear() {
 	m_impl->clear();
@@ -137,15 +152,16 @@ Regex::finalizeSwitch() {
 ExecResult
 Regex::exec(
 	State* state,
-	const sl::StringRef& chunk
+	const void* p,
+	size_t size
 ) const {
 	if (state->isMatch())
 		state->reset(state->getMatchEndOffset(), state->getMatchLastChar());
 
 	if (!(m_flags & RegexFlag_Stream))
-		state->setEof(state->getBaseOffset() + chunk.getLength());
+		state->setEof(state->getBaseOffset() + size);
 
-	return (ExecResult)m_impl->exec((RE2::SM::State*)state->m_impl, chunk >> toAbsl);
+	return (ExecResult)m_impl->exec((RE2::SM::State*)state->m_impl, absl::string_view((char*)p, size));
 }
 
 ExecResult
@@ -157,8 +173,10 @@ Regex::eof(
 }
 
 bool
-Regex::captureSubmatches(
-	const sl::StringRef& match,
+Regex::captureSubmatchesImpl(
+	uint_t switchCaseId,
+	const void* p,
+	size_t size,
 	sl::StringRef* submatchArray0,
 	size_t count
 ) const {
@@ -166,7 +184,12 @@ Regex::captureSubmatches(
 	sl::Array<absl::string_view> submatchArray(rc::BufKind_Stack, buffer, sizeof(buffer));
 	submatchArray.setCount(count);
 
-	bool result = m_impl->capture_submatches(match >> toAbsl, submatchArray, count);
+	absl::string_view text((char*)p, size);
+
+	bool result = m_impl->kind() == RE2::SM::kRegexpSwitch ?
+		m_impl->capture_submatches(switchCaseId, text, submatchArray, count) :
+		m_impl->capture_submatches(text, submatchArray, count);
+
 	if (!result)
 		return false;
 

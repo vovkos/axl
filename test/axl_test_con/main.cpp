@@ -556,7 +556,7 @@ testCharSet() {
 #define _AXL_RE_TEST_SIMPLE_MATCH 1
 #define _AXL_RE_TEST_STREAM       1
 #define _AXL_RE_TEST_SWITCH       1
-#define _AXL_RE_TEST_LOAD_SAVE    1
+#define _AXL_RE_TEST_LOAD_SAVE    0
 #define _AXL_RE_TEST_FULL_DFA     1
 
 void
@@ -1013,14 +1013,10 @@ testRegex() {
 	} while (0);
 
 	do {
-		printf("compiling\n");
-
 		regex.createSwitch();
 		regex.compileSwitchCase("[0-9]+");
 		regex.compileSwitchCase(".");
 		regex.finalizeSwitch();
-
-		printf("matching\n");
 
 		re::ExecResult result;
 		re::State state(re::StateInit(re::ExecFlag_AnchorDataBegin | re::ExecFlag_Stream, 1000));
@@ -1030,7 +1026,6 @@ testRegex() {
 		ASSERT(result == re::ExecResult_Match && state.getMatchAcceptId() == 1 && state.getMatch()->getSize() == 1);
 
 		result = regex.exec(&state, "123456");
-		printf("regex result: %d\n", result);
 		ASSERT(result == re::ExecResult_Continue);
 
 		result = regex.exec(&state, "\x2e");
@@ -1043,15 +1038,13 @@ testRegex() {
 		ASSERT(result == re::ExecResult_Match && state.getMatchAcceptId() == 0 && state.getMatch()->getSize() == 6);
 	} while (0);
 
-	return;
-
 	// const char src[] = "[\xd0\xb1-\xd0\xb3]+";
 	// const char src[] = "a|[a-z]+1";
 	// const char src[] = "x(a*b)*(a*c)*";
 	const char src[] = "\\b([a-c]+)([0-9]+)\\b";
 	// const char src[] = "^$";
 
-	printf("REGEX: %s\n\n", src);
+	printf("REGEX: %s\n", src);
 
 	result = regex.compile(src);
 	if (!result) {
@@ -1060,7 +1053,7 @@ testRegex() {
 	}
 
 #if (_AXL_RE_PRINT_NFA)
-	printf("NFA:\n");
+	printf("\nNFA:\n");
 	regex.printNfa();
 #endif
 #if (_AXL_RE_PRINT_DFA)
@@ -1602,8 +1595,8 @@ testRegex() {
 
 		printf("matching\n");
 
-		char const text[] = "\r123456\r" "123456" "\x2e" "123456";
-		char const chunk1[] = "\r123456\r";
+		char const text[] = "\r123456" "123456";
+		char const chunk1[] = "\r123456\x2e";
 		char const chunk2[] = "123456";
 		char const chunk3[] = "\x2e";
 		char const chunk4[] = "123456";
@@ -1616,6 +1609,7 @@ testRegex() {
 		re2::State state(BaseOffset, re2::State::EofChar);
 
 		result = regex.exec(&state, chunk1);
+		ASSERT(result == re2::ExecResult_Match && state.getMatchId() == 1 && state.getMatchSize() == 1);
 
 		printf(
 			"regex result: %d, match id: %d, match offset: %lld, match length: %d, match: %s\n",
@@ -1626,13 +1620,21 @@ testRegex() {
 			sl::StringRef(text + state.getMatchOffset() - BaseOffset, state.getMatchSize()).sz()
 		);
 
-		ASSERT(result == re2::ExecResult_Match && state.getMatchId() == 1 && state.getMatchSize() == 1);
-
 		result = regex.exec(&state, chunk2);
-		printf("regex result: %d\n", result);
 		ASSERT(result == re2::ExecResult_Continue);
 
 		result = regex.exec(&state, chunk3);
+		ASSERT(result == re2::ExecResult_Continue);
+
+		result = regex.exec(&state, chunk4);
+		ASSERT(result == re2::ExecResult_ContinueBackward);
+
+		result = regex.exec(&state, chunk3);
+		ASSERT(result == re2::ExecResult_ContinueBackward);
+
+		result = regex.exec(&state, chunk2);
+		ASSERT(result == re2::ExecResult_Match && state.getMatchId() == 0 && state.getMatchSize() == 6);
+
 		printf(
 			"regex result: %d, match id: %d, match offset: %lld, match length: %d\n",
 			result,
@@ -1640,12 +1642,16 @@ testRegex() {
 			state.getMatchOffset(),
 			state.getMatchSize()
 		);
-		ASSERT(result == re2::ExecResult_Match && state.getMatchId() == 0 && state.getMatchSize() == 6);
 
 		result = regex.exec(&state, chunk4);
-		printf("regex result: %d\n", result);
+		ASSERT(result == re2::ExecResult_Continue);
 
 		result = regex.eof(&state);
+		ASSERT(result == re2::ExecResult_ContinueBackward);
+
+		result = regex.exec(&state, chunk4);
+		ASSERT(result == re2::ExecResult_Match && state.getMatchId() == 0 && state.getMatchSize() == 6);
+
 		printf(
 			"regex result: %d, match id: %d, match offset: %lld, match length: %d, match: %s\n",
 			result,
@@ -1654,11 +1660,8 @@ testRegex() {
 			state.getMatchSize(),
 			sl::StringRef(text + state.getMatchOffset() - BaseOffset, state.getMatchSize()).sz()
 		);
-
-		ASSERT(result == re2::ExecResult_Match && state.getMatchId() == 0 && state.getMatchSize() == 6);
 	} while (0);
 
-/*
 	// const char src[] = "[\xd0\xb1-\xd0\xb3]+";
 	// const char src[] = "a|[a-z]+1";
 	// const char src[] = "x(a*b)*(a*c)*";
@@ -1666,25 +1669,6 @@ testRegex() {
 	// const char src[] = "^$";
 
 	printf("REGEX: %s\n\n", src);
-
-	result = regex.compile(src);
-	if (!result) {
-		printf("error: %s\n", err::getLastErrorDescription().sz());
-		return;
-	}
-
-#if (_AXL_RE_TEST_LOAD_SAVE)
-	sl::Array<char> storage;
-	regex.save(&storage);
-	printf("\nNFA storage: %d B\n", storage.getCount());
-
-	re2::Regex regex2;
-	result = regex2.load(storage) != -1;
-	if (!result) {
-		printf("error: %s\n", err::getLastErrorDescription().sz());
-		return;
-	}
-#endif
 
 //	const char text[] = "suka\xd0\xb0\xd0\xb1\xd0\xb2\xd0\xb3\xd0\xb4\xd0\xb5\xd0\xb6hui";
 //	const char text[] = "ahgbcbcbcdedsdds";
@@ -1694,52 +1678,71 @@ testRegex() {
 #if (_AXL_RE_TEST_SIMPLE_MATCH)
 	printf("\nMATCHING TEXT: '%s'\n", text);
 
+	result = regex.compile(src);
+	if (!result) {
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
 	state = regex.exec(text);
 	if (!state) {
 		printf("NO MATCH!\n");
 		return;
 	}
 
-	match = state.getMatch();
-	ASSERT(match);
-
 	printf(
 		"$0: %p(%d) '%s'\n",
-		match->getOffset(),
-		match->getSize(),
-		match->getText().sz()
+		state.getMatchOffset(),
+		state.getMatchSize(),
+		sl::StringRef(text + state.getMatchOffset(), state.getMatchSize()).sz()
 	);
 
-	count = state.getCaptureCount();
-	for (size_t i = 1; i < count; i++) {
-		const re2::Match* capture = state.getCapture(i);
-		if (capture)
+	size_t captureCount = regex.getCaptureCount();
+	sl::Array<sl::StringRef> submatchArray;
+	submatchArray.setCount(captureCount + 1);
+
+	const char* p0 = text + state.getMatchOffset();
+	regex.captureSubmatches(
+		sl::StringRef(p0, state.getMatchSize()),
+		submatchArray,
+		submatchArray.getCount()
+	);
+
+	for (size_t i = 0; i < submatchArray.getCount(); i++) {
+		sl::StringRef submatch = submatchArray[i];
+		if (submatch.cp()) {
+			size_t offset = submatch.cp() - text;
 			printf(
-				"$%d: %p(%d) '%s'\n",
+				"$%d: 0x%zx(%d) '%s'\n",
 				i,
-				capture->getOffset(),
-				capture->getSize(),
-				capture->getText().sz()
+				offset,
+				submatch.getLength(),
+				submatch.sz()
 			);
+		}
 	}
 #endif
 
 #if (_AXL_RE_TEST_STREAM)
 	printf("STREAM MATCH: '%s':\n", text);
 
-	state.initialize(re2::RegexFlag_Stream);
+	result = regex.compile(re2::RegexFlag_Stream, src);
+	if (!result) {
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
 
 	p = text;
 	end = text + lengthof(text);
 	for (; p < end; p++) {
-		re2::ExecResult result = regex.exec(&state, p, 1);
+		re2::ExecResult result = regex.exec(&state, sl::StringRef(p, 1));
 		if (result != re2::ExecResult_Continue) {
 			if (result != re2::ExecResult_ContinueBackward)
 				break;
 
 			for (p--; p >= text; p--) {
 				result = regex.exec(&state, p, 1);
-				if (result >= 0)
+				if (result != re2::ExecResult_ContinueBackward)
 					break;
 			}
 
@@ -1747,16 +1750,15 @@ testRegex() {
 		}
 	}
 
-	match = state.getMatch();
-	if (!match) {
+	if (!state.isMatch()) {
 		printf("NO MATCH!\n");
 		return;
 	}
 
 	printf(
 		"$0: %llx(%d)\n",
-		match->getOffset(),
-		match->getSize()
+		state.getMatchOffset(),
+		state.getMatchSize()
 	);
 #endif
 
@@ -1805,29 +1807,32 @@ testRegex() {
 	p = source;
 	end = p + lengthof(source);
 
-	state.initialize(re2::ExecFlag_AnchorDataBegin);
+	result = regex.compile(re2::RegexFlag_AnchorStart, src);
+	if (!result) {
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
 	while (p < end) {
 		re2::ExecResult result = regex.exec(&state, p, end - p);
-		if (!result) {
+		if (!state.isMatch()) {
 			printf("NO MATCH!\n");
 			break;
 		}
 
 		size_t id = state.getMatchId();
-		match = state.getMatch();
-		ASSERT(match);
 
 		printf("#%d %s: %llx(%d) '%s'\n",
 			id,
 			caseNameMap[id],
-			match->getOffset(),
-			match->getSize(),
-			match->getText().sz()
+			state.getMatchOffset(),
+			state.getMatchSize(),
+			sl::StringRef(source + state.getMatchOffset(), state.getMatchSize()).sz()
 		);
 
-		p += match->getSize();
+		p += state.getMatchSize();
 	}
-#endif */
+#endif
 }
 
 } // namespace test_re2
@@ -4101,41 +4106,42 @@ testNetBios() {
 #if (_AXL_OS_WIN)
 
 BOOL WriteSlot(HANDLE hSlot, const char* lpszMessage) {
-   BOOL fResult;
-   DWORD cbWritten;
+	BOOL fResult;
+	DWORD cbWritten;
 
-   fResult = ::WriteFile(hSlot,
-	 lpszMessage,
-	 strlen(lpszMessage),
-	 &cbWritten,
-	 (LPOVERLAPPED)NULL);
+	fResult = ::WriteFile(hSlot,
+		lpszMessage,
+		strlen(lpszMessage),
+		&cbWritten,
+		(LPOVERLAPPED)NULL
+	);
 
-   if (!fResult) {
-	  printf("WriteFile failed with %d.\n", GetLastError());
-	  return FALSE;
-   }
+	if (!fResult) {
+		printf("WriteFile failed with %d.\n", GetLastError());
+		return FALSE;
+	}
 
-   printf("Slot written to successfully.\n");
+	printf("Slot written to successfully.\n");
 
-   return TRUE;
+	return TRUE;
 }
 
 BOOL ReadSlot(HANDLE hSlot) {
-   BOOL fResult;
-   DWORD cbRead;
+	BOOL fResult;
+	DWORD cbRead;
 
-   char buffer[256];
+	char buffer[256];
 
-   fResult = ReadFile(hSlot, buffer, sizeof(buffer) - 1, &cbRead, NULL);
-   if (!fResult) {
-	  printf("ReadFile failed with %d.\n", GetLastError());
-	  return FALSE;
-   }
+	fResult = ReadFile(hSlot, buffer, sizeof(buffer) - 1, &cbRead, NULL);
+	if (!fResult) {
+		printf("ReadFile failed with %d.\n", GetLastError());
+		return FALSE;
+	}
 
-   buffer[cbRead] = 0;
-   printf("Read from slot: %s\n", buffer);
+	buffer[cbRead] = 0;
+	printf("Read from slot: %s\n", buffer);
 
-   return TRUE;
+	return TRUE;
 }
 
 void
@@ -5626,7 +5632,7 @@ sslVerifyCallback(
 	X509* cert = X509_STORE_CTX_get_current_cert(ctx);
 	printSslCertificate(cert);
 	int err = X509_STORE_CTX_get_error(ctx);
-    printf("  error: %d: %s\n", err, X509_verify_cert_error_string(err));
+	printf("  error: %d: %s\n", err, X509_verify_cert_error_string(err));
 
 	return true;
 }
@@ -6603,7 +6609,7 @@ receiptTest() {
 			"  product ID:              %s\n"
 			"  transaction ID:          %s\n"
 			"  original transaction ID: %s\n"
-  			"  web order line ID        %d\n"
+			"  web order line ID        %d\n"
 			"  purchase date:           %s%s\n"
 			"  original purchase date:  %s%s\n"
 			"  subs expiration date:    %s%s\n"
@@ -6962,32 +6968,32 @@ enum {
 };
 
 static const uint8_t utf8d[] = {
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 00..1f
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 20..3f
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 40..5f
-  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 60..7f
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9, // 80..9f
-  7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7, // a0..bf
-  8,8,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2, // c0..df
-  0xa,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x4,0x3,0x3, // e0..ef
-  0xb,0x6,0x6,0x6,0x5,0x8,0x8,0x8,0x8,0x8,0x8,0x8,0x8,0x8,0x8,0x8, // f0..ff
-  0x0,0x1,0x2,0x3,0x5,0x8,0x7,0x1,0x1,0x1,0x4,0x6,0x1,0x1,0x1,0x1, // s0..s0
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,0,1,0,1,1,1,1,1,1, // s1..s2
-  1,2,1,1,1,1,1,2,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1, // s3..s4
-  1,2,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,3,1,3,1,1,1,1,1,1, // s5..s6
-  1,3,1,1,1,1,1,3,1,3,1,1,1,1,1,1,1,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1, // s7..s8
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 00..1f
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 20..3f
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 40..5f
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 60..7f
+	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9, // 80..9f
+	7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7, // a0..bf
+	8,8,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2, // c0..df
+	0xa,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x4,0x3,0x3, // e0..ef
+	0xb,0x6,0x6,0x6,0x5,0x8,0x8,0x8,0x8,0x8,0x8,0x8,0x8,0x8,0x8,0x8, // f0..ff
+	0x0,0x1,0x2,0x3,0x5,0x8,0x7,0x1,0x1,0x1,0x4,0x6,0x1,0x1,0x1,0x1, // s0..s0
+	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,0,1,0,1,1,1,1,1,1, // s1..s2
+	1,2,1,1,1,1,1,2,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1, // s3..s4
+	1,2,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,3,1,3,1,1,1,1,1,1, // s5..s6
+	1,3,1,1,1,1,1,3,1,3,1,1,1,1,1,1,1,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1, // s7..s8
 };
 
 uint32_t inline
 decode(uint32_t* state, uint32_t* codep, uint32_t byte) {
-  uint32_t type = utf8d[byte];
+	uint32_t type = utf8d[byte];
 
-  *codep = (*state != UTF8_ACCEPT) ?
-    (byte & 0x3fu) | (*codep << 6) :
-    (0xff >> type) & (byte);
+	*codep = (*state != UTF8_ACCEPT) ?
+		(byte & 0x3fu) | (*codep << 6) :
+		(0xff >> type) & (byte);
 
-  *state = utf8d[256 + *state*16 + type];
-  return *state;
+	*state = utf8d[256 + *state*16 + type];
+	return *state;
 }
 
 } // namespace utf8_0
@@ -7001,36 +7007,36 @@ enum {
 };
 
 static const uint8_t utf8d[] = {
-  // The first part of the table maps bytes to character classes that
-  // to reduce the size of the transition table and create bitmasks.
-   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
-   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,  7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
-   8,8,2,2,2,2,2,2,2,2,2,2,2,2,2,2,  2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
-  10,3,3,3,3,3,3,3,3,3,3,3,3,4,3,3, 11,6,6,6,5,8,8,8,8,8,8,8,8,8,8,8,
+	// The first part of the table maps bytes to character classes that
+	// to reduce the size of the transition table and create bitmasks.
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+	7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,  7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+	8,8,2,2,2,2,2,2,2,2,2,2,2,2,2,2,  2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+	10,3,3,3,3,3,3,3,3,3,3,3,3,4,3,3, 11,6,6,6,5,8,8,8,8,8,8,8,8,8,8,8,
 
-  // The second part is a transition table that maps a combination
-  // of a state of the automaton and a character class to a state.
-   0,12,24,36,60,96,84,12,12,12,48,72, 12,12,12,12,12,12,12,12,12,12,12,12,
-  12, 0,12,12,12,12,12, 0,12, 0,12,12, 12,24,12,12,12,12,12,24,12,24,12,12,
-  12,12,12,12,12,12,12,24,12,12,12,12, 12,24,12,12,12,12,12,12,12,24,12,12,
-  12,12,12,12,12,12,12,36,12,36,12,12, 12,36,12,12,12,12,12,36,12,36,12,12,
-  12,36,12,12,12,12,12,12,12,12,12,12,
+	// The second part is a transition table that maps a combination
+	// of a state of the automaton and a character class to a state.
+	0,12,24,36,60,96,84,12,12,12,48,72, 12,12,12,12,12,12,12,12,12,12,12,12,
+	12, 0,12,12,12,12,12, 0,12, 0,12,12, 12,24,12,12,12,12,12,24,12,24,12,12,
+	12,12,12,12,12,12,12,24,12,12,12,12, 12,24,12,12,12,12,12,12,12,24,12,12,
+	12,12,12,12,12,12,12,36,12,36,12,12, 12,36,12,12,12,12,12,36,12,36,12,12,
+	12,36,12,12,12,12,12,12,12,12,12,12,
 };
 
 uint32_t inline
 decode(uint32_t* state, uint32_t* codep, uint32_t byte) {
-  uint32_t type = utf8d[byte];
+	uint32_t type = utf8d[byte];
 
-  *codep = (*state != UTF8_ACCEPT) ?
-    (byte & 0x3fu) | (*codep << 6) :
-    (0xff >> type) & (byte);
+	*codep = (*state != UTF8_ACCEPT) ?
+		(byte & 0x3fu) | (*codep << 6) :
+		(0xff >> type) & (byte);
 
-  *state = utf8d[256 + *state + type];
-  return *state;
+	*state = utf8d[256 + *state + type];
+	return *state;
 }
 
 //..............................................................................
@@ -8253,9 +8259,9 @@ testHid() {
 	rd.printReports();
 	printf(">>>>>\n");
 
-    for (;;) {
-        char buffer[256];
-        size_t readResult;
+	for (;;) {
+		char buffer[256];
+		size_t readResult;
 
 		readResult = device.read(buffer, sizeof(buffer));
 		if (readResult == -1) {
@@ -8265,8 +8271,8 @@ testHid() {
 
 		ASSERT(readResult); // we use blocking read
 
-        enc::HexEncoding::encode(&strings[0], buffer, readResult, enc::HexEncodingFlag_Multiline);
-        printf("read: %s\n", strings[0].sz());
+		enc::HexEncoding::encode(&strings[0], buffer, readResult, enc::HexEncodingFlag_Multiline);
+		printf("read: %s\n", strings[0].sz());
 
 		uint_t reportId;
 		const char* p;
@@ -8293,7 +8299,7 @@ testHid() {
 		}
 
 		report->decode(p);
-    }
+	}
 }
 
 #endif

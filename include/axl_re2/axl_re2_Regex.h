@@ -52,6 +52,8 @@ public:
 	Regex();
 	~Regex();
 
+	// properties
+
 	RegexKind
 	getRegexKind() const;
 
@@ -60,10 +62,19 @@ public:
 		return m_flags;
 	}
 
-	void
-	clear();
+	size_t
+	getSwitchCaseCount() const;
+
+	size_t
+	getCaptureCount() const;
+
+	size_t
+	getCaptureCount(uint_t switchCaseId) const;
 
 	// compilation
+
+	void
+	clear();
 
 	bool
 	compile(
@@ -88,13 +99,30 @@ public:
 	// execution
 
 	State
-	exec(const sl::StringRef& text) const;
+	exec(
+		const void* p,
+		size_t size
+	) const;
+
+	State
+	exec(const sl::StringRef& text) const {
+		return exec(text.cp(), text.getLength());
+	}
+
+	ExecResult
+	exec(
+		State* state,
+		const void* p,
+		size_t size
+	) const;
 
 	ExecResult
 	exec(
 		State* state,
 		const sl::StringRef& chunk
-	) const;
+	) const {
+		return exec(state, chunk.cp(), chunk.getLength());
+	}
 
 	ExecResult
 	eof(
@@ -104,7 +132,50 @@ public:
 
 	bool
 	captureSubmatches(
-		const sl::StringRef& match,
+		const void* p,
+		size_t size,
+		sl::StringRef* submatchArray,
+		size_t count
+	) const {
+		return captureSubmatchesImpl(0, p, size, submatchArray, count);
+	}
+
+	bool
+	captureSubmatches(
+		uint_t switchCaseId,
+		const void* p,
+		size_t size,
+		sl::StringRef* submatchArray,
+		size_t count
+	) const {
+		return captureSubmatchesImpl(switchCaseId, p, size, submatchArray, count);
+	}
+
+	bool
+	captureSubmatches(
+		const sl::StringRef& text,
+		sl::StringRef* submatchArray,
+		size_t count
+	) const {
+		return captureSubmatchesImpl(0, text.cp(), text.getLength(), submatchArray, count);
+	}
+
+	bool
+	captureSubmatches(
+		uint_t switchCaseId,
+		const sl::StringRef& text,
+		sl::StringRef* submatchArray,
+		size_t count
+	) const {
+		return captureSubmatchesImpl(switchCaseId, text.cp(), text.getLength(), submatchArray, count);
+	}
+
+protected:
+	bool
+	captureSubmatchesImpl(
+		uint_t switchCaseId,
+		const void* p,
+		size_t size,
 		sl::StringRef* submatchArray,
 		size_t count
 	) const;
@@ -114,10 +185,13 @@ public:
 
 inline
 State
-Regex::exec(const sl::StringRef& text) const {
+Regex::exec(
+	const void* p,
+	size_t size
+) const {
 	State state;
-	state.setEof(text.getLength());
-	exec(&state, text);
+	state.setEof(size);
+	exec(&state, p, size);
 	return state;
 }
 
