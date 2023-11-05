@@ -40,7 +40,8 @@ State::State(const State& src) {
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
 State::State(State&& src) {
-	operator = (std::move(src));
+	m_impl = src.m_impl;
+	src.m_impl = NULL;
 }
 #endif
 
@@ -61,6 +62,7 @@ State::~State()	{
 #if (_AXL_CPP_HAS_RVALUE_REF)
 State&
 State::operator = (State&& src) {
+	delete m_impl;
 	m_impl = src.m_impl;
 	src.m_impl = NULL;
 	return *this;
