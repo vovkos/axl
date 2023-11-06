@@ -54,11 +54,12 @@ source_group(
 
 #...............................................................................
 #
-# axl_re22s library (wrappers for re2)
+# axl_re2s library (wrappers for re2)
 #
 
 include_directories(
 	${AXL_INC_DIR}
+	${RE2S_INC_DIR}
 )
 
 add_library(
@@ -68,13 +69,15 @@ add_library(
 	${LIB_CPP_LIST}
 )
 
-target_link_libraries(axl_re2 re2::re2)
-
 target_precompile_headers(
 	axl_re2
 	PRIVATE
 	${PCH_H}
 )
+
+if(TARGET re2::re2)
+	target_link_libraries(axl_re2 re2::re2)
+endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

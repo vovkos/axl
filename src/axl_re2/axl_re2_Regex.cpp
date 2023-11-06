@@ -16,21 +16,22 @@ namespace axl {
 namespace re2 {
 
 using ::re2::RE2;
+using ::re2::StringPiece;
 
 //..............................................................................
 
-// convenient AXL <-> Abseil string conversions
+// convenient AXL <-> RE2 string conversions
 
-const struct ToAbsl* toAbsl;
+const struct ToRe2* toRe2;
 const struct ToAxl* toAxl;
 
-absl::string_view
-operator >> (const sl::StringRef& src, const ToAbsl*) {
-	return absl::string_view(src.cp(), src.getLength());
+StringPiece
+operator >> (const sl::StringRef& src, const ToRe2*) {
+	return StringPiece(src.cp(), src.getLength());
 }
 
 sl::StringRef
-operator >> (const absl::string_view& src, const ToAxl*) {
+operator >> (StringPiece& src, const ToAxl*) {
 	return sl::StringRef(src.data(), src.length());
 }
 
@@ -115,7 +116,7 @@ Regex::compile(
 	const sl::StringRef& source
 ) {
 	bool result = m_impl->create(
-		source >> toAbsl,
+		source >> toRe2,
 		calcRe2OptionsFromRegexFlags(flags),
 		calcRe2AnchorFromRegexFlags(flags)
 	);
@@ -139,7 +140,7 @@ Regex::createSwitch(uint_t flags) {
 
 uint_t
 Regex::compileSwitchCase(const sl::StringRef& source) {
-	int id = m_impl->add_switch_case(source >> toAbsl);
+	int id = m_impl->add_switch_case(source >> toRe2);
 	return id != -1 ? id : err::fail<uint_t>(-1, m_impl->error() >> toAxl);
 }
 
@@ -161,7 +162,7 @@ Regex::exec(
 	if (!(m_flags & RegexFlag_Stream))
 		state->setEof(state->getBaseOffset() + size);
 
-	return (ExecResult)m_impl->exec((RE2::SM::State*)state->m_impl, absl::string_view((char*)p, size));
+	return (ExecResult)m_impl->exec((RE2::SM::State*)state->m_impl, StringPiece((char*)p, size));
 }
 
 ExecResult
@@ -181,10 +182,10 @@ Regex::captureSubmatchesImpl(
 	size_t count
 ) const {
 	char buffer[256];
-	sl::Array<absl::string_view> submatchArray(rc::BufKind_Stack, buffer, sizeof(buffer));
+	sl::Array<StringPiece> submatchArray(rc::BufKind_Stack, buffer, sizeof(buffer));
 	submatchArray.setCount(count);
 
-	absl::string_view text((char*)p, size);
+	StringPiece text((char*)p, size);
 
 	bool result = m_impl->kind() == RE2::SM::kRegexpSwitch ?
 		m_impl->capture_submatches(switchCaseId, text, submatchArray, count) :

@@ -171,6 +171,11 @@ endif()
 if(BUILD_AXL_RE2)
 	add_definitions(-D_AXL_RE2=1)
 	list(APPEND OPT_LIB_LIST axl_re2)
+	if(NOT TARGET re2::re2) # otherwise, added automatically
+		include_directories(${RE2S_INC_DIR})
+		link_directories(${RE2S_LIB_DIR})
+		list(APPEND OPT_LIB_LIST re2)
+	endif()
 endif()
 
 if(BUILD_AXL_ZIP)
