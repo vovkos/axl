@@ -120,7 +120,9 @@ public:
 	getMatchNextChar() const;
 
 	void
-	reset();
+	reset() {
+		reset(0, EofChar, -1, EofChar);
+	}
 
 	void
 	reset(
