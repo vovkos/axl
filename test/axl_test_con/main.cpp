@@ -1109,21 +1109,21 @@ testRegex() {
 	);
 
 	count = state.getCaptureCount();
-	for (size_t i = 1; i < count; i++) {
-		const re::Match* capture = state.getCapture(i);
-		if (capture)
+	for (size_t i = 0; i <= count; i++) {
+		match = state.getGroup(i);
+		if (match)
 			printf(
-				"$%d: %p(%d) '%s'\n",
+				"$%d: 0x%llx(%d) '%s'\n",
 				i,
-				capture->getOffset(),
-				capture->getSize(),
-				capture->getText().sz()
+				match->getOffset(),
+				match->getSize(),
+				match->getText().sz()
 			);
 	}
 #endif
 
 #if (_AXL_RE_TEST_STREAM)
-	printf("STREAM MATCH: '%s':\n", text);
+	printf("\nSTREAM MATCH: '%s':\n", text);
 
 	state.initialize(re::ExecFlag_Stream);
 
@@ -1152,7 +1152,7 @@ testRegex() {
 	}
 
 	printf(
-		"$0: %llx(%d)\n",
+		"$0: 0x%llx(%d)\n",
 		match->getOffset(),
 		match->getSize()
 	);
@@ -1586,14 +1586,10 @@ testRegex() {
 	} while (0);
 
 	do {
-		printf("compiling\n");
-
 		regex.createSwitch(re2::RegexFlag_AnchorStart | re2::RegexFlag_Stream);
 		regex.compileSwitchCase("[0-9]+");
 		regex.compileSwitchCase(".");
 		regex.finalizeSwitch();
-
-		printf("matching\n");
 
 		char const text[] = "\r123456" "123456";
 		char const chunk1[] = "\r123456\x2e";
@@ -1668,7 +1664,7 @@ testRegex() {
 	const char src[] = "\\b([a-c]+)([0-9]+)\\b";
 	// const char src[] = "^$";
 
-	printf("REGEX: %s\n\n", src);
+	printf("REGEX: %s\n", src);
 
 //	const char text[] = "suka\xd0\xb0\xd0\xb1\xd0\xb2\xd0\xb3\xd0\xb4\xd0\xb5\xd0\xb6hui";
 //	const char text[] = "ahgbcbcbcdedsdds";
@@ -1691,7 +1687,7 @@ testRegex() {
 	}
 
 	printf(
-		"$0: %p(%d) '%s'\n",
+		"$0: 0x%llx(%d) '%s'\n",
 		state.getMatchOffset(),
 		state.getMatchSize(),
 		sl::StringRef(text + state.getMatchOffset(), state.getMatchSize()).sz()
@@ -1724,7 +1720,7 @@ testRegex() {
 #endif
 
 #if (_AXL_RE_TEST_STREAM)
-	printf("STREAM MATCH: '%s':\n", text);
+	printf("\nSTREAM MATCH: '%s':\n", text);
 
 	result = regex.compile(re2::RegexFlag_Stream, src);
 	if (!result) {
@@ -1732,6 +1728,7 @@ testRegex() {
 		return;
 	}
 
+	state.reset();
 	p = text;
 	end = text + lengthof(text);
 	for (; p < end; p++) {
@@ -1756,7 +1753,7 @@ testRegex() {
 	}
 
 	printf(
-		"$0: %llx(%d)\n",
+		"$0: 0x%llx(%d)\n",
 		state.getMatchOffset(),
 		state.getMatchSize()
 	);
@@ -1771,7 +1768,11 @@ testRegex() {
 	regex.compileSwitchCase("0x[0-9a-fA-F]+");
 	regex.compileSwitchCase("[a-zA-Z_][a-zA-Z_0-9]*");
 	regex.compileSwitchCase("\\s+");
-	regex.finalizeSwitch();
+	result = regex.finalizeSwitch();
+	if (!result) {
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
 
 	static const char* caseNameMap[] = {
 		"<char>",
@@ -1804,14 +1805,9 @@ testRegex() {
 		"suka\n"
 		" suka_hui_123\n";
 
+	state.reset();
 	p = source;
 	end = p + lengthof(source);
-
-	result = regex.compile(re2::RegexFlag_AnchorStart, src);
-	if (!result) {
-		printf("error: %s\n", err::getLastErrorDescription().sz());
-		return;
-	}
 
 	while (p < end) {
 		re2::ExecResult result = regex.exec(&state, p, end - p);
@@ -8528,6 +8524,8 @@ void testSyncHidUsbMon() {
 
 //..............................................................................
 
+#include "axl_mem_Tracker.h"
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -8553,7 +8551,6 @@ main(
 #elif (_AXL_OS_POSIX)
 	signal(SIGPIPE, SIG_IGN);
 #endif
-
 
 #if (_AXL_RE2)
 	test_re::testRegex();
