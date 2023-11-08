@@ -52,6 +52,10 @@ public:
 	Regex();
 	~Regex();
 
+	operator bool () const {
+		return getRegexKind() != RegexKind_Undefined;
+	}
+
 	// properties
 
 	RegexKind
