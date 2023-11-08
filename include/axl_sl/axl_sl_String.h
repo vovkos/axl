@@ -677,6 +677,8 @@ public:
 protected:
 	const C*
 	ensureNullTerminated() const {
+		ASSERT(m_length); // otherwise, shouldn't be here
+
 		if (m_isNullTerminated)
 			return m_p;
 
@@ -685,10 +687,14 @@ protected:
 			return m_p;
 		}
 
+		if (m_hdr)
+			m_hdr->release();
+
 		String string(*this);
-		attachBufHdr(string.getHdr());
 		m_p = (C*)string.sz();
+		m_hdr = string.getHdr();
 		m_isNullTerminated = true;
+		((StringRef*)&string)->m_hdr = NULL;
 		return m_p;
 	}
 
