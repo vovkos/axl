@@ -374,7 +374,7 @@ public:
 	isEqual(const StringRef& string) const {
 		return
 			m_length == string.m_length &&
-			Details::cmp(m_p, string.m_p, m_length) == 0;
+			memcmp(m_p, string.m_p, m_length * sizeof(C)) == 0;
 	}
 
 	bool
