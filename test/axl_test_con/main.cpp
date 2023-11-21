@@ -1102,7 +1102,7 @@ testRegex() {
 	ASSERT(match);
 
 	printf(
-		"$0: %p(%d) '%s'\n",
+		"$0: 0x%llx(%d) '%s'\n",
 		match->getOffset(),
 		match->getSize(),
 		match->getText().sz()
@@ -1299,7 +1299,7 @@ testRegex() {
 		const char text[] = "abc\x91ijk\x93lmn";
 
 		re2::State state;
-		re2::ExecResult result = regex.exec(&state, text);
+		re2::ExecResult result = regex.execEof(&state, text);
 		ASSERT(result == re2::ExecResult_Match);
 
 		printf(
@@ -1322,7 +1322,7 @@ testRegex() {
 		char const text[] = "abcd";
 
 		re2::State state;
-		re2::ExecResult result = regex.exec(&state, text);
+		re2::ExecResult result = regex.execEof(&state, text);
 		ASSERT(result == re2::ExecResult_Match);
 
 		size_t baseOffset = state.getMatchEndOffset();
@@ -1351,7 +1351,7 @@ testRegex() {
 	} while (0);
 
 	do {
-		regex.createSwitch(re2::RegexFlag_AnchorStart);
+		regex.createSwitch();
 
 		result =
 			regex.compileSwitchCase("\\s*(foo\\d*)\\s+(bar\\d*)?\\s*") != -1 &&
@@ -1364,8 +1364,8 @@ testRegex() {
 
 		char const text[] = " foo123 bar567 ";
 
-		re2::State state;
-		re2::ExecResult result = regex.exec(&state, text);
+		re2::State state(re2::Anchor_Start);
+		re2::ExecResult result = regex.execEof(&state, text);
 		ASSERT(result == re2::ExecResult_Match);
 
 		printf(
@@ -1378,7 +1378,7 @@ testRegex() {
 	} while (0);
 
 	do {
-		regex.createSwitch(re2::RegexFlag_AnchorStart | re2::RegexFlag_Stream);
+		regex.createSwitch();
 
 		result =
 			regex.compileSwitchCase("open[ \t]*\\d*[\r\n]") != -1 &&
@@ -1395,7 +1395,7 @@ testRegex() {
 		const char chunk1[] = "op";
 		const char chunk2[] = "en 12\n con";
 
-		re2::State state;
+		re2::State state(re2::Anchor_Start);
 		re2::ExecResult result = regex.exec(&state, chunk1);
 		ASSERT(result == re2::ExecResult_Continue);
 
@@ -1414,7 +1414,7 @@ testRegex() {
 	} while (0);
 
 	do {
-		result = regex.compile(re2::RegexFlag_Stream, "<[^>]*>");
+		result = regex.compile("<[^>]*>");
 		if (!result) {
 			printf("error: %s\n", err::getLastErrorDescription().sz());
 			return;
@@ -1435,7 +1435,7 @@ testRegex() {
 	} while (0);
 
 	do {
-		result = regex.compile(re2::RegexFlag_Stream, "char|[a-z]*1");
+		result = regex.compile("char|[a-z]*1");
 		if (!result) {
 			printf("error: %s\n", err::getLastErrorDescription().sz());
 			return;
@@ -1449,7 +1449,7 @@ testRegex() {
 		re2::ExecResult result = regex.exec(&state, text);
 		ASSERT(result == re2::ExecResult_Continue);
 
-		result = regex.eof(&state, false);
+		result = regex.execEof(&state);
 		ASSERT(result == re2::ExecResult_ContinueBackward);
 
 		result = regex.exec(&state, rchunk2);
@@ -1468,7 +1468,7 @@ testRegex() {
 
 
 	do {
-		result = regex.compile(re2::RegexFlag_Stream, "[3-9]+");
+		result = regex.compile("[3-9]+");
 		if (!result) {
 			printf("error: %s\n", err::getLastErrorDescription().sz());
 			return;
@@ -1489,7 +1489,7 @@ testRegex() {
 		result = regex.exec(&state, chunk2);
 		ASSERT(result == re2::ExecResult_Continue);
 
-		result = regex.eof(&state, false);
+		result = regex.execEof(&state);
 		ASSERT(result == re2::ExecResult_ContinueBackward);
 
 		result = regex.exec(&state, "");
@@ -1507,7 +1507,7 @@ testRegex() {
 	} while (0);
 
 	do {
-		result = regex.compile(re2::RegexFlag_Stream, "[a-z]+");
+		result = regex.compile("[a-z]+");
 		if (!result) {
 			printf("error: %s\n", err::getLastErrorDescription().sz());
 			return;
@@ -1534,7 +1534,7 @@ testRegex() {
 	} while (0);
 
 	do {
-		result = regex.compile(re2::RegexFlag_Stream, "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
+		result = regex.compile("abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz");
 		if (!result) {
 			printf("error: %s\n", err::getLastErrorDescription().sz());
 			return;
@@ -1551,7 +1551,7 @@ testRegex() {
 		ASSERT(result == re2::ExecResult_Continue);
 		result = regex.exec(&state, chunk3);
 		ASSERT(result == re2::ExecResult_Continue);
-		result = regex.eof(&state);
+		result = regex.execEof(&state);
 		ASSERT(result == re2::ExecResult_ContinueBackward);
 		result = regex.exec(&state, chunk3);
 		ASSERT(result == re2::ExecResult_ContinueBackward);
@@ -1586,7 +1586,7 @@ testRegex() {
 	} while (0);
 
 	do {
-		regex.createSwitch(re2::RegexFlag_AnchorStart | re2::RegexFlag_Stream);
+		regex.createSwitch();
 		regex.compileSwitchCase("[0-9]+");
 		regex.compileSwitchCase(".");
 		regex.finalizeSwitch();
@@ -1602,7 +1602,7 @@ testRegex() {
 		};
 
 		re2::ExecResult result;
-		re2::State state(BaseOffset, re2::State::EofChar);
+		re2::State state(re2::Anchor_Start, BaseOffset, re2::EofChar);
 
 		result = regex.exec(&state, chunk1);
 		ASSERT(result == re2::ExecResult_Match && state.getMatchId() == 1 && state.getMatchSize() == 1);
@@ -1642,7 +1642,7 @@ testRegex() {
 		result = regex.exec(&state, chunk4);
 		ASSERT(result == re2::ExecResult_Continue);
 
-		result = regex.eof(&state);
+		result = regex.execEof(&state);
 		ASSERT(result == re2::ExecResult_ContinueBackward);
 
 		result = regex.exec(&state, chunk4);
@@ -1722,7 +1722,7 @@ testRegex() {
 #if (_AXL_RE_TEST_STREAM)
 	printf("\nSTREAM MATCH: '%s':\n", text);
 
-	result = regex.compile(re2::RegexFlag_Stream, src);
+	result = regex.compile(src);
 	if (!result) {
 		printf("error: %s\n", err::getLastErrorDescription().sz());
 		return;
@@ -1738,7 +1738,7 @@ testRegex() {
 				break;
 
 			for (p--; p >= text; p--) {
-				result = regex.exec(&state, p, 1);
+				result = regex.exec(&state, sl::StringRef(p, 1));
 				if (result != re2::ExecResult_ContinueBackward)
 					break;
 			}
@@ -1805,12 +1805,13 @@ testRegex() {
 		"suka\n"
 		" suka_hui_123\n";
 
-	state.reset();
+	state.reset(re2::Anchor_Start);
+	state.setEof(lengthof(source));
 	p = source;
 	end = p + lengthof(source);
 
 	while (p < end) {
-		re2::ExecResult result = regex.exec(&state, p, end - p);
+		re2::ExecResult result = regex.exec(&state, sl::StringRef(p, end - p));
 		if (!state.isMatch()) {
 			printf("NO MATCH!\n");
 			break;

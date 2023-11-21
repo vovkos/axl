@@ -24,12 +24,13 @@ public:
 	Impl() {}
 
 	Impl(
+		RE2::Anchor anchor,
 		uint64_t baseOffset,
 		int baseChar,
 		uint64_t eofOffset,
 		int eofChar
 	):
-		RE2::SM::State(baseOffset, baseChar, eofOffset, eofChar) {}
+		RE2::SM::State(anchor, baseOffset, baseChar, eofOffset, eofChar) {}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -47,12 +48,13 @@ State::State(State&& src) {
 
 void
 State::init(
+	Anchor anchor,
 	uint64_t baseOffset,
 	int baseChar,
 	uint64_t eofOffset,
 	int eofChar
 ) {
-	m_impl = new Impl(baseOffset, baseChar, eofOffset, eofChar);
+	m_impl = new Impl((RE2::Anchor)anchor, baseOffset, baseChar, eofOffset, eofChar);
 }
 
 State::~State()	{
@@ -78,6 +80,11 @@ State::operator = (const State& src) {
 bool
 State::isMatch() const {
 	return m_impl->is_match();
+}
+
+Anchor
+State::getAnchor() const {
+	return (Anchor)m_impl->anchor();
 }
 
 uint64_t
@@ -132,12 +139,13 @@ State::getMatchNextChar() const {
 
 void
 State::reset(
+	Anchor anchor,
 	uint64_t baseOffset,
 	int baseChar,
 	uint64_t eofOffset,
 	int eofChar
 ) {
-	m_impl->reset(baseOffset, baseChar, eofOffset, eofChar);
+	m_impl->reset((RE2::Anchor)anchor, baseOffset, baseChar, eofOffset, eofChar);
 }
 
 void

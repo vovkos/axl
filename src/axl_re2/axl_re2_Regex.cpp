@@ -62,12 +62,6 @@ calcRe2OptionsFromRegexFlags(uint_t flags) {
 	return options;
 }
 
-inline
-RE2::Anchor
-calcRe2AnchorFromRegexFlags(uint_t flags) {
-	return (RE2::Anchor)((flags & RegexFlag_AnchorMask) >> 4);
-}
-
 //..............................................................................
 
 class Regex::Impl: public RE2::SM {
@@ -117,8 +111,7 @@ Regex::compile(
 ) {
 	bool result = m_impl->create(
 		source >> toRe2,
-		calcRe2OptionsFromRegexFlags(flags),
-		calcRe2AnchorFromRegexFlags(flags)
+		calcRe2OptionsFromRegexFlags(flags)
 	);
 
 	if (!result)
@@ -130,11 +123,7 @@ Regex::compile(
 
 void
 Regex::createSwitch(uint_t flags) {
-	m_impl->create_switch(
-		calcRe2OptionsFromRegexFlags(flags),
-		calcRe2AnchorFromRegexFlags(flags)
-	);
-
+	m_impl->create_switch(calcRe2OptionsFromRegexFlags(flags));
 	m_flags = flags;
 }
 
@@ -153,24 +142,25 @@ Regex::finalizeSwitch() {
 ExecResult
 Regex::exec(
 	State* state,
-	const void* p,
-	size_t size
+	const sl::StringRef& chunk
 ) const {
-	if (state->isMatch())
-		state->reset(state->getMatchEndOffset(), state->getMatchLastChar());
-
-	if (!(m_flags & RegexFlag_Stream))
-		state->setEof(state->getBaseOffset() + size);
-
-	return (ExecResult)m_impl->exec((RE2::SM::State*)state->m_impl, StringPiece((char*)p, size));
+	return (ExecResult)m_impl->exec(
+		(RE2::SM::State*)state->m_impl,
+		StringPiece(chunk.cp(), chunk.getLength())
+	);
 }
 
 ExecResult
-Regex::eof(
+Regex::execEof(
 	State* state,
+	const sl::StringRef& lastChunk,
 	int eofChar
 ) const {
-	return (ExecResult)m_impl->eof((RE2::SM::State*)state->m_impl, eofChar);
+	return (ExecResult)m_impl->exec_eof(
+		(RE2::SM::State*)state->m_impl,
+		StringPiece(lastChunk.cp(), lastChunk.getLength()),
+		eofChar
+	);
 }
 
 bool

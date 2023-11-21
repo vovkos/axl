@@ -1,4 +1,4 @@
-//..............................................................................
+ //..............................................................................
 //
 //  This file is part of the AXL library.
 //
@@ -21,13 +21,9 @@ namespace re2 {
 //..............................................................................
 
 enum RegexFlag {
-	RegexFlag_Stream          = 0x01,
-	RegexFlag_OneLine         = 0x02,
-	RegexFlag_Latin1          = 0x04,
-	RegexFlag_CaseInsensitive = 0x08,
-	RegexFlag_AnchorStart     = 0x10, // RE2::ANCHOR_START
-	RegexFlag_FullMatch       = 0x20, // RE2::ANCHOR_BOTH
-	RegexFlag_AnchorMask      = 0x30,
+	RegexFlag_OneLine         = 0x01,
+	RegexFlag_Latin1          = 0x02,
+	RegexFlag_CaseInsensitive = 0x04,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -92,7 +88,7 @@ public:
 	}
 
 	void
-	createSwitch(uint_t flags = RegexFlag_AnchorStart);
+	createSwitch(uint_t flags = 0);
 
 	uint_t
 	compileSwitchCase(const sl::StringRef& source);
@@ -103,36 +99,28 @@ public:
 	// execution
 
 	State
-	exec(
-		const void* p,
-		size_t size
-	) const;
-
-	State
-	exec(const sl::StringRef& text) const {
-		return exec(text.cp(), text.getLength());
-	}
-
-	ExecResult
-	exec(
-		State* state,
-		const void* p,
-		size_t size
-	) const;
+	exec(const sl::StringRef& text) const;
 
 	ExecResult
 	exec(
 		State* state,
 		const sl::StringRef& chunk
-	) const {
-		return exec(state, chunk.cp(), chunk.getLength());
-	}
+	) const;
 
 	ExecResult
-	eof(
+	execEof(
 		State* state,
-		int eofChar = State::EofChar
+		const sl::StringRef& lastChunk,
+		int eofChar = EofChar
 	) const;
+
+	ExecResult
+	execEof(
+		State* state,
+		int eofChar = EofChar
+	) const {
+		return execEof(state, sl::StringRef(), eofChar);
+	}
 
 	bool
 	captureSubmatches(
@@ -189,13 +177,9 @@ protected:
 
 inline
 State
-Regex::exec(
-	const void* p,
-	size_t size
-) const {
+Regex::exec(const sl::StringRef& text) const {
 	State state;
-	state.setEof(size);
-	exec(&state, p, size);
+	execEof(&state, text);
 	return state;
 }
 

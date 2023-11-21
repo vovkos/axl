@@ -31,13 +31,22 @@ enum ExecResult {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+enum Anchor {
+	Anchor_None      = 0, // RE2::UNANCHORED
+	Anchor_Start     = 1, // RE2::ANCHOR_START
+	Anchor_FullMatch = 2, // RE2::ANCHOR_BOTH
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+enum {
+	EofChar = 256, // RE2::SM::kByteEndText
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 class State {
 	friend class Regex;
-
-public:
-	enum {
-		EofChar = 256,
-	};
 
 protected:
 	class Impl; // RE2::SM::State
@@ -46,24 +55,26 @@ protected:
 	Impl* m_impl;
 
 public:
-	State() {
-		init(0, EofChar, -1, EofChar);
+	State(Anchor anchor = Anchor_None) {
+		init(anchor, 0, EofChar, -1, EofChar);
 	}
 
 	State(
+		Anchor anchor,
 		uint64_t baseOffset,
 		int baseChar
 	) {
-		init(baseOffset, baseChar, -1, EofChar);
+		init(anchor, baseOffset, baseChar, -1, EofChar);
 	}
 
 	State(
+		Anchor anchor,
 		uint64_t baseOffset,
 		int baseChar,
 		uint64_t eofOffset,
 		int eofChar = EofChar
 	) {
-		init(baseOffset, baseChar, eofOffset, eofChar);
+		init(anchor, baseOffset, baseChar, eofOffset, eofChar);
 	}
 
 	State(const State& src);
@@ -88,6 +99,9 @@ public:
 
 	bool
 	isMatch() const;
+
+	Anchor
+	getAnchor() const;
 
 	uint64_t
 	getBaseOffset() const;
@@ -120,20 +134,22 @@ public:
 	getMatchNextChar() const;
 
 	void
-	reset() {
-		reset(0, EofChar, -1, EofChar);
+	reset(Anchor anchor = Anchor_None) {
+		reset(anchor, 0, EofChar, -1, EofChar);
 	}
 
 	void
 	reset(
+		Anchor anchor,
 		uint64_t baseOffset,
 		int baseChar
 	) {
-		reset(baseOffset, baseChar, -1, EofChar);
+		reset(anchor, baseOffset, baseChar, -1, EofChar);
 	}
 
 	void
 	reset(
+		Anchor anchor,
 		uint64_t baseOffset,
 		int baseChar,
 		uint64_t eofOffset,
@@ -149,6 +165,7 @@ public:
 protected:
 	void
 	init(
+		Anchor anchor,
 		uint64_t baseOffset,
 		int baseChar,
 		uint64_t eofOffset,
