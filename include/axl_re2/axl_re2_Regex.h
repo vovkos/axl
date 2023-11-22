@@ -62,14 +62,20 @@ public:
 		return m_flags;
 	}
 
-	size_t
-	getSwitchCaseCount() const;
+	sl::StringRef
+	getPattern() const;
 
 	size_t
 	getCaptureCount() const;
 
 	size_t
-	getCaptureCount(uint_t switchCaseId) const;
+	getSwitchCaseCount() const;
+
+	sl::StringRef
+	getSwitchCasePattern(uint_t switchCaseId) const;
+
+	size_t
+	getSwitchCaseCaptureCount(uint_t switchCaseId) const;
 
 	// compilation
 
@@ -159,22 +165,23 @@ public:
 		Match* submatchArray,
 		size_t count
 	) const {
-		return captureSubmatchesImpl(0, match, submatchArray, count);
+		return captureSubmatchesImpl(RegexKind_Single, 0, match, submatchArray, count);
 	}
 
 	bool
-	captureSubmatches(
+	captureSwitchCaseSubmatches(
 		uint_t switchCaseId,
 		const Match& match,
 		Match* submatchArray,
 		size_t count
 	) const {
-		return captureSubmatchesImpl(switchCaseId, match, submatchArray, count);
+		return captureSubmatchesImpl(RegexKind_Switch, switchCaseId, match, submatchArray, count);
 	}
 
 protected:
 	bool
 	captureSubmatchesImpl(
+		RegexKind kind,
 		uint_t switchCaseId,
 		const Match& match,
 		Match* submatchArray,

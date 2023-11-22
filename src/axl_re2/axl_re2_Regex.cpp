@@ -63,18 +63,28 @@ Regex::getRegexKind() const {
 }
 
 size_t
+Regex::getCaptureCount() const {
+	return m_impl->capture_count();
+}
+
+sl::StringRef
+Regex::getPattern() const {
+	return m_impl->pattern() >> toAxl;
+}
+
+size_t
 Regex::getSwitchCaseCount() const {
 	return m_impl->switch_case_count();
 }
 
 size_t
-Regex::getCaptureCount() const {
-	return m_impl->capture_count();
+Regex::getSwitchCaseCaptureCount(uint_t switchCaseId) const {
+	return m_impl->capture_count(switchCaseId);
 }
 
-size_t
-Regex::getCaptureCount(uint_t switchCaseId) const {
-	return m_impl->capture_count(switchCaseId);
+sl::StringRef
+Regex::getSwitchCasePattern(uint_t switchCaseId) const {
+	return m_impl->pattern(switchCaseId) >> toAxl;
 }
 
 // compilation
@@ -264,6 +274,7 @@ Regex::execEof(
 
 bool
 Regex::captureSubmatchesImpl(
+	RegexKind kind,
 	uint_t switchCaseId,
 	const Match& match,
 	Match* submatchArray_axl,
@@ -275,7 +286,7 @@ Regex::captureSubmatchesImpl(
 
 	const sl::StringRef& text = match.getText();
 
-	bool result = m_impl->kind() == RE2::SM::kRegexpSwitch ?
+	bool result = kind == RE2::SM::kRegexpSwitch ?
 		m_impl->capture_submatches(switchCaseId, text >> toRe2, submatchArray_re2, count) :
 		m_impl->capture_submatches(text >> toRe2, submatchArray_re2, count);
 
