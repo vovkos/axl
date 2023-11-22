@@ -97,11 +97,6 @@ State::getEofOffset() const {
 	return m_impl->eof_offset();
 }
 
-uint_t
-State::getMatchId() const {
-	return m_impl->match_id();
-}
-
 int
 State::getBaseChar() const {
 	return m_impl->base_char();
@@ -146,6 +141,7 @@ void
 State::prepareMatch() const {
 	ASSERT(m_match.m_offset == -1 && m_match.m_endOffset == -1);
 
+	m_match.m_id = m_impl->match_id();
 	m_match.m_offset = m_impl->match_offset();
 	m_match.m_endOffset = m_impl->match_end_offset();
 	if (m_impl->has_match_text())

@@ -46,7 +46,7 @@ enum {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Match {
+class Capture {
 	friend class State;
 	friend class Regex;
 
@@ -56,15 +56,14 @@ protected:
 	sl::StringRef m_text;
 
 public:
-	Match() {
+	Capture() {
 		m_offset = -1;
 		m_endOffset = -1;
 	}
 
-	Match(
-		uint64_t offset,
-		const sl::StringRef& text
-	);
+	operator bool () const {
+		return isValid();
+	}
 
 	bool
 	isValid() const {
@@ -108,24 +107,40 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-Match::Match(
-	uint64_t offset,
-	const sl::StringRef& text
-) {
-	m_offset = offset;
-	m_endOffset = offset + text.getLength();
-	m_text = text;
-}
-
-inline
 void
-Match::reset() {
+Capture::reset() {
 	m_offset = -1;
 	m_endOffset = -1;
 	m_text.clear();
 }
 
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//..............................................................................
+
+class Match: public Capture {
+	friend class State;
+	friend class Regex;
+
+protected:
+	uint_t m_id;
+
+public:
+	Match() {
+		m_id = -1;
+	}
+
+	uint_t
+	getId() const {
+		return m_id;
+	}
+
+	void
+	reset() {
+		Capture::reset();
+		m_id = -1;
+	}
+};
+
+//..............................................................................
 
 class State {
 	friend class Regex;
@@ -191,9 +206,6 @@ public:
 
 	uint64_t
 	getEofOffset() const;
-
-	uint_t
-	getMatchId() const;
 
 	const Match&
 	getMatch() const;

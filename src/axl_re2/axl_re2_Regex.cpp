@@ -48,7 +48,8 @@ class Regex::Impl: public RE2::SM {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-Regex::Regex()	{
+void
+Regex::init() {
 	m_impl = new Impl;
 	m_flags = 0;
 }
@@ -276,34 +277,34 @@ bool
 Regex::captureSubmatchesImpl(
 	RegexKind kind,
 	uint_t switchCaseId,
-	const Match& match,
-	Match* submatchArray_axl,
+	uint64_t matchOffset,
+	const sl::StringRef& matchText_axl,
+	Capture* submatchArray_axl,
 	size_t count
 ) const {
 	char buffer[256];
 	sl::Array<StringPiece> submatchArray_re2(rc::BufKind_Stack, buffer, sizeof(buffer));
 	submatchArray_re2.setCount(count);
 
-	const sl::StringRef& text = match.getText();
+	StringPiece matchText_re2 = matchText_axl >> toRe2;
 
 	bool result = kind == RE2::SM::kRegexpSwitch ?
-		m_impl->capture_submatches(switchCaseId, text >> toRe2, submatchArray_re2, count) :
-		m_impl->capture_submatches(text >> toRe2, submatchArray_re2, count);
+		m_impl->capture_submatches(switchCaseId, matchText_re2, submatchArray_re2, count) :
+		m_impl->capture_submatches(matchText_re2, submatchArray_re2, count);
 
 	if (!result)
 		return false;
 
-	const char* p0 = text.cp();
-	uint64_t baseOffset = match.getOffset();
+	const char* p0 = matchText_re2.data();
 	for (size_t i = 0; i < count; i++) {
-		Match* dst = &submatchArray_axl[i];
+		Capture* dst = &submatchArray_axl[i];
 		const StringPiece& src = submatchArray_re2[i];
 		if (!src.data()) {
 			dst->reset();
 			continue;
 		}
 
-		dst->m_offset = baseOffset + src.data() - p0;
+		dst->m_offset = matchOffset + src.data() - p0;
 		dst->m_endOffset = dst->m_offset + src.length();
 		dst->m_text = src >> toAxl;
 	}

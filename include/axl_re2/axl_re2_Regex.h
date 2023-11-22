@@ -29,7 +29,7 @@ enum RegexFlag {
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 enum RegexKind {
-	RegexKind_Undefined, // RE2::SM::kUninitialized
+	RegexKind_Undefined, // RE2::SM::kUndefined
 	RegexKind_Single,    // RE2::SM::kSingleRegexp
 	RegexKind_Switch,    // RE2::SM::kRegexpSwitch
 };
@@ -45,7 +45,23 @@ protected:
 	uint_t m_flags;
 
 public:
-	Regex();
+	Regex() {
+		init();
+	}
+
+	Regex(const sl::StringRef& pattern) {
+		init();
+		compile(pattern);
+	}
+
+	Regex(
+		uint_t flags,
+		const sl::StringRef& pattern
+	) {
+		init();
+		compile(flags, pattern);
+	}
+
 	~Regex();
 
 	operator bool () const {
@@ -127,13 +143,13 @@ public:
 
 	// execution
 
-	State
+	Match
 	exec(
 		Anchor anchor,
 		const sl::StringRef& text
 	) const;
 
-	State
+	Match
 	exec(const sl::StringRef& text) const {
 		return exec(Anchor_None, text);
 	}
@@ -161,30 +177,115 @@ public:
 
 	bool
 	captureSubmatches(
-		const Match& match,
-		Match* submatchArray,
+		const sl::StringRef& matchText,
+		Capture* submatchArray,
 		size_t count
 	) const {
-		return captureSubmatchesImpl(RegexKind_Single, 0, match, submatchArray, count);
+		return captureSubmatchesImpl(
+			RegexKind_Single,
+			0,
+			0,
+			matchText,
+			submatchArray,
+			count
+		);
+	}
+	bool
+	captureSubmatches(
+		uint64_t matchOffset,
+		const sl::StringRef& matchText,
+		Capture* submatchArray,
+		size_t count
+	) const {
+		return captureSubmatchesImpl(
+			RegexKind_Single,
+			0,
+			matchOffset,
+			matchText,
+			submatchArray,
+			count
+		);
+	}
+
+	bool
+	captureSubmatches(
+		const Capture& match,
+		Capture* submatchArray,
+		size_t count
+	) const {
+		return captureSubmatchesImpl(
+			RegexKind_Single,
+			0,
+			match.getOffset(),
+			match.getText(),
+			submatchArray,
+			count
+		);
 	}
 
 	bool
 	captureSwitchCaseSubmatches(
 		uint_t switchCaseId,
-		const Match& match,
-		Match* submatchArray,
+		const sl::StringRef& matchText,
+		Capture* submatchArray,
 		size_t count
 	) const {
-		return captureSubmatchesImpl(RegexKind_Switch, switchCaseId, match, submatchArray, count);
+		return captureSubmatchesImpl(
+			RegexKind_Switch,
+			switchCaseId,
+			0,
+			matchText,
+			submatchArray,
+			count
+		);
+	}
+
+	bool
+	captureSwitchCaseSubmatches(
+		uint_t switchCaseId,
+		uint64_t matchOffset,
+		const sl::StringRef& matchText,
+		Capture* submatchArray,
+		size_t count
+	) const {
+		return captureSubmatchesImpl(
+			RegexKind_Switch,
+			switchCaseId,
+			matchOffset,
+			matchText,
+			submatchArray,
+			count
+		);
+	}
+
+	bool
+	captureSwitchCaseSubmatches(
+		uint_t switchCaseId,
+		const Capture& match,
+		Capture* submatchArray,
+		size_t count
+	) const {
+		return captureSubmatchesImpl(
+			RegexKind_Switch,
+			switchCaseId,
+			match.getOffset(),
+			match.getText(),
+			submatchArray,
+			count
+		);
 	}
 
 protected:
+	void
+	init();
+
 	bool
 	captureSubmatchesImpl(
 		RegexKind kind,
 		uint_t switchCaseId,
-		const Match& match,
-		Match* submatchArray,
+		uint64_t matchOffset,
+		const sl::StringRef& matchText,
+		Capture* submatchArray,
 		size_t count
 	) const;
 };
@@ -192,14 +293,14 @@ protected:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-State
+Match
 Regex::exec(
 	Anchor anchor,
 	const sl::StringRef& text
 ) const {
 	State state(anchor);
 	execEof(&state, text);
-	return state;
+	return state.isMatch() ? state.getMatch() : Match();
 }
 
 //..............................................................................
