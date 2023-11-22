@@ -11,6 +11,7 @@
 
 #include "pch.h"
 #include "axl_re2_Regex.h"
+#include "axl_re2_Storage.h"
 
 namespace axl {
 namespace re2 {
@@ -76,6 +77,8 @@ Regex::getCaptureCount(uint_t switchCaseId) const {
 	return m_impl->capture_count(switchCaseId);
 }
 
+// compilation
+
 void
 Regex::clear() {
 	m_impl->clear();
@@ -116,6 +119,127 @@ Regex::finalizeSwitch() {
 	bool result = m_impl->finalize_switch();
 	return result ? true : err::fail(m_impl->error() >> toAxl);
 }
+
+// serialization
+
+size_t
+Regex::load(
+	const void* data,
+	size_t size
+) {
+	if (size < sizeof(StorageHdr))
+		return err::fail<size_t>(-1, "regex storage buffer too small");
+
+	clear();
+
+	const StorageHdr* hdr = (const StorageHdr*)data;
+	if (hdr->m_signature != StorageSignature ||
+		hdr->m_version != StorageVersion_Current ||
+		hdr->m_dataSize > size - sizeof(StorageHdr)
+	)
+		return err::fail<size_t>(-1, "invalid regex storage");
+
+	RE2::Options options = calcRe2OptionsFromRegexFlags(hdr->m_flags);
+	switch (hdr->m_regexKind) {
+	case RegexKind_Single: {
+		if (hdr->m_switchCaseCount)
+			return err::fail<size_t>(-1, "regex kind mismatch");
+
+		StringPiece pattern((char*)(hdr + 1), hdr->m_dataSize);
+		bool result = m_impl->create(pattern, options);
+		if (!result)
+			return err::fail<size_t>(-1, "invalid regex pattern syntax");
+
+		if (hdr->m_captureCount != m_impl->capture_count())
+			return err::fail<size_t>(-1, "regex capture count mismatch");
+
+		return sizeof(StorageHdr) + hdr->m_dataSize;
+		}
+
+	case RegexKind_Switch:
+		break;
+
+	default:
+		return err::fail<size_t>(-1, "invalid regex kind");
+	}
+
+	// load switch-case
+
+	m_impl->create_switch(options);
+	const char* p = (char*)(hdr + 1);
+	const char* end = p + hdr->m_dataSize;
+
+	for (size_t i = 0; i < hdr->m_switchCaseCount; i++) {
+		size_t leftoverSize = end - p;
+		const SwitchCaseHdr* hdr = (const SwitchCaseHdr*)p;
+		if (leftoverSize < sizeof(SwitchCaseHdr) ||
+			hdr->m_signature != SwitchCaseSignature ||
+			leftoverSize < sizeof(SwitchCaseHdr) + hdr->m_length
+		)
+			return err::fail<size_t>(-1, "invalid regex storage");
+
+		p = (char*)(hdr + 1);
+		StringPiece pattern(p, hdr->m_length);
+		int id = m_impl->add_switch_case(pattern);
+		if (id == -1)
+			return err::fail<size_t>(-1, "invalid regex pattern syntax");
+
+		if (hdr->m_captureCount != m_impl->capture_count(id))
+			return err::fail<size_t>(-1, "regex capture count mismatch");
+
+		p += hdr->m_length;
+	}
+
+	bool result = m_impl->finalize_switch();
+	if (!result)
+		return err::fail<size_t>(-1, "can't compile final RE2 program");
+
+	return sizeof(StorageHdr) + hdr->m_dataSize;
+}
+
+size_t
+Regex::save(sl::Array<char>* buffer) const {
+	buffer->clear();
+
+	buffer->appendEmptySpace(sizeof(StorageHdr));
+	StorageHdr* hdr = (StorageHdr*)buffer->p();
+	hdr->m_signature = StorageSignature;
+	hdr->m_version = StorageVersion_Current;
+	hdr->m_regexKind = getRegexKind();
+	hdr->m_flags = getFlags();
+
+	switch (getRegexKind()) {
+	case RegexKind_Single: {
+		hdr->m_switchCaseCount = 0;
+		hdr->m_captureCount = getCaptureCount();
+		hdr->m_dataSize = m_impl->pattern().length();
+		return buffer->append(m_impl->pattern().data(), hdr->m_dataSize);
+		}
+
+	case RegexKind_Switch:
+		break;
+
+	default:
+		return err::fail<size_t>(-1, "can't save uninitialized regex");
+	}
+
+	hdr->m_switchCaseCount = getSwitchCaseCount();
+	hdr->m_captureCount = 0;
+
+	for (size_t i = 0; i < hdr->m_switchCaseCount; i++) {
+		buffer->appendEmptySpace(sizeof(SwitchCaseHdr));
+		SwitchCaseHdr* hdr = (SwitchCaseHdr*)buffer->p();
+		hdr->m_signature = SwitchCaseSignature;
+		hdr->m_captureCount = m_impl->capture_count(i);
+		hdr->m_length = m_impl->pattern(i).length();
+		return buffer->append(m_impl->pattern(i).data(), hdr->m_length);
+	}
+
+	hdr->m_dataSize = buffer->getCount() - sizeof(StorageHdr);
+	return buffer->getCount();
+}
+
+// execution
 
 ExecResult
 Regex::exec(

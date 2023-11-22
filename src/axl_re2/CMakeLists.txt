@@ -17,6 +17,7 @@ set(
 	LIB_H_LIST
 	${AXL_INC_DIR}/axl_re2/axl_re2_Regex.h
 	${AXL_INC_DIR}/axl_re2/axl_re2_State.h
+	axl_re2_Storage.h
 )
 
 set(

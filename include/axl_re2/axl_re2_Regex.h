@@ -96,6 +96,29 @@ public:
 	bool
 	finalizeSwitch();
 
+	// serialization
+
+	size_t
+	load(
+		const void* p,
+		size_t size
+	);
+
+	size_t
+	load(const sl::ArrayRef<char>& buffer) {
+		return load(buffer.cp(), buffer.getCount());
+	}
+
+	size_t
+	save(sl::Array<char>* buffer) const;
+
+	sl::Array<char>
+	save() const {
+		sl::Array<char> buffer;
+		save(&buffer);
+		return buffer;
+	}
+
 	// execution
 
 	State
