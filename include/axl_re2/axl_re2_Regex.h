@@ -122,7 +122,15 @@ public:
 	// execution
 
 	State
-	exec(const sl::StringRef& text) const;
+	exec(
+		Anchor anchor,
+		const sl::StringRef& text
+	) const;
+
+	State
+	exec(const sl::StringRef& text) const {
+		return exec(Anchor_None, text);
+	}
 
 	ExecResult
 	exec(
@@ -178,8 +186,11 @@ protected:
 
 inline
 State
-Regex::exec(const sl::StringRef& text) const {
-	State state;
+Regex::exec(
+	Anchor anchor,
+	const sl::StringRef& text
+) const {
+	State state(anchor);
 	execEof(&state, text);
 	return state;
 }
