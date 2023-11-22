@@ -97,21 +97,6 @@ State::getEofOffset() const {
 	return m_impl->eof_offset();
 }
 
-uint64_t
-State::getMatchOffset() const {
-	return m_impl->match_offset();
-}
-
-uint64_t
-State::getMatchEndOffset() const {
-	return m_impl->match_end_offset();
-}
-
-uint64_t
-State::getMatchSize() const {
-	return m_impl->match_length();
-}
-
 uint_t
 State::getMatchId() const {
 	return m_impl->match_id();
@@ -146,6 +131,7 @@ State::reset(
 	int eofChar
 ) {
 	m_impl->reset((RE2::Anchor)anchor, baseOffset, baseChar, eofOffset, eofChar);
+	m_match.reset();
 }
 
 void
@@ -154,6 +140,16 @@ State::setEof(
 	int eofChar
 ) {
 	m_impl->set_eof(offset, eofChar);
+}
+
+void
+State::prepareMatch() const {
+	ASSERT(m_match.m_offset == -1 && m_match.m_endOffset == -1);
+
+	m_match.m_offset = m_impl->match_offset();
+	m_match.m_endOffset = m_impl->match_end_offset();
+	if (m_impl->has_match_text())
+		m_match.m_text = m_impl->match_text() >> toAxl;
 }
 
 //..............................................................................

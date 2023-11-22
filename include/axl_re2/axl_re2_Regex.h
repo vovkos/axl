@@ -21,9 +21,9 @@ namespace re2 {
 //..............................................................................
 
 enum RegexFlag {
-	RegexFlag_OneLine         = 0x01,
-	RegexFlag_Latin1          = 0x02,
-	RegexFlag_CaseInsensitive = 0x04,
+	RegexFlag_OneLine         = 0x01, // R2::Options.one_line -> true (otherwise, false)
+	RegexFlag_Latin1          = 0x02, // R2::Options.encoding -> EncodingLatin1 (otherwise, EncodingUTF8)
+	RegexFlag_CaseInsensitive = 0x04, // R2::Options.case_sensitive -> (otherwise, false)
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -124,51 +124,29 @@ public:
 
 	bool
 	captureSubmatches(
-		const void* p,
-		size_t size,
-		sl::StringRef* submatchArray,
+		const Match& match,
+		Match* submatchArray,
 		size_t count
 	) const {
-		return captureSubmatchesImpl(0, p, size, submatchArray, count);
+		return captureSubmatchesImpl(0, match, submatchArray, count);
 	}
 
 	bool
 	captureSubmatches(
 		uint_t switchCaseId,
-		const void* p,
-		size_t size,
-		sl::StringRef* submatchArray,
+		const Match& match,
+		Match* submatchArray,
 		size_t count
 	) const {
-		return captureSubmatchesImpl(switchCaseId, p, size, submatchArray, count);
-	}
-
-	bool
-	captureSubmatches(
-		const sl::StringRef& text,
-		sl::StringRef* submatchArray,
-		size_t count
-	) const {
-		return captureSubmatchesImpl(0, text.cp(), text.getLength(), submatchArray, count);
-	}
-
-	bool
-	captureSubmatches(
-		uint_t switchCaseId,
-		const sl::StringRef& text,
-		sl::StringRef* submatchArray,
-		size_t count
-	) const {
-		return captureSubmatchesImpl(switchCaseId, text.cp(), text.getLength(), submatchArray, count);
+		return captureSubmatchesImpl(switchCaseId, match, submatchArray, count);
 	}
 
 protected:
 	bool
 	captureSubmatchesImpl(
 		uint_t switchCaseId,
-		const void* p,
-		size_t size,
-		sl::StringRef* submatchArray,
+		const Match& match,
+		Match* submatchArray,
 		size_t count
 	) const;
 };

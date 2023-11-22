@@ -1302,12 +1302,14 @@ testRegex() {
 		re2::ExecResult result = regex.execEof(&state, text);
 		ASSERT(result == re2::ExecResult_Match);
 
+		const re2::Match& match = state.getMatch();
+
 		printf(
 			"match(%d): %lld..%lld (%s)\n",
 			state.getMatchId(),
-			state.getMatchOffset(),
-			state.getMatchEndOffset(),
-			sl::StringRef(text + state.getMatchOffset(), state.getMatchSize()).sz()
+			match.getOffset(),
+			match.getEndOffset(),
+			match.getText().sz()
 		);
 
 	} while (0);
@@ -1325,27 +1327,29 @@ testRegex() {
 		re2::ExecResult result = regex.execEof(&state, text);
 		ASSERT(result == re2::ExecResult_Match);
 
-		size_t baseOffset = state.getMatchEndOffset();
+		re2::Match match = state.getMatch();
 
 		printf(
 			"match(%d): %lld..%lld (%s)\n",
 			state.getMatchId(),
-			state.getMatchOffset(),
-			state.getMatchEndOffset(),
-			sl::StringRef(text + state.getMatchOffset(), state.getMatchSize()).sz()
+			match.getOffset(),
+			match.getEndOffset(),
+			match.getText().sz()
 		);
 
 		char const text2[] = "xyz\nabcd";
 
-		result = regex.exec(&state, text2);
+		result = regex.execEof(&state, text2);
 		ASSERT(result == re2::ExecResult_Match);
+
+		match = state.getMatch();
 
 		printf(
 			"match(%d): %lld..%lld (%s)\n",
 			state.getMatchId(),
-			state.getMatchOffset(),
-			state.getMatchEndOffset(),
-			sl::StringRef(text2 - baseOffset + state.getMatchOffset(), state.getMatchSize()).sz()
+			match.getOffset(),
+			match.getEndOffset(),
+			match.getText().sz()
 		);
 
 	} while (0);
@@ -1368,12 +1372,14 @@ testRegex() {
 		re2::ExecResult result = regex.execEof(&state, text);
 		ASSERT(result == re2::ExecResult_Match);
 
+		const re2::Match& match = state.getMatch();
+
 		printf(
 			"match(%d): %lld..%lld (%s)\n",
 			state.getMatchId(),
-			state.getMatchOffset(),
-			state.getMatchEndOffset(),
-			sl::StringRef(text + state.getMatchOffset(), state.getMatchSize()).sz()
+			match.getOffset(),
+			match.getEndOffset(),
+			match.getText().sz()
 		);
 	} while (0);
 
@@ -1405,11 +1411,13 @@ testRegex() {
 		result = regex.exec(&state, chunk1);
 		ASSERT(result == re2::ExecResult_Match);
 
+		const re2::Match& match = state.getMatch();
+
 		printf(
 			"match(%d): %lld..%lld\n",
 			state.getMatchId(),
-			state.getMatchOffset(),
-			state.getMatchEndOffset()
+			match.getOffset(),
+			match.getEndOffset()
 		);
 	} while (0);
 
@@ -1423,14 +1431,16 @@ testRegex() {
 		char const text[] = "abc<def>ghi";
 
 		re2::State state;
-		re2::ExecResult result = regex.exec(&state, text);
+		re2::ExecResult result = regex.execEof(&state, text);
 		ASSERT(result == re2::ExecResult_Match);
+
+		const re2::Match& match = state.getMatch();
 
 		printf(
 			"match: %lld..%lld: '%s'\n",
-			state.getMatchOffset(),
-			state.getMatchEndOffset(),
-			sl::StringRef(text + state.getMatchOffset(), state.getMatchSize()).sz()
+			match.getOffset(),
+			match.getEndOffset(),
+			match.getText().sz()
 		);
 	} while (0);
 
@@ -1458,11 +1468,13 @@ testRegex() {
 		result = regex.exec(&state, rchunk1);
 		ASSERT(result == re2::ExecResult_Match);
 
+		const re2::Match& match = state.getMatch();
+
 		printf(
 			"match: %lld..%lld: '%s'\n",
-			state.getMatchOffset(),
-			state.getMatchEndOffset(),
-			sl::StringRef(text + state.getMatchOffset(), state.getMatchSize()).sz()
+			match.getOffset(),
+			match.getEndOffset(),
+			sl::StringRef(text + match.getOffset(), match.getSize()).sz()
 		);
 	} while (0);
 
@@ -1498,11 +1510,13 @@ testRegex() {
 		result = regex.exec(&state, rchunk);
 		ASSERT(result == re2::ExecResult_Match);
 
+		const re2::Match& match = state.getMatch();
+
 		printf(
 			"match: %lld..%lld: '%s'\n",
-			state.getMatchOffset(),
-			state.getMatchEndOffset(),
-			sl::StringRef(text + state.getMatchOffset(), state.getMatchSize()).sz()
+			match.getOffset(),
+			match.getEndOffset(),
+			sl::StringRef(text + match.getOffset(), match.getSize()).sz()
 		);
 	} while (0);
 
@@ -1520,7 +1534,10 @@ testRegex() {
 		re2::State state;
 		re2::ExecResult result = regex.exec(&state, chunk1);
 		ASSERT(result == re2::ExecResult_Match);
-		printf("match: %lld..%lld\n", state.getMatchOffset(), state.getMatchEndOffset());
+
+		re2::Match match = state.getMatch();
+
+		printf("match: %lld..%lld\n", match.getOffset(), match.getEndOffset());
 
 		result = regex.exec(&state, chunk2);
 		ASSERT(result == re2::ExecResult_Continue);
@@ -1530,7 +1547,9 @@ testRegex() {
 
 		result = regex.exec(&state, chunk2);
 		ASSERT(result == re2::ExecResult_Match);
-		printf("match: %lld..%lld\n", state.getMatchOffset(), state.getMatchEndOffset());
+		match = state.getMatch();
+
+		printf("match: %lld..%lld\n", match.getOffset(), match.getEndOffset());
 	} while (0);
 
 	do {
@@ -1558,9 +1577,15 @@ testRegex() {
 		result = regex.exec(&state, chunk2);
 		ASSERT(result == re2::ExecResult_Match);
 
-		if (state.isMatch())
-			printf("match: %lld..%lld\n", state.getMatchOffset(), state.getMatchEndOffset());
-		else
+		if (state.isMatch()) {
+			const re2::Match& match = state.getMatch();
+
+			printf(
+				"match: %lld..%lld\n",
+				match.getOffset(),
+				match.getEndOffset()
+			);
+		} else
 			printf("mismatch\n");
 	} while (0);
 
@@ -1574,14 +1599,16 @@ testRegex() {
 		char const text[] = "...ba...";
 
 		re2::State state = regex.exec(text);
-		if (state.isMatch())
+		if (state.isMatch()) {
+			const re2::Match& match = state.getMatch();
+
 			printf(
 				"match: %lld..%lld '%s'\n",
-				state.getMatchOffset(),
-				state.getMatchEndOffset(),
-				sl::StringRef(text + state.getMatchOffset(), state.getMatchSize()).sz()
+				match.getOffset(),
+				match.getEndOffset(),
+				match.getText().sz()
 			);
-		else
+		} else
 			printf("mismatch\n");
 	} while (0);
 
@@ -1605,15 +1632,17 @@ testRegex() {
 		re2::State state(re2::Anchor_Start, BaseOffset, re2::EofChar);
 
 		result = regex.exec(&state, chunk1);
-		ASSERT(result == re2::ExecResult_Match && state.getMatchId() == 1 && state.getMatchSize() == 1);
+		ASSERT(result == re2::ExecResult_Match && state.getMatchId() == 1 && state.getMatch().getSize() == 1);
+
+		re2::Match match = state.getMatch();
 
 		printf(
 			"regex result: %d, match id: %d, match offset: %lld, match length: %d, match: %s\n",
 			result,
 			state.getMatchId(),
-			state.getMatchOffset(),
-			state.getMatchSize(),
-			sl::StringRef(text + state.getMatchOffset() - BaseOffset, state.getMatchSize()).sz()
+			match.getOffset(),
+			match.getSize(),
+			sl::StringRef(text + match.getOffset() - BaseOffset, match.getSize()).sz()
 		);
 
 		result = regex.exec(&state, chunk2);
@@ -1629,14 +1658,16 @@ testRegex() {
 		ASSERT(result == re2::ExecResult_ContinueBackward);
 
 		result = regex.exec(&state, chunk2);
-		ASSERT(result == re2::ExecResult_Match && state.getMatchId() == 0 && state.getMatchSize() == 6);
+		ASSERT(result == re2::ExecResult_Match && state.getMatchId() == 0 && state.getMatch().getSize() == 6);
+
+		match = state.getMatch();
 
 		printf(
 			"regex result: %d, match id: %d, match offset: %lld, match length: %d\n",
 			result,
 			state.getMatchId(),
-			state.getMatchOffset(),
-			state.getMatchSize()
+			match.getOffset(),
+			match.getSize()
 		);
 
 		result = regex.exec(&state, chunk4);
@@ -1646,15 +1677,17 @@ testRegex() {
 		ASSERT(result == re2::ExecResult_ContinueBackward);
 
 		result = regex.exec(&state, chunk4);
-		ASSERT(result == re2::ExecResult_Match && state.getMatchId() == 0 && state.getMatchSize() == 6);
+		ASSERT(result == re2::ExecResult_Match && state.getMatchId() == 0 && state.getMatch().getSize() == 6);
+
+		match = state.getMatch();
 
 		printf(
 			"regex result: %d, match id: %d, match offset: %lld, match length: %d, match: %s\n",
 			result,
 			state.getMatchId(),
-			state.getMatchOffset(),
-			state.getMatchSize(),
-			sl::StringRef(text + state.getMatchOffset() - BaseOffset, state.getMatchSize()).sz()
+			match.getOffset(),
+			match.getSize(),
+			sl::StringRef(text + match.getOffset() - BaseOffset, match.getSize()).sz()
 		);
 	} while (0);
 
@@ -1686,36 +1719,35 @@ testRegex() {
 		return;
 	}
 
+	re2::Match match = state.getMatch();
+
 	printf(
 		"$0: 0x%llx(%d) '%s'\n",
-		state.getMatchOffset(),
-		state.getMatchSize(),
-		sl::StringRef(text + state.getMatchOffset(), state.getMatchSize()).sz()
+		match.getOffset(),
+		match.getSize(),
+		match.getText().sz()
 	);
 
 	size_t captureCount = regex.getCaptureCount();
-	sl::Array<sl::StringRef> submatchArray;
+	sl::Array<re2::Match> submatchArray;
 	submatchArray.setCount(captureCount + 1);
 
-	const char* p0 = text + state.getMatchOffset();
 	regex.captureSubmatches(
-		sl::StringRef(p0, state.getMatchSize()),
+		match,
 		submatchArray,
 		submatchArray.getCount()
 	);
 
 	for (size_t i = 0; i < submatchArray.getCount(); i++) {
-		sl::StringRef submatch = submatchArray[i];
-		if (submatch.cp()) {
-			size_t offset = submatch.cp() - text;
+		const re2::Match& submatch = submatchArray[i];
+		if (submatch.isValid())
 			printf(
 				"$%d: 0x%zx(%d) '%s'\n",
 				i,
-				offset,
-				submatch.getLength(),
-				submatch.sz()
+				submatch.getOffset(),
+				submatch.getSize(),
+				submatch.getText().sz()
 			);
-		}
 	}
 #endif
 
@@ -1752,10 +1784,12 @@ testRegex() {
 		return;
 	}
 
+	match = state.getMatch();
+
 	printf(
 		"$0: 0x%llx(%d)\n",
-		state.getMatchOffset(),
-		state.getMatchSize()
+		match.getOffset(),
+		match.getSize()
 	);
 #endif
 
@@ -1818,16 +1852,17 @@ testRegex() {
 		}
 
 		size_t id = state.getMatchId();
+		const re2::Match& match = state.getMatch();
 
 		printf("#%d %s: %llx(%d) '%s'\n",
 			id,
 			caseNameMap[id],
-			state.getMatchOffset(),
-			state.getMatchSize(),
-			sl::StringRef(source + state.getMatchOffset(), state.getMatchSize()).sz()
+			match.getOffset(),
+			match.getSize(),
+			match.getText().sz()
 		);
 
-		p += state.getMatchSize();
+		p += match.getSize();
 	}
 #endif
 }

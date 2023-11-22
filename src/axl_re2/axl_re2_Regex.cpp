@@ -20,28 +20,6 @@ using ::re2::StringPiece;
 
 //..............................................................................
 
-// convenient AXL <-> RE2 string conversions
-
-const struct ToRe2* toRe2;
-const struct ToAxl* toAxl;
-
-StringPiece
-operator >> (const sl::StringRef& src, const ToRe2*) {
-	return StringPiece(src.cp(), src.getLength());
-}
-
-sl::StringRef
-operator >> (StringPiece& src, const ToAxl*) {
-	return sl::StringRef(src.data(), src.length());
-}
-
-sl::StringRef
-operator >> (const std::string& src, const ToAxl*) {
-	return sl::StringRef(src.data(), src.length());
-}
-
-//..............................................................................
-
 RE2::Options
 calcRe2OptionsFromRegexFlags(uint_t flags) {
 	RE2::Options options;
@@ -144,10 +122,9 @@ Regex::exec(
 	State* state,
 	const sl::StringRef& chunk
 ) const {
-	return (ExecResult)m_impl->exec(
-		(RE2::SM::State*)state->m_impl,
-		StringPiece(chunk.cp(), chunk.getLength())
-	);
+	if (state->m_match.isValid())
+		state->m_match.reset();
+	return (ExecResult)m_impl->exec((RE2::SM::State*)state->m_impl, chunk >> toRe2);
 }
 
 ExecResult
@@ -156,36 +133,45 @@ Regex::execEof(
 	const sl::StringRef& lastChunk,
 	int eofChar
 ) const {
-	return (ExecResult)m_impl->exec_eof(
-		(RE2::SM::State*)state->m_impl,
-		StringPiece(lastChunk.cp(), lastChunk.getLength()),
-		eofChar
-	);
+	if (state->m_match.isValid())
+		state->m_match.reset();
+	return (ExecResult)m_impl->exec_eof((RE2::SM::State*)state->m_impl, lastChunk >> toRe2, eofChar);
 }
 
 bool
 Regex::captureSubmatchesImpl(
 	uint_t switchCaseId,
-	const void* p,
-	size_t size,
-	sl::StringRef* submatchArray0,
+	const Match& match,
+	Match* submatchArray_axl,
 	size_t count
 ) const {
 	char buffer[256];
-	sl::Array<StringPiece> submatchArray(rc::BufKind_Stack, buffer, sizeof(buffer));
-	submatchArray.setCount(count);
+	sl::Array<StringPiece> submatchArray_re2(rc::BufKind_Stack, buffer, sizeof(buffer));
+	submatchArray_re2.setCount(count);
 
-	StringPiece text((char*)p, size);
+	const sl::StringRef& text = match.getText();
 
 	bool result = m_impl->kind() == RE2::SM::kRegexpSwitch ?
-		m_impl->capture_submatches(switchCaseId, text, submatchArray, count) :
-		m_impl->capture_submatches(text, submatchArray, count);
+		m_impl->capture_submatches(switchCaseId, text >> toRe2, submatchArray_re2, count) :
+		m_impl->capture_submatches(text >> toRe2, submatchArray_re2, count);
 
 	if (!result)
 		return false;
 
-	for (size_t i = 0; i < count; i++)
-		submatchArray0[i] = submatchArray[i] >> toAxl;
+	const char* p0 = text.cp();
+	uint64_t baseOffset = match.getOffset();
+	for (size_t i = 0; i < count; i++) {
+		Match* dst = &submatchArray_axl[i];
+		const StringPiece& src = submatchArray_re2[i];
+		if (!src.data()) {
+			dst->reset();
+			continue;
+		}
+
+		dst->m_offset = baseOffset + src.data() - p0;
+		dst->m_endOffset = dst->m_offset + src.length();
+		dst->m_text = src >> toAxl;
+	}
 
 	return true;
 }

@@ -17,13 +17,14 @@ namespace axl {
 namespace re2 {
 
 class Regex;
+class State;
 
 //..............................................................................
 
 enum ExecResult {
 	ExecResult_ErrorInconsistent = -2, // RE2::SM::ErrorInconsistent - reverse scan couldn't find a match (inconsistent data)
 	ExecResult_ErrorOutOfMemory  = -1, // RE2::SM::ErrorOutOfMemory  - DFA run out-of-memory
-	ExecResult_Mismatch          = 0,  // RE2::SM::Mismatch          - match can't be found; next exec will reset & restart
+	ExecResult_Mismatch          = 0,  // RE2::SM::Mismatch          - match can't be found
 	ExecResult_Continue,               // RE2::SM::Continue,         - match not found yet; continue feeding next chunks of data
 	ExecResult_ContinueBackward,       // RE2::SM::ContinueBackward  - match end found; continue feeding previous chunks of data
 	ExecResult_Match,                  // RE2::SM::Match,            - match end & start found
@@ -45,6 +46,87 @@ enum {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+class Match {
+	friend class State;
+	friend class Regex;
+
+protected:
+	uint64_t m_offset;
+	uint64_t m_endOffset;
+	sl::StringRef m_text;
+
+public:
+	Match() {
+		m_offset = -1;
+		m_endOffset = -1;
+	}
+
+	Match(
+		uint64_t offset,
+		const sl::StringRef& text
+	);
+
+	bool
+	isValid() const {
+		ASSERT((m_offset == -1) == (m_endOffset == -1)); // both -1 or both not -1
+		return m_offset != -1;
+	}
+
+	bool
+	hasText() const {
+		return m_text.cp() != NULL;
+	}
+
+	uint64_t
+	getOffset() const {
+		ASSERT(isValid());
+		return m_offset;
+	}
+
+	uint64_t
+	getEndOffset() const {
+		ASSERT(isValid());
+		return m_endOffset;
+	}
+
+	uint64_t
+	getSize() const {
+		ASSERT(isValid());
+		return m_endOffset - m_offset;
+	}
+
+	const sl::StringRef&
+	getText() const {
+		ASSERT(hasText());
+		return m_text;
+	}
+
+	void
+	reset();
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+Match::Match(
+	uint64_t offset,
+	const sl::StringRef& text
+) {
+	m_offset = offset;
+	m_endOffset = offset + text.getLength();
+	m_text = text;
+}
+
+inline
+void
+Match::reset() {
+	m_offset = -1;
+	m_endOffset = -1;
+	m_text.clear();
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 class State {
 	friend class Regex;
 
@@ -53,6 +135,7 @@ protected:
 
 protected:
 	Impl* m_impl;
+	mutable Match m_match;
 
 public:
 	State(Anchor anchor = Anchor_None) {
@@ -109,17 +192,11 @@ public:
 	uint64_t
 	getEofOffset() const;
 
-	uint64_t
-	getMatchOffset() const;
-
-	uint64_t
-	getMatchEndOffset() const;
-
-	uint64_t
-	getMatchSize() const;
-
 	uint_t
 	getMatchId() const;
+
+	const Match&
+	getMatch() const;
 
 	int
 	getBaseChar() const;
@@ -169,9 +246,25 @@ protected:
 		uint64_t baseOffset,
 		int baseChar,
 		uint64_t eofOffset,
-		int eofChar = EofChar
+		int eofChar
 	);
+
+	void
+	prepareMatch() const;
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+const Match&
+State::getMatch() const {
+	ASSERT(isMatch());
+
+	if (m_match.m_offset == -1)
+		prepareMatch();
+
+	return m_match;
+}
 
 //..............................................................................
 
