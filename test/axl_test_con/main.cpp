@@ -1278,6 +1278,16 @@ testRegex2() {
 namespace test_re2 {
 
 void
+testRegexFullMatch() {
+	re2::Regex regex("abc");
+	re2::Match match = regex.exec("abcd", re2::ExecFlag_FullMatch);
+	if (match)
+		printf("match '%s'\n", match.getText().sz());
+	else
+		printf("mismatch\n");
+}
+
+void
 testRegex() {
 	re2::Regex regex;
 	re2::State state;
@@ -1369,7 +1379,7 @@ testRegex() {
 
 		char const text[] = " foo123 bar567 ";
 
-		re2::State state(re2::ExecFlag_AnchorStart);
+		re2::State state(re2::ExecFlag_Anchored);
 		re2::ExecResult result = regex.execEof(&state, text);
 		ASSERT(result == re2::ExecResult_Match);
 
@@ -1402,7 +1412,7 @@ testRegex() {
 		const char chunk1[] = "op";
 		const char chunk2[] = "en 12\n con";
 
-		re2::State state(re2::ExecFlag_AnchorStart);
+		re2::State state(re2::ExecFlag_Anchored);
 		re2::ExecResult result = regex.exec(&state, chunk1);
 		ASSERT(result == re2::ExecResult_Continue);
 
@@ -1628,7 +1638,7 @@ testRegex() {
 		};
 
 		re2::ExecResult result;
-		re2::State state(re2::ExecFlag_AnchorStart, BaseOffset, re2::EofChar);
+		re2::State state(re2::ExecFlag_Anchored, BaseOffset, re2::EofChar);
 
 		result = regex.exec(&state, chunk1);
 		ASSERT(result == re2::ExecResult_Match);
@@ -1839,7 +1849,7 @@ testRegex() {
 		"suka\n"
 		" suka_hui_123\n";
 
-	state.reset(re2::ExecFlag_AnchorStart);
+	state.reset(re2::ExecFlag_Anchored);
 	state.setEofOffset(lengthof(source));
 	p = source;
 	end = p + lengthof(source);
@@ -8589,8 +8599,9 @@ main(
 #endif
 
 #if (_AXL_RE2)
-	test_re::testRegex();
-	test_re2::testRegex();
+	// test_re::testRegex();
+	// test_re2::testRegex();
+	test_re2::testRegexFullMatch();
 #endif
 
 	return 0;
