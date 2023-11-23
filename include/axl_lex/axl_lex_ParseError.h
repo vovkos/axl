@@ -134,7 +134,7 @@ ensureSrcPosError(
 	int col = 0
 ) {
 	err::Error error = err::getLastError();
-	if (!error.isNoError() && !isSrcPosError(error))
+	if (!isSrcPosError(error))
 		pushSrcPosError(filePath, line, col);
 }
 

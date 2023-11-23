@@ -156,7 +156,6 @@ setError(const ErrorRef& error) {
 size_t
 pushError(const ErrorRef& error) {
 	Error stack = getLastError();
-	ASSERT(!stack.isKindOf(g_stdErrorGuid, StdErrorCode_NoError));
 	size_t result = stack.push(error);
 	return result != -1 ? setError(stack) : -1;
 }
