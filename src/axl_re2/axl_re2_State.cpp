@@ -92,29 +92,19 @@ State::getBaseOffset() const {
 	return m_impl->base_offset();
 }
 
+int
+State::getBaseChar() const {
+	return m_impl->base_char();
+}
+
 uint64_t
 State::getEofOffset() const {
 	return m_impl->eof_offset();
 }
 
 int
-State::getBaseChar() const {
-	return m_impl->base_char();
-}
-
-int
 State::getEofChar() const {
 	return m_impl->eof_char();
-}
-
-int
-State::getMatchLastChar() const {
-	return m_impl->match_last_char();
-}
-
-int
-State::getMatchNextChar() const {
-	return m_impl->match_next_char();
 }
 
 void

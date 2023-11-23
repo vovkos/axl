@@ -190,29 +190,23 @@ public:
 	bool
 	isMatch() const;
 
+	const Match&
+	getMatch() const;
+
 	uint_t
 	getExecFlags() const;
 
 	uint64_t
 	getBaseOffset() const;
 
-	uint64_t
-	getEofOffset() const;
-
-	const Match&
-	getMatch() const;
-
 	int
 	getBaseChar() const;
 
+	uint64_t
+	getEofOffset() const;
+
 	int
 	getEofChar() const;
-
-	int
-	getMatchLastChar() const;
-
-	int
-	getMatchNextChar() const;
 
 	void
 	reset(uint_t execFlags = 0) {
