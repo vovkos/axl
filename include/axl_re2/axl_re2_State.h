@@ -32,10 +32,10 @@ enum ExecResult {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-enum Anchor {
-	Anchor_None      = 0, // RE2::UNANCHORED
-	Anchor_Start     = 1, // RE2::ANCHOR_START
-	Anchor_FullMatch = 2, // RE2::ANCHOR_BOTH
+enum ExecFlag {
+	ExecFlag_AnchorStart        = 0x01, // RE2::SM::kAnchorStart or RE2::ANCHOR_START
+	ExecFlag_FullMatch          = 0x02, // RE2::SM::kAnchorStart or RE2::ANCHOR_BOTH
+	ExecFlag_MatchEndOffsetOnly = 0x04, // RE2::SM::kMatchEndOffsetOnly
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -153,26 +153,18 @@ protected:
 	mutable Match m_match;
 
 public:
-	State(Anchor anchor = Anchor_None) {
-		init(anchor, 0, EofChar, -1, EofChar);
+	State(uint_t execFlags = 0) {
+		init(execFlags, 0, EofChar, -1, EofChar);
 	}
 
 	State(
-		Anchor anchor,
-		uint64_t baseOffset,
-		int baseChar
-	) {
-		init(anchor, baseOffset, baseChar, -1, EofChar);
-	}
-
-	State(
-		Anchor anchor,
+		uint_t execFlags,
 		uint64_t baseOffset,
 		int baseChar,
-		uint64_t eofOffset,
+		uint64_t eofOffset = -1,
 		int eofChar = EofChar
 	) {
-		init(anchor, baseOffset, baseChar, eofOffset, eofChar);
+		init(execFlags, baseOffset, baseChar, eofOffset, eofChar);
 	}
 
 	State(const State& src);
@@ -198,8 +190,8 @@ public:
 	bool
 	isMatch() const;
 
-	Anchor
-	getAnchor() const;
+	uint_t
+	getExecFlags() const;
 
 	uint64_t
 	getBaseOffset() const;
@@ -223,25 +215,16 @@ public:
 	getMatchNextChar() const;
 
 	void
-	reset(Anchor anchor = Anchor_None) {
-		reset(anchor, 0, EofChar, -1, EofChar);
+	reset(uint_t execFlags = 0) {
+		reset(execFlags, 0, EofChar, -1, EofChar);
 	}
 
 	void
 	reset(
-		Anchor anchor,
-		uint64_t baseOffset,
-		int baseChar
-	) {
-		reset(anchor, baseOffset, baseChar, -1, EofChar);
-	}
-
-	void
-	reset(
-		Anchor anchor,
+		uint_t execFlags,
 		uint64_t baseOffset,
 		int baseChar,
-		uint64_t eofOffset,
+		uint64_t eofOffset = -1,
 		int eofChar = EofChar
 	);
 
@@ -254,7 +237,7 @@ public:
 protected:
 	void
 	init(
-		Anchor anchor,
+		uint_t execFlags,
 		uint64_t baseOffset,
 		int baseChar,
 		uint64_t eofOffset,

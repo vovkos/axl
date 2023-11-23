@@ -24,13 +24,13 @@ public:
 	Impl() {}
 
 	Impl(
-		RE2::Anchor anchor,
+		uint_t execFlags,
 		uint64_t baseOffset,
 		int baseChar,
 		uint64_t eofOffset,
 		int eofChar
 	):
-		RE2::SM::State(anchor, baseOffset, baseChar, eofOffset, eofChar) {}
+		RE2::SM::State(execFlags, baseOffset, baseChar, eofOffset, eofChar) {}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -48,13 +48,13 @@ State::State(State&& src) {
 
 void
 State::init(
-	Anchor anchor,
+	uint_t execFlags,
 	uint64_t baseOffset,
 	int baseChar,
 	uint64_t eofOffset,
 	int eofChar
 ) {
-	m_impl = new Impl((RE2::Anchor)anchor, baseOffset, baseChar, eofOffset, eofChar);
+	m_impl = new Impl(execFlags, baseOffset, baseChar, eofOffset, eofChar);
 }
 
 State::~State()	{
@@ -82,9 +82,9 @@ State::isMatch() const {
 	return m_impl->is_match();
 }
 
-Anchor
-State::getAnchor() const {
-	return (Anchor)m_impl->anchor();
+uint_t
+State::getExecFlags() const {
+	return m_impl->exec_flags();
 }
 
 uint64_t
@@ -119,13 +119,13 @@ State::getMatchNextChar() const {
 
 void
 State::reset(
-	Anchor anchor,
+	uint_t execFlags,
 	uint64_t baseOffset,
 	int baseChar,
 	uint64_t eofOffset,
 	int eofChar
 ) {
-	m_impl->reset((RE2::Anchor)anchor, baseOffset, baseChar, eofOffset, eofChar);
+	m_impl->reset(execFlags, baseOffset, baseChar, eofOffset, eofChar);
 	m_match.reset();
 }
 

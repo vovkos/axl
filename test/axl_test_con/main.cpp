@@ -1368,7 +1368,7 @@ testRegex() {
 
 		char const text[] = " foo123 bar567 ";
 
-		re2::State state(re2::Anchor_Start);
+		re2::State state(re2::ExecFlag_AnchorStart);
 		re2::ExecResult result = regex.execEof(&state, text);
 		ASSERT(result == re2::ExecResult_Match);
 
@@ -1401,7 +1401,7 @@ testRegex() {
 		const char chunk1[] = "op";
 		const char chunk2[] = "en 12\n con";
 
-		re2::State state(re2::Anchor_Start);
+		re2::State state(re2::ExecFlag_AnchorStart);
 		re2::ExecResult result = regex.exec(&state, chunk1);
 		ASSERT(result == re2::ExecResult_Continue);
 
@@ -1627,7 +1627,7 @@ testRegex() {
 		};
 
 		re2::ExecResult result;
-		re2::State state(re2::Anchor_Start, BaseOffset, re2::EofChar);
+		re2::State state(re2::ExecFlag_AnchorStart, BaseOffset, re2::EofChar);
 
 		result = regex.exec(&state, chunk1);
 		ASSERT(result == re2::ExecResult_Match);
@@ -1838,7 +1838,7 @@ testRegex() {
 		"suka\n"
 		" suka_hui_123\n";
 
-	state.reset(re2::Anchor_Start);
+	state.reset(re2::ExecFlag_AnchorStart);
 	state.setEof(lengthof(source));
 	p = source;
 	end = p + lengthof(source);
