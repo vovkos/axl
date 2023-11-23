@@ -556,7 +556,7 @@ testCharSet() {
 #define _AXL_RE_TEST_SIMPLE_MATCH 1
 #define _AXL_RE_TEST_STREAM       1
 #define _AXL_RE_TEST_SWITCH       1
-#define _AXL_RE_TEST_LOAD_SAVE    0
+#define _AXL_RE_TEST_LOAD_SAVE    1
 #define _AXL_RE_TEST_FULL_DFA     1
 
 void
@@ -1281,6 +1281,7 @@ void
 testRegex() {
 	re2::Regex regex;
 	re2::State state;
+	sl::Array<char> storage;
 	size_t count = 0;
 	bool result;
 	const char* p;
@@ -1821,7 +1822,7 @@ testRegex() {
 	regex.save(&storage);
 	printf("\nNFA storage: %d B\n", storage.getCount());
 
-	result = regex2.load(storage) != -1;
+	result = regex.load(storage) != -1;
 	if (!result) {
 		printf("error: %s\n", err::getLastErrorDescription().sz());
 		return;

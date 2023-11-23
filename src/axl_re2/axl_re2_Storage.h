@@ -19,8 +19,8 @@ namespace re2 {
 //..............................................................................
 
 enum {
-	StorageSignature    = ':2re',
-	SwitchCaseSignature = ':sac',
+	StorageSignature    = ':2er',
+	SwitchCaseSignature = ':sc\n',
 };
 
 enum StorageVersion {

@@ -221,10 +221,11 @@ Regex::save(sl::Array<char>* buffer) const {
 
 	switch (getRegexKind()) {
 	case RegexKind_Single: {
+		const std::string& pattern = m_impl->pattern();
 		hdr->m_switchCaseCount = 0;
 		hdr->m_captureCount = getCaptureCount();
-		hdr->m_dataSize = m_impl->pattern().length();
-		return buffer->append(m_impl->pattern().data(), hdr->m_dataSize);
+		hdr->m_dataSize = pattern.length();
+		return buffer->append(pattern.data(), pattern.length());
 		}
 
 	case RegexKind_Switch:
@@ -234,19 +235,22 @@ Regex::save(sl::Array<char>* buffer) const {
 		return err::fail<size_t>(-1, "can't save uninitialized regex");
 	}
 
-	hdr->m_switchCaseCount = getSwitchCaseCount();
+	size_t count = getSwitchCaseCount();
+	hdr->m_switchCaseCount = count;
 	hdr->m_captureCount = 0;
 
-	for (size_t i = 0; i < hdr->m_switchCaseCount; i++) {
+	for (size_t i = 0; i < count; i++) {
+		const std::string& pattern = m_impl->pattern(i);
+		size_t offset = buffer->getCount();
 		buffer->appendEmptySpace(sizeof(SwitchCaseHdr));
-		SwitchCaseHdr* hdr = (SwitchCaseHdr*)buffer->p();
+		SwitchCaseHdr* hdr = (SwitchCaseHdr*)(buffer->p() + offset);
 		hdr->m_signature = SwitchCaseSignature;
 		hdr->m_captureCount = m_impl->capture_count(i);
-		hdr->m_length = m_impl->pattern(i).length();
-		return buffer->append(m_impl->pattern(i).data(), hdr->m_length);
+		hdr->m_length = pattern.length();
+		buffer->append(pattern.data(), pattern.length());
 	}
 
-	hdr->m_dataSize = buffer->getCount() - sizeof(StorageHdr);
+	((StorageHdr*)buffer->p())->m_dataSize = buffer->getCount() - sizeof(StorageHdr);
 	return buffer->getCount();
 }
 
