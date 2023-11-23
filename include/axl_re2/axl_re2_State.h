@@ -223,10 +223,13 @@ public:
 	);
 
 	void
-	setEof(
+	setEofOffset(
 		uint64_t offset,
 		int eofChar = EofChar
 	);
+
+	void
+	setEof(int eofChar = EofChar);
 
 protected:
 	void

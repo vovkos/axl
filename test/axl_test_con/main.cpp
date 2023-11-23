@@ -1839,7 +1839,7 @@ testRegex() {
 		" suka_hui_123\n";
 
 	state.reset(re2::ExecFlag_AnchorStart);
-	state.setEof(lengthof(source));
+	state.setEofOffset(lengthof(source));
 	p = source;
 	end = p + lengthof(source);
 

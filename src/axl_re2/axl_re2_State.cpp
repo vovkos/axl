@@ -120,11 +120,16 @@ State::reset(
 }
 
 void
-State::setEof(
+State::setEofOffset(
 	uint64_t offset,
 	int eofChar
 ) {
-	m_impl->set_eof(offset, eofChar);
+	m_impl->set_eof_offset(offset, eofChar);
+}
+
+void
+State::setEof(int eofChar) {
+	m_impl->set_eof(eofChar);
 }
 
 void
