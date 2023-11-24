@@ -292,7 +292,7 @@ Regex::captureSubmatchesImpl(
 
 	StringPiece matchText_re2 = matchText_axl >> toRe2;
 
-	count = kind == RE2::SM::kRegexpSwitch ?
+	count = kind == RegexKind_Switch ?
 		m_impl->capture_submatches(switchCaseId, matchText_re2, submatchArray_re2, count) :
 		m_impl->capture_submatches(matchText_re2, submatchArray_re2, count);
 
