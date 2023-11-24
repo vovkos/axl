@@ -196,11 +196,12 @@ findZeroBit(
 
 //..............................................................................
 
-template <size_t bitCount>
+template <size_t N>
 class BitMapN {
 public:
 	enum {
-		PageCount = bitCount / AXL_PTR_BITS + bitCount % AXL_PTR_BITS ? 1 : 0
+		BitCount  = N,
+		PageCount = BitCount / AXL_PTR_BITS + BitCount % AXL_PTR_BITS ? 1 : 0
 	};
 
 protected:
@@ -248,12 +249,14 @@ public:
 
 	bool
 	getBit(size_t bit) const {
-		return sl::getBit(m_map, PageCount, bit);
+		ASSERT(bit < BitCount);
+		return sl::getBit_u(m_map, bit);
 	}
 
 	void
 	setBit(size_t bit) {
-		sl::setBit(m_map, PageCount, bit);
+		ASSERT(bit < BitCount);
+		sl::setBit_u(m_map, bit);
 	}
 
 	void
@@ -261,7 +264,23 @@ public:
 		size_t from,
 		size_t to
 	) {
-		sl::setBitRange(m_map, PageCount, from, to);
+		ASSERT(from <= BitCount && to <= BitCount);
+		sl::setBitRange_u(m_map, from, to);
+	}
+
+	void
+	clearBit(size_t bit) {
+		ASSERT(bit < BitCount);
+		sl::clearBit_u(m_map, bit);
+	}
+
+	void
+	clearBitRange(
+		size_t from,
+		size_t to
+	) {
+		ASSERT(from <= BitCount && to <= BitCount);
+		sl::clearBitRange_u(m_map, from, to);
 	}
 
 	template <typename Op>
@@ -331,13 +350,13 @@ public:
 	}
 
 	size_t
-	getPageCount() const {
-		return m_map.getCount();
+	getBitCount() const {
+		return getPageCount() * AXL_PTR_BITS;
 	}
 
 	size_t
-	getBitCount() const {
-		return getPageCount() * AXL_PTR_BITS;
+	getPageCount() const {
+		return m_map.getCount();
 	}
 
 	void

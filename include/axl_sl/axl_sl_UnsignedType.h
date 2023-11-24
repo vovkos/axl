@@ -20,7 +20,7 @@ namespace sl {
 
 //..............................................................................
 
-template <size_t T>
+template <size_t N>
 class UnsignedTypeImpl {
 };
 
