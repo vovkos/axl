@@ -1301,7 +1301,7 @@ testRegex() {
 
 	do {
 
-		result = regex.compile(re2::RegexFlag_Latin1, "\x91");
+		result = regex.compile("\x91", re2::RegexFlag_Latin1);
 		if (!result) {
 			printf("error: %s\n", err::getLastErrorDescription().sz());
 			return;

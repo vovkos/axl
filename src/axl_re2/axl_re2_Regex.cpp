@@ -98,8 +98,8 @@ Regex::clear() {
 
 bool
 Regex::compile(
-	uint_t flags,
-	const sl::StringRef& source
+	const sl::StringRef& source,
+	uint_t flags
 ) {
 	bool result = m_impl->create(
 		source >> toRe2,
@@ -277,7 +277,7 @@ Regex::execEof(
 	return (ExecResult)m_impl->exec_eof((RE2::SM::State*)state->m_impl, lastChunk >> toRe2, eofChar);
 }
 
-bool
+size_t
 Regex::captureSubmatchesImpl(
 	RegexKind kind,
 	uint_t switchCaseId,
@@ -292,12 +292,12 @@ Regex::captureSubmatchesImpl(
 
 	StringPiece matchText_re2 = matchText_axl >> toRe2;
 
-	bool result = kind == RE2::SM::kRegexpSwitch ?
+	count = kind == RE2::SM::kRegexpSwitch ?
 		m_impl->capture_submatches(switchCaseId, matchText_re2, submatchArray_re2, count) :
 		m_impl->capture_submatches(matchText_re2, submatchArray_re2, count);
 
-	if (!result)
-		return false;
+	if (count == -1)
+		return -1;
 
 	const char* p0 = matchText_re2.data();
 	for (size_t i = 0; i < count; i++) {
@@ -313,7 +313,7 @@ Regex::captureSubmatchesImpl(
 		dst->m_text = src >> toAxl;
 	}
 
-	return true;
+	return count;
 }
 
 //..............................................................................

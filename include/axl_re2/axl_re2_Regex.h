@@ -51,17 +51,12 @@ public:
 		init();
 	}
 
-	Regex(const sl::StringRef& pattern) {
-		init();
-		compile(pattern);
-	}
-
 	Regex(
-		uint_t flags,
-		const sl::StringRef& pattern
+		const sl::StringRef& pattern,
+		uint_t flags = 0
 	) {
 		init();
-		compile(flags, pattern);
+		compile(pattern, flags);
 	}
 
 	~Regex();
@@ -102,14 +97,9 @@ public:
 
 	bool
 	compile(
-		uint_t flags,
-		const sl::StringRef& source
+		const sl::StringRef& source,
+		uint_t flags = 0
 	);
-
-	bool
-	compile(const sl::StringRef& source) {
-		return compile(0, source);
-	}
 
 	void
 	createSwitch(uint_t flags = 0);
@@ -172,7 +162,7 @@ public:
 		return execEof(state, sl::StringRef(), eofChar);
 	}
 
-	bool
+	size_t
 	captureSubmatches(
 		const sl::StringRef& matchText,
 		Capture* submatchArray,
@@ -187,7 +177,8 @@ public:
 			count
 		);
 	}
-	bool
+
+	size_t
 	captureSubmatches(
 		uint64_t matchOffset,
 		const sl::StringRef& matchText,
@@ -204,7 +195,7 @@ public:
 		);
 	}
 
-	bool
+	size_t
 	captureSubmatches(
 		const Capture& match,
 		Capture* submatchArray,
@@ -220,7 +211,7 @@ public:
 		);
 	}
 
-	bool
+	size_t
 	captureSwitchCaseSubmatches(
 		uint_t switchCaseId,
 		const sl::StringRef& matchText,
@@ -237,7 +228,7 @@ public:
 		);
 	}
 
-	bool
+	size_t
 	captureSwitchCaseSubmatches(
 		uint_t switchCaseId,
 		uint64_t matchOffset,
@@ -255,7 +246,7 @@ public:
 		);
 	}
 
-	bool
+	size_t
 	captureSwitchCaseSubmatches(
 		uint_t switchCaseId,
 		const Capture& match,
@@ -276,7 +267,7 @@ protected:
 	void
 	init();
 
-	bool
+	size_t
 	captureSubmatchesImpl(
 		RegexKind kind,
 		uint_t switchCaseId,
