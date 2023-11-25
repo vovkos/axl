@@ -1485,7 +1485,7 @@ testRegex() {
 			"match: %lld..%lld: '%s'\n",
 			match.getOffset(),
 			match.getEndOffset(),
-			sl::StringRef(text + match.getOffset(), match.getSize()).sz()
+			sl::StringRef(text + match.getOffset(), match.getLength()).sz()
 		);
 	} while (0);
 
@@ -1527,7 +1527,7 @@ testRegex() {
 			"match: %lld..%lld: '%s'\n",
 			match.getOffset(),
 			match.getEndOffset(),
-			sl::StringRef(text + match.getOffset(), match.getSize()).sz()
+			sl::StringRef(text + match.getOffset(), match.getLength()).sz()
 		);
 	} while (0);
 
@@ -1644,15 +1644,15 @@ testRegex() {
 		ASSERT(result == re2::ExecResult_Match);
 
 		re2::Match match = state.getMatch();
-		ASSERT(match.getId() == 1 && match.getSize() == 1);
+		ASSERT(match.getId() == 1 && match.getLength() == 1);
 
 		printf(
 			"regex result: %d, match id: %d, match offset: %lld, match length: %d, match: %s\n",
 			result,
 			match.getId(),
 			match.getOffset(),
-			match.getSize(),
-			sl::StringRef(text + match.getOffset() - BaseOffset, match.getSize()).sz()
+			match.getLength(),
+			sl::StringRef(text + match.getOffset() - BaseOffset, match.getLength()).sz()
 		);
 
 		result = regex.exec(&state, chunk2);
@@ -1671,14 +1671,14 @@ testRegex() {
 		ASSERT(result == re2::ExecResult_Match);
 
 		match = state.getMatch();
-		ASSERT(match.getId() == 0 && match.getSize() == 6);
+		ASSERT(match.getId() == 0 && match.getLength() == 6);
 
 		printf(
 			"regex result: %d, match id: %d, match offset: %lld, match length: %d\n",
 			result,
 			match.getId(),
 			match.getOffset(),
-			match.getSize()
+			match.getLength()
 		);
 
 		result = regex.exec(&state, chunk4);
@@ -1691,15 +1691,15 @@ testRegex() {
 		ASSERT(result == re2::ExecResult_Match);
 
 		match = state.getMatch();
-		ASSERT(match.getId() == 0 && state.getMatch().getSize() == 6);
+		ASSERT(match.getId() == 0 && match.getLength() == 6);
 
 		printf(
 			"regex result: %d, match id: %d, match offset: %lld, match length: %d, match: %s\n",
 			result,
 			match.getId(),
 			match.getOffset(),
-			match.getSize(),
-			sl::StringRef(text + match.getOffset() - BaseOffset, match.getSize()).sz()
+			match.getLength(),
+			sl::StringRef(text + match.getOffset() - BaseOffset, match.getLength()).sz()
 		);
 	} while (0);
 
@@ -1734,7 +1734,7 @@ testRegex() {
 	printf(
 		"$0: 0x%llx(%d) '%s'\n",
 		match.getOffset(),
-		match.getSize(),
+		match.getLength(),
 		match.getText().sz()
 	);
 
@@ -1755,7 +1755,7 @@ testRegex() {
 				"$%d: 0x%zx(%d) '%s'\n",
 				i,
 				submatch.getOffset(),
-				submatch.getSize(),
+				submatch.getLength(),
 				submatch.getText().sz()
 			);
 	}
@@ -1799,7 +1799,7 @@ testRegex() {
 	printf(
 		"$0: 0x%llx(%d)\n",
 		match.getOffset(),
-		match.getSize()
+		match.getLength()
 	);
 #endif
 
@@ -1868,11 +1868,11 @@ testRegex() {
 			id,
 			caseNameMap[id],
 			match.getOffset(),
-			match.getSize(),
+			match.getLength(),
 			match.getText().sz()
 		);
 
-		p += match.getSize();
+		p += match.getLength();
 	}
 #endif
 }

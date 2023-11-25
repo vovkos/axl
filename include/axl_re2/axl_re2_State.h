@@ -89,7 +89,7 @@ public:
 	}
 
 	uint64_t
-	getSize() const {
+	getLength() const {
 		ASSERT(isValid());
 		return m_endOffset - m_offset;
 	}
