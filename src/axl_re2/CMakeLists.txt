@@ -76,10 +76,6 @@ target_precompile_headers(
 	${PCH_H}
 )
 
-if(TARGET re2::re2)
-	target_link_libraries(axl_re2 re2::re2)
-endif()
-
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 axl_install_redirected_includes(
