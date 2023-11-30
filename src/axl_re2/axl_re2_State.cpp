@@ -129,6 +129,12 @@ State::reset(
 }
 
 void
+State::resume() {
+	m_impl->resume();
+	m_match.reset();
+}
+
+void
 State::setEofOffset(
 	uint64_t offset,
 	int eofChar

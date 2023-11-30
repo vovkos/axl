@@ -308,6 +308,9 @@ public:
 	);
 
 	void
+	resume();
+
+	void
 	setEofOffset(
 		uint64_t offset,
 		int eofChar = EofChar
