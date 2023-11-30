@@ -472,14 +472,14 @@ typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::CaseFoldedReverseDeta
 typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::CaseFoldedWholeWordDetails> BoyerMooreCaseFoldedWholeWordTextFind_utf8;
 typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::CaseFoldedWholeWordReverseDetails> BoyerMooreCaseFoldedWholeWordReverseTextFind_utf8;
 
-typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_ascii::Details>                    BoyerMooreTextFind_ascii;
-typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_ascii::ReverseDetails>             BoyerMooreReverseTextFind_ascii;
-typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_ascii::WholeWordDetails>           BoyerMooreWholeWordTextFind_ascii;
-typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_ascii::WholeWordReverseDetails>    BoyerMooreWholeWordReverseTextFind_ascii;
-typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_ascii::CaseFoldedDetails>          BoyerMooreCaseFoldedTextFind_ascii;
-typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_ascii::CaseFoldedReverseDetails>   BoyerMooreCaseFoldedReverseTextFind_ascii;
-typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_ascii::CaseFoldedWholeWordDetails> BoyerMooreCaseFoldedWholeWordTextFind_ascii;
-typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_ascii::CaseFoldedWholeWordReverseDetails> BoyerMooreCaseFoldedWholeWordReverseTextFind_ascii;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_latin1::Details>                    BoyerMooreTextFind_latin1;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_latin1::ReverseDetails>             BoyerMooreReverseTextFind_latin1;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_latin1::WholeWordDetails>           BoyerMooreWholeWordTextFind_latin1;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_latin1::WholeWordReverseDetails>    BoyerMooreWholeWordReverseTextFind_latin1;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_latin1::CaseFoldedDetails>          BoyerMooreCaseFoldedTextFind_latin1;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_latin1::CaseFoldedReverseDetails>   BoyerMooreCaseFoldedReverseTextFind_latin1;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_latin1::CaseFoldedWholeWordDetails> BoyerMooreCaseFoldedWholeWordTextFind_latin1;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_latin1::CaseFoldedWholeWordReverseDetails> BoyerMooreCaseFoldedWholeWordReverseTextFind_latin1;
 
 typedef BoyerMooreTextFind_utf8                    BoyerMooreTextFind;
 typedef BoyerMooreReverseTextFind_utf8             BoyerMooreReverseTextFind;

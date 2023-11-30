@@ -21,7 +21,7 @@ namespace enc {
 
 CharCodec*
 getCharCodec(CharCodecKind codecKind) {
-	static StdCodec<Ascii>     asciiCodec;
+	static StdCodec<Latin1>    latin1Codec;
 	static StdCodec<Utf8>      utf8Codec;
 	static StdCodec<Utf16s>    utf16Codec;
 	static StdCodec<Utf16s_be> utf16Codec_be;
@@ -29,7 +29,7 @@ getCharCodec(CharCodecKind codecKind) {
 	static StdCodec<Utf32s_be> utf32Codec_be;
 
 	static CharCodec* codecTable[CharCodecKind__Count] = {
-		&asciiCodec,
+		&latin1Codec,
 		&utf8Codec,
 		&utf16Codec,
 		&utf16Codec_be,

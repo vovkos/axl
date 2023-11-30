@@ -11,7 +11,7 @@
 
 #pragma once
 
-#define _AXL_ENC_ASCII_H
+#define _AXL_ENC_LATIN1_H
 
 #include "axl_enc_Unicode.h"
 #include "axl_sl_PtrIterator.h"
@@ -21,7 +21,7 @@ namespace enc {
 
 //..............................................................................
 
-class AsciiEncoder {
+class Latin1Encoder {
 public:
 	enum {
 		MaxEncodeLength = 1 // always one 8-bit codeunit per codepoint
@@ -54,7 +54,7 @@ public:
 //..............................................................................
 
 template <bool IsReverse0>
-class AsciiDecoderBase {
+class Latin1DecoderBase {
 public:
 	enum {
 		MaxEmitLength = 1,
@@ -102,17 +102,17 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef AsciiDecoderBase<false> AsciiDecoder;
-typedef AsciiDecoderBase<true>  AsciiReverseDecoder;
+typedef Latin1DecoderBase<false> Latin1Decoder;
+typedef Latin1DecoderBase<true>  Latin1ReverseDecoder;
 
 //..............................................................................
 
-class Ascii {
+class Latin1 {
 public:
 	typedef char C;
-	typedef AsciiEncoder Encoder;
-	typedef AsciiDecoder Decoder;
-	typedef AsciiReverseDecoder ReverseDecoder;
+	typedef Latin1Encoder Encoder;
+	typedef Latin1Decoder Decoder;
+	typedef Latin1ReverseDecoder ReverseDecoder;
 };
 
 //..............................................................................

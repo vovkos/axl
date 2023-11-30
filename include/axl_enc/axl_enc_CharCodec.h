@@ -15,7 +15,7 @@
 
 #include "axl_sl_Array.h"
 #include "axl_sl_String.h"
-#include "axl_enc_Ascii.h"
+#include "axl_enc_Latin1.h"
 
 namespace axl {
 namespace enc {
@@ -23,7 +23,7 @@ namespace enc {
 //..............................................................................
 
 enum CharCodecKind {
-	CharCodecKind_Ascii = 0,
+	CharCodecKind_Latin1 = 0,
 	CharCodecKind_Utf8,
 	CharCodecKind_Utf16,
 	CharCodecKind_Utf16_be,

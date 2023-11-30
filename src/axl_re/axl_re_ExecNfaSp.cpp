@@ -261,7 +261,7 @@ public:
 
 ExecNfaEngine*
 createExecNfaSp(StateImpl* parent) {
-	static ExecNfaSpFactory<enc::AsciiDecoder>     asciiFactory;
+	static ExecNfaSpFactory<enc::Latin1Decoder>    latin1Factory;
 	static ExecNfaSpFactory<enc::Utf8Decoder>      utf8Factory;
 	static ExecNfaSpFactory<enc::Utf16sDecoder>    utf16Factory;
 	static ExecNfaSpFactory<enc::Utf16sDecoder_be> utf16Factory_be;
@@ -269,7 +269,7 @@ createExecNfaSp(StateImpl* parent) {
 	static ExecNfaSpFactory<enc::Utf32sDecoder_be> utf32Factory_be;
 
 	static ExecEngineFactory* factoryTable[enc::CharCodecKind__Count] = {
-		&asciiFactory,
+		&latin1Factory,
 		&utf8Factory,
 		&utf16Factory,
 		&utf16Factory_be,
@@ -280,7 +280,7 @@ createExecNfaSp(StateImpl* parent) {
 	size_t i = parent->m_init.m_codecKind;
 	if (i >= countof(factoryTable)) {
 		ASSERT(false);
-		i = enc::CharCodecKind_Ascii;
+		i = enc::CharCodecKind_Latin1;
 	}
 
 	return (ExecNfaEngine*)factoryTable[i]->createExecEngine(parent);

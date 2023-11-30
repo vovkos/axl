@@ -620,7 +620,7 @@ public:
 
 ExecDfaBase*
 createExecDfa(StateImpl* parent) {
-	static ExecDfaFactory<sl::False, enc::Ascii>     asciiFactory;
+	static ExecDfaFactory<sl::False, enc::Latin1>    latin1Factory;
 	static ExecDfaFactory<sl::False, enc::Utf8>      utf8Factory;
 	static ExecDfaFactory<sl::False, enc::Utf16s>    utf16Factory;
 	static ExecDfaFactory<sl::False, enc::Utf16s_be> utf16Factory_be;
@@ -628,7 +628,7 @@ createExecDfa(StateImpl* parent) {
 	static ExecDfaFactory<sl::False, enc::Utf32s_be> utf32Factory_be;
 
 	static ExecEngineFactory* factoryTable[enc::CharCodecKind__Count] = {
-		&asciiFactory,
+		&latin1Factory,
 		&utf8Factory,
 		&utf16Factory,
 		&utf16Factory_be,
@@ -639,7 +639,7 @@ createExecDfa(StateImpl* parent) {
 	size_t i = parent->m_init.m_codecKind;
 	if (i >= countof(factoryTable)) {
 		ASSERT(false);
-		i = enc::CharCodecKind_Ascii;
+		i = enc::CharCodecKind_Latin1;
 	}
 
 	return (ExecDfaBase*)factoryTable[i]->createExecEngine(parent);
@@ -647,7 +647,7 @@ createExecDfa(StateImpl* parent) {
 
 ExecDfaBase*
 createExecDfaReverse(StateImpl* parent) {
-	static ExecDfaFactory<sl::True, enc::Ascii>     asciiFactory;
+	static ExecDfaFactory<sl::True, enc::Latin1>    latin1Factory;
 	static ExecDfaFactory<sl::True, enc::Utf8>      utf8Factory;
 	static ExecDfaFactory<sl::True, enc::Utf16s>    utf16Factory;
 	static ExecDfaFactory<sl::True, enc::Utf16s_be> utf16Factory_be;
@@ -655,7 +655,7 @@ createExecDfaReverse(StateImpl* parent) {
 	static ExecDfaFactory<sl::True, enc::Utf32s_be> utf32Factory_be;
 
 	static ExecEngineFactory* factoryTable[enc::CharCodecKind__Count] = {
-		&asciiFactory,
+		&latin1Factory,
 		&utf8Factory,
 		&utf16Factory,
 		&utf16Factory_be,
@@ -666,7 +666,7 @@ createExecDfaReverse(StateImpl* parent) {
 	size_t i = parent->m_init.m_codecKind;
 	if (i >= countof(factoryTable)) {
 		ASSERT(false);
-		i = enc::CharCodecKind_Ascii;
+		i = enc::CharCodecKind_Latin1;
 	}
 
 	return (ExecDfaBase*)factoryTable[i]->createExecEngine(parent);

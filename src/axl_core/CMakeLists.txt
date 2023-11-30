@@ -209,7 +209,7 @@ set(
 	${AXL_INC_DIR}/axl_enc/axl_enc_HexEncoding.h
 	${AXL_INC_DIR}/axl_enc/axl_enc_Leb128.h
 	${AXL_INC_DIR}/axl_enc/axl_enc_Unicode.h
-	${AXL_INC_DIR}/axl_enc/axl_enc_Ascii.h
+	${AXL_INC_DIR}/axl_enc/axl_enc_Latin1.h
 	${AXL_INC_DIR}/axl_enc/axl_enc_UtfDfa.h
 	${AXL_INC_DIR}/axl_enc/axl_enc_Utf8Dfa.h
 	${AXL_INC_DIR}/axl_enc/axl_enc_Utf16Dfa.h
