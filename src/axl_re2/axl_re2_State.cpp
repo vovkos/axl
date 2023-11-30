@@ -37,14 +37,12 @@ public:
 
 State::State(const State& src) {
 	m_impl = new Impl(*src.m_impl);
+	m_match = src.m_match;
 }
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
-State::State(State&& src) {
-	m_impl = src.m_impl;
-	src.m_impl = NULL;
+State::~State()	{
+	delete m_impl;
 }
-#endif
 
 void
 State::init(
@@ -57,29 +55,30 @@ State::init(
 	m_impl = new Impl(execFlags, baseOffset, baseChar, eofOffset, eofChar);
 }
 
-State::~State()	{
-	delete m_impl;
+void
+State::copy(const State& src) {
+	*m_impl = *src.m_impl;
+	m_match = src.m_match;
 }
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
-State&
-State::operator = (State&& src) {
+void
+State::move(State&& src) {
 	delete m_impl;
 	m_impl = src.m_impl;
+	m_match = std::move(src.m_match);
 	src.m_impl = NULL;
-	return *this;
 }
 #endif
-
-State&
-State::operator = (const State& src) {
-	*m_impl = *src.m_impl;
-	return *this;
-}
 
 bool
 State::isMatch() const {
 	return m_impl->is_match();
+}
+
+bool
+State::isPreMatch() const {
+	return m_impl->match_id() != -1;
 }
 
 uint_t
@@ -105,6 +104,16 @@ State::getEofOffset() const {
 int
 State::getEofChar() const {
 	return m_impl->eof_char();
+}
+
+int
+State::getMatchLastChar() const {
+	return m_impl->match_last_char();
+}
+
+int
+State::getMatchNextChar() const {
+	return m_impl->match_next_char();
 }
 
 void
@@ -134,13 +143,25 @@ State::setEof(int eofChar) {
 
 void
 State::prepareMatch() const {
-	ASSERT(m_match.m_offset == -1 && m_match.m_endOffset == -1);
+	ASSERT(m_match.m_offset == -1);
 
 	m_match.m_id = m_impl->match_id();
 	m_match.m_offset = m_impl->match_offset();
 	m_match.m_endOffset = m_impl->match_end_offset();
 	if (m_impl->has_match_text())
 		m_match.m_text = m_impl->match_text() >> toAxl;
+}
+
+void
+State::preparePreMatch() const {
+	ASSERT(m_match.m_id == -1 && m_match.m_endOffset == -1);
+
+	if (isMatch())
+		prepareMatch();
+	else {
+		m_match.m_id = m_impl->match_id();
+		m_match.m_endOffset = m_impl->match_end_offset();
+	}
 }
 
 //..............................................................................

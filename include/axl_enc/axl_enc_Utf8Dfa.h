@@ -513,22 +513,22 @@ public:
 		);
 
 		static EmitFn* emitTable[StateCount] = {
-			&emitNothing,                       // 0  - State_Start
-			&emitNothing,                       // 1  - unused
+			&emitNothing,                // 0  - State_Start
+			&emitNothing,                // 1  - unused
 			&emitPendingCus_State_Cb_1,  // 2  - State_Cb_1
-			&emitNothing,                       // 3  - unused
+			&emitNothing,                // 3  - unused
 			&emitPendingCus_State_Cb_2,  // 4  - State_Cb_2
-			&emitNothing,                       // 5  - unused
+			&emitNothing,                // 5  - unused
 			&emitPendingCus_State_Cb_3,  // 6  - State_Cb_3
 			&emitPendingCus_State_Cb_3,  // 7  - State_Cb_3_Error
-			&emitNothing,                       // 8  - unused
-			&emitNothing,                       // 9  - State_Error
-			&emitNothing,                       // 10 - State_Ready
-			&emitNothing,                       // 11 - State_Ready_Error
-			&emitNothing,                       // 12 - unused
-			&emitNothing,                       // 13 - State_Ready_Error_2
-			&emitNothing,                       // 14 - unused
-			&emitNothing,                       // 15 - State_Ready_Error_3
+			&emitNothing,                // 8  - unused
+			&emitNothing,                // 9  - State_Error
+			&emitNothing,                // 10 - State_Ready
+			&emitNothing,                // 11 - State_Ready_Error
+			&emitNothing,                // 12 - unused
+			&emitNothing,                // 13 - State_Ready_Error_2
+			&emitNothing,                // 14 - unused
+			&emitNothing,                // 15 - State_Ready_Error_3
 		};
 
 		emitTable[m_state](emitter, p, m_acc);

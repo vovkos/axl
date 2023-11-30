@@ -61,9 +61,33 @@ public:
 		m_endOffset = -1;
 	}
 
+	Capture(const Capture& src) {
+		copy(src);
+	}
+
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	Capture(Capture&& src) {
+		move(std::move(src));
+	}
+#endif
+
 	operator bool () const {
 		return isValid();
 	}
+
+	Capture&
+	operator = (const Capture& src) {
+		copy(src);
+		return *this;
+	}
+
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	Capture&
+	operator = (Capture&& src) {
+		move(std::move(src));
+		return *this;
+	}
+#endif
 
 	bool
 	isValid() const {
@@ -102,6 +126,15 @@ public:
 
 	void
 	reset();
+
+	void
+	copy(const Capture& src);
+
+protected:
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	void
+	move(Capture&& src);
+#endif
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -112,6 +145,22 @@ Capture::reset() {
 	m_offset = -1;
 	m_endOffset = -1;
 	m_text.clear();
+}
+
+inline
+void
+Capture::copy(const Capture& src) {
+	m_offset = src.m_offset;
+	m_endOffset = src.m_endOffset;
+	m_text = src.m_text;
+}
+
+inline
+void
+Capture::move(Capture&& src) {
+	m_offset = src.m_offset;
+	m_endOffset = src.m_endOffset;
+	m_text = std::move(src.m_text);
 }
 
 //..............................................................................
@@ -138,6 +187,21 @@ public:
 		Capture::reset();
 		m_id = -1;
 	}
+
+	void
+	copy(const Match& src) {
+		Capture::copy(src);
+		m_id = src.m_id;
+	}
+
+protected:
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	void
+	move(Match&& src) {
+		Capture::move(std::move(src));
+		m_id = src.m_id;
+	}
+#endif
 };
 
 //..............................................................................
@@ -170,28 +234,43 @@ public:
 	State(const State& src);
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
-	State(State&& src);
+	State(State&& src) {
+		m_impl = NULL;
+		move(std::move(src));
+	}
 #endif
 
 	~State();
-
-#if (_AXL_CPP_HAS_RVALUE_REF)
-	State&
-	operator = (State&& src);
-#endif
-
-	State&
-	operator = (const State& src);
 
 	operator bool () const {
 		return isMatch();
 	}
 
+	State&
+	operator = (const State& src) {
+		copy(src);
+		return *this;
+	}
+
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	State&
+	operator = (State&& src) {
+		move(std::move(src));
+		return *this;
+	}
+#endif
+
 	bool
 	isMatch() const;
 
+	bool
+	isPreMatch() const;
+
 	const Match&
 	getMatch() const;
+
+	const Match&
+	getPreMatch() const;
 
 	uint_t
 	getExecFlags() const;
@@ -207,6 +286,12 @@ public:
 
 	int
 	getEofChar() const;
+
+	int
+	getMatchLastChar() const;
+
+	int
+	getMatchNextChar() const;
 
 	void
 	reset(uint_t execFlags = 0) {
@@ -242,7 +327,18 @@ protected:
 	);
 
 	void
+	copy(const State& src);
+
+#if (_AXL_CPP_HAS_RVALUE_REF)
+	void
+	move(State&& src);
+#endif
+
+	void
 	prepareMatch() const;
+
+	void
+	preparePreMatch() const;
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -254,6 +350,17 @@ State::getMatch() const {
 
 	if (m_match.m_offset == -1)
 		prepareMatch();
+
+	return m_match;
+}
+
+inline
+const Match&
+State::getPreMatch() const {
+	ASSERT(isPreMatch());
+
+	if (m_match.m_endOffset == -1)
+		preparePreMatch();
 
 	return m_match;
 }
