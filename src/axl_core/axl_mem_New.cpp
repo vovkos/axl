@@ -55,8 +55,7 @@ removeTrackerBlock(
 	size_t size
 ) AXL_NOEXCEPT {
 	TrackerBlock* block = (TrackerBlock*)((char*)p - sizeof(TrackerBlock));
-	if (size != block->m_size)
-		AXL_TRACE("*** sized operator delete mismatch: new(%d) vs delete(%d)\n", block->m_size, size);
+	ASSERT(size <= block->m_size);
 	getTracker()->remove(block);
 	return block;
 }
