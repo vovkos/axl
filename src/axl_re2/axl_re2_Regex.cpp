@@ -261,7 +261,7 @@ Regex::exec(
 	State* state,
 	const sl::StringRef& chunk
 ) const {
-	if (state->m_match.isValid())
+	if (state->m_match)
 		state->m_match.reset();
 	return (ExecResult)m_impl->exec((RE2::SM::State*)state->m_impl, chunk >> toRe2);
 }
@@ -272,7 +272,7 @@ Regex::execEof(
 	const sl::StringRef& lastChunk,
 	int eofChar
 ) const {
-	if (state->m_match.isValid())
+	if (state->m_match)
 		state->m_match.reset();
 	return (ExecResult)m_impl->exec_eof((RE2::SM::State*)state->m_impl, lastChunk >> toRe2, eofChar);
 }

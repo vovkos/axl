@@ -71,10 +71,6 @@ public:
 	}
 #endif
 
-	operator bool () const {
-		return isValid();
-	}
-
 	Capture&
 	operator = (const Capture& src) {
 		copy(src);
@@ -89,10 +85,8 @@ public:
 	}
 #endif
 
-	bool
-	isValid() const {
-		ASSERT((m_offset == -1) == (m_endOffset == -1)); // both -1 or both not -1
-		return m_offset != -1;
+	operator bool () const {
+		return m_endOffset != -1; // pre-match is still OK
 	}
 
 	bool
@@ -102,19 +96,19 @@ public:
 
 	uint64_t
 	getOffset() const {
-		ASSERT(isValid());
+		ASSERT(m_offset != -1);
 		return m_offset;
 	}
 
 	uint64_t
 	getEndOffset() const {
-		ASSERT(isValid());
+		ASSERT(m_endOffset != -1);
 		return m_endOffset;
 	}
 
 	uint64_t
 	getLength() const {
-		ASSERT(isValid());
+		ASSERT(m_endOffset != -1 && m_offset != -1);
 		return m_endOffset - m_offset;
 	}
 

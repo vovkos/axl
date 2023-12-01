@@ -1750,7 +1750,7 @@ testRegex() {
 
 	for (size_t i = 0; i < submatchArray.getCount(); i++) {
 		const re2::Capture& submatch = submatchArray[i];
-		if (submatch.isValid())
+		if (submatch)
 			printf(
 				"$%d: 0x%zx(%d) '%s'\n",
 				i,
