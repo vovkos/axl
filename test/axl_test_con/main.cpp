@@ -1417,10 +1417,7 @@ testRegex() {
 		ASSERT(result == re2::ExecResult_Continue);
 
 		result = regex.exec(&state, chunk2);
-		ASSERT(result == re2::ExecResult_ContinueBackward);
-
-		result = regex.exec(&state, chunk1);
-		ASSERT(result == re2::ExecResult_Match);
+		ASSERT(result == re2::ExecResult_Match); // anchored search
 
 		const re2::Match& match = state.getMatch();
 
@@ -1662,13 +1659,7 @@ testRegex() {
 		ASSERT(result == re2::ExecResult_Continue);
 
 		result = regex.exec(&state, chunk4);
-		ASSERT(result == re2::ExecResult_ContinueBackward);
-
-		result = regex.exec(&state, chunk3);
-		ASSERT(result == re2::ExecResult_ContinueBackward);
-
-		result = regex.exec(&state, chunk2);
-		ASSERT(result == re2::ExecResult_Match);
+		ASSERT(result == re2::ExecResult_Match); // anchored search
 
 		match = state.getMatch();
 		ASSERT(match.getId() == 0 && match.getLength() == 6);
@@ -1685,10 +1676,7 @@ testRegex() {
 		ASSERT(result == re2::ExecResult_Continue);
 
 		result = regex.execEof(&state);
-		ASSERT(result == re2::ExecResult_ContinueBackward);
-
-		result = regex.exec(&state, chunk4);
-		ASSERT(result == re2::ExecResult_Match);
+		ASSERT(result == re2::ExecResult_Match); // anchored search
 
 		match = state.getMatch();
 		ASSERT(match.getId() == 0 && match.getLength() == 6);
@@ -1830,7 +1818,7 @@ testRegex() {
 
 #if (_AXL_RE_TEST_LOAD_SAVE)
 	regex.save(&storage);
-	printf("\nNFA storage: %d B\n", storage.getCount());
+	printf("\nRegex storage: %d B\n", storage.getCount());
 
 	result = regex.load(storage) != -1;
 	if (!result) {
@@ -8599,9 +8587,9 @@ main(
 #endif
 
 #if (_AXL_RE2)
-	// test_re::testRegex();
-	// test_re2::testRegex();
-	test_re2::testRegexFullMatch();
+	test_re::testRegex();
+	test_re2::testRegex();
+	// test_re2::testRegexFullMatch();
 #endif
 
 	return 0;
