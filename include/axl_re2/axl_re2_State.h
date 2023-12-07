@@ -36,6 +36,7 @@ enum ExecFlag {
 	ExecFlag_Anchored      = 0x01, // RE2::SM::kAnchored or RE2::ANCHOR_START
 	ExecFlag_FullMatch     = 0x02, // RE2::SM::kFullMatch or RE2::ANCHOR_BOTH
 	ExecFlag_EndOffsetOnly = 0x04, // RE2::SM::kEndOffsetOnly
+	ExecFlag__Mask         = 0x07,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

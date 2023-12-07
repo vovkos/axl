@@ -25,7 +25,9 @@ namespace re2 {
 enum RegexFlag {
 	RegexFlag_OneLine         = 0x10, // R2::Options.one_line -> true (otherwise, false)
 	RegexFlag_Latin1          = 0x20, // R2::Options.encoding -> EncodingLatin1 (otherwise, EncodingUTF8)
-	RegexFlag_CaseInsensitive = 0x40, // R2::Options.case_sensitive -> (otherwise, false)
+	RegexFlag_CaseInsensitive = 0x40, // R2::Options.case_sensitive -> false (otherwise, true)
+	RegexFlag_WholeWord       = 0x80, // R2::Options.word_boundary -> true (otherwise, false)
+	RegexFlag__Mask           = 0xf0,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

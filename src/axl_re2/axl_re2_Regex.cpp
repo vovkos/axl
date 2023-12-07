@@ -38,6 +38,9 @@ calcRe2OptionsFromRegexFlags(uint_t flags) {
 	if (flags & RegexFlag_CaseInsensitive)
 		options.set_case_sensitive(false);
 
+	if (flags & RegexFlag_WholeWord)
+		options.set_word_boundary(true);
+
 	return options;
 }
 
