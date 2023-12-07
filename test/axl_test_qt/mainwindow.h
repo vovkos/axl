@@ -13,7 +13,7 @@
 
 #define MAINWINDOW_H
 
-#define _TEST_PAINT 0
+#define _TEST_PAINT 1
 #define _TEST_EDIT  0
 #define _TEST_TREE  1
 
@@ -24,7 +24,9 @@
 class MyWidget: public QWidget {
 public:
 	MyWidget(QWidget* parent = NULL):
-		QWidget(parent) {}
+		QWidget(parent) {
+		setAttribute(Qt::WA_StaticContents);
+	}
 
 	virtual
 	void

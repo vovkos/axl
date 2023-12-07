@@ -37,8 +37,24 @@ public:
 
 void
 MyWidget::paintEvent(QPaintEvent* e) {
+	printf(
+		"Qt::WA_StaticContents: %d, rect: { %d, %d, %d, %d }\n",
+		testAttribute(Qt::WA_StaticContents),
+		e->rect().x(),
+		e->rect().y(),
+		e->rect().width(),
+		e->rect().height()
+	);
+
 	QPainter painter(this);
-	painter.drawText(QPointF(100, 200), QString::fromUtf16((const ushort*)L"\x25cc\x0301."));
+//	painter.drawText(QPointF(100, 200), QString::fromUtf16((const ushort*)L"\x25cc\x0301."));
+
+	uint8_t r = 0x80 + rand() % 0x80;
+	uint8_t g = 0x80 + rand() % 0x80;
+	uint8_t b = 0x80 + rand() % 0x80;
+
+	painter.fillRect(e->rect(), RGB(r, g, b));
+
 
 /*	char str[] = "abcdefghijklmnopqrstuvwxyz";
 
