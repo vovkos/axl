@@ -120,56 +120,6 @@ endmacro()
 #...............................................................................
 
 macro(
-axl_create_mem_tracker_setting)
-	set(
-		_OPTION_LIST
-		"0 (OFF)"
-		"1 (Debug builds only)"
-		"2 (Always ON)"
-	)
-
-	# ensuring that shared objects will use the overriden new/delete operators is
-	# not easy; without this guarantee, crashes are possible (e.g., shared object
-	# allocates, main app frees)
-
-	# it's still pretty useful when no shared objects are involved
-
-	set(_DEFAULT_IDX 0)
-	list(GET _OPTION_LIST ${_DEFAULT_IDX} _DEFAULT)
-
-	axl_create_setting(
-		AXL_MEM_TRACKER
-		DESCRIPTION "AXL memory tracker usage"
-		DEFAULT ${_DEFAULT}
-		${_OPTION_LIST}
-	)
-endmacro()
-
-macro(
-axl_apply_mem_tracker_setting)
-	string(SUBSTRING "${AXL_MEM_TRACKER}" 0 1 _LEVEL)
-
-	if(IS_MULTI_CONFIGURATION)
-		if("${_LEVEL}" EQUAL 2)
-			add_definitions(-D_AXL_MEM_TRACKER_DEBUG=1)
-			add_definitions(-D_AXL_MEM_TRACKER_RELEASE=1)
-		elseif("${_LEVEL}" EQUAL 1)
-			add_definitions(-D_AXL_MEM_TRACKER_DEBUG=1)
-		endif()
-	elseif(
-		"${_LEVEL}" EQUAL 2 OR
-		"${_LEVEL}" EQUAL 1 AND "${CMAKE_BUILD_TYPE}" STREQUAL "Debug"
-	)
-		add_definitions(-D_AXL_MEM_TRACKER=1)
-		set(AXL_MEM_TRACKER_ENABLED TRUE)
-	else()
-		unset(AXL_MEM_TRACKER_ENABLED)
-	endif()
-endmacro()
-
-#...............................................................................
-
-macro(
 axl_create_msvc_settings)
 
 	option(
@@ -605,14 +555,7 @@ axl_apply_gcc_settings)
 	if(NOT APPLE)
 		if(GCC_LINK_EXPORTLESS_EXE)
 			set(_FILE "${CMAKE_CURRENT_BINARY_DIR}/exportless-exe.version")
-
-			if(AXL_MEM_TRACKER_ENABLED)
-				set(_SCRIPT "{ global: _Znw*\; _Zdl*\; local: *\; }\;")
-			else()
-				set(_SCRIPT "{ local: *\; }\;")
-			endif()
-
-			file(WRITE ${_FILE} ${_SCRIPT})
+			file(WRITE ${_FILE} "{ local: *\; }\;")
 			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--version-script='${_FILE}'")
 		endif()
 
@@ -739,10 +682,6 @@ axl_create_std_settings)
 	axl_create_target_cpu_setting()
 	axl_create_build_type_setting()
 
-	if(AXL_MEM_TRACKER_SETTING)
-		axl_create_mem_tracker_setting()
-	endif()
-
 	if(MSVC)
 		axl_create_msvc_settings()
 	elseif(GCC)
@@ -755,10 +694,6 @@ axl_apply_std_settings)
 
 	axl_apply_target_cpu_setting()
 	axl_apply_build_type_setting()
-
-	if(AXL_MEM_TRACKER_SETTING)
-		axl_apply_mem_tracker_setting()
-	endif()
 
 	if(MSVC)
 		axl_apply_msvc_settings()
@@ -811,10 +746,6 @@ axl_print_std_settings)
 
 	if(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "")
 		axl_message("    Build configuration:" ${CMAKE_BUILD_TYPE})
-	endif()
-
-	if("${PROJECT_NAME}" STREQUAL "axl")
-		axl_message("    Memory tracker:" "${AXL_MEM_TRACKER}")
 	endif()
 
 	set(_C_FLAGS_DEBUG "${CMAKE_C_COMPILER_ARG1} ${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_DEBUG}")

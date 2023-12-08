@@ -41,6 +41,8 @@ static struct ModuleInit {
 
 Module::Module() {
 #if (_AXL_OS_WIN)
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
 	m_hModule = ::GetModuleHandle(NULL);
 
 	SYSTEM_INFO systemInfo;
@@ -50,7 +52,6 @@ Module::Module() {
 	m_systemInfo.m_mappingAlignFactor = systemInfo.dwAllocationGranularity;
 
 	sys::win::initNtDllFunctions();
-
 #elif (_AXL_OS_POSIX)
 	m_systemInfo.m_processorCount     = sysconf(_SC_NPROCESSORS_ONLN);
 	m_systemInfo.m_pageSize           = sysconf(_SC_PAGE_SIZE);

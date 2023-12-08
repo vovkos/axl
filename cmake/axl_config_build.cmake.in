@@ -20,7 +20,6 @@ set(
 
 set(AXL_SHARE_DIR         "@AXL_SHARE_DIR@")
 set(AXL_DOC_SHARE_DIR     "@AXL_ROOT_DIR@/doc/share")
-set(AXL_MEM_TRACKER       "@AXL_MEM_TRACKER@")
 set(AXL_SPHINX_HTML_THEME "sphinx_rtd_theme")
 
 include("@AXL_ROOT_DIR@/version.cmake")

@@ -649,18 +649,6 @@ axl_trace(
 #	error unsupported platform
 #endif
 
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-// AXL memory tracker
-
-#ifndef _AXL_MEM_TRACKER
-#	if (_AXL_DEBUG)
-#		define _AXL_MEM_TRACKER _AXL_MEM_TRACKER_DEBUG
-#	else
-#		define _AXL_MEM_TRACKER _AXL_MEM_TRACKER_RELEASE
-#	endif
-#endif
-
 //..............................................................................
 
 // warnings suppression (GCC loses diagnostic pragmas defined in PCHs)

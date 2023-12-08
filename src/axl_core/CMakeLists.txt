@@ -40,7 +40,6 @@ set(
 	${AXL_INC_DIR}/axl_mem/axl_mem_Block.h
 	${AXL_INC_DIR}/axl_mem/axl_mem_New.h
 	${AXL_INC_DIR}/axl_mem/axl_mem_Pool.h
-	${AXL_INC_DIR}/axl_mem/axl_mem_Tracker.h
 	${AXL_INC_DIR}/axl_mem/axl_mem_ScatterGather.h
 	${AXL_INC_DIR}/axl_mem/axl_mem_ExecutableBlockArena.h
 )
@@ -51,18 +50,11 @@ set(
 	axl_mem_ExecutableBlockArena.cpp
 )
 
-set(
-	MEM_NEW_CPP_LIST
-	axl_mem_New.cpp
-	axl_mem_Tracker.cpp
-)
-
 source_group(
 	mem
 	FILES
 	${MEM_H_LIST}
 	${MEM_CPP_LIST}
-	${MEM_NEW_CPP_LIST}
 )
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -486,7 +478,7 @@ source_group(
 
 #...............................................................................
 #
-# axl_core & axl_mem_new libraries
+# axl_core libraries
 #
 
 include_directories(${AXL_INC_DIR})
@@ -521,18 +513,6 @@ add_library(
 
 target_precompile_headers(
 	axl_core
-	PRIVATE
-	${PCH_H}
-)
-
-add_library(
-	axl_mem_new
-	${PCH_H_LIST}
-	${MEM_NEW_CPP_LIST}
-)
-
-target_precompile_headers(
-	axl_mem_new
 	PRIVATE
 	${PCH_H}
 )

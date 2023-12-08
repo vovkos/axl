@@ -22,9 +22,6 @@ if(_CONFIG_CMAKE)
 	axl_message("    CMake files:"    "${AXL_CMAKE_DIR}")
 	axl_message("    Includes:"       "${AXL_INC_DIR}")
 	axl_message("    Libraries:"      "${AXL_LIB_DIR}")
-	axl_message("    Memory tracker:" "${AXL_MEM_TRACKER}")
-
-	axl_apply_mem_tracker_setting()
 
 	set(AXL_FOUND TRUE)
 else()

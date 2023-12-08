@@ -85,10 +85,6 @@ const struct ZeroInit_t {} ZeroInit;
 } // namespace mem
 } // namespace axl
 
-// replaceable operators new/delete are non-inline and kept in axl_mem_new
-// to enable AXL memory tracking, build AXL with -D_AXL_MEM_TRACKER_DEBUG=1
-// then link executables (and only executables!) with axl_mem_new
-
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // zero-initialized new

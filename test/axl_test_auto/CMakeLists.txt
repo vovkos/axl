@@ -37,7 +37,6 @@ set(
 	test_StringTemplate.cpp
 	test_Usb.cpp
 	test_Bstr.cpp
-	test_NewDeleteQt.cpp
 )
 
 source_group(
@@ -49,10 +48,6 @@ source_group(
 
 if(NOT WIN32)
 	axl_exclude_from_build(test_Bstr.cpp)
-endif()
-
-if(NOT QT_FOUND)
-	axl_exclude_from_build(test_NewDeleteQt.cpp)
 endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -131,16 +126,11 @@ set_target_properties(
 	FOLDER test
 )
 
-if(QT_FOUND)
-	qt5_use_modules_alt(axl_test_auto Core)
-endif()
-
 target_link_libraries(
 	axl_test_auto
 	${OPT_LIB_LIST}
 	axl_lex
 	axl_io
-	axl_mem_new
 	axl_core
 )
 

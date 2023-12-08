@@ -206,7 +206,6 @@ target_link_libraries(
 	axl_test_con
 	${OPT_LIB_LIST}
 	axl_io
-	axl_mem_new
 	axl_core
 )
 
