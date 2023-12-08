@@ -128,17 +128,13 @@ axl_create_mem_tracker_setting)
 		"2 (Always ON)"
 	)
 
-	if(WIN32)
-		set(_DEFAULT_IDX 1)
-	else()
-		# with libstdc++, new/delete operators are versioned which makes it hard
-		# to override them in shared objects (and otherwise, it leads to crashes)
+	# ensuring that shared objects will use the overriden new/delete operators is
+	# not easy; without this guarantee, crashes are possible (e.g., shared object
+	# allocates, main app frees)
 
-		# but it's still OK to use with libc++ or when no shared objects are involved
+	# it's still pretty useful when no shared objects are involved
 
-		set(_DEFAULT_IDX 0)
-	endif()
-
+	set(_DEFAULT_IDX 0)
 	list(GET _OPTION_LIST ${_DEFAULT_IDX} _DEFAULT)
 
 	axl_create_setting(
