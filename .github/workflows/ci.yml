@@ -29,7 +29,7 @@ jobs:
             run: |
                 call ci\github-actions\set-env.bat ${{matrix.TARGET_CPU}}
                 call ci\github-actions\install-windows.bat
-                git clone --depth 1 https://github.com/vovkos/re2s
+                git clone --branch re2s-no-abseil --depth 1 https://github.com/vovkos/re2s
 
         -   name: Build and test
             shell: cmd
@@ -81,7 +81,7 @@ jobs:
             run: |
                 export TARGET_CPU=${{matrix.TARGET_CPU}}
                 source ./ci/github-actions/install-linux.sh
-                git clone --depth 1 https://github.com/vovkos/re2s
+                git clone --branch re2s-no-abseil --depth 1 https://github.com/vovkos/re2s
 
         -   name: Build and test
             shell: bash
@@ -123,7 +123,7 @@ jobs:
             run: |
                 pwd
                 source ./ci/github-actions/install-osx.sh
-                git clone --depth 1 https://github.com/vovkos/re2s
+                git clone --branch re2s-no-abseil --depth 1 https://github.com/vovkos/re2s
 
         -   name: Build and test
             shell: bash
