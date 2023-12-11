@@ -29,3 +29,5 @@ popd
 echo set\(RE2S_CMAKE_DIR $THIS_DIR/re2s/install/lib/cmake/re2s\) >> paths.cmake
 
 cat paths.cmake
+
+ls $THIS_DIR/re2s/install/lib/cmake/re2s

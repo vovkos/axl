@@ -32,4 +32,6 @@ echo set(RE2S_CMAKE_DIR %THIS_DIR_CMAKE%/re2s/install/lib/cmake/re2s) >> paths.c
 
 type paths.cmake
 
+dir %THIS_DIR_CMAKE%/re2s/install/lib/cmake/re2s
+
 :: . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
