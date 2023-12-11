@@ -13,6 +13,9 @@
 
 :: . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+set THIS_DIR=%CD%
+set THIS_DIR_CMAKE=%THIS_DIR:\=/%
+
 mkdir re2s\.build
 cd re2s\.build
 
