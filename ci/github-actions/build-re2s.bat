@@ -28,10 +28,6 @@ cmake .. ^
 cmake --build . --target install %CMAKE_BUILD_FLAGS% || exit
 
 cd %THIS_DIR%
-echo set(RE2S_CMAKE_DIR %THIS_DIR_CMAKE%/re2s/install/lib/cmake/re2s) >> paths.cmake
-
-type paths.cmake
-
-dir %THIS_DIR_CMAKE%/re2s/install/lib/cmake/re2s
+echo set(RE2S_CMAKE_DIR %THIS_DIR_CMAKE%/re2s/install/lib/cmake/re2) >> paths.cmake
 
 :: . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

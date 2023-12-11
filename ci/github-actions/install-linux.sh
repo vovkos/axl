@@ -11,7 +11,7 @@
 
 # now to official APT packages
 
-if [ "$TARGET_CPU" != "x86" ]; then
+if [[ "$TARGET_CPU" != "x86" ]]; then
 	sudo apt-get -qq update
 
 	sudo apt-get install -y liblua5.2-dev
