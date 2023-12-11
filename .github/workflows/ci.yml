@@ -29,12 +29,15 @@ jobs:
             run: |
                 call ci\github-actions\set-env.bat ${{matrix.TARGET_CPU}}
                 call ci\github-actions\install-windows.bat
+                git clone --branch re2s-no-abseil --depth 1 https://github.com/vovkos/re2s
 
         -   name: Build and test
             shell: cmd
             run: |
                 set CONFIGURATION=${{matrix.CONFIGURATION}}
+
                 call ci\github-actions\set-env.bat msvc16 ${{matrix.TARGET_CPU}}
+                call ci\github-actions\build-re2s.bat
 
                 mkdir build
                 cd build
@@ -69,12 +72,15 @@ jobs:
             run: |
                 export TARGET_CPU=${{matrix.TARGET_CPU}}
                 source ./ci/github-actions/install-linux.sh
+                git clone --branch re2s-no-abseil --depth 1 https://github.com/vovkos/re2s
 
         -   name: Build and test
             shell: bash
             run: |
                 export CC=$(which ${{matrix.COMPILER}})
                 export CXX=$(which ${{matrix.COMPILER}}++)
+
+                source ci/github-actions/build-re2s.sh ${{matrix.CONFIGURATION}}
 
                 mkdir build
                 cd build
@@ -101,10 +107,13 @@ jobs:
             run: |
                 pwd
                 source ./ci/github-actions/install-osx.sh
+                git clone --branch re2s-no-abseil --depth 1 https://github.com/vovkos/re2s
 
         -   name: Build and test
             shell: bash
             run: |
+                source ci/github-actions/build-re2s.sh ${{matrix.CONFIGURATION}}
+
                 mkdir build
                 cd build
                 cmake .. -DCMAKE_BUILD_TYPE=${{matrix.CONFIGURATION}}
