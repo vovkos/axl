@@ -32,4 +32,5 @@ cmake .. \
 make install
 popd
 
-echo set\(RE2S_CMAKE_DIR $THIS_DIR/re2s/install/lib/cmake/re2\) >> paths.cmake
+echo "set(RE2S_CMAKE_DIR $THIS_DIR/re2s/install/lib/cmake/re2)" >> paths.cmake
+echo "axl_override_setting(GCC_FLAG_CPP_STANDARD -std=c++11)" >> settings.cmake

@@ -11,11 +11,7 @@
 
 unset(RE2S_FOUND)
 
-message("--- RE2S_CMAKE_DIR: ${RE2S_CMAKE_DIR}")
-
 if(EXISTS ${RE2S_INC_DIR}/re2/sm.h AND RE2S_LIB_DIR)
-	message("re2s -- branch 1")
-
 	set(RE2S_FOUND TRUE)
 	set(RE2S_LIB_NAME re2)
 
@@ -31,11 +27,8 @@ if(EXISTS ${RE2S_INC_DIR}/re2/sm.h AND RE2S_LIB_DIR)
 		set(RE2S_VERSION ${PACKAGE_VERSION})
 	endif()
 elseif(RE2S_CMAKE_DIR)
-	message("re2s -- branch 2 ${RE2S_CMAKE_DIR}")
-
 	unset(re2_DIR CACHE)
 	find_package(re2 QUIET PATHS ${RE2S_CMAKE_DIR} NO_DEFAULT_PATH)
-
 
 	if(re2_FOUND)
 		set(RE2S_FOUND TRUE)
