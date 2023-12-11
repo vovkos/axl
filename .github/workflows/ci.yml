@@ -80,7 +80,7 @@ jobs:
                 export CC=$(which ${{matrix.COMPILER}})
                 export CXX=$(which ${{matrix.COMPILER}}++)
 
-                source ci/github-actions/build-re2s.sh ${{matrix.CONFIGURATION}}
+                source ci/github-actions/build-re2s.sh ${{matrix.TARGET_CPU}} ${{matrix.CONFIGURATION}}
 
                 mkdir build
                 cd build

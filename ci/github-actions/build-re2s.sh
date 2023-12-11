@@ -9,14 +9,13 @@
 #
 #...............................................................................
 
-CONFIGURATION=$1
+TARGET_CPU=$1
+CONFIGURATION=$2
 THIS_DIR=$(pwd)
 CXX_FLAGS=-fPIC
 
 mkdir re2s/.build
 pushd re2s/.build
-
-echo config: $1
 
 if [[ "$TARGET_CPU" == "x86" ]]; then
 	CXX_FLAGS=-m32 $CXX_FLAGS

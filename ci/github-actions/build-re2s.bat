@@ -20,13 +20,16 @@ mkdir re2s\.build
 cd re2s\.build
 
 cmake .. ^
-	%CMAKE_CONFIGURE_FLAGS% ^
 	-DCMAKE_INSTALL_PREFIX=%THIS_DIR_CMAKE%/re2s/install ^
 	-DBUILD_SHARED_LIBS=OFF ^
 	-DRE2_BUILD_TESTING=OFF ^
+	%CMAKE_CONFIGURE_FLAGS% ^
 	|| exit
 
-cmake --build . --target install %CMAKE_BUILD_FLAGS% || exit
+cmake ^
+	--build . ^
+	--target install %CMAKE_BUILD_FLAGS% ^
+	|| exit
 
 cd %THIS_DIR%
 echo set(RE2S_CMAKE_DIR %THIS_DIR_CMAKE%/re2s/install/lib/cmake/re2) >> paths.cmake
