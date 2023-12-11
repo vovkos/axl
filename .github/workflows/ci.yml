@@ -35,18 +35,9 @@ jobs:
             shell: cmd
             run: |
                 set CONFIGURATION=${{matrix.CONFIGURATION}}
-                set THIS_DIR=%CD%
-                set THIS_DIR_CMAKE=%THIS_DIR:\=/%
 
                 call ci\github-actions\set-env.bat msvc16 ${{matrix.TARGET_CPU}}
-
-                mkdir re2s\.build
-                cd re2s\.build
-                cmake .. -DCMAKE_INSTALL_PREFIX=%THIS_DIR_CMAKE%/re2s/install || exit
-                cmake --build . --target install %CMAKE_BUILD_FLAGS% || exit
-
-                cd %THIS_DIR%
-                echo set (RE2S_CMAKE_DIR %THIS_DIR_CMAKE%/re2s/install/lib/cmake/re2s) >> paths.cmake
+                call ci\github-actions\build-re2s.bat
 
                 mkdir build
                 cd build
@@ -88,15 +79,8 @@ jobs:
             run: |
                 export CC=$(which ${{matrix.COMPILER}})
                 export CXX=$(which ${{matrix.COMPILER}}++)
-                THIS_DIR=$(pwd)
 
-                mkdir re2s/.build
-                pushd re2s/.build
-                cmake .. -DCMAKE_BUILD_TYPE=${{matrix.CONFIGURATION}} -DCMAKE_INSTALL_PREFIX=$THIS_DIR/re2s/install -DCMAKE_CXX_FLAGS=-fPIC
-                make install
-                popd
-
-                echo set (RE2S_CMAKE_DIR $THIS_DIR/re2s/install/lib/cmake/re2s) >> paths.cmake
+                source ci/github-actions/build-re2s.sh ${{matrix.CONFIGURATION}}
 
                 mkdir build
                 cd build
@@ -128,15 +112,7 @@ jobs:
         -   name: Build and test
             shell: bash
             run: |
-                THIS_DIR=$(pwd)
-
-                mkdir re2s/.build
-                pushd re2s/.build
-                cmake .. -DCMAKE_BUILD_TYPE=${{matrix.CONFIGURATION}} -DCMAKE_INSTALL_PREFIX=$THIS_DIR/re2s/install -DCMAKE_CXX_FLAGS=-fPIC
-                make install
-                popd
-
-                echo set (RE2S_CMAKE_DIR $THIS_DIR/re2s/install/lib/cmake/re2s) >> paths.cmake
+                source ci/github-actions/build-re2s.sh
 
                 mkdir build
                 cd build
