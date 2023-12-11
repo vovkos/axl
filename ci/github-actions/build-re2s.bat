@@ -20,6 +20,7 @@ mkdir re2s\.build
 cd re2s\.build
 
 cmake .. ^
+	%CMAKE_CONFIGURE_FLAGS% ^
 	-DCMAKE_INSTALL_PREFIX=%THIS_DIR_CMAKE%/re2s/install ^
 	-DBUILD_SHARED_LIBS=OFF ^
 	-DRE2_BUILD_TESTING=OFF ^
