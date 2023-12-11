@@ -18,7 +18,7 @@ mkdir re2s/.build
 pushd re2s/.build
 
 if [[ "$TARGET_CPU" == "x86" ]]; then
-	CXX_FLAGS=-m32 $CXX_FLAGS
+	CXX_FLAGS="-m32 $CXX_FLAGS"
 fi
 
 cmake .. \
