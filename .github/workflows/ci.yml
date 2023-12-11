@@ -112,7 +112,7 @@ jobs:
         -   name: Build and test
             shell: bash
             run: |
-                source ci/github-actions/build-re2s.sh ${{matrix.CONFIGURATION}}
+                source ci/github-actions/build-re2s.sh $(uname -m) ${{matrix.CONFIGURATION}}
 
                 mkdir build
                 cd build
