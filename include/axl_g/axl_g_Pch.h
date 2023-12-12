@@ -426,16 +426,6 @@ wcslen_s(const wchar_t* p) {
 #define AXL_MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define AXL_MAX(a, b) (((a) > (b)) ? (a) : (b))
 
-//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-// ensure class is never accidentally copied
-
-#define AXL_DISABLE_COPY(Class) \
-private: \
-	Class(const Class&);  \
-	void \
-	operator = (const Class&); \
-
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // ASSERT macro
@@ -449,6 +439,34 @@ private: \
 #ifndef ASSERT
 #	define ASSERT AXL_ASSERT
 #endif
+
+//. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// ensure class is never accidentally copied
+
+#define AXL_DISABLE_COPY(Class) \
+private: \
+	Class(const Class&);  \
+	void \
+	operator = (const Class&); \
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// ensure class has no tail padding
+
+namespace axl {
+namespace g {
+
+template <typename T>
+struct TailPaddingCheck: T {
+	char m_field; // this field might be allocated in T's tail padding
+};
+
+} // namespace g
+} // namespace axl
+
+#define AXL_HAS_TAIL_PADDING(T) (sizeof(axl::g::TailPaddingCheck<T>) == sizeof(T))
+#define AXL_ASSERT_NO_TAIL_PADDING(T) AXL_ASSERT(!AXL_HAS_TAIL_PADDING(T))
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
