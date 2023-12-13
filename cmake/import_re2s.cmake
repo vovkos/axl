@@ -11,7 +11,12 @@
 
 unset(RE2S_FOUND)
 
-if(EXISTS ${RE2S_INC_DIR}/re2/sm.h AND RE2S_LIB_DIR)
+if(TARGET re2::re2) # in-tree
+	set(RE2S_FOUND TRUE)
+	set(RE2S_LIB_NAME re2::re2)
+	unset(RE2S_LIB_DIR)
+	get_target_property(RE2S_INC_DIR re2::re2 INTERFACE_INCLUDE_DIRECTORIES)
+elseif(EXISTS ${RE2S_INC_DIR}/re2/sm.h AND RE2S_LIB_DIR)
 	set(RE2S_FOUND TRUE)
 	set(RE2S_LIB_NAME re2)
 
@@ -36,7 +41,6 @@ elseif(RE2S_CMAKE_DIR)
 		set(RE2S_VERSION ${re2_VERSION})
 		set(RE2S_LIB_NAME re2::re2)
 		get_target_property(RE2S_INC_DIR re2::re2 INTERFACE_INCLUDE_DIRECTORIES)
-		get_target_property(_ re2::re2 IMPORTED_LOCATION_DEBUG)
 	endif()
 endif()
 
