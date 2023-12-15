@@ -150,6 +150,7 @@ Capture::copy(const Capture& src) {
 	m_text = src.m_text;
 }
 
+#if (_AXL_CPP_HAS_RVALUE_REF)
 inline
 void
 Capture::move(Capture&& src) {
@@ -157,6 +158,7 @@ Capture::move(Capture&& src) {
 	m_endOffset = src.m_endOffset;
 	m_text = std::move(src.m_text);
 }
+#endif
 
 //..............................................................................
 
