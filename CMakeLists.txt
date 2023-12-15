@@ -17,6 +17,12 @@ include(cmake/axl_cmake.cmake NO_POLICY_SCOPE)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+if (NOT "${GCC_FLAG_CPP_STANDARD}" MATCHES "-std=")
+	set(CMAKE_CXX_STANDARD 11)
+endif()
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 set(AXL_ROOT_DIR     ${CMAKE_CURRENT_LIST_DIR})
 set(AXL_BIN_BASE_DIR ${CMAKE_CURRENT_BINARY_DIR}/bin)
 set(AXL_LIB_BASE_DIR ${CMAKE_CURRENT_BINARY_DIR}/lib)
