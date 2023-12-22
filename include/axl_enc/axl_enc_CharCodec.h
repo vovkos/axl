@@ -176,6 +176,7 @@ public:
 	virtual
 	size_t
 	calcRequiredBufferLengthToDecode_utf8(
+		DecoderState* state,
 		const void* p,
 		size_t size,
 		utf32_t replacement = StdChar_Replacement
@@ -184,6 +185,7 @@ public:
 	virtual
 	size_t
 	calcRequiredBufferLengthToDecode_utf16(
+		DecoderState* state,
 		const void* p,
 		size_t size,
 		utf32_t replacement = StdChar_Replacement
@@ -192,10 +194,41 @@ public:
 	virtual
 	size_t
 	calcRequiredBufferLengthToDecode_utf32(
+		DecoderState* state,
 		const void* p,
 		size_t size,
 		utf32_t replacement = StdChar_Replacement
 	) = 0;
+
+	size_t
+	calcRequiredBufferLengthToDecode_utf8(
+		const void* p,
+		size_t size,
+		utf32_t replacement = StdChar_Replacement
+	) {
+		DecoderState state = 0;
+		return calcRequiredBufferLengthToDecode_utf8(p, size, replacement);
+	}
+
+	size_t
+	calcRequiredBufferLengthToDecode_utf16(
+		const void* p,
+		size_t size,
+		utf32_t replacement = StdChar_Replacement
+	) {
+		DecoderState state = 0;
+		return calcRequiredBufferLengthToDecode_utf16(p, size, replacement);
+	}
+
+	size_t
+	calcRequiredBufferLengthToDecode_utf32(
+		const void* p,
+		size_t size,
+		utf32_t replacement = StdChar_Replacement
+	) {
+		DecoderState state = 0;
+		return calcRequiredBufferLengthToDecode_utf32(p, size, replacement);
+	}
 
 	// decode
 
@@ -229,7 +262,6 @@ public:
 		utf32_t replacement = StdChar_Replacement
 	) = 0;
 
-	virtual
 	ConvertLengthResult
 	decode_utf8_u(
 		utf8_t* buffer,
@@ -241,7 +273,6 @@ public:
 		return decode_utf8_u(&state, buffer, p, size, replacement);
 	}
 
-	virtual
 	ConvertLengthResult
 	decode_utf16_u(
 		utf16_t* buffer,
@@ -253,7 +284,6 @@ public:
 		return decode_utf16_u(&state, buffer, p, size, replacement);
 	}
 
-	virtual
 	ConvertLengthResult
 	decode_utf32_u(
 		utf32_t* buffer,
@@ -298,7 +328,6 @@ public:
 		utf32_t replacement = StdChar_Replacement
 	) = 0;
 
-	virtual
 	ConvertLengthResult
 	decode_utf8(
 		utf8_t* buffer,
@@ -311,7 +340,6 @@ public:
 		return decode_utf8(&state, buffer, bufferLength, p, size, replacement);
 	}
 
-	virtual
 	ConvertLengthResult
 	decode_utf16(
 		utf16_t* buffer,
@@ -324,7 +352,6 @@ public:
 		return decode_utf16(&state, buffer, bufferLength, p, size, replacement);
 	}
 
-	virtual
 	ConvertLengthResult
 	decode_utf32(
 		utf32_t* buffer,
@@ -576,11 +603,13 @@ public:
 	virtual
 	size_t
 	calcRequiredBufferLengthToDecode_utf8(
+		DecoderState* state,
 		const void* p,
 		size_t size,
 		utf32_t replacement = StdChar_Replacement
 	) {
 		return Convert<Utf8, T>::calcRequiredLength(
+			state,
 			(C*)p,
 			(C*)p + size / sizeof(C),
 			replacement
@@ -590,11 +619,13 @@ public:
 	virtual
 	size_t
 	calcRequiredBufferLengthToDecode_utf16(
+		DecoderState* state,
 		const void* p,
 		size_t size,
 		utf32_t replacement = StdChar_Replacement
 	) {
 		return Convert<Utf16, T>::calcRequiredLength(
+			state,
 			(C*)p,
 			(C*)p + size / sizeof(C),
 			replacement
@@ -604,11 +635,13 @@ public:
 	virtual
 	size_t
 	calcRequiredBufferLengthToDecode_utf32(
+		DecoderState* state,
 		const void* p,
 		size_t size,
 		utf32_t replacement = StdChar_Replacement
 	) {
 		return Convert<Utf32, T>::calcRequiredLength(
+			state,
 			(C*)p,
 			(C*)p + size / sizeof(C),
 			replacement
