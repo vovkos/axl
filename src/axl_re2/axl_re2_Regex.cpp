@@ -26,6 +26,7 @@ calcRe2OptionsFromRegexFlags(uint_t flags) {
 	RE2::Options options;
 	options.set_longest_match(true);
 	options.set_dot_nl(true);
+	options.set_word_boundary(true);
 
 	if (flags & RegexFlag_OneLine)
 		options.set_one_line(true);
@@ -37,9 +38,6 @@ calcRe2OptionsFromRegexFlags(uint_t flags) {
 
 	if (flags & RegexFlag_CaseInsensitive)
 		options.set_case_sensitive(false);
-
-	if (flags & RegexFlag_WholeWord)
-		options.set_word_boundary(true);
 
 	return options;
 }
@@ -99,13 +97,37 @@ Regex::clear() {
 	m_flags = 0;
 }
 
+inline
+sl::StringRef
+adjustRegexPattern(
+	const sl::StringRef& source,
+	uint_t flags
+) {
+	if (!(flags & RegexFlag_WholeWord))
+		return source;
+
+	static sl::StringRef anchor = "\\b";
+	bool hasPrefix = source.isPrefix(anchor);
+	bool hasSuffix = source.isSuffix(anchor);
+
+	if (hasPrefix)
+		return hasSuffix ? source : sl::String(source) + anchor;
+
+	sl::String string = anchor;
+	string += source;
+	if (!hasSuffix)
+		string += anchor;
+
+	return string;
+}
+
 bool
 Regex::compile(
 	const sl::StringRef& source,
 	uint_t flags
 ) {
 	bool result = m_impl->create(
-		source >> toRe2,
+		adjustRegexPattern(source, flags) >> toRe2,
 		calcRe2OptionsFromRegexFlags(flags)
 	);
 
@@ -124,7 +146,7 @@ Regex::createSwitch(uint_t flags) {
 
 uint_t
 Regex::compileSwitchCase(const sl::StringRef& source) {
-	int id = m_impl->add_switch_case(source >> toRe2);
+	int id = m_impl->add_switch_case(adjustRegexPattern(source, m_flags) >> toRe2);
 	return id != -1 ? id : err::fail<uint_t>(-1, m_impl->error() >> toAxl);
 }
 

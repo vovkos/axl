@@ -1300,6 +1300,20 @@ testRegex() {
 	printf("--- matching with axl::re2::Regex...\n");
 
 	do {
+		result = regex.compile("abc", re2::RegexFlag_WholeWord);
+		if (!result) {
+			printf("error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		const char text[] = "abc def";
+
+		re2::State state;
+		re2::ExecResult result = regex.execEof(&state, text);
+		printf("result: %d\n");
+	} while (0);
+
+	do {
 
 		result = regex.compile("\x91", re2::RegexFlag_Latin1);
 		if (!result) {
@@ -8585,7 +8599,7 @@ main(
 #endif
 
 #if (_AXL_RE2)
-	test_re::testRegex();
+	// test_re::testRegex();
 	test_re2::testRegex();
 	// test_re2::testRegexFullMatch();
 #endif
