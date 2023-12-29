@@ -239,8 +239,6 @@ public:
 		size_t binSize,
 		enc::DecoderState decoderState
 	) {
-		ASSERT(binOffset >= charOffset);
-
 		m_offset += charOffset;
 		m_binOffset += binOffset;
 		m_decoderState = decoderState;
