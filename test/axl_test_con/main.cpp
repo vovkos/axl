@@ -1310,7 +1310,7 @@ testRegex() {
 
 		re2::State state;
 		re2::ExecResult result = regex.execEof(&state, text);
-		printf("result: %d\n");
+		printf("result: %d\n", result);
 	} while (0);
 
 	do {

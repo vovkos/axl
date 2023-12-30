@@ -717,11 +717,11 @@ benchCodecs() {
 	sl::Array<char> buffer2;
 
 	io::SimpleMappedFile file;
-	file.open("/home/vladimir/mc-term.bin", io::FileFlag_ReadOnly);
+	file.open("c:/users/vladimir/mc-term.bin", io::FileFlag_ReadOnly);
 	buffer1.setCount(file.getMappingSize());
 	memcpy(buffer1.p(), file.p(), file.getMappingSize());
 
-	file.open("/home/vladimir/mc-clear-term.bin", io::FileFlag_ReadOnly);
+	file.open("c:/users/vladimir/mc-clear-term.bin", io::FileFlag_ReadOnly);
 	buffer2.setCount(file.getMappingSize());
 	memcpy(buffer2.p(), file.p(), file.getMappingSize());
 
@@ -735,7 +735,7 @@ benchCodecs() {
 	);
 	size_t length_utf = result.m_dst - data_utf;
 
-	int n = 30000;
+	int n = 10000;
 
 	do {
 		uint64_t t0 = sys::getTimestamp();
@@ -746,17 +746,15 @@ benchCodecs() {
 		QVector<uint> ucs;
 		for (int i = 0; i < n; i++) {
 			s = codec->toUnicode((char*)data_utf, length_utf * sizeof(data_utf[0]));
-			ucs = s.toUcs4();
+			// ucs = s.toUcs4();
 		}
 
 		uint64_t t1 = sys::getTimestamp();
-		printf("iterations: %d, msec: %lld\n", n, (t1 - t0) / 10000);
+		printf("QT iterations: %d, msec: %lld\n", n, (t1 - t0) / 10000);
 	} while (0);
 
 	do {
 		uint64_t t0 = sys::getTimestamp();
-
-		enc::CharCodec* codec = enc::getCharCodec(enc::CharCodecKind_Utf16);
 
 		static utf32_t buffer_utf32[16 * 1024];
 		static utf16_t buffer_utf16[16 * 1024];
@@ -769,11 +767,8 @@ benchCodecs() {
 			for (const char* p = data_utf; p < end; p++) {
 				uchar_t c = *p;
 				Dfa next = dfa.decode(c);
-				if (next.getState() == Dfa::State_Ready)
+				if (next.isReady()) {
 					*dst++ = next.getCodePoint();
-				else if (next.isError()) {
-					printf("WTF?!\n");
-					*dst++ = c;
 				}
 
 				dfa = next;
@@ -781,27 +776,39 @@ benchCodecs() {
 		}
 
 		uint64_t t1 = sys::getTimestamp();
-		printf("iterations: %d, msec: %lld\n", n, (t1 - t0) / 10000);
+		printf("enc::Utf8Dfa iterations: %d, msec: %lld\n", n, (t1 - t0) / 10000);
 	} while (0);
 
 	do {
 		uint64_t t0 = sys::getTimestamp();
 
-		enc::CharCodec* codec = enc::getCharCodec(enc::CharCodecKind_Utf16);
-
 		static utf32_t buffer_utf32[16 * 1024];
 		static utf16_t buffer_utf16[16 * 1024];
 
 		for (int i = 0; i < n; i++) {
-			enc::Convert<enc::Utf32, DataUtf>::convert_u(
-				buffer_utf32,
+			enc::Convert<enc::Utf16, DataUtf>::convert_u(
+				buffer_utf16,
 				data_utf,
 				data_utf + length_utf
 			);
 		}
 
 		uint64_t t1 = sys::getTimestamp();
-		printf("iterations: %d, msec: %lld\n", n, (t1 - t0) / 10000);
+		printf("enc::Convert::convert_u iterations: %d, msec: %lld\n", n, (t1 - t0) / 10000);
+
+		enc::CharCodec* codec = enc::getCharCodec(enc::CharCodecKind_Utf8);
+
+		t0 = sys::getTimestamp();
+		for (int i = 0; i < n; i++) {
+			codec->decode_utf16_u(
+				buffer_utf16,
+				data_utf,
+				length_utf
+			);
+		}
+
+		t1 = sys::getTimestamp();
+		printf("enc::CharCodec::decode_utf16_u iterations: %d, msec: %lld\n", n, (t1 - t0) / 10000);
 	} while (0);
 
 	do {
@@ -811,12 +818,12 @@ benchCodecs() {
 		static utf16_t buffer_utf16[16 * 1024];
 
 		for (int i = 0; i < n; i++) {
-			std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
-			std::u32string s = converter.from_bytes(data_utf, data_utf + length_utf);
+			std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> converter;
+			std::u16string s = converter.from_bytes(data_utf, data_utf + length_utf);
 		}
 
 		uint64_t t1 = sys::getTimestamp();
-		printf("iterations: %d, msec: %lld\n", n, (t1 - t0) / 10000);
+		printf("STL iterations: %d, msec: %lld\n", n, (t1 - t0) / 10000);
 	} while (0);
 }
 
