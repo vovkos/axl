@@ -195,16 +195,16 @@ public:
 		for (; p < end && emitter.canEmit(); p++) {
 			uint16_t c = *p;
 			Dfa next = dfa.decode(c);
-			if (next.isError()) {
+			if (next.getState() == Dfa::State_Ready)
+				emitter.emitCp(p + 1, next.getCodePoint());
+			else if (next.isError()) {
 				if (dfa.getPendingLength())
 					emitter.emitCu(p - 1, dfa.getCodePoint());
-				if (next.getState() == Dfa::State_Error)
-					emitter.emitCu(p + 1, next.getCodePoint());
-				else if (next.isReady())
+				if (next.isReady())
 					emitter.emitCpAfterCu(p + 1, next.getCodePoint());
-			} else if (next.isReady())
-				emitter.emitCp(p + 1, next.getCodePoint());
-
+				else if (next.getState() == Dfa::State_Error)
+					emitter.emitCu(p + 1, next.getCodePoint());
+			}
 			dfa = next;
 		}
 

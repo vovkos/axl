@@ -141,14 +141,15 @@ protected:
 		for (; p < end && emitter.canEmit(); p++) {
 			uchar_t c = *p;
 			Dfa next = dfa.decode(c);
-			if (next.isError()) {
-				dfa.emitPendingCus(emitter, p);
-				if (next.getState() == Dfa::State_Error)
-					emitter.emitCu(p + 1, c);
-				else if (next.isReady())
-					emitter.emitCpAfterCu(p + 1, next.getCodePoint());
-			} else if (next.isReady())
+			if (next.getState() == Dfa::State_Ready)
 				emitter.emitCp(p + 1, next.getCodePoint());
+			else if (next.isError()) {
+				dfa.emitPendingCus(emitter, p);
+				if (next.isReady())
+					emitter.emitCpAfterCu(p + 1, next.getCodePoint());
+				else if (next.getState() == Dfa::State_Error)
+					emitter.emitCu(p + 1, c);
+			}
 
 			dfa = next;
 		}

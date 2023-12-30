@@ -198,6 +198,7 @@ public:
 		Emitter& emitter,
 		const utf8_t* p
 	) {
+#if (_AXL_ENC_EMIT_PENDING_CUS_TABLE)
 		typedef void EmitFn(
 			Emitter& emitter,
 			const utf8_t* p,
@@ -224,6 +225,31 @@ public:
 		};
 
 		emitTable[m_state >> 3](emitter, p, m_cp);
+#else
+		switch (m_state) {
+		case State_1_2:
+		case State_1_2_Error:
+			emitPendingCus_State_1_2(emitter, p, m_cp);
+			break;
+		case State_1_3:
+		case State_1_3_Error:
+			emitPendingCus_State_1_3(emitter, p, m_cp);
+			break;
+		case State_2_3:
+			emitPendingCus_State_2_3(emitter, p, m_cp);
+			break;
+		case State_1_4:
+		case State_1_4_Error:
+			emitPendingCus_State_1_4(emitter, p, m_cp);
+			break;
+		case State_2_4:
+			emitPendingCus_State_2_4(emitter, p, m_cp);
+			break;
+		case State_3_4:
+			emitPendingCus_State_3_4(emitter, p, m_cp);
+			break;
+		}
+#endif
 	}
 
 protected:
@@ -506,6 +532,7 @@ public:
 		Emitter& emitter,
 		const utf8_t* p
 	) {
+#if (_AXL_ENC_EMIT_PENDING_CUS_TABLE)
 		typedef void EmitFn(
 			Emitter& emitter,
 			const utf8_t* p,
@@ -532,6 +559,20 @@ public:
 		};
 
 		emitTable[m_state](emitter, p, m_acc);
+#else
+		switch (m_state) {
+		case State_Cb_1:
+			emitPendingCus_State_Cb_1(emitter, p, m_cp);
+			break;
+		case State_Cb_2:
+			emitPendingCus_State_Cb_2(emitter, p, m_cp);
+			break;
+		case State_Cb_3:
+		case State_Cb_3_Error:
+			emitPendingCus_State_Cb_3(emitter, p, m_cp);
+			break;
+		}
+#endif
 	}
 
 protected:

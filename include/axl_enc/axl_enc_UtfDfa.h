@@ -12,6 +12,7 @@
 #pragma once
 
 #define _AXL_ENC_UTFDFA_H
+#define _AXL_ENC_EMIT_PENDING_CUS_TABLE 0
 
 #include "axl_g_Pch.h"
 

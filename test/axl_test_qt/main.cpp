@@ -13,10 +13,17 @@
 #include "mainwindow.h"
 #include "axl_sys_Thread.h"
 #include "axl_re_Regex.h"
+#include "axl_io_MappedFile.h"
 
 #include <QCheckBox>
 #include <QDialogButtonBox>
 #include "axl_sys_DynamicLib.h"
+
+#include <iostream>
+#include <string>
+#include <locale>
+#include <codecvt>
+
 
 //..............................................................................
 
@@ -704,6 +711,115 @@ addRootCaCertificates() {
 		QSslSocket::addDefaultCaCertificate(*it);
 }
 
+void
+benchCodecs() {
+	sl::Array<char> buffer1;
+	sl::Array<char> buffer2;
+
+	io::SimpleMappedFile file;
+	file.open("/home/vladimir/mc-term.bin", io::FileFlag_ReadOnly);
+	buffer1.setCount(file.getMappingSize());
+	memcpy(buffer1.p(), file.p(), file.getMappingSize());
+
+	file.open("/home/vladimir/mc-clear-term.bin", io::FileFlag_ReadOnly);
+	buffer2.setCount(file.getMappingSize());
+	memcpy(buffer2.p(), file.p(), file.getMappingSize());
+
+	typedef enc::Utf8 DataUtf;
+
+	static DataUtf::C data_utf[16 * 1024];
+	enc::ConvertResult<DataUtf::C, utf8_t> result = enc::Convert<DataUtf, enc::Utf8>::convert_u(
+		data_utf,
+		buffer1.p(),
+		buffer1.getEnd()
+	);
+	size_t length_utf = result.m_dst - data_utf;
+
+	int n = 30000;
+
+	do {
+		uint64_t t0 = sys::getTimestamp();
+
+		const QTextCodec* codec = QTextCodec::codecForName("utf8");
+
+		QString s;
+		QVector<uint> ucs;
+		for (int i = 0; i < n; i++) {
+			s = codec->toUnicode((char*)data_utf, length_utf * sizeof(data_utf[0]));
+			ucs = s.toUcs4();
+		}
+
+		uint64_t t1 = sys::getTimestamp();
+		printf("iterations: %d, msec: %lld\n", n, (t1 - t0) / 10000);
+	} while (0);
+
+	do {
+		uint64_t t0 = sys::getTimestamp();
+
+		enc::CharCodec* codec = enc::getCharCodec(enc::CharCodecKind_Utf16);
+
+		static utf32_t buffer_utf32[16 * 1024];
+		static utf16_t buffer_utf16[16 * 1024];
+
+		for (int i = 0; i < n; i++) {
+			typedef enc::Utf8Dfa Dfa;
+			Dfa dfa(0);
+			utf32_t* dst = buffer_utf32;
+			const char* end = data_utf + length_utf;
+			for (const char* p = data_utf; p < end; p++) {
+				uchar_t c = *p;
+				Dfa next = dfa.decode(c);
+				if (next.getState() == Dfa::State_Ready)
+					*dst++ = next.getCodePoint();
+				else if (next.isError()) {
+					printf("WTF?!\n");
+					*dst++ = c;
+				}
+
+				dfa = next;
+			}
+		}
+
+		uint64_t t1 = sys::getTimestamp();
+		printf("iterations: %d, msec: %lld\n", n, (t1 - t0) / 10000);
+	} while (0);
+
+	do {
+		uint64_t t0 = sys::getTimestamp();
+
+		enc::CharCodec* codec = enc::getCharCodec(enc::CharCodecKind_Utf16);
+
+		static utf32_t buffer_utf32[16 * 1024];
+		static utf16_t buffer_utf16[16 * 1024];
+
+		for (int i = 0; i < n; i++) {
+			enc::Convert<enc::Utf32, DataUtf>::convert_u(
+				buffer_utf32,
+				data_utf,
+				data_utf + length_utf
+			);
+		}
+
+		uint64_t t1 = sys::getTimestamp();
+		printf("iterations: %d, msec: %lld\n", n, (t1 - t0) / 10000);
+	} while (0);
+
+	do {
+		uint64_t t0 = sys::getTimestamp();
+
+		static utf32_t buffer_utf32[16 * 1024];
+		static utf16_t buffer_utf16[16 * 1024];
+
+		for (int i = 0; i < n; i++) {
+			std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> converter;
+			std::u32string s = converter.from_bytes(data_utf, data_utf + length_utf);
+		}
+
+		uint64_t t1 = sys::getTimestamp();
+		printf("iterations: %d, msec: %lld\n", n, (t1 - t0) / 10000);
+	} while (0);
+}
+
 int
 main(
 	int argc,
@@ -838,6 +954,9 @@ main(
 	QApplication app(argc, argv);
 
 	addRootCaCertificates();
+
+	benchCodecs();
+	return 0;
 
 	/*
 	QStringList items;
