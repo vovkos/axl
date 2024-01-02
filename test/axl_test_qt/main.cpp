@@ -737,8 +737,8 @@ benchCodecs() {
 
 	int n = 10000;
 
-	// for (size_t i = 0; i < length_utf; i++)
-	// 	data_utf[i] = rand() % 0xff;
+	for (size_t i = 0; i < length_utf; i++)
+	 	data_utf[i] = rand() % 0xff;
 
 	do {
 		uint64_t t0 = sys::getTimestamp();
@@ -812,7 +812,7 @@ benchCodecs() {
 		t1 = sys::getTimestamp();
 		printf("enc::CharCodec::decode_utf16_u iterations: %d, msec: %lld\n", n, (t1 - t0) / 10000);
 	} while (0);
-
+/*
 	do {
 		uint64_t t0 = sys::getTimestamp();
 
@@ -826,7 +826,7 @@ benchCodecs() {
 
 		uint64_t t1 = sys::getTimestamp();
 		printf("STL iterations: %d, msec: %lld\n", n, (t1 - t0) / 10000);
-	} while (0);
+	} while (0); */
 }
 
 int
