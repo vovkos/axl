@@ -737,6 +737,9 @@ benchCodecs() {
 
 	int n = 10000;
 
+	// for (size_t i = 0; i < length_utf; i++)
+	// 	data_utf[i] = rand() % 0xff;
+
 	do {
 		uint64_t t0 = sys::getTimestamp();
 
@@ -767,9 +770,8 @@ benchCodecs() {
 			for (const char* p = data_utf; p < end; p++) {
 				uchar_t c = *p;
 				Dfa next = dfa.decode(c);
-				if (next.isReady()) {
+				if (next.isReady())
 					*dst++ = next.getCodePoint();
-				}
 
 				dfa = next;
 			}

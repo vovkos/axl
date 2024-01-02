@@ -198,58 +198,38 @@ public:
 		Emitter& emitter,
 		const utf8_t* p
 	) {
-#if (_AXL_ENC_EMIT_PENDING_CUS_TABLE)
-		typedef void EmitFn(
-			Emitter& emitter,
-			const utf8_t* p,
-			uint32_t cp
-		);
-
-		static EmitFn* emitTable[StateCount] = {
-			&emitNothing,               // 0   - State_Start
-			&emitNothing,               // 8   - unused
-			&emitPendingCus_State_1_2,  // 16  - State_1_2
-			&emitPendingCus_State_1_2,  // 24  - State_1_2_Error
-			&emitPendingCus_State_1_3,  // 32  - State_1_3
-			&emitPendingCus_State_1_3,  // 40  - State_1_3_Error
-			&emitPendingCus_State_2_3,  // 48  - State_2_3
-			&emitNothing,               // 56  - unused
-			&emitPendingCus_State_1_4,  // 64  - State_1_4
-			&emitPendingCus_State_1_4,  // 72  - State_1_4_Error
-			&emitPendingCus_State_2_4,  // 80  - State_2_4
-			&emitNothing,               // 88  - unused
-			&emitPendingCus_State_3_4,  // 96  - State_3_4
-			&emitNothing,               // 104 - State_Error
-			&emitNothing,               // 112 - State_Ready
-			&emitNothing,               // 120 - State_Ready_Error
-		};
-
-		emitTable[m_state >> 3](emitter, p, m_cp);
-#else
 		switch (m_state) {
 		case State_1_2:
 		case State_1_2_Error:
-			emitPendingCus_State_1_2(emitter, p, m_cp);
+			emitter.emitCu(p, 0xc0 | m_cp);
 			break;
+
 		case State_1_3:
 		case State_1_3_Error:
-			emitPendingCus_State_1_3(emitter, p, m_cp);
+			emitter.emitCu(p, 0xe0 | m_cp);
 			break;
+
 		case State_2_3:
-			emitPendingCus_State_2_3(emitter, p, m_cp);
+			emitter.emitCu(p - 1, 0xe0 | (m_cp >> 6));
+			emitter.emitCu(p, 0x80 | (m_cp & 0x3f));
 			break;
+
 		case State_1_4:
 		case State_1_4_Error:
-			emitPendingCus_State_1_4(emitter, p, m_cp);
+			emitter.emitCu(p, 0xf0 | m_cp);
 			break;
+
 		case State_2_4:
-			emitPendingCus_State_2_4(emitter, p, m_cp);
+			emitter.emitCu(p - 1, 0xf0 | (m_cp >> 6));
+			emitter.emitCu(p, 0x80 | (m_cp & 0x3f));
 			break;
+
 		case State_3_4:
-			emitPendingCus_State_3_4(emitter, p, m_cp);
+			emitter.emitCu(p - 2, 0xf0 | (m_cp >> 12));
+			emitter.emitCu(p - 1, 0x80 | ((m_cp >> 6) & 0x3f));
+			emitter.emitCu(p, 0x80 | (m_cp & 0x3f));
 			break;
 		}
-#endif
 	}
 
 protected:
@@ -258,86 +238,6 @@ protected:
 		utf32_t cp
 	) {
 		init(state, cp);
-	}
-
-	template <typename Emitter>
-	static
-	void
-	emitNothing(
-		Emitter& emitter,
-		const utf8_t* p,
-		uint32_t acc
-	) {
-	}
-
-	template <typename Emitter>
-	static
-	void
-	emitPendingCus_State_1_2(
-		Emitter& emitter,
-		const utf8_t* p,
-		uint32_t acc
-	) {
-		emitter.emitCu(p, 0xc0 | (acc & 0x3f));
-	}
-
-	template <typename Emitter>
-	static
-	void
-	emitPendingCus_State_1_3(
-		Emitter& emitter,
-		const utf8_t* p,
-		uint32_t acc
-	) {
-		emitter.emitCu(p, 0xe0 | (acc & 0x3f));
-	}
-
-	template <typename Emitter>
-	static
-	void
-	emitPendingCus_State_2_3(
-		Emitter& emitter,
-		const utf8_t* p,
-		uint32_t acc
-	) {
-		emitter.emitCu(p - 1, 0xe0 | ((acc >> 6) & 0x3f));
-		emitter.emitCu(p, 0x80 | (acc & 0x3f));
-	}
-
-	template <typename Emitter>
-	static
-	void
-	emitPendingCus_State_1_4(
-		Emitter& emitter,
-		const utf8_t* p,
-		uint32_t acc
-	) {
-		emitter.emitCu(p, 0xf0 | (acc & 0x3f));
-	}
-
-	template <typename Emitter>
-	static
-	void
-	emitPendingCus_State_2_4(
-		Emitter& emitter,
-		const utf8_t* p,
-		uint32_t acc
-	) {
-		emitter.emitCu(p - 1, 0xf0 | ((acc >> 6) & 0x3f));
-		emitter.emitCu(p, 0x80 | (acc & 0x3f));
-	}
-
-	template <typename Emitter>
-	static
-	void
-	emitPendingCus_State_3_4(
-		Emitter& emitter,
-		const utf8_t* p,
-		uint32_t acc
-	) {
-		emitter.emitCu(p - 2, 0xf0 | ((acc >> 12) & 0x3f));
-		emitter.emitCu(p - 1, 0x80 | ((acc >> 6) & 0x3f));
-		emitter.emitCu(p, 0x80 | (acc & 0x3f));
 	}
 };
 
@@ -532,47 +432,23 @@ public:
 		Emitter& emitter,
 		const utf8_t* p
 	) {
-#if (_AXL_ENC_EMIT_PENDING_CUS_TABLE)
-		typedef void EmitFn(
-			Emitter& emitter,
-			const utf8_t* p,
-			uint32_t cp
-		);
-
-		static EmitFn* emitTable[StateCount] = {
-			&emitNothing,                // 0  - State_Start
-			&emitNothing,                // 1  - unused
-			&emitPendingCus_State_Cb_1,  // 2  - State_Cb_1
-			&emitNothing,                // 3  - unused
-			&emitPendingCus_State_Cb_2,  // 4  - State_Cb_2
-			&emitNothing,                // 5  - unused
-			&emitPendingCus_State_Cb_3,  // 6  - State_Cb_3
-			&emitPendingCus_State_Cb_3,  // 7  - State_Cb_3_Error
-			&emitNothing,                // 8  - unused
-			&emitNothing,                // 9  - State_Error
-			&emitNothing,                // 10 - State_Ready
-			&emitNothing,                // 11 - State_Ready_Error
-			&emitNothing,                // 12 - unused
-			&emitNothing,                // 13 - State_Ready_Error_2
-			&emitNothing,                // 14 - unused
-			&emitNothing,                // 15 - State_Ready_Error_3
-		};
-
-		emitTable[m_state](emitter, p, m_acc);
-#else
 		switch (m_state) {
 		case State_Cb_1:
-			emitPendingCus_State_Cb_1(emitter, p, m_cp);
+			emitter.emitCu(p, 0x80 | (m_acc & 0x3f));
 			break;
+
 		case State_Cb_2:
-			emitPendingCus_State_Cb_2(emitter, p, m_cp);
+			emitter.emitCu(p, 0x80 | (m_acc & 0x3f));
+			emitter.emitCu(p, 0x80 | ((m_acc >> 6) & 0x3f));
 			break;
+
 		case State_Cb_3:
 		case State_Cb_3_Error:
-			emitPendingCus_State_Cb_3(emitter, p, m_cp);
+			emitter.emitCu(p, 0x80 | (m_acc & 0x3f));
+			emitter.emitCu(p, 0x80 | ((m_acc >> 6) & 0x3f));
+			emitter.emitCu(p, 0x80 | ((m_acc >> 12) & 0x3f));
 			break;
 		}
-#endif
 	}
 
 protected:
@@ -583,52 +459,6 @@ protected:
 	) {
 		init(state, cp);
 		m_acc = acc;
-	}
-
-	template <typename Emitter>
-	static
-	void
-	emitNothing(
-		Emitter& emitter,
-		const utf8_t* p,
-		uint32_t acc
-	) {
-	}
-
-	template <typename Emitter>
-	static
-	void
-	emitPendingCus_State_Cb_1(
-		Emitter& emitter,
-		const utf8_t* p,
-		uint32_t acc
-	) {
-		emitter.emitCu(p, 0x80 | (acc & 0x3f));
-	}
-
-	template <typename Emitter>
-	static
-	void
-	emitPendingCus_State_Cb_2(
-		Emitter& emitter,
-		const utf8_t* p,
-		uint32_t acc
-	) {
-		emitter.emitCu(p, 0x80 | (acc & 0x3f));
-		emitter.emitCu(p, 0x80 | ((acc >> 6) & 0x3f));
-	}
-
-	template <typename Emitter>
-	static
-	void
-	emitPendingCus_State_Cb_3(
-		Emitter& emitter,
-		const utf8_t* p,
-		uint32_t acc
-	) {
-		emitter.emitCu(p, 0x80 | (acc & 0x3f));
-		emitter.emitCu(p, 0x80 | ((acc >> 6) & 0x3f));
-		emitter.emitCu(p, 0x80 | ((acc >> 12) & 0x3f));
 	}
 };
 
