@@ -33,7 +33,7 @@ public:
 	static
 	size_t
 	getEncodeLength(
-		utf32_t cp,
+		uint32_t cp,
 		utf32_t replacement = StdChar_Replacement
 	) {
 		return
@@ -49,7 +49,7 @@ public:
 	C*
 	encode(
 		C* p,
-		utf32_t cp,
+		uint32_t cp,
 		utf32_t replacement = StdChar_Replacement
 	) {
 		if (cp < 0x80) {
