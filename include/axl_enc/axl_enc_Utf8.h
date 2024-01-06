@@ -102,6 +102,18 @@ public:
 
 	template <typename Emitter>
 	static
+	void
+	emitPendingCus(
+		DecoderState state,
+		Emitter& emitter,
+		const C* p
+	) {
+		Dfa dfa(state);
+		return dfa.emitPendingCus(emitter, p);
+	}
+
+	template <typename Emitter>
+	static
 	const C*
 	decode(
 		DecoderState* state,
