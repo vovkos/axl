@@ -300,6 +300,8 @@ public:
 
 		while (p < end) {
 			utf32_t buffer[Details::DecoderBufferLength];
+			printf("+pendingLength: %d\n", Decoder::getPendingLength(decoderState));
+
 			typename Convert::Result convertResult = Convert::convert(
 				&decoderState,
 				buffer,
@@ -307,6 +309,8 @@ public:
 				p,
 				end
 			);
+
+			printf("-pendingLength: %d\n", Decoder::getPendingLength(decoderState));
 
 			const char* p2 = convertResult.m_src; // just a short alias
 			size_t srcLength = -(p - p2); // respect IsReverse
@@ -457,7 +461,9 @@ protected:
 
 		// search the latest data
 
-		return binTailSize + Locate::locate(&decoderState, i - charTailLength, p, end).m_srcLength;
+		result = Locate::locate(&decoderState, i - charTailLength, p, end);
+		size_t pending = enc::Utf8Decoder::getPendingLength(decoderState);
+		return binTailSize + result.m_srcLength;
 	}
 };
 

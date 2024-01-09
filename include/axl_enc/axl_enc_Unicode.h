@@ -590,13 +590,8 @@ public:
 		const C* src,
 		const C* srcEnd
 	) {
-		Emitter emitter(pos);
-		const C* p = Decoder::decode(emitter, src, srcEnd);
-		size_t srcLength = PtrIterator::sub(p, src);
-		size_t actualPos = emitter.getPos();
-		return actualPos > pos ? // overshoot due to emission of CUs
-			ConvertLengthResult(pos, srcLength - (actualPos - pos)) :
-			ConvertLengthResult(actualPos, srcLength);
+		DecoderState state = 0;
+		return locate(&state, pos, src, srcEnd);
 	}
 };
 
