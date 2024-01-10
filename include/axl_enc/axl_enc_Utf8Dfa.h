@@ -438,14 +438,14 @@ public:
 			break;
 
 		case State_Cb_2:
-			emitter.emitCu(p, 0x80 | (m_acc & 0x3f));
+			emitter.emitCu(p + 1, 0x80 | (m_acc & 0x3f));
 			emitter.emitCu(p, 0x80 | ((m_acc >> 6) & 0x3f));
 			break;
 
 		case State_Cb_3:
 		case State_Cb_3_Error:
-			emitter.emitCu(p, 0x80 | (m_acc & 0x3f));
-			emitter.emitCu(p, 0x80 | ((m_acc >> 6) & 0x3f));
+			emitter.emitCu(p + 2, 0x80 | (m_acc & 0x3f));
+			emitter.emitCu(p + 1, 0x80 | ((m_acc >> 6) & 0x3f));
 			emitter.emitCu(p, 0x80 | ((m_acc >> 12) & 0x3f));
 			break;
 		}

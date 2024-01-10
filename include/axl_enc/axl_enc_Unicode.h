@@ -22,8 +22,8 @@ namespace enc {
 //..............................................................................
 
 enum StdChar {
-	StdChar_Undefined   = 0xffff,
-	StdChar_Replacement = 0xfffd,
+	StdChar_Undefined   = 0xffff, //   (Undefined Character)
+	StdChar_Replacement = 0xfffd, // � (Replacement Character)
 };
 
 //..............................................................................
