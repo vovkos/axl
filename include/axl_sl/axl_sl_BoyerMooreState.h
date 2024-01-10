@@ -24,8 +24,8 @@ namespace sl {
 template <typename C>
 class BoyerMooreStateBase {
 protected:
-	sl::CircularBufferBase<C> m_tail;
 	uint64_t m_offset; // for reverse find, it's the (positive) offset from the end
+	sl::CircularBufferBase<C> m_tail;
 
 public:
 	BoyerMooreStateBase() {
@@ -110,9 +110,10 @@ typedef BoyerMooreStateBase<char> BoyerMooreBinState;
 
 class BoyerMooreTextState: public BoyerMooreStateBase<utf32_t> {
 protected:
-	sl::CircularBuffer m_binTail;
 	uint64_t m_binOffset;
-	enc::DecoderState m_decoderState;
+	sl::CircularBuffer m_binTail;
+	enc::DecoderState m_binTailDecoderState; // before bin-tail
+	enc::DecoderState m_decoderState;        // after bin-tail (i.e., at the offset of the next incoming byte)
 
 public:
 	utf32_t m_prefix; // freely adjustible
@@ -120,6 +121,8 @@ public:
 public:
 	BoyerMooreTextState() {
 		m_binOffset = 0;
+		m_binTailDecoderState = 0;
+		m_decoderState = 0;
 		m_prefix = 0;
 	}
 
@@ -178,6 +181,11 @@ public:
 	}
 
 	enc::DecoderState
+	getBinTailDecoderState() const {
+		return m_binTailDecoderState;
+	}
+
+	enc::DecoderState
 	getDecoderState() const {
 		return m_decoderState;
 	}
@@ -224,6 +232,7 @@ public:
 		BoyerMooreStateBase<utf32_t>::reset(charOffset);
 		m_binTail.clear();
 		m_binOffset = binOffset;
+		m_binTailDecoderState = 0;
 		m_decoderState = 0;
 		m_prefix = 0;
 	}
@@ -237,10 +246,12 @@ public:
 		size_t binOffset,
 		const void* bin,
 		size_t binSize,
+		enc::DecoderState binTailDecoderState,
 		enc::DecoderState decoderState
 	) {
 		m_offset += charOffset;
 		m_binOffset += binOffset;
+		m_binTailDecoderState = binTailDecoderState;
 		m_decoderState = decoderState;
 
 		size_t charTailLength = m_tail.getDataLength();
@@ -275,8 +286,6 @@ public:
 				ASSERT(result == binSize);
 			}
 		}
-
-		ASSERT(m_binTail.getDataSize() >= m_tail.getDataLength());
 	}
 
 protected:
@@ -287,12 +296,13 @@ protected:
 		uint64_t binOffset
 	) {
 		m_binOffset = binOffset;
+		m_binTailDecoderState = 0;
 		m_decoderState = 0;
 		m_prefix = 0;
 
 		return
 			BoyerMooreStateBase<utf32_t>::create(patternLength, charOffset) &&
-			m_binTail.create(patternLength * 4); // a codepoint takes up to 4 bytes
+			m_binTail.create(patternLength * 4); // a codepoint takes up to 4 bytes in all unicode encodings
 	}
 };
 

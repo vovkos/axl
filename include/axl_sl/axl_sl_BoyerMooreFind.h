@@ -197,7 +197,7 @@ typedef BoyerMooreBinFindBase<BoyerMooreReverseBinDetails>         BoyerMooreRev
 struct BoyerMooreTextFindResult {
 	uint64_t m_charOffset;
 	uint64_t m_binOffset;
-	uint64_t m_binEndOffset; // not necessarily the size needed to "properly" encode pattern!
+	uint64_t m_binEndOffset;
 
 	BoyerMooreTextFindResult() {
 		m_charOffset = -1;
@@ -233,6 +233,20 @@ public:
 		IsCaseFolded = Details::IsCaseFolded,
 		IsWholeWord  = Details::IsWholeWord,
 		IsReverse    = Details::IsReverse,
+	};
+
+protected:
+	struct LocateBinOffsetResult {
+		size_t m_offset;
+		enc::DecoderState m_decoderState;
+
+		LocateBinOffsetResult(
+			size_t offset,
+			enc::DecoderState decoderState
+		) {
+			m_offset = offset;
+			m_decoderState = decoderState;
+		}
 	};
 
 public:
@@ -276,10 +290,11 @@ public:
 	BoyerMooreTextFindResult
 	find(
 		const void* p,
-		size_t size
+		size_t size,
+		utf32_t replacementChar = enc::StdChar_Replacement
 	) const {
 		BoyerMooreTextState state(sl::StringRef_utf32(this->m_pattern, this->m_pattern.getCount()));
-		BoyerMooreTextFindResult result = find(&state, p, size);
+		BoyerMooreTextFindResult result = find(&state, p, size, replacementChar);
 		if (IsWholeWord && !result.isValid())
 			result = eof(&state);
 		return result;
@@ -289,7 +304,8 @@ public:
 	find(
 		BoyerMooreTextState* state,
 		const void* p0,
-		size_t size
+		size_t size,
+		utf32_t replacementChar = enc::StdChar_Replacement
 	) const {
 		ASSERT(state->getPatternLength() == this->m_pattern.getCount());
 
@@ -300,17 +316,15 @@ public:
 
 		while (p < end) {
 			utf32_t buffer[Details::DecoderBufferLength];
-			printf("+pendingLength: %d\n", Decoder::getPendingLength(decoderState));
 
 			typename Convert::Result convertResult = Convert::convert(
 				&decoderState,
 				buffer,
 				buffer + countof(buffer),
 				p,
-				end
+				end,
+				replacementChar
 			);
-
-			printf("-pendingLength: %d\n", Decoder::getPendingLength(decoderState));
 
 			const char* p2 = convertResult.m_src; // just a short alias
 			size_t srcLength = -(p - p2); // respect IsReverse
@@ -331,18 +345,21 @@ public:
 					return createFindResult(state, i, p, p2);
 			}
 
-			size_t binOffset = locateBinOffset(state, i, p, p2); // locate bin-offset of the prospective start of match
+			// locate bin-offset of the prospective start of match
+			LocateBinOffsetResult locateResult = locateBinOffset(state, i, p, p2);
 
 			state->advance<IsReverse>(
 				i,
 				buffer,
 				dstLength,
-				binOffset,
+				locateResult.m_offset,
 				p,
 				srcLength,
+				locateResult.m_decoderState,
 				decoderState
 			);
 
+			ASSERT(state->getBinTailSize() + Decoder::getPendingLength(locateResult.m_decoderState) >= state->getTailLength());
 			p = p2;
 		}
 
@@ -407,14 +424,14 @@ protected:
 	) const {
 		BoyerMooreTextFindResult result;
 		result.m_charOffset = state->getOffset() + i;
-		result.m_binOffset = state->getBinOffset() + locateBinOffset(state, i, p, end);
-		result.m_binEndOffset = state->getBinOffset() + locateBinOffset(state, i + this->m_pattern.getCount(), p, end);
+		result.m_binOffset = state->getBinOffset() + locateBinOffset(state, i, p, end).m_offset;
+		result.m_binEndOffset = state->getBinOffset() + locateBinOffset(state, i + this->m_pattern.getCount(), p, end).m_offset;
 		state->reset(result.m_charOffset, result.m_binOffset);
 		return result;
 	}
 
 	static
-	size_t
+	LocateBinOffsetResult
 	locateBinOffset(
 		const BoyerMooreTextState* state,
 		size_t i,
@@ -429,9 +446,9 @@ protected:
 		if (i > charTailLength)
 			decoderState = state->getDecoderState(); // well past tail; can skip tail search
 		else { // search tail first
+			decoderState = state->getBinTailDecoderState();
 			const char* front = state->getBinTailFront();
 			const char* back = state->getBinTailBack();
-			decoderState = 0;
 
 			if (front < back) // one continous chunk
 				result = IsReverse ?
@@ -454,7 +471,7 @@ protected:
 			}
 
 			if (result.m_dstLength >= i) // found in tail
-				return result.m_srcLength;
+				return LocateBinOffsetResult(result.m_srcLength, decoderState);
 
 			// otherwise, move on to the latest data
 		}
@@ -462,8 +479,7 @@ protected:
 		// search the latest data
 
 		result = Locate::locate(&decoderState, i - charTailLength, p, end);
-		size_t pending = enc::Utf8Decoder::getPendingLength(decoderState);
-		return binTailSize + result.m_srcLength;
+		return LocateBinOffsetResult(binTailSize + result.m_srcLength, decoderState);
 	}
 };
 
