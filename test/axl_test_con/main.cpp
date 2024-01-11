@@ -4867,64 +4867,194 @@ testBoyerMoore() {
 	sl::BoyerMooreTextFindResult textFindResult;
 
 	do {
-		unsigned char haystack[] = {
-			0x70, 0x08,
-			0x89, 0x48, 0x04, 0x8b, 0x0d, 0x5c, 0x90, 0x42,
-			0x00, 0x89, 0x08, 0xa3, 0x5c, 0x90, 0x42, 0x00,
-			0x33, 0xc0, 0xeb, 0x03, 0x83, 0xc8, 0xff, 0x5e,
-			0xc2, 0x08, 0x00, 0x83, 0xec, 0x14, 0x53, 0x55,
-			0x56, 0x8b, 0x35, 0x30, 0xec, 0x42, 0x00, 0x57,
-			0x6a, 0x03, 0xe8, 0x29, 0x29, 0x00, 0x00, 0x33,
-			0xdb, 0x3b, 0xc3, 0x74, 0x12, 0xff, 0xd0, 0x0f,
-			0xb7, 0xc0, 0x50, 0x68, 0x00, 0x50, 0x43, 0x00,
-			0xe8, 0xe1, 0x24, 0x00, 0x00, 0xeb, 0x4a, 0xbf,
-			0xa0, 0xa0, 0x42, 0x00, 0x53, 0x57, 0x53, 0x68,
-			0x24, 0x73, 0x40, 0x00, 0x68, 0x01, 0x00, 0x00,
-			0x80, 0xc7, 0x05, 0x00, 0x50, 0x43, 0x00, 0x30,
-			0x78, 0x00, 0x00, 0xe8, 0x47, 0x24, 0x00, 0x00,
-			0x38, 0x1d, 0xa0, 0xa0, 0x42, 0x00, 0x75, 0x16,
-			0x53, 0x57, 0x68, 0x42, 0x73, 0x40, 0x00, 0x68,
-			0xfc, 0x72, 0x40, 0x00, 0x68, 0x03, 0x00, 0x00,
-			0x80, 0xe8, 0x29, 0x24, 0x00, 0x00, 0x57, 0x68,
-			0x00, 0x50, 0x43, 0x00, 0xe8, 0x53, 0x25, 0x00,
-			0x00, 0xe8, 0x4e, 0x02, 0x00, 0x00, 0xa1, 0x38,
-			0xec, 0x42, 0x00, 0xbd, 0x00, 0x44, 0x43, 0x00,
-			0x83, 0xe0, 0x20, 0x55, 0xa3, 0xa0, 0xec, 0x42,
-			0x00, 0xc7, 0x05, 0xbc, 0xec, 0x42, 0x00, 0x00,
-			0x00, 0x01, 0x00, 0xe8, 0xe4, 0x20, 0x00, 0x00,
-			0x85, 0xc0, 0x0f, 0x85, 0x81, 0x00, 0x00, 0x00,
-			0x8b, 0x4e, 0x48, 0x3b, 0xcb, 0x74, 0x7a, 0x8b,
-			0x56, 0x4c, 0xa1, 0x58, 0xec, 0x42, 0x00, 0xbf,
-			0xc0, 0xdb, 0x42, 0x00, 0x53, 0x03, 0xd0, 0x57,
-			0x03, 0xc8, 0x52, 0x51, 0xff, 0x76, 0x44, 0xe8,
-			0xcb, 0x23, 0x00, 0x00, 0xa0, 0xc0, 0xdb, 0x42,
-			0x00, 0x3a, 0xc3, 0x74, 0x54, 0x3c, 0x22, 0x75,
-			0x0f, 0xbf, 0xc1, 0xdb, 0x42, 0x00, 0x6a, 0x22,
-			0x57, 0xe8, 0xe8, 0x1f, 0x00, 0x00, 0x88, 0x18,
+		const char* fileName = "E:/release-archive/tide/tide-5-04-50.exe";
+		// const char* fileName = "C:/log-markup-test.bin";
 
-			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		io::SimpleMappedFile file;
+		result = file.open(fileName, io::FileFlag_ReadOnly);
+		if (!result) {
+			printf("file error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		size_t size = file.getMappingSize();
+		size = 0x30000;
+
+		const char* p0 = (char*)file.p();
+		const char* end0 = p0 + size;
+
+		p0 += 0x20000;
+		p0 += 16 * 1024;
+		p0 += 8 * 1024;
+		p0 += 4 * 1024;
+		p0 += 2 * 1024;
+		p0 += 1 * 1024;
+		p0 += 512;
+		p0 += 128;
+		p0 += 64;
+
+		end0 -= 16;
+		end0 -= 256;
+		end0 -= 32 * 1024;
+
+		// printf("%s\n", enc::HexEncoding::encode(p0, end0 - p0, enc::HexEncodingFlag_Multiline).sz());
+
+		uint8_t a0[] = { 0x56, 0x33, 0xf6, 0x83, 0xf9 };
+
+		uint8_t a1[] = {
+			0x69, 0xc6, 0xbd, 0x85, 0xa4, 0xcc, 0xf7,
 		};
 
-		utf32_t buffer[4 * 1024];
-		enc::ConvertResult<utf32_t, utf8_t> result = enc::Convert<enc::Utf32, enc::Utf8>::convert_u(
-			buffer,
-			(char*)haystack,
-			(char*)haystack + 0xfe
-		);
+		uint8_t a[] = {
+			0xce, 0xe6, 0xfa, 0x6e,  0xba, 0x46, 0xab, 0xef,
+			0x95, 0xbf, 0xa4, 0xbe,  0xb3, 0xaf, 0xf9, 0xd5,
+		};
 
-		size_t dstLength = result.m_dst - buffer;
-		size_t srcLength = result.m_src - (char*)haystack;
+		p0 = (char*)a;
+		end0 = p0 + sizeof(a);
 
-		enc::ConvertLengthResult result2 = enc::Locate<enc::Utf8>::locate(
-			0xfc,
-			(char*)haystack,
-			(char*)haystack + sizeof(haystack)
-		);
+		const char* p;
+		const char* end;
+		uint64_t offset;
 
 		sl::StringRef needle = "Mic";
+
+		struct Range {
+			uint64_t m_from;
+			uint64_t m_to;
+		};
+
+		enum {
+			ChunkSize = 1
+		};
+
+		sl::BoyerMooreTextState state;
+		state.create(needle);
+
+		sl::Array<Range> forward;
+		sl::Array<Range> backward;
+		sl::Array<Range> forward2;
+		sl::Array<Range> backward2;
+
+		/*printf("forward as a whole\n");
 		sl::BoyerMooreCaseFoldedTextFind_utf8 find(needle);
-		textFindResult = find.find(haystack, sizeof(haystack));
-		printf("text forward find result: %d\n", textFindResult.m_binOffset);
+		p = p0;
+		end = end0;
+		offset = 0;
+
+		for (;;) {
+			textFindResult = find.find(p, end - p);
+			if (textFindResult.m_binOffset == -1) {
+				printf("not found\n");
+				break;
+			}
+
+			Range range = { offset + textFindResult.m_binOffset, offset + textFindResult.m_binEndOffset };
+			forward.append(range);
+
+			printf("found at: 0x%llx: 0x%llx\n", range.m_from, range.m_to);
+			p += textFindResult.m_binEndOffset;
+			offset += textFindResult.m_binEndOffset;
+		} */
+
+		printf("backward as a whole\n");
+		sl::BoyerMooreReverseTextFind_utf8 rfind(needle);
+		p = p0;
+		end = end0;
+		offset = end0 - p0;
+
+		for (;;) {
+			textFindResult = rfind.find(p, end - p);
+			if (textFindResult.m_binOffset == -1) {
+				printf("not found\n");
+				break;
+			}
+
+			Range range = { offset - textFindResult.m_binEndOffset, offset - textFindResult.m_binOffset };
+			backward.append(range);
+
+			printf("found at: 0x%llx: 0x%llx\n", range.m_from, range.m_to);
+			end -= textFindResult.m_binEndOffset;
+			offset -= textFindResult.m_binEndOffset;
+		}
+
+		backward.reverse();
+		/*
+		printf("forward in chunks\n");
+		sl::BoyerMooreCaseFoldedTextFind_utf8 find2(needle);
+		p = p0;
+		end = end0;
+		state.reset(0, 0);
+
+		while (p < end) {
+			size_t chunkSize = end - p;
+			if (chunkSize > ChunkSize)
+				chunkSize = ChunkSize;
+
+			textFindResult = find2.find(&state, p, chunkSize);
+			if (textFindResult.m_binOffset == -1) {
+				p += chunkSize;
+				continue;
+			}
+
+			Range range = { textFindResult.m_binOffset, textFindResult.m_binEndOffset };
+			forward2.append(range);
+
+			printf("found at: 0x%llx: 0x%llx\n", range.m_from, range.m_to);
+			p = p0 + range.m_to;
+			state.reset(0, textFindResult.m_binEndOffset);
+		}
+
+		printf("backward in chunks\n");
+		sl::BoyerMooreCaseFoldedReverseTextFind_utf8 rfind2(needle);
+		p = p0;
+		end = end0;
+		state.reset();
+		offset = end0 - p0;
+
+		while (p < end) {
+			size_t chunkSize = end - p;
+			if (chunkSize > ChunkSize)
+				chunkSize = ChunkSize;
+
+			textFindResult = rfind2.find(&state, end - chunkSize, chunkSize);
+			if (textFindResult.m_binOffset == -1) {
+				end -= chunkSize;
+				continue;
+			}
+
+			Range range = { offset - textFindResult.m_binEndOffset, offset - textFindResult.m_binOffset };
+			backward2.append(range);
+
+			printf("found at: 0x%llx: 0x%llx\n", range.m_from, range.m_to);
+			offset -= textFindResult.m_binEndOffset;
+			end = p0 + range.m_from;
+			state.reset();
+		}
+
+		backward2.reverse();
+
+		size_t count1 = forward.getCount();
+		size_t count2 = backward.getCount();
+		size_t count3 = forward2.getCount();
+		size_t count4 = backward2.getCount();
+		int cmp12 = memcmp(forward, backward, AXL_MIN(count1, count2) * sizeof(Range));
+		int cmp13 = memcmp(forward, forward2, AXL_MIN(count1, count3) * sizeof(Range));
+		int cmp14 = memcmp(forward, backward2, AXL_MIN(count1, count4) * sizeof(Range));
+
+		printf(
+			"count1: %d count2: %d count3: %d count4: %d memcmp12: %d memcmp13: %d memcmp14: %d",
+			count1,
+			count2,
+			count3,
+			count4,
+			cmp12,
+			cmp13,
+			cmp14
+		);
+
+		ASSERT(count1 == count2 && count1 == count3 && count1 == count4);
+		ASSERT(!cmp12 && !cmp13 && !cmp14); */
 	} while (0);
 
 	return;
@@ -7388,10 +7518,13 @@ testUtf8() {
 
 		int cmp = memcmp(forward, backward, AXL_MIN(count1, count2) * sizeof(utf32_t));
 		printf("count1: %zd, count2: %zd, memcmp: %d\n", count1, count2, cmp);
-		return;
+
+		ASSERT(count1 == count2 && !cmp);
 	} while (0);
 
-	{
+	return;
+
+	do {
 		Emitter_utf8 emitter;
 
 		printf("forward...\n");
@@ -7399,9 +7532,9 @@ testUtf8() {
 
 		printf("backward...\n");
 		enc::Utf8::ReverseDecoder::decode(emitter, (utf8_t*)g_data + sizeof(g_data) - 1, (utf8_t*)g_data - 1);
+	} while (0);
 
-		return;
-	}
+	return;
 
 	uint32_t prevState = UTF8_ACCEPT;
 	uint32_t state = UTF8_ACCEPT;
@@ -8843,8 +8976,8 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	utf::testUtf8();
-	//testBoyerMoore();
+	// utf::testUtf8();
+	testBoyerMoore();
 	return 0;
 }
 

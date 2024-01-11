@@ -315,7 +315,7 @@ public:
 		enc::DecoderState decoderState = state->getDecoderState();
 
 		while (p < end) {
-			utf32_t buffer[Details::DecoderBufferLength];
+			utf32_t buffer[8]; // Details::DecoderBufferLength];
 
 			typename Convert::Result convertResult = Convert::convert(
 				&decoderState,
@@ -331,6 +331,14 @@ public:
 			size_t dstLength = convertResult.m_dst - buffer;
 			size_t fullLength = state->getTailLength() + dstLength;
 			size_t i;
+
+			printf(
+				"dstLength: %d srcLength: %d pending: %d ",
+				dstLength,
+				srcLength,
+				Decoder::getPendingLength(decoderState)
+			);
+
 
 			BoyerMooreTextAccessor accessor(state, buffer);
 
@@ -359,7 +367,16 @@ public:
 				decoderState
 			);
 
-			ASSERT(state->getBinTailSize() + Decoder::getPendingLength(locateResult.m_decoderState) >= state->getTailLength());
+			printf("i: %d locate-bin: %d pre-bin-tail: %d bin-tail: %d post-bin-tail: %d tail: %d\n",
+				i,
+				locateResult.m_offset,
+				Decoder::getPendingLength(locateResult.m_decoderState),
+				state->getBinTailSize(),
+				Decoder::getPendingLength(decoderState),
+				state->getTailLength()
+			);
+
+ 			ASSERT(state->getBinTailSize() + Decoder::getPendingLength(locateResult.m_decoderState) >= state->getTailLength());
 			p = p2;
 		}
 
@@ -438,14 +455,18 @@ protected:
 		const char* p,
 		const char* end
 	) {
-		enc::ConvertLengthResult result;
 		enc::DecoderState decoderState;
-		size_t charTailLength = state->getTailLength();
+		enc::ConvertLengthResult result;
+
+		size_t tailLength = state->getTailLength();
 		size_t binTailSize = state->getBinTailSize();
 
-		if (i > charTailLength)
-			decoderState = state->getDecoderState(); // well past tail; can skip tail search
-		else { // search tail first
+		if (!binTailSize)
+			decoderState = state->getDecoderState();
+		else {
+			// important! always start search from the tail -- even if i > tailLength
+			// pending CUs in the decoder state could compensate for the missing chars in the char tail
+
 			decoderState = state->getBinTailDecoderState();
 			const char* front = state->getBinTailFront();
 			const char* back = state->getBinTailBack();
@@ -455,29 +476,33 @@ protected:
 					Locate::locate(&decoderState, i, back - 1, front - 1) :
 					Locate::locate(&decoderState, i, front, back);
 			else { // two disjoint chunks
-				p = state->getBinTailBuffer();
-				end = state->getBinTailBufferEnd();
+				const char* buffer = state->getBinTailBuffer();
+				const char* bufferEnd = state->getBinTailBufferEnd();
 
 				if (IsReverse) {
-					result = Locate::locate(&decoderState, i, back - 1, p - 1); // back first
-					if (result.m_dstLength < i) // not found; search front now
-						result = Locate::locate(&decoderState, i, end - 1, front - 1);
+					result = Locate::locate(&decoderState, i, back - 1, buffer - 1); // back first
+					if (result.m_dstLength < i) { // not yet; search front now
+						enc::ConvertLengthResult result2 = Locate::locate(&decoderState, i - result.m_dstLength, bufferEnd - 1, front - 1);
+						result.m_dstLength += result2.m_dstLength;
+						result.m_srcLength += result2.m_srcLength;
+					}
 				} else {
-					result = Locate::locate(&decoderState, i, front, end); // front first
-					if (result.m_dstLength < i) // not found; search back now
-						result = Locate::locate(&decoderState, i, p, back);
+					result = Locate::locate(&decoderState, i, front, bufferEnd); // front first
+					if (result.m_dstLength < i) { // not found; search back now
+						enc::ConvertLengthResult result2 = Locate::locate(&decoderState, i - result.m_dstLength, buffer, back);
+						result.m_dstLength += result2.m_dstLength;
+						result.m_srcLength += result2.m_srcLength;
+					}
 				}
 			}
 
 			if (result.m_dstLength >= i) // found in tail
 				return LocateBinOffsetResult(result.m_srcLength, decoderState);
 
-			// otherwise, move on to the latest data
+			// not yet, search the latest data
 		}
 
-		// search the latest data
-
-		result = Locate::locate(&decoderState, i - charTailLength, p, end);
+		result = Locate::locate(&decoderState, i - tailLength, p, end);
 		return LocateBinOffsetResult(binTailSize + result.m_srcLength, decoderState);
 	}
 };
