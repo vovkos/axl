@@ -457,7 +457,6 @@ protected:
 			else { // two disjoint chunks
 				p = state->getBinTailBuffer();
 				end = state->getBinTailBufferEnd();
-				enc::DecoderState decoderState = 0;
 
 				if (IsReverse) {
 					result = Locate::locate(&decoderState, i, back - 1, p - 1); // back first
