@@ -93,6 +93,7 @@ public:
 		State_ReadyPair         = 6 * CcCount,  // 24 - codepoint is ready (surrogate pair)
 
 		State_ErrorBit          = 1 * CcCount,  // 4  - invalid sequence bit
+		State_IndexMask         = -1,
 	};
 
 	enum {
@@ -144,6 +145,7 @@ public:
 		State_ReadyPair         = 6 * CcCount,  // 24 - codepoint is ready (surrogate pair)
 
 		State_ErrorBit          = 1 * CcCount,  // 4  - invalid sequence bit
+		State_IndexMask         = -1,
 	};
 
 	enum {

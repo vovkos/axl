@@ -30,13 +30,14 @@ public:
 	typedef UtfDfa<Utf32sDfaBase<IsBigEndian>, Utf32sDfaRoot> BaseType;
 
 	enum State {
-		State_Start    = 0,
-		State_1        = 1,
-		State_2        = 2,
-		State_3        = 3,
-		State_Ready    = 4,
+		State_Start     = 0,
+		State_1         = 1,
+		State_2         = 2,
+		State_3         = 3,
+		State_Ready     = 4,
 
-		State_ErrorBit = 0,  // never yield errors
+		State_ErrorBit  = 0,  // never yield errors
+		State_IndexMask = -1,
 	};
 
 public:

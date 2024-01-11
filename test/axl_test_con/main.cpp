@@ -7209,6 +7209,188 @@ typedef Emitter<utf16_t> Emitter_utf16;
 
 void
 testUtf8() {
+	do {
+		enum {
+			BufferSize = 1024
+		};
+
+		utf32_t buffer[BufferSize];
+
+		// const char* fileName = "C:/log-markup-test-2.bin";
+		const char* fileName = "e:/release-archive/tide/tide-5-04-50.exe";
+
+		printf("");
+
+		sl::Array<utf32_t> forward;
+		sl::Array<utf32_t> backward;
+
+		io::SimpleMappedFile file;
+		file.open(fileName);
+		size_t size = file.getMappingSize();
+
+
+		const char* p0 = (char*)file.p();
+		const char* end0 = p0 + size;
+
+		unsigned char a0[] = {
+			0x13, 0x8b, 0x8e, 0xa0, 0x9b,
+		};
+
+		unsigned char a1[] = {
+			0xcc, 0x00, 0x0f, 0x84, 0x51, 0x02,
+		};
+
+		unsigned char a2[] = {
+			0x85, 0xff, 0x0f, 0x85,  0x91, 0x00, 0x00, 0x00,
+		};
+
+		unsigned char a3[] = {
+			0x84, 0x90, 0xf9, 0xff,  0xff, 0x8b, 0x7d, 0xd4,
+		};
+
+		unsigned char a[] = {
+			0x13, 0x8b, 0x8e, 0xa0,  0x9b, 0x00, 0x00, 0x2b,
+		};
+
+		// p0 = (char*)a;
+		// end0 = p0 + sizeof(a);
+
+		enc::DecoderState state = 0;
+		const char* p = p0;
+		const char* end = end0;
+
+		struct PendingCuEmitter {
+			utf32_t* m_p;
+
+			void
+			emitCu(
+				const char* p,
+				utf32_t c
+			) {
+				*m_p++ = c;
+			}
+		};
+
+		PendingCuEmitter pendingCuEmitter;
+
+#define _PRINT_EMITTER 0
+#if (_PRINT_EMITTER)
+		struct PrintEmitter {
+			intptr_t m_delta;
+
+			PrintEmitter() {
+				m_delta = 0;
+			}
+
+			bool
+			canEmit() {
+				return true;
+			}
+
+			void
+			emitCp(
+				const char* p,
+				utf32_t c
+			) {
+				printf("emitCp(%p, 0x%02x)\n", p + m_delta, (uint32_t)c);
+			}
+
+			void
+			emitCu(
+				const char* p,
+				utf32_t c
+			) {
+				printf("emitCu(%p, 0x%02x)\n", p + m_delta, (uint32_t)c);
+			}
+
+			void
+			emitCpAfterCu(
+				const char* p,
+				utf32_t c
+			) {
+				printf("emitCpAfterCu(%p, 0x%02x)\n", p + m_delta, (uint32_t)c);
+			}
+		};
+
+		PrintEmitter printEmitter;
+
+		printf("forward:\n");
+		printEmitter.m_delta = -1;
+		enc::Utf8Decoder::decode(&state, printEmitter, p, end);
+		enc::Utf8Decoder::emitPendingCus(state, printEmitter, end);
+		state = 0;
+		printf("---\n");
+#endif
+
+		state = 0;
+		while (p < end) {
+			enc::ConvertResult<utf32_t, utf8_t> result = enc::Convert<
+				enc::Utf32,
+				enc::Utf8,
+				sl::Nop<utf32_t>,
+				enc::Utf8::Decoder
+			>::convert(
+				&state,
+				buffer,
+				buffer + countof(buffer),
+				p,
+				end
+			);
+
+			forward.append(buffer, result.m_dst - buffer);
+			p = result.m_src;
+		}
+
+		pendingCuEmitter.m_p = buffer;
+		enc::Utf8Decoder::emitPendingCus(state, pendingCuEmitter, p);
+		forward.append(buffer, pendingCuEmitter.m_p - buffer);
+
+		state = 0;
+		p = end0 - 1;
+		end = p0 - 1;
+
+#if (_PRINT_EMITTER)
+		printf("backward:\n");
+		printEmitter.m_delta = 1;
+		enc::Utf8ReverseDecoder::decode(&state, printEmitter, p, end);
+		enc::Utf8ReverseDecoder::emitPendingCus(state, printEmitter, end);
+		state = 0;
+		printf("---\n");
+#endif
+
+		state = 0;
+
+		while (p > end) {
+			enc::ConvertResult<utf32_t, utf8_t> result = enc::Convert<
+				enc::Utf32,
+				enc::Utf8,
+				sl::Nop<utf32_t>,
+				enc::Utf8::ReverseDecoder
+			>::convert(
+				&state,
+				buffer,
+				buffer + countof(buffer),
+				p,
+				end
+			);
+
+			backward.append(buffer, result.m_dst - buffer);
+			p = result.m_src;
+		}
+
+		pendingCuEmitter.m_p = buffer;
+		enc::Utf8ReverseDecoder::emitPendingCus(state, pendingCuEmitter, p);
+		backward.append(buffer, pendingCuEmitter.m_p - buffer);
+
+		size_t count1 = forward.getCount();
+		size_t count2 = backward.getCount();
+		backward.reverse();
+
+		int cmp = memcmp(forward, backward, AXL_MIN(count1, count2) * sizeof(utf32_t));
+		printf("count1: %zd, count2: %zd, memcmp: %d\n", count1, count2, cmp);
+		return;
+	} while (0);
+
 	{
 		Emitter_utf8 emitter;
 
@@ -8661,7 +8843,8 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	testBoyerMoore();
+	utf::testUtf8();
+	//testBoyerMoore();
 	return 0;
 }
 

@@ -152,17 +152,18 @@ public:
 		State_Error       = 13 * CcCount,  // 104 - invalid sequence
 		State_Ready       = 14 * CcCount,  // 112 - codepoint is ready
 		State_Ready_Error = 15 * CcCount,  // 120 - codepoint is ready (with error)
+		State__Count      = 16,
 
 		State_ErrorBit    = 1 * CcCount,   // 8   - invalid sequence bit
+		State_IndexMask   = -1,
 	};
 
 	enum {
-		StateCount = 16,
 	};
 
 protected:
-	static const uchar_t m_dfa[StateCount * CcCount];
-	static const uchar_t m_pendingLengthTable[StateCount];
+	static const uint8_t m_dfa[State__Count * CcCount];
+	static const uint_t m_pendingLengthTable[State__Count];
 
 public:
 	Utf8Dfa() {}
@@ -243,27 +244,27 @@ protected:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-AXL_SELECT_ANY const uchar_t Utf8Dfa::m_dfa[] = {
+AXL_SELECT_ANY const uint8_t Utf8Dfa::m_dfa[] = {
 //  00..0f             80..bf       c0..df            e0..ef           f0..f7           f8..ff
-	State_Ready,       State_Error, State_1_2,        State_1_3,       State_1_4,       State_Error,  0, 0,  // 0   - State_Start
-	0,                 0,           0,                0,               0,               0,            0, 0,  // 8   - unused
-	State_Ready_Error, State_Ready, State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 16  - State_1_2
-	State_Ready_Error, State_Ready, State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 24  - State_1_2_Error
-	State_Ready_Error, State_2_3,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 32  - State_1_3
-	State_Ready_Error, State_2_3,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 40  - State_1_3_Error
-	State_Ready_Error, State_Ready, State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 48  - State_2_3
-	0,                 0,           0,                0,               0,               0,            0, 0,  // 56  - unused
-	State_Ready_Error, State_2_4,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 64  - State_1_4
-	State_Ready_Error, State_2_4,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 72  - State_1_4_Error
-	State_Ready_Error, State_3_4,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 80  - State_2_4
-	0,                 0,           0,                0,               0,               0,            0, 0,  // 88  - unused
-	State_Ready_Error, State_Ready, State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 96  - State_3_4
-	State_Ready,       State_Error, State_1_2,        State_1_3,       State_1_4,       State_Error,  0, 0,  // 104 - State_Error
-	State_Ready,       State_Error, State_1_2,        State_1_3,       State_1_4,       State_Error,  0, 0,  // 112 - State_Ready
-	State_Ready,       State_Error, State_1_2,        State_1_3,       State_1_4,       State_Error,  0, 0,  // 120 - State_Ready_Error
+	State_Ready,       State_Error, State_1_2,        State_1_3,       State_1_4,       State_Error,  0, 0,  // 0  - State_Start
+	0,                 0,           0,                0,               0,               0,            0, 0,  // 1  - unused
+	State_Ready_Error, State_Ready, State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 2  - State_1_2
+	State_Ready_Error, State_Ready, State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 3  - State_1_2_Error
+	State_Ready_Error, State_2_3,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 4  - State_1_3
+	State_Ready_Error, State_2_3,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 5  - State_1_3_Error
+	State_Ready_Error, State_Ready, State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 6  - State_2_3
+	0,                 0,           0,                0,               0,               0,            0, 0,  // 7  - unused
+	State_Ready_Error, State_2_4,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 8  - State_1_4
+	State_Ready_Error, State_2_4,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 9  - State_1_4_Error
+	State_Ready_Error, State_3_4,   State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 10 - State_2_4
+	0,                 0,           0,                0,               0,               0,            0, 0,  // 11 - unused
+	State_Ready_Error, State_Ready, State_1_2_Error,  State_1_3_Error, State_1_4_Error, State_Error,  0, 0,  // 12 - State_3_4
+	State_Ready,       State_Error, State_1_2,        State_1_3,       State_1_4,       State_Error,  0, 0,  // 12 - State_Error
+	State_Ready,       State_Error, State_1_2,        State_1_3,       State_1_4,       State_Error,  0, 0,  // 14 - State_Ready
+	State_Ready,       State_Error, State_1_2,        State_1_3,       State_1_4,       State_Error,  0, 0,  // 15 - State_Ready_Error
 };
 
-AXL_SELECT_ANY const uchar_t Utf8Dfa::m_pendingLengthTable[] = {
+AXL_SELECT_ANY const uint_t Utf8Dfa::m_pendingLengthTable[] = {
 	0,  // 0   - State_Start
 	0,  // 8   - unused
 	1,  // 16  - State_1_2
@@ -345,29 +346,44 @@ Utf8Dfa::decode(uchar_t c) {
 
 */
 
+// states stores pre-calculated values for all necessary shifts
+
+#define AXL_ENC_MAKE_UTF8R_STATE(row, pending, errors) ( \
+	(pending) | \
+	((row) * CcCount) | \
+	(((pending) * 6) << 8) | \
+	(((pending) ? ((pending) - 1) * 6 : 0) << 16) | \
+	(((errors) * 6) << 24) \
+)
+
 class Utf8ReverseDfa: public UtfDfa<Utf8ReverseDfa, Utf8CcMap> {
 public:
 	enum {
 		IsReverse = true,
 	};
 
-	// don't pre-multiply state values because we need state bits
-	// for branchless codepoint calculations; right-shifting would
-	// kill all the benefits of pre-multiplication
-
 	enum State {
-		State_Start         = 0,   // start state
-		State_Cb_1          = 2,   // 1st continuation byte
-		State_Cb_2          = 4,   // 2nd continuation byte
-		State_Cb_3          = 6,   // 3rd continuation byte
-		State_Cb_3_Error    = 7,   // 3rd continuation byte (with error)
-		State_Error         = 9,   // invalid sequence
-		State_Ready         = 10,  // codepoint is ready
-		State_Ready_Error   = 11,  // codepoint is ready (with error)
-		State_Ready_Error_2 = 13,  // codepoint is ready (with double error)
-		State_Ready_Error_3 = 15,  // codepoint is ready (with triple error)
+		State_Start         = AXL_ENC_MAKE_UTF8R_STATE(0,  0,  0),  // 0x00000000 - start state
+		State_Error         = AXL_ENC_MAKE_UTF8R_STATE(1,  0,  0),  // 0x00000008 - invalid sequence
+		State_Cb_1          = AXL_ENC_MAKE_UTF8R_STATE(2,  1,  0),  // 0x00000611 - 1st continuation byte
+		State_Error_1       = AXL_ENC_MAKE_UTF8R_STATE(3,  0,  1),  // 0x06000018 - invalid sequence (with error CU)
+		State_Cb_2          = AXL_ENC_MAKE_UTF8R_STATE(4,  2,  0),  // 0x00060c22 - 2nd continuation byte
+		State_Error_2       = AXL_ENC_MAKE_UTF8R_STATE(5,  0,  2),  // 0x0c000028 - invalid sequence (with double error CU)
+		State_Cb_3          = AXL_ENC_MAKE_UTF8R_STATE(6,  3,  0),  // 0x000c1233 - 3rd continuation byte
+		State_Cb_3_Error    = AXL_ENC_MAKE_UTF8R_STATE(7,  3,  1),  // 0x060c123b - 3rd continuation byte (with error CU)
+		State_Error_3       = AXL_ENC_MAKE_UTF8R_STATE(9,  0,  3),  // 0x12000048 - invalid sequence (with triple error CU)
+		State_Ready         = AXL_ENC_MAKE_UTF8R_STATE(10, 0,  0),  // 0x00000050 - codepoint is ready
+		State_Ready_Error   = AXL_ENC_MAKE_UTF8R_STATE(11, 0,  1),  // 0x06000058 - codepoint is ready (with error CU)
+		State_Ready_Error_2 = AXL_ENC_MAKE_UTF8R_STATE(13, 0,  2),  // 0x0c000068 - codepoint is ready (with double error CU)
+		State_Ready_Error_3 = AXL_ENC_MAKE_UTF8R_STATE(15, 0,  3),  // 0x12000078 - codepoint is ready (with triple error CU)
+		State__Count        = 16,
 
-		State_ErrorBit      = 1,   // invalid sequence bit
+		State_ErrorBit         = 1 * CcCount,   // 8   - invalid sequence bit
+		State_IndexMask        = 0x0f * CcCount,
+		State_CbCountMask      = 0x03,
+		State_CbLoadMask       = 0x0000ff00,
+		State_CbStoreMask      = 0x00ff0000,
+		State_ErrorCbCountMask = 0xff000000,
 	};
 
 	enum {
@@ -375,8 +391,8 @@ public:
 	};
 
 protected:
-	static const uchar_t m_dfa[StateCount * CcCount];
-	static const uchar_t m_pendingLengthTable[StateCount];
+	static const uint32_t m_dfa[StateCount * CcCount];
+	static const uint32_t m_stateDb[StateCount];
 	uint_t m_acc;
 
 public:
@@ -391,12 +407,12 @@ public:
 	static
 	size_t
 	getPendingLength(DecoderState storage) {
-		return m_pendingLengthTable[extractState(storage)];
+		return extractState(storage) & State_CbCountMask;
 	}
 
 	size_t
 	getPendingLength() const {
-		return m_pendingLengthTable[m_state];
+		return m_state & State_CbCountMask;
 	}
 
 	void
@@ -407,13 +423,13 @@ public:
 
 	void
 	load(uint32_t storage) {
-		m_state = storage >> 24;
+		m_state = m_stateDb[((storage >> 24) & State_IndexMask) / CcCount];
 		m_acc = storage & 0x00ffffff;
 	}
 
 	uint32_t
 	save() const {
-		return (m_state << 24) | (m_acc & 0x00ffffff);
+		return (m_state << 24) | m_acc; // the hi-byte of acc is always zero
 	}
 
 	Utf8ReverseDfa
@@ -451,6 +467,38 @@ public:
 		}
 	}
 
+	template <typename Emitter>
+	void
+	emitErrorPendingCus(
+		uint_t nextState,
+		Emitter& emitter,
+		const utf8_t* p
+	) {
+		switch (nextState) {
+		case State_Error_1:
+		case State_Ready_Error:
+			emitter.emitCu(p, 0x80 | (m_acc & 0x3f));
+			break;
+
+		case State_Error_2:
+		case State_Ready_Error_2:
+			emitter.emitCu(p + 1, 0x80 | (m_acc & 0x3f));
+			emitter.emitCu(p, 0x80 | ((m_acc >> 6) & 0x3f));
+			break;
+
+		case State_Error_3:
+		case State_Ready_Error_3:
+			emitter.emitCu(p + 2, 0x80 | (m_acc & 0x3f));
+			emitter.emitCu(p + 1, 0x80 | ((m_acc >> 6) & 0x3f));
+			emitter.emitCu(p, 0x80 | ((m_acc >> 12) & 0x3f));
+			break;
+
+		case State_Cb_3_Error:
+			emitter.emitCu(p + 2, 0x80 | (m_acc & 0x3f));
+			break;
+		}
+	}
+
 protected:
 	Utf8ReverseDfa(
 		uint_t state,
@@ -464,69 +512,62 @@ protected:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-AXL_SELECT_ANY const uchar_t Utf8ReverseDfa::m_dfa[] = {
-//  00..0f               80..bf            c0..df               e0..ef             f0..f7       f8..ff
-	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error, State_Error,  0, 0,  // 0  - State_Start
-	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 1  - unused
-	State_Ready_Error,   State_Cb_2,       State_Ready,         State_Error,       State_Error, State_Error,  0, 0,  // 2  - State_Cb_1
-	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 3  - unused
-	State_Ready_Error_2, State_Cb_3,       State_Ready_Error,   State_Ready,       State_Error, State_Error,  0, 0,  // 4  - State_Cb_2
-	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 5  - unused
-	State_Ready_Error_3, State_Cb_3_Error, State_Ready_Error_2, State_Ready_Error, State_Ready, State_Error,  0, 0,  // 6  - State_Cb_3
-	State_Ready_Error_3, State_Cb_3_Error, State_Ready_Error_2, State_Ready_Error, State_Ready, State_Error,  0, 0,  // 7  - State_Cb_3_Error
-	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 8  - unused
-	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error, State_Error,  0, 0,  // 9  - State_Error
-	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error, State_Error,  0, 0,  // 10 - State_Ready
-	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error, State_Error,  0, 0,  // 11 - State_Ready_Error
-	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 12 - unused
-	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error, State_Error,  0, 0,  // 13 - State_Ready_Error_2
-	0,                   0,                0,                   0,                 0,           0,            0, 0,  // 14 - unused
-	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error, State_Error,  0, 0,  // 15 - State_Ready_Error_3
+AXL_SELECT_ANY const uint32_t Utf8ReverseDfa::m_stateDb[StateCount] = {
+	State_Start,         // 0
+	State_Error,         // 1
+	State_Cb_1,          // 2
+	State_Error_1,       // 3
+	State_Cb_2,          // 4
+	State_Error_2,       // 5
+	State_Cb_3,          // 6
+	State_Cb_3_Error,    // 7
+	0,                   // 8
+	State_Error_3,       // 9
+	State_Ready,         // 10
+	State_Ready_Error,   // 11
+	0,                   // 12
+	State_Ready_Error_2, // 13
+	0,                   // 14
+	State_Ready_Error_3, // 15
 };
 
-AXL_SELECT_ANY const uchar_t Utf8ReverseDfa::m_pendingLengthTable[] = {
-	0,  // 0  - State_Start
-	0,  // 1  - unused
-	1,  // 2  - State_Cb_1
-	0,  // 3  - unused
-	2,  // 4  - State_Cb_2
-	0,  // 5  - unused
-	3,  // 6  - State_Cb_3
-	3,  // 7  - State_Cb_3_Error
-	0,  // 8  - unused
-	0,  // 9  - State_Error
-	0,  // 10 - State_Ready
-	0,  // 11 - State_Ready_Error
-	0,  // 12 - unused
-	0,  // 13 - State_Ready_Error_2
-	0,  // 14 - unused
-	0,  // 15 - State_Ready_Error_3
+AXL_SELECT_ANY const uint32_t Utf8ReverseDfa::m_dfa[] = {
+//  00..0f               80..bf            c0..df               e0..ef             f0..f7         f8..ff
+	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error,   State_Error,   0, 0,  // 0  - State_Start
+	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error,   State_Error,   0, 0,  // 1  - State_Error
+	State_Ready_Error,   State_Cb_2,       State_Ready,         State_Error_1,     State_Error_1, State_Error_1, 0, 0,  // 2  - State_Cb_1
+	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error,   State_Error,   0, 0,  // 3  - State_Error_1
+	State_Ready_Error_2, State_Cb_3,       State_Ready_Error,   State_Ready,       State_Error_2, State_Error_2, 0, 0,  // 4  - State_Cb_2
+	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error,   State_Error,   0, 0,  // 5  - State_Error_2
+	State_Ready_Error_3, State_Cb_3_Error, State_Ready_Error_2, State_Ready_Error, State_Ready,   State_Error_3, 0, 0,  // 6  - State_Cb_3
+	State_Ready_Error_3, State_Cb_3_Error, State_Ready_Error_2, State_Ready_Error, State_Ready,   State_Error_3, 0, 0,  // 7  - State_Cb_3_Error
+	0,                   0,                0,                   0,                 0,             0,             0, 0,  // 8  - unused
+	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error,   State_Error,   0, 0,  // 9  - State_Error_3
+	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error,   State_Error,   0, 0,  // 10 - State_Ready
+	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error,   State_Error,   0, 0,  // 11 - State_Ready_Error
+	0,                   0,                0,                   0,                 0,             0,             0, 0,  // 12 - unused
+	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error,   State_Error,   0, 0,  // 13 - State_Ready_Error_2
+	0,                   0,                0,                   0,                 0,             0,             0, 0,  // 14 - unused
+	State_Ready,         State_Cb_1,       State_Error,         State_Error,       State_Error,   State_Error,   0, 0,  // 15 - State_Ready_Error_3
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-// use branchless arithmetics as it's (most likely) faster on modern CPUs
-// TODO: still need some benchmarking against simpler and shorter branched impls
 
 inline
 Utf8ReverseDfa
 Utf8ReverseDfa::decode(uchar_t c) {
 	uint_t cc = m_map[c];
 	uint_t prevState = m_state;
-	uint_t nextState = m_dfa[(prevState << 3) + cc];
+	uint_t nextState = m_dfa[(prevState & State_IndexMask) + cc];
 	uint_t acc = m_acc;
 	uint_t cp = m_cp;
 
 	if (cc == Cc_Cb) {
-		ASSERT(nextState <= State_Cb_3_Error); // continuation bytes always get us here
-		uint_t shift = 6 * ((nextState >> 1) - 1);
-		acc >>= 6 & -(nextState & 1); // drop last continuation byte on error
-		acc |= (c & 0x3f) << shift;   // shift according to the new position
+		acc >>= ((nextState & State_ErrorCbCountMask) >> 24); // drop the last continuation byte on Cb3_Error
+		acc |= (c & 0x3f) << ((nextState & State_CbStoreMask) >> 16);
 	} else {
-		ASSERT(nextState >= State_Error); // error or ready
-		uint_t shift = 6 * ((prevState >> 1) & (((prevState & 8) >> 3) - 1)); // zero if state >= 8
-		acc |= ((0xff >> cc) & c) << shift; // shift according to the previous position
-		acc >>= 6 * ((nextState - 9) >> 1); // drop continuation bytes on errors
+		acc |= ((0xff >> cc) & c) << ((prevState & State_CbLoadMask) >> 8); // shift according to the previous position
+		acc >>= ((nextState & State_ErrorCbCountMask) >> 24); // drop continuation bytes on errors
 		cp = acc;
 		acc = 0;
 	}

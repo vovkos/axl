@@ -46,7 +46,7 @@ public:
 	static
 	bool
 	isReady(uint_t state)  {
-		return state >= T::State_Ready;
+		return (state & T::State_IndexMask) >= (T::State_Ready & T::State_IndexMask);
 	}
 
 	bool

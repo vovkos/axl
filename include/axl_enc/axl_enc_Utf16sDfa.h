@@ -38,6 +38,7 @@ public:
 		State_ReadyPair         = 10 * CcCount, // 40 - codepoint is ready (surrogate pair)
 
 		State_ErrorBit          = 1 * CcCount,  // 4  - invalid sequence bit
+		State_IndexMask         = -1,
 		State_LastHalf          = State_3_4,
 	};
 
@@ -108,6 +109,7 @@ public:
 		State_ReadyPair                = 18 * CcCount, // 72 - codepoint is ready (surrogate pair)
 
 		State_ErrorBit                 = 1 * CcCount,  // 4  - invalid sequence bit
+		State_IndexMask                = -1,
 		State_LastHalf                 = State_PendingReadyPair,
 	};
 
@@ -191,6 +193,7 @@ public:
 		State_ReadyPair                = 18 * CcCount, // 72 - codepoint is ready (surrogate pair)
 
 		State_ErrorBit                 = 1 * CcCount,  // 4  - invalid sequence bit
+		State_IndexMask                = -1,
 		State_LastHalf                 = State_PendingReadyPair,
 	};
 
@@ -270,6 +273,7 @@ public:
 		State_ReadyPair         = 10 * CcCount, // 40 - codepoint is ready (surrogate pair)
 
 		State_ErrorBit          = 1 * CcCount,  // 4  - invalid sequence bit
+		State_IndexMask         = -1,
 		State_LastHalf          = State_3_4,
 	};
 

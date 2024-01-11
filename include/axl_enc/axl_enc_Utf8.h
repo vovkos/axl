@@ -82,7 +82,10 @@ public:
 
 // emits a replacement per each byte of an invalid UTF-8 sequence
 
-template <typename Dfa0>
+template <
+	typename T,
+	typename Dfa0
+>
 class Utf8DecoderBase {
 public:
 	typedef utf8_t C;
@@ -122,7 +125,7 @@ public:
 		const C* end
 	) {
 		Dfa dfa(*state);
-		p = decode(dfa, emitter, p, end);
+		p = T::decodeImpl(dfa, emitter, p, end);
 		*state = dfa.save();
 		return p;
 	}
@@ -136,20 +139,29 @@ public:
 		const C* end
 	) {
 		Dfa dfa;
-		return decode(dfa, emitter, p, end);
+		return T::decodeImpl(dfa, emitter, p, end);
 	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class Utf8Decoder: public Utf8DecoderBase<
+	Utf8Decoder,
+	Utf8Dfa
+> {
+	friend class Utf8DecoderBase<Utf8Decoder, Utf8Dfa>;
 
 protected:
 	template <typename Emitter>
 	static
 	const C*
-	decode(
+	decodeImpl(
 		Dfa& dfa,
 		Emitter& emitter,
 		const C* p0,
 		const C* end
 	) {
-		sl::PtrIterator<const C, Dfa::IsReverse> p = p0;
+		const C* p = p0;
 		for (; p < end && emitter.canEmit(); p++) {
 			uchar_t c = *p;
 			Dfa next = dfa.decode(c);
@@ -172,8 +184,42 @@ protected:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef Utf8DecoderBase<Utf8Dfa>        Utf8Decoder;
-typedef Utf8DecoderBase<Utf8ReverseDfa> Utf8ReverseDecoder;
+class Utf8ReverseDecoder: public Utf8DecoderBase<
+	Utf8ReverseDecoder,
+	Utf8ReverseDfa
+> {
+	friend class Utf8DecoderBase<Utf8ReverseDecoder, Utf8ReverseDfa>;
+
+protected:
+	template <typename Emitter>
+	static
+	const C*
+	decodeImpl(
+		Dfa& dfa,
+		Emitter& emitter,
+		const C* p0,
+		const C* end
+	) {
+		const C* p = p0;
+		for (; p > end && emitter.canEmit(); p--) {
+			uchar_t c = *p;
+			Dfa next = dfa.decode(c);
+			if (next.getState() == Dfa::State_Ready)
+				emitter.emitCp(p - 1, next.getCodePoint());
+			else if (next.isError()) {
+				dfa.emitErrorPendingCus(next.getState(), emitter, p);
+				if (next.isReady())
+					emitter.emitCpAfterCu(p - 1, next.getCodePoint());
+				else if (next.getState() != Dfa::State_Cb_3_Error) // all others emit the current CU
+					emitter.emitCu(p - 1, c);
+			}
+
+			dfa = next;
+		}
+
+		return p;
+	}
+};
 
 //..............................................................................
 
