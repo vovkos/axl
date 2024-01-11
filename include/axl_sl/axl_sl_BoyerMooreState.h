@@ -257,34 +257,32 @@ public:
 		size_t charTailLength = m_tail.getDataLength();
 		size_t binTailSize = m_binTail.getDataSize();
 
-		if (binOffset >= binTailSize) {
-			ASSERT(charOffset >= charTailLength);
-
+		if (charOffset >= charTailLength) {
 			charOffset -= charTailLength;
 			size_t textCopyLength = textLength - charOffset;
 			m_tail.clear();
 			size_t result = m_tail.write(text + charOffset, textCopyLength);
 			ASSERT(result == textCopyLength);
-
-			binOffset -= binTailSize;
-			size_t binCopySize = binSize - binOffset;
-			m_binTail.clear();
-			result = m_binTail.write((char*)bin + binOffset, binCopySize);
-			ASSERT(result == binCopySize);
 		} else {
 			m_tail.drop(charOffset);
 			size_t result = m_tail.write(text, textLength); // text is already reversed
 			ASSERT(result == textLength);
+		}
 
-			if (IsReverse) {
-				m_binTail.dropBack(binOffset);
-				result = m_binTail.writeFront((char*)bin, binSize);
-				ASSERT(result == binSize);
-			} else {
-				m_binTail.dropFront(binOffset);
-				result = m_binTail.writeBack((char*)bin, binSize);
-				ASSERT(result == binSize);
-			}
+		if (binOffset >= binTailSize) {
+			binOffset -= binTailSize;
+			size_t binCopySize = binSize - binOffset;
+			m_binTail.clear();
+			size_t result = m_binTail.write((char*)bin + binOffset, binCopySize);
+			ASSERT(result == binCopySize);
+		} else if (IsReverse) {
+			m_binTail.dropBack(binOffset);
+			size_t result = m_binTail.writeFront((char*)bin, binSize);
+			ASSERT(result == binSize);
+		} else {
+			m_binTail.dropFront(binOffset);
+			size_t result = m_binTail.writeBack((char*)bin, binSize);
+			ASSERT(result == binSize);
 		}
 	}
 
