@@ -213,10 +213,6 @@ struct BoyerMooreTextFindResult {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-#if (_AXL_DEBUG)
-#	define _AXL_SL_BM_DEBUG_PRINT 0
-#endif
-
 template <typename Details>
 class BoyerMooreTextFindBase: public BoyerMooreFindBase<Details> {
 public:
@@ -304,11 +300,6 @@ public:
 
 		enc::DecoderState decoderState = state->getDecoderState();
 
-#if (_AXL_SL_BM_DEBUG_PRINT)
-		sl::Array<utf32_t> tail;
-		sl::Array<char> binTail;
-#endif
-
 		while (p < end) {
 			utf32_t buffer[Details::DecoderBufferLength];
 
@@ -327,22 +318,6 @@ public:
 			size_t fullLength = state->getTailLength() + dstLength;
 			size_t i;
 
-#if (_AXL_SL_BM_DEBUG_PRINT)
-			printf(
-				"0x%02x, dstLength: %d srcLength: %d pending: %d\n",
-				(uchar_t)*p,
-				dstLength,
-				srcLength,
-				Decoder::getPendingLength(decoderState)
-			);
-
-			printf("  buf: ");
-
-			for (size_t i = 0; i < dstLength; i++)
-				printf("0x%x ", (uint32_t)buffer[i]);
-
-			printf("\n");
-#endif
 			BoyerMooreTextAccessor accessor(state, buffer);
 
 			if (IsWholeWord) {
@@ -368,29 +343,6 @@ public:
 				srcLength,
 				decoderState
 			);
-
-#if (_AXL_SL_BM_DEBUG_PRINT)
-			printf("  i: %d locate-bin: %d bin-tail: %d post-bin-tail: %d tail: %d\n",
-				i,
-				binOffset,
-				state->getBinTailSize(),
-				Decoder::getPendingLength(decoderState),
-				state->getTailLength()
-			);
-
-			state->peekTail(&tail);
-			state->peekBinTail(&binTail);
-
-			printf("  chr-tail: ");
-			for (size_t i = 0; i < tail.getCount(); i++)
-				printf("0x%x ", (uint32_t)tail[i]);
-
-			printf("\n  bin-tail: ");
-			for (size_t i = 0; i < binTail.getCount(); i++)
-				printf("0x%x ", (uchar_t)binTail[i]);
-
-			printf("\n");
-#endif
 
  			ASSERT(state->getBinTailSize() >= state->getTailLength());
 			p = p2;

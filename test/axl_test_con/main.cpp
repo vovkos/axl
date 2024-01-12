@@ -4881,6 +4881,170 @@ testBoyerMoore() {
 
 		const char* p0 = (char*)file.p();
 		const char* end0 = p0 + size;
+
+		const uchar_t a[] = " mic mic mic ";
+		// p0 = (char*)a;
+		// end0 = p0 + sizeof(a);
+
+		const char* p;
+		const char* end;
+		uint64_t offset;
+
+		sl::StringRef needle = "mic";
+
+		struct Range {
+			uint64_t m_from;
+			uint64_t m_to;
+		};
+
+		enum {
+			ChunkSize = 1
+		};
+
+		sl::BoyerMooreBinState state;
+		state.create(needle.getLength());
+
+		sl::Array<Range> forward;
+		sl::Array<Range> backward;
+		sl::Array<Range> forward2;
+		sl::Array<Range> backward2;
+
+		printf("bin forward as a whole\n");
+		sl::BoyerMooreBinFind find(needle.cp(), needle.getLength());
+		p = p0;
+		end = end0;
+		offset = 0;
+
+		for (;;) {
+			size_t findResult = find.find(p, end - p);
+			if (findResult == -1) {
+				printf("not found\n");
+				break;
+			}
+
+			Range range = { offset + findResult, offset + findResult + needle.getLength() };
+			forward.append(range);
+
+			printf("found at: 0x%llx: 0x%llx\n", range.m_from, range.m_to);
+			p = p0 + range.m_to;
+			offset = range.m_to;
+		}
+
+		printf("bin backward as a whole\n");
+		sl::BoyerMooreReverseBinFind rfind(needle.cp(), needle.getLength());
+		p = p0;
+		end = end0;
+		offset = end0 - p0;
+
+		for (;;) {
+			size_t findResult = rfind.find(p, end - p);
+			if (findResult == -1) {
+				printf("not found\n");
+				break;
+			}
+
+			Range range = { offset - findResult - needle.getLength(), offset - findResult };
+			backward.append(range);
+
+			printf("found at: 0x%llx: 0x%llx\n", range.m_from, range.m_to);
+			end = p0 + range.m_from;
+			offset = range.m_from;
+		}
+
+		backward.reverse();
+
+		printf("bin forward in chunks\n");
+		sl::BoyerMooreBinFind find2(needle.cp(), needle.getLength());
+		p = p0;
+		end = end0;
+		state.reset();
+
+		while (p < end) {
+			size_t chunkSize = end - p;
+			if (chunkSize > ChunkSize)
+				chunkSize = ChunkSize;
+
+			size_t findResult = find2.find(&state, p, chunkSize);
+			if (findResult == -1) {
+				p += chunkSize;
+				continue;
+			}
+
+			Range range = { findResult, findResult + needle.getLength() };
+			forward2.append(range);
+
+			printf("found at: 0x%llx: 0x%llx\n", range.m_from, range.m_to);
+			p = p0 + range.m_to;
+			state.reset(range.m_to);
+		}
+
+		printf("bin backward in chunks\n");
+		sl::BoyerMooreReverseBinFind rfind2(needle.cp(), needle.getLength());
+		p = p0;
+		end = end0;
+		offset = end0 - p0;
+		state.reset();
+
+		while (p < end) {
+			size_t chunkSize = end - p;
+			if (chunkSize > ChunkSize)
+				chunkSize = ChunkSize;
+
+			size_t findResult = rfind2.find(&state, end - chunkSize, chunkSize);
+			if (findResult == -1) {
+				end -= chunkSize;
+				continue;
+			}
+
+			Range range = { offset - findResult - needle.getLength(), offset - findResult };
+			backward2.append(range);
+
+			printf("found at: 0x%llx: 0x%llx\n", range.m_from, range.m_to);
+			end = p0 + range.m_from;
+			offset = range.m_from;
+			state.reset();
+		}
+
+		backward2.reverse();
+
+		size_t count1 = forward.getCount();
+		size_t count2 = backward.getCount();
+		size_t count3 = forward2.getCount();
+		size_t count4 = backward2.getCount();
+		int cmp12 = memcmp(forward, backward, AXL_MIN(count1, count2) * sizeof(Range));
+		int cmp13 = memcmp(forward, forward2, AXL_MIN(count1, count3) * sizeof(Range));
+		int cmp14 = memcmp(forward, backward2, AXL_MIN(count1, count4) * sizeof(Range));
+
+		printf(
+			"count1: %d count2: %d count3: %d count4: %d memcmp12: %d memcmp13: %d memcmp14: %d\n",
+			count1,
+			count2,
+			count3,
+			count4,
+			cmp12,
+			cmp13,
+			cmp14
+		);
+
+		ASSERT(count1 == count2 && count1 == count3 && count1 == count4);
+		ASSERT(!cmp12 && !cmp13 && !cmp14);
+	} while (0);
+
+	do {
+		const char* fileName = "E:/release-archive/tide/tide-5-04-50.exe";
+		// const char* fileName = "C:/log-markup-test.bin";
+
+		io::SimpleMappedFile file;
+		result = file.open(fileName, io::FileFlag_ReadOnly);
+		if (!result) {
+			printf("file error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		size_t size = file.getMappingSize();
+
+		const char* p0 = (char*)file.p();
+		const char* end0 = p0 + size;
 /*
 		p0 = end0 - 0x20000;
 		p0 += 32 * 1024;
@@ -4998,7 +5162,7 @@ testBoyerMoore() {
 		sl::BoyerMooreCaseFoldedTextFind_utf8 find2(needle);
 		p = p0;
 		end = end0;
-		state.reset(0, 0);
+		state.reset();
 
 		while (p < end) {
 			size_t chunkSize = end - p;
@@ -5057,7 +5221,7 @@ testBoyerMoore() {
 		int cmp14 = memcmp(forward, backward2, AXL_MIN(count1, count4) * sizeof(Range));
 
 		printf(
-			"count1: %d count2: %d count3: %d count4: %d memcmp12: %d memcmp13: %d memcmp14: %d",
+			"count1: %d count2: %d count3: %d count4: %d memcmp12: %d memcmp13: %d memcmp14: %d\n",
 			count1,
 			count2,
 			count3,
