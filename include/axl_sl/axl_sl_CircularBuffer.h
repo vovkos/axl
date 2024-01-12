@@ -155,15 +155,31 @@ public:
 	}
 
 	size_t
-	readAll(sl::Array<C>* buffer) {
+	peek(sl::Array<C>* buffer) const {
 		size_t length = m_length;
 		bool result = buffer->setCount(length);
 		if (!result)
 			return -1;
 
 		copyFrom(m_front, *buffer, length);
-		clear();
 		return length;
+	}
+
+	sl::Array<C>
+	peek() {
+		sl::Array<C> buffer;
+		peek(&buffer);
+		return buffer;
+	}
+
+	size_t
+	readAll(sl::Array<C>* buffer) {
+		size_t result = peek(buffer);
+		if (result == -1)
+			return -1;
+
+		clear();
+		return result;
 	}
 
 	sl::Array<C>
@@ -293,7 +309,7 @@ protected:
 		size_t i,
 		C* p,
 		size_t length
-	) {
+	) const {
 		if (i + length <= m_buffer.getCount())
 			sl::ArrayDetails<C>::copy(p, m_buffer + i, length);
 		else {
