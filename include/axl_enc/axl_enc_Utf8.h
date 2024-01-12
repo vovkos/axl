@@ -207,7 +207,7 @@ protected:
 			if (next.getState() == Dfa::State_Ready)
 				emitter.emitCp(p - 1, next.getCodePoint());
 			else if (next.isError()) {
-				dfa.emitErrorPendingCus(next.getState(), emitter, p);
+				dfa.emitErrorPendingCus(c, next.getState(), emitter, p);
 				if (next.isReady())
 					emitter.emitCpAfterCu(p - 1, next.getCodePoint());
 				else if (next.getState() != Dfa::State_Cb_3_Error) // all others emit the current CU

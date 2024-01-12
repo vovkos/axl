@@ -470,10 +470,16 @@ public:
 	template <typename Emitter>
 	void
 	emitErrorPendingCus(
+		uchar_t c,
 		uint_t nextState,
 		Emitter& emitter,
 		const utf8_t* p
 	) {
+		if (isReady(nextState)) {
+			uint_t cc = m_map[c];
+			p += cc - 1; // adjust for multi-byte sequences
+		}
+
 		switch (nextState) {
 		case State_Error_1:
 		case State_Ready_Error:
