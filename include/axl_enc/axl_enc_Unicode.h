@@ -519,20 +519,34 @@ public:
 	typedef typename Encoding::C C;
 	typedef sl::PtrIterator<const C, Decoder::IsReverse> PtrIterator;
 
+	// simple compensation for overshoot due to emission of pending CUs won't always work
+	// counter-example: the reverse UTF-8 decoder might emit two CBs, then a two-byte CP
+	// therefore, we have to range-check before emission of CUs or post-CU CPs
+
 	class Emitter {
 	protected:
 		size_t m_pos;
 		size_t m_targetPos;
+		const C* m_p;
 
 	public:
-		Emitter(size_t pos) {
+		Emitter(
+			size_t pos,
+			const C* src
+		) {
 			m_pos = 0;
 			m_targetPos = pos;
+			m_p = src;
 		}
 
 		size_t
 		getPos() const {
 			return m_pos;
+		}
+
+		const C*
+		getSrc() const {
+			return m_p;
 		}
 
 		bool
@@ -545,6 +559,7 @@ public:
 			const C* p,
 			utf32_t cp
 		) {
+			m_p = p;
 			m_pos++;
 		}
 
@@ -553,7 +568,7 @@ public:
 			const C* p,
 			utf32_t cu
 		) {
-			m_pos++;
+			emitChecked(p);
 		}
 
 		void
@@ -561,7 +576,16 @@ public:
 			const C* p,
 			utf32_t cp
 		) {
-			m_pos++;
+			emitChecked(p);
+		}
+
+	protected:
+		void
+		emitChecked(const C* p) {
+			if (canEmit()) {
+				m_p = p;
+				m_pos++;
+			}
 		}
 	};
 
@@ -574,13 +598,11 @@ public:
 		const C* src,
 		const C* srcEnd
 	) {
-		Emitter emitter(pos);
+		Emitter emitter(pos, src);
 		const C* p = Decoder::decode(state, emitter, src, srcEnd);
-		size_t srcLength = PtrIterator::sub(p, src);
 		size_t actualPos = emitter.getPos();
-		return actualPos > pos ? // overshoot due to emission of CUs
-			ConvertLengthResult(pos, srcLength - (actualPos - pos)) :
-			ConvertLengthResult(actualPos, srcLength);
+		intptr_t srcLength = PtrIterator::sub(actualPos < pos ? p : emitter.getSrc(), src); // could be negative!
+		return ConvertLengthResult(actualPos, srcLength);
 	}
 
 	static
