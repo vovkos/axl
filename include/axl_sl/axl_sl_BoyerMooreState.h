@@ -88,7 +88,12 @@ public:
 			i -= tailLength;
 			size_t copyLength = length - i;
 			m_tail.clear();
-			size_t result = m_tail.write(p + i, copyLength);
+			size_t result = m_tail.write(
+				IsReverse ?
+					p + length - copyLength - i :
+					p + i,
+				copyLength
+			);
 			ASSERT(result == copyLength);
 		} else if (IsReverse) {
 			m_tail.dropBack(i);
@@ -273,7 +278,12 @@ public:
 			binOffset -= binTailSize;
 			size_t binCopySize = binSize - binOffset;
 			m_binTail.clear();
-			size_t result = m_binTail.write((char*)bin + binOffset, binCopySize);
+			size_t result = m_binTail.write(
+				IsReverse ?
+					(char*)bin + binSize - binCopySize - binOffset :
+					(char*)bin + binOffset,
+				binCopySize
+				);
 			ASSERT(result == binCopySize);
 		} else if (IsReverse) {
 			m_binTail.dropBack(binOffset);

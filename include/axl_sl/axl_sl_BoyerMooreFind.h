@@ -361,7 +361,7 @@ public:
 				buffer,
 				dstLength,
 				locateResult.m_offset,
-				p,
+				IsReverse ? p2 + 1 : (const char*)p,
 				srcLength,
 				locateResult.m_decoderState,
 				decoderState
@@ -455,53 +455,53 @@ protected:
 		const char* p,
 		const char* end
 	) {
-		enc::DecoderState decoderState;
 		enc::ConvertLengthResult result;
-
 		size_t tailLength = state->getTailLength();
 		size_t binTailSize = state->getBinTailSize();
 
-		if (!binTailSize)
-			decoderState = state->getDecoderState();
-		else {
-			// important! always start search from the tail -- even if i > tailLength
-			// pending CUs in the decoder state could compensate for the missing chars in the char tail
-
-			decoderState = state->getBinTailDecoderState();
-			const char* front = state->getBinTailFront();
-			const char* back = state->getBinTailBack();
-
-			if (front < back) // one continous chunk
-				result = IsReverse ?
-					Locate::locate(&decoderState, i, back - 1, front - 1) :
-					Locate::locate(&decoderState, i, front, back);
-			else { // two disjoint chunks
-				const char* buffer = state->getBinTailBuffer();
-				const char* bufferEnd = state->getBinTailBufferEnd();
-
-				if (IsReverse) {
-					result = Locate::locate(&decoderState, i, back - 1, buffer - 1); // back first
-					if (result.m_dstLength < i) { // not yet; search front now
-						enc::ConvertLengthResult result2 = Locate::locate(&decoderState, i - result.m_dstLength, bufferEnd - 1, front - 1);
-						result.m_dstLength += result2.m_dstLength;
-						result.m_srcLength += result2.m_srcLength;
-					}
-				} else {
-					result = Locate::locate(&decoderState, i, front, bufferEnd); // front first
-					if (result.m_dstLength < i) { // not found; search back now
-						enc::ConvertLengthResult result2 = Locate::locate(&decoderState, i - result.m_dstLength, buffer, back);
-						result.m_dstLength += result2.m_dstLength;
-						result.m_srcLength += result2.m_srcLength;
-					}
-				}
-			}
-
-			if (result.m_dstLength >= i) // found in tail
-				return LocateBinOffsetResult(result.m_srcLength, decoderState);
-
-			// not yet, search the latest data
+		if (!binTailSize) {
+			enc::DecoderState decoderState = state->getDecoderState();
+			result = Locate::locate(&decoderState, i - tailLength, p, end);
+			return LocateBinOffsetResult(result.m_srcLength, decoderState);
 		}
 
+		// important! always start search from the tail -- even if i > tailLength
+		// pending CUs in the decoder state could compensate for the missing chars in the char tail
+
+		enc::DecoderState decoderState = state->getBinTailDecoderState();
+		const char* front = state->getBinTailFront();
+		const char* back = state->getBinTailBack();
+
+		if (front < back) // one continous chunk
+			result = IsReverse ?
+				Locate::locate(&decoderState, i, back - 1, front - 1) :
+				Locate::locate(&decoderState, i, front, back);
+		else { // two disjoint chunks
+			const char* buffer = state->getBinTailBuffer();
+			const char* bufferEnd = state->getBinTailBufferEnd();
+
+			if (IsReverse) {
+				result = Locate::locate(&decoderState, i, back - 1, buffer - 1); // back first
+				if (result.m_dstLength < i) { // not yet; search front now
+					enc::ConvertLengthResult result2 = Locate::locate(&decoderState, i - result.m_dstLength, bufferEnd - 1, front - 1);
+					result.m_dstLength += result2.m_dstLength;
+					result.m_srcLength += result2.m_srcLength;
+				}
+			} else {
+				result = Locate::locate(&decoderState, i, front, bufferEnd); // front first
+				if (result.m_dstLength < i) { // not found; search back now
+					enc::ConvertLengthResult result2 = Locate::locate(&decoderState, i - result.m_dstLength, buffer, back);
+					result.m_dstLength += result2.m_dstLength;
+					result.m_srcLength += result2.m_srcLength;
+				}
+			}
+		}
+
+		if (result.m_dstLength >= i) // found in tail
+			return LocateBinOffsetResult(result.m_srcLength, decoderState);
+
+		// not yet, search the latest data
+		ASSERT(result.m_srcLength == binTailSize);
 		result = Locate::locate(&decoderState, i - tailLength, p, end);
 		return LocateBinOffsetResult(binTailSize + result.m_srcLength, decoderState);
 	}
