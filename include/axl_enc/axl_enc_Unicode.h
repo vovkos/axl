@@ -519,10 +519,11 @@ public:
 	typedef typename Encoding::C C;
 	typedef sl::PtrIterator<const C, Decoder::IsReverse> PtrIterator;
 
-	// simple compensation for overshoot due to emission of pending CUs won't always work
-	// counter-example: the reverse UTF-8 decoder might emit two CBs, then a two-byte CP
-	// therefore, we have to range-check before emission of CUs or post-CU CPs
+	// alas, we can't use simple compensation for overshoot of pending CUs post-decode;
+	// counter-example: the reverse UTF-8 decoder might emit two CBs, then a two-byte CP.
+	// therefore, we have to range-check before emission of CUs or post-CU CPs.
 
+protected:
 	class Emitter {
 	protected:
 		size_t m_pos;
@@ -591,7 +592,7 @@ public:
 
 public:
 	static
-	ConvertLengthResult
+	ConvertLengthResult // ConvertLengthResult.m_srcLength could be negative!
 	locate(
 		DecoderState* state,
 		size_t pos,
@@ -601,7 +602,7 @@ public:
 		Emitter emitter(pos, src);
 		const C* p = Decoder::decode(state, emitter, src, srcEnd);
 		size_t actualPos = emitter.getPos();
-		intptr_t srcLength = PtrIterator::sub(actualPos < pos ? p : emitter.getSrc(), src); // could be negative!
+		intptr_t srcLength = PtrIterator::sub(actualPos < pos ? p : emitter.getSrc(), src);
 		return ConvertLengthResult(actualPos, srcLength);
 	}
 
@@ -614,6 +615,57 @@ public:
 	) {
 		DecoderState state = 0;
 		return locate(&state, pos, src, srcEnd);
+	}
+};
+
+//..............................................................................
+
+// simply advances decoder state over input
+
+template <typename Decoder>
+class Advance {
+public:
+	typedef typename Decoder::C C;
+
+protected:
+	struct Emitter {
+		bool
+		canEmit() const {
+			return true;
+		}
+
+		void
+		emitCp(
+			const C* p,
+			utf32_t cp
+		) {
+		}
+
+		void
+		emitCu(
+			const C* p,
+			utf32_t cu
+		) {
+		}
+
+		void
+		emitCpAfterCu(
+			const C* p,
+			utf32_t cp
+		) {
+		}
+	};
+
+public:
+	static
+	void
+	advance(
+		DecoderState* state,
+		const C* src,
+		const C* srcEnd
+	) {
+		Emitter emitter;
+		Decoder::decode(state, emitter, src, srcEnd);
 	}
 };
 

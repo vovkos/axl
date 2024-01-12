@@ -174,6 +174,14 @@ public:
 	// calc decode buffer
 
 	virtual
+	void
+	advanceDecoderState(
+		DecoderState* state,
+		const void* p,
+		size_t size
+	) = 0;
+
+	virtual
 	size_t
 	calcRequiredBufferLengthToDecode_utf8(
 		DecoderState* state,
@@ -597,6 +605,20 @@ public:
 		return ConvertLengthResult(
 			(result.m_dst - (C*)buffer) * sizeof(C),
 			result.m_src - string.cp()
+		);
+	}
+
+	virtual
+	void
+	advanceDecoderState(
+		DecoderState* state,
+		const void* p,
+		size_t size
+	) {
+		return Advance<typename T::Decoder>::advance(
+			state,
+			(C*)p,
+			(C*)p + size / sizeof(C)
 		);
 	}
 
