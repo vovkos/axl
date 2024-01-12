@@ -476,8 +476,10 @@ public:
 		const utf8_t* p
 	) {
 		if (isReady(nextState)) {
+			// State_Ready_Error_x is only possible for Cc_Ascii (0), Cc_Hdr_2 (2), Cc_Hdr_3 (3)
+			// cc >> 1 yields exactly what we need: 0 -> 0, 2 -> 1, 3 -> 2
 			uint_t cc = m_map[c];
-			p += cc - 1; // adjust for multi-byte sequences
+			p += cc >> 1;
 		}
 
 		switch (nextState) {
