@@ -54,6 +54,11 @@ public:
 		return m_tail.getDataLength();
 	}
 
+	size_t
+	peekTail(sl::Array<C>* buffer) {
+		return m_tail.peek(buffer);
+	}
+
 	C
 	getTailChar(size_t i) const {
 		return m_tail[i];
@@ -116,9 +121,8 @@ typedef BoyerMooreStateBase<char> BoyerMooreBinState;
 class BoyerMooreTextState: public BoyerMooreStateBase<utf32_t> {
 protected:
 	uint64_t m_binOffset;
-	sl::CircularBuffer m_binTail;
-	enc::DecoderState m_binTailDecoderState; // before bin-tail
-	enc::DecoderState m_decoderState;        // after bin-tail (i.e., at the offset of the next incoming byte)
+	sl::CircularBuffer m_binTail; // decoder state before bin tail is always 0
+	enc::DecoderState m_decoderState;
 
 public:
 	utf32_t m_prefix; // freely adjustible
@@ -126,7 +130,6 @@ public:
 public:
 	BoyerMooreTextState() {
 		m_binOffset = 0;
-		m_binTailDecoderState = 0;
 		m_decoderState = 0;
 		m_prefix = 0;
 	}
@@ -165,6 +168,12 @@ public:
 		return m_binTail.getDataSize();
 	}
 
+	size_t
+	peekBinTail(sl::Array<char>* buffer) {
+		return m_binTail.peek(buffer);
+	}
+
+
 	const char*
 	getBinTailFront() const {
 		return m_binTail.getFront();
@@ -183,11 +192,6 @@ public:
 	const char*
 	getBinTailBufferEnd() const {
 		return m_binTail.getBufferEnd();
-	}
-
-	enc::DecoderState
-	getBinTailDecoderState() const {
-		return m_binTailDecoderState;
 	}
 
 	enc::DecoderState
@@ -237,7 +241,6 @@ public:
 		BoyerMooreStateBase<utf32_t>::reset(charOffset);
 		m_binTail.clear();
 		m_binOffset = binOffset;
-		m_binTailDecoderState = 0;
 		m_decoderState = 0;
 		m_prefix = 0;
 	}
@@ -251,16 +254,16 @@ public:
 		size_t binOffset,
 		const void* bin,
 		size_t binSize,
-		enc::DecoderState binTailDecoderState,
 		enc::DecoderState decoderState
 	) {
 		m_offset += charOffset;
 		m_binOffset += binOffset;
-		m_binTailDecoderState = binTailDecoderState;
 		m_decoderState = decoderState;
 
 		size_t charTailLength = m_tail.getDataLength();
 		size_t binTailSize = m_binTail.getDataSize();
+
+		// important -- process char tail and bin tail independently
 
 		if (charOffset >= charTailLength) {
 			charOffset -= charTailLength;
@@ -283,7 +286,7 @@ public:
 					(char*)bin + binSize - binCopySize - binOffset :
 					(char*)bin + binOffset,
 				binCopySize
-				);
+			);
 			ASSERT(result == binCopySize);
 		} else if (IsReverse) {
 			m_binTail.dropBack(binOffset);
@@ -304,7 +307,6 @@ protected:
 		uint64_t binOffset
 	) {
 		m_binOffset = binOffset;
-		m_binTailDecoderState = 0;
 		m_decoderState = 0;
 		m_prefix = 0;
 

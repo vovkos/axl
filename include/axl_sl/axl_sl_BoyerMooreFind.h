@@ -213,6 +213,10 @@ struct BoyerMooreTextFindResult {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+#if (_AXL_DEBUG)
+#	define _AXL_SL_BM_DEBUG_PRINT 0
+#endif
+
 template <typename Details>
 class BoyerMooreTextFindBase: public BoyerMooreFindBase<Details> {
 public:
@@ -233,20 +237,6 @@ public:
 		IsCaseFolded = Details::IsCaseFolded,
 		IsWholeWord  = Details::IsWholeWord,
 		IsReverse    = Details::IsReverse,
-	};
-
-protected:
-	struct LocateBinOffsetResult {
-		size_t m_offset;
-		enc::DecoderState m_decoderState;
-
-		LocateBinOffsetResult(
-			size_t offset,
-			enc::DecoderState decoderState
-		) {
-			m_offset = offset;
-			m_decoderState = decoderState;
-		}
 	};
 
 public:
@@ -314,8 +304,13 @@ public:
 
 		enc::DecoderState decoderState = state->getDecoderState();
 
+#if (_AXL_SL_BM_DEBUG_PRINT)
+		sl::Array<utf32_t> tail;
+		sl::Array<char> binTail;
+#endif
+
 		while (p < end) {
-			utf32_t buffer[8]; // Details::DecoderBufferLength];
+			utf32_t buffer[Details::DecoderBufferLength];
 
 			typename Convert::Result convertResult = Convert::convert(
 				&decoderState,
@@ -332,14 +327,22 @@ public:
 			size_t fullLength = state->getTailLength() + dstLength;
 			size_t i;
 
+#if (_AXL_SL_BM_DEBUG_PRINT)
 			printf(
-				"dstLength: %d srcLength: %d pending: %d ",
+				"0x%02x, dstLength: %d srcLength: %d pending: %d\n",
+				(uchar_t)*p,
 				dstLength,
 				srcLength,
 				Decoder::getPendingLength(decoderState)
 			);
 
+			printf("  buf: ");
 
+			for (size_t i = 0; i < dstLength; i++)
+				printf("0x%x ", (uint32_t)buffer[i]);
+
+			printf("\n");
+#endif
 			BoyerMooreTextAccessor accessor(state, buffer);
 
 			if (IsWholeWord) {
@@ -354,29 +357,42 @@ public:
 			}
 
 			// locate bin-offset of the prospective start of match
-			LocateBinOffsetResult locateResult = locateBinOffset(state, i, p, p2);
+			size_t binOffset = locateBinOffset(state, i, p, p2);
 
 			state->advance<IsReverse>(
 				i,
 				buffer,
 				dstLength,
-				locateResult.m_offset,
+				binOffset,
 				IsReverse ? p2 + 1 : (const char*)p,
 				srcLength,
-				locateResult.m_decoderState,
 				decoderState
 			);
 
-			printf("i: %d locate-bin: %d pre-bin-tail: %d bin-tail: %d post-bin-tail: %d tail: %d\n",
+#if (_AXL_SL_BM_DEBUG_PRINT)
+			printf("  i: %d locate-bin: %d bin-tail: %d post-bin-tail: %d tail: %d\n",
 				i,
-				locateResult.m_offset,
-				Decoder::getPendingLength(locateResult.m_decoderState),
+				binOffset,
 				state->getBinTailSize(),
 				Decoder::getPendingLength(decoderState),
 				state->getTailLength()
 			);
 
- 			ASSERT(state->getBinTailSize() + Decoder::getPendingLength(locateResult.m_decoderState) >= state->getTailLength());
+			state->peekTail(&tail);
+			state->peekBinTail(&binTail);
+
+			printf("  chr-tail: ");
+			for (size_t i = 0; i < tail.getCount(); i++)
+				printf("0x%x ", (uint32_t)tail[i]);
+
+			printf("\n  bin-tail: ");
+			for (size_t i = 0; i < binTail.getCount(); i++)
+				printf("0x%x ", (uchar_t)binTail[i]);
+
+			printf("\n");
+#endif
+
+ 			ASSERT(state->getBinTailSize() >= state->getTailLength());
 			p = p2;
 		}
 
@@ -441,14 +457,14 @@ protected:
 	) const {
 		BoyerMooreTextFindResult result;
 		result.m_charOffset = state->getOffset() + i;
-		result.m_binOffset = state->getBinOffset() + locateBinOffset(state, i, p, end).m_offset;
-		result.m_binEndOffset = state->getBinOffset() + locateBinOffset(state, i + this->m_pattern.getCount(), p, end).m_offset;
+		result.m_binOffset = state->getBinOffset() + locateBinOffset(state, i, p, end);
+		result.m_binEndOffset = state->getBinOffset() + locateBinOffset(state, i + this->m_pattern.getCount(), p, end);
 		state->reset(result.m_charOffset, result.m_binOffset);
 		return result;
 	}
 
 	static
-	LocateBinOffsetResult
+	size_t
 	locateBinOffset(
 		const BoyerMooreTextState* state,
 		size_t i,
@@ -459,16 +475,15 @@ protected:
 		size_t tailLength = state->getTailLength();
 		size_t binTailSize = state->getBinTailSize();
 
-		if (!binTailSize) {
+		if (i >= tailLength) { // beyond tail
 			enc::DecoderState decoderState = state->getDecoderState();
 			result = Locate::locate(&decoderState, i - tailLength, p, end);
-			return LocateBinOffsetResult(result.m_srcLength, decoderState);
+
+			ASSERT((intptr_t)(binTailSize + result.m_srcLength) >= 0);
+			return binTailSize + result.m_srcLength;
 		}
 
-		// important! always start search from the tail -- even if i > tailLength
-		// pending CUs in the decoder state could compensate for the missing chars in the char tail
-
-		enc::DecoderState decoderState = state->getBinTailDecoderState();
+		enc::DecoderState decoderState = 0;
 		const char* front = state->getBinTailFront();
 		const char* back = state->getBinTailBack();
 
@@ -497,13 +512,17 @@ protected:
 			}
 		}
 
-		if (result.m_dstLength >= i) // found in tail
-			return LocateBinOffsetResult(result.m_srcLength, decoderState);
+		if (result.m_dstLength >= i)  { // found in tail
+			ASSERT((intptr_t)result.m_srcLength >= 0);
+			return result.m_srcLength;
+		}
 
 		// not yet, search the latest data
 		ASSERT(result.m_srcLength == binTailSize);
 		result = Locate::locate(&decoderState, i - tailLength, p, end);
-		return LocateBinOffsetResult(binTailSize + result.m_srcLength, decoderState);
+
+		ASSERT((intptr_t)(binTailSize + result.m_srcLength) >= 0);
+		return binTailSize + result.m_srcLength;
 	}
 };
 

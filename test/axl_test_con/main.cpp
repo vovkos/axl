@@ -4878,24 +4878,24 @@ testBoyerMoore() {
 		}
 
 		size_t size = file.getMappingSize();
-		size = 0x30000;
 
 		const char* p0 = (char*)file.p();
 		const char* end0 = p0 + size;
-
-		p0 += 0x20000;
-		p0 += 16 * 1024;
-		p0 += 8 * 1024;
+/*
+		p0 = end0 - 0x20000;
+		p0 += 32 * 1024;
 		p0 += 4 * 1024;
-		p0 += 2 * 1024;
-		p0 += 1 * 1024;
 		p0 += 512;
-		p0 += 128;
-		p0 += 64;
-
+		p0 += 256;
+		p0 += 32;
 		end0 -= 16;
-		end0 -= 256;
-		end0 -= 32 * 1024;
+		end0 -= 64;
+		end0 -= 128;
+		end0 -= 1 * 1024;
+		end0 -= 2 * 1024;
+		end0 -= 8 * 1024;
+		end0 -= 16 * 1024;
+		end0 -= 0x10000; */
 
 		// printf("%s\n", enc::HexEncoding::encode(p0, end0 - p0, enc::HexEncodingFlag_Multiline).sz());
 
@@ -4905,13 +4905,27 @@ testBoyerMoore() {
 			0x69, 0xc6, 0xbd, 0x85, 0xa4, 0xcc, 0xf7,
 		};
 
-		uint8_t a[] = {
-			0xce, 0xe6, 0xfa, 0x6e,  0xba, 0x46, 0xab, 0xef,
-			0x95, 0xbf, 0xa4, 0xbe,  0xb3, 0xaf, 0xf9, 0xd5,
+		uint8_t a2[] = {
+			0xce, 0xe6, 0xfa, 0x6e, 0xba, 0x46, 0xab, 0xef,
+			0x95, 0xbf, 0xa4, 0xbe, 0xb3, 0xaf, 0xf9, 0xd5,
 		};
 
-		p0 = (char*)a;
-		end0 = p0 + sizeof(a);
+		uint8_t a3[] = {
+			0x75, 0x72, 0x6e, 0x3a, 0x73, 0x63, 0x68, 0x65,
+			0x6d, 0x61, 0x73, 0x2d, 0x6d, 0x69, 0x63, 0x72,
+		};
+
+		uint8_t a4[] = {
+			0x56, 0xd0, 0xca, 0x69, 0xc6, 0xbd, 0x85, 0xa4,
+			0xcc, 0xf7, 0x50, 0xe5, 0x61, 0x96, 0xb7, 0xca
+		};
+
+		uint8_t a[] = {
+			0x05, 0x9a
+		};
+
+		// p0 = (char*)a;
+		// end0 = p0 + sizeof(a);
 
 		const char* p;
 		const char* end;
@@ -4936,7 +4950,7 @@ testBoyerMoore() {
 		sl::Array<Range> forward2;
 		sl::Array<Range> backward2;
 
-		/*printf("forward as a whole\n");
+		printf("forward as a whole\n");
 		sl::BoyerMooreCaseFoldedTextFind_utf8 find(needle);
 		p = p0;
 		end = end0;
@@ -4955,10 +4969,10 @@ testBoyerMoore() {
 			printf("found at: 0x%llx: 0x%llx\n", range.m_from, range.m_to);
 			p += textFindResult.m_binEndOffset;
 			offset += textFindResult.m_binEndOffset;
-		} */
+		}
 
 		printf("backward as a whole\n");
-		sl::BoyerMooreReverseTextFind_utf8 rfind(needle);
+		sl::BoyerMooreCaseFoldedReverseTextFind_utf8 rfind(needle);
 		p = p0;
 		end = end0;
 		offset = end0 - p0;
@@ -4979,7 +4993,7 @@ testBoyerMoore() {
 		}
 
 		backward.reverse();
-		/*
+
 		printf("forward in chunks\n");
 		sl::BoyerMooreCaseFoldedTextFind_utf8 find2(needle);
 		p = p0;
@@ -5054,7 +5068,7 @@ testBoyerMoore() {
 		);
 
 		ASSERT(count1 == count2 && count1 == count3 && count1 == count4);
-		ASSERT(!cmp12 && !cmp13 && !cmp14); */
+		ASSERT(!cmp12 && !cmp13 && !cmp14);
 	} while (0);
 
 	return;
