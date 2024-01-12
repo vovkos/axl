@@ -599,6 +599,11 @@ public:
 		const C* src,
 		const C* srcEnd
 	) {
+		if (!pos) // shortcut
+			return ConvertLengthResult(0, -Decoder::getPendingLength(*state));
+
+		// if pos is non-zero, no need to adjust the initial src ptr (emitCp/emitCu will do that)
+
 		Emitter emitter(pos, src);
 		const C* p = Decoder::decode(state, emitter, src, srcEnd);
 		size_t actualPos = emitter.getPos();
