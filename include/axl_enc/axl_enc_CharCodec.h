@@ -174,6 +174,10 @@ public:
 	// calc decode buffer
 
 	virtual
+	size_t
+	getPendingLength(DecoderState state) = 0;
+
+	virtual
 	void
 	advanceDecoderState(
 		DecoderState* state,
@@ -606,6 +610,12 @@ public:
 			(result.m_dst - (C*)buffer) * sizeof(C),
 			result.m_src - string.cp()
 		);
+	}
+
+	virtual
+	size_t
+	getPendingLength(DecoderState state) {
+		return T::Decoder::getPendingLength(state);
 	}
 
 	virtual
