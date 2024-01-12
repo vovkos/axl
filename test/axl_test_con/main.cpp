@@ -4882,7 +4882,7 @@ testBoyerMoore() {
 		const char* p0 = (char*)file.p();
 		const char* end0 = p0 + size;
 
-		const uchar_t a[] = " mic mic mic ";
+		const uchar_t a[] = " Mic mic Mic ";
 		// p0 = (char*)a;
 		// end0 = p0 + sizeof(a);
 
@@ -4890,7 +4890,7 @@ testBoyerMoore() {
 		const char* end;
 		uint64_t offset;
 
-		sl::StringRef needle = "mic";
+		sl::StringRef needle = "Mic";
 
 		struct Range {
 			uint64_t m_from;
@@ -9154,7 +9154,7 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	// utf::testUtf8();
+	utf::testUtf8();
 	testBoyerMoore();
 	return 0;
 }
