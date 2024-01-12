@@ -91,7 +91,7 @@ public:
 		size_t length
 	) const {
 		size_t i = findImpl(sl::PtrIterator<const C, IsReverse>(IsReverse ? p + length - 1 : p), 0, length);
-		return i < length ? i : -1;
+		return i + m_pattern.getCount() <= length ? i : -1;
 	}
 
 	uint64_t
