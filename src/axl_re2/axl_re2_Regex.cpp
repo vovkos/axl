@@ -89,6 +89,11 @@ Regex::getSwitchCasePattern(uint_t switchCaseId) const {
 	return m_impl->pattern(switchCaseId) >> toAxl;
 }
 
+bool
+Regex::isNullable() const {
+	return m_impl->nullable();
+}
+
 // compilation
 
 void

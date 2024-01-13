@@ -1278,6 +1278,26 @@ testRegex2() {
 namespace test_re2 {
 
 void
+testRegexNullable() {
+	const char* patternList[] = {
+		"a",
+		"a+",
+		"a*",
+		"a?",
+		"a|a*",
+		"a|a?",
+	};
+
+	re2::Regex regex;
+	for (size_t i = 0; i < countof(patternList); i++) {
+		bool result = regex.compile(patternList[i]);
+		ASSERT(result);
+
+		printf("%s: nullable: %d\n", patternList[i], regex.isNullable());
+	}
+}
+
+void
 testRegexFullMatch() {
 	re2::Regex regex("abc");
 	re2::Match match = regex.exec("abcd", re2::ExecFlag_FullMatch);
@@ -9154,8 +9174,10 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	utf::testUtf8();
-	testBoyerMoore();
+	// utf::testUtf8();
+	// testBoyerMoore();
+
+	test_re2::testRegexNullable();
 	return 0;
 }
 

@@ -92,6 +92,9 @@ public:
 	size_t
 	getSwitchCaseCaptureCount(uint_t switchCaseId) const;
 
+	bool
+	isNullable() const;
+
 	// compilation
 
 	void
