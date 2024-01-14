@@ -158,9 +158,6 @@ public:
 		State_IndexMask   = -1,
 	};
 
-	enum {
-	};
-
 protected:
 	static const uint8_t m_dfa[State__Count * CcCount];
 	static const uint_t m_pendingLengthTable[State__Count];
