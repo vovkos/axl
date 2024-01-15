@@ -79,13 +79,18 @@ public:
 	}
 
 	size_t
+	getDataLength() const {
+		return m_length;
+	}
+
+	size_t
 	getBufferLength() const {
 		return m_buffer.getCount();
 	}
 
 	size_t
-	getDataLength() const {
-		return m_length;
+	getFreeBufferLength() const {
+		return m_buffer.getCount() - m_length;
 	}
 
 	const C*
