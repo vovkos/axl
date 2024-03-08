@@ -47,12 +47,11 @@ public:
 	// T must implement:
 
 	//	void
-	//	SendMsgEx (
+	//	sendMsgEx (
 	//		const void* const* pBlockArray,
 	// 		size_t const* pSizeArray,
 	// 		size_t Count
 	// 		);
-
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
