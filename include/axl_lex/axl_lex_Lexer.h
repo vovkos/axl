@@ -43,6 +43,11 @@ public:
 		m_tokenPool = mem::getCurrentThreadPool<Token>();
 	}
 
+	mem::Pool<Token>*
+	getTokenPool() const {
+		return m_tokenPool;
+	}
+
 	static
 	void
 	clearTokenPool() {
