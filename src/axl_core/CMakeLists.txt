@@ -159,6 +159,7 @@ set(
 	${AXL_INC_DIR}/axl_sl/axl_sl_Packetizer.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_Protocol.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_RbTree.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_RangeTree.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_String.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_StringDetails.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_StringHashTable.h

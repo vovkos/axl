@@ -475,6 +475,16 @@ protected:
 		x->m_parent = y;
 	}
 
+	void
+	adjustKey(
+		Node* x,
+		KeyArg key
+	) {
+		ASSERT(!x->m_prev || m_cmp(((Node*)x->m_prev)->m_key, key) < 0);
+		ASSERT(!x->m_next || m_cmp(((Node*)x->m_next)->m_key, key) > 0);
+		x->m_key = key;
+	}
+
 	// overridables: tree rebalancing on insert/delete
 
 	void
