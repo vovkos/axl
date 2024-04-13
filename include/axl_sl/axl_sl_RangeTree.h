@@ -79,6 +79,11 @@ template <
 >
 class RangeTree: public sl::RbTree<Offset, RangeTreeValue<Offset, Value, ValueArg, ValueEq> > {
 public:
+	typedef sl::RbTree<Offset, RangeTreeValue<Offset, Value, ValueArg, ValueEq> > Tree;
+	typedef typename Tree::Iterator Iterator;
+	typedef typename Tree::ConstIterator ConstIterator;
+
+public:
 	ConstIterator
 	addRange(
 		Offset offset,
@@ -88,7 +93,7 @@ public:
 		ASSERT(length);
 		Offset endOffset = offset + length;
 
-		Iterator it = find<RelOpKind_Le>(offset);
+		Iterator it = this->template find<RelOpKind_Le>(offset);
 		if (!it || it->m_value.m_endOffset < offset) { // no intersections with preceding ranges, add a new one
 			it = addPoint(offset, endOffset, value);
 			normalize(it);
@@ -132,7 +137,7 @@ protected:
 		Offset endOffset,
 		ValueArg value
 	) {
-		Iterator it = visit(offset);
+		Iterator it = this->visit(offset);
 		it->m_value.m_endOffset = endOffset;
 		it->m_value.m_value = value;
 		return it;
@@ -143,16 +148,16 @@ protected:
 		Iterator nextIt = it.getNext();
 		while (nextIt) {
 			if (nextIt->m_value.m_endOffset <= it->m_value.m_endOffset) // the old range is completely covered, erase
-				erase(nextIt++);
+				this->erase(nextIt++);
 			else { // spans beyond
 				if (nextIt->getKey() > it->m_value.m_endOffset) // no intersection
 					break;
 
 				if (!ValueEq()(nextIt->m_value.m_value, it->m_value.m_value)) // different value, adjust the old range
-					adjustKey(*nextIt, it->m_value.m_endOffset);
+					this->adjustKey(*nextIt, it->m_value.m_endOffset);
 				else { // same value, combine ranges and erase the old one
 					it->m_value.m_endOffset = nextIt->m_value.m_endOffset;
-					erase(nextIt);
+					this->erase(nextIt);
 				}
 
 				break;
