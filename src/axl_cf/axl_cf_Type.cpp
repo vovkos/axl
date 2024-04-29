@@ -100,7 +100,7 @@ cfTypeToInt(CFTypeRef cfType) {
 		return ::CFBooleanGetValue((CFBooleanRef) cfType);
 	else if (typeId == getNumberTypeId()) {
 		int x = 0;
-		::CFNumberGetValue((CFNumberRef)cfType, kCFNumberLongLongType, &x);
+		::CFNumberGetValue((CFNumberRef)cfType, kCFNumberIntType, &x);
 		return x;
 	} else
 		return 0;

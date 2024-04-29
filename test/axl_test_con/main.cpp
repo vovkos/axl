@@ -9174,10 +9174,7 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	// utf::testUtf8();
-	// testBoyerMoore();
-
-	test_re2::testRegexNullable();
+	testEnumSerial();
 	return 0;
 }
 
