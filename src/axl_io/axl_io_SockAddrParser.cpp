@@ -101,11 +101,6 @@ SockAddrParser::parse(in6_addr* addr) {
 		if (result)
 			zeroRunIdx = i;
 
-		skipWhiteSpace();
-
-		if (m_p >= m_end || !isxdigit(*m_p))
-			break;
-
 		uint_t word;
 		result = parseInt(&word, 16);
 		if (!result)
@@ -415,7 +410,10 @@ SockAddrParser::parseInt(
 	skipWhiteSpace();
 
 	char* end;
-	*p = (uint_t)strtoul(m_p, &end, radix);
+	if (m_p < m_end)
+		*p = (uint_t)strtoul(m_p, &end, radix);
+	else
+		end = (char*)m_p;
 
 	if (end == m_p) {
 		err::setError(err::SystemErrorCode_InvalidAddress);

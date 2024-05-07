@@ -236,7 +236,6 @@ parseAddr_ip4(
 	in_addr* addr,
 	const sl::StringRef& string
 ) {
-	;
 	return SockAddrParser(string).parse(addr);
 }
 

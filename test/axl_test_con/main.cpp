@@ -4544,8 +4544,12 @@ testConn() {
 	thread.start();
 	thread.m_startEvent.wait();
 */
+
 	io::SockAddr addr;
 	addr.parse("192.168.1.73:1002");
+
+	in_addr addr2;
+	io::parseAddr_ip4(&addr2, sl::StringRef());
 
 	printf("connecting to %s...\n", addr.getString().sz());
 
@@ -9174,7 +9178,7 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	testEnumSerial();
+	testConn();
 	return 0;
 }
 
