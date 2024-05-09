@@ -304,7 +304,7 @@ public:
 #if (_AXL_RE_TRACE_CAPTURE)
 #	define AXL_RE_TRACE_CAPTURE AXL_TRACE
 #else
-#	define AXL_RE_TRACE_CAPTURE (void)
+#	define AXL_RE_TRACE_CAPTURE(...)
 #endif
 
 //..............................................................................

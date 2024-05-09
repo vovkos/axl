@@ -645,7 +645,7 @@ axl_trace(
 
 #	define AXL_TRACE axl_trace
 #else
-#	define AXL_TRACE (void)
+#	define AXL_TRACE(...)
 #endif
 
 #ifndef TRACE
