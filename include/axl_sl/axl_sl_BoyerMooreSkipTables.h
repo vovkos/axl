@@ -48,12 +48,13 @@ public:
 		if (!result)
 			return false;
 
+		sl::Array<size_t>::Rwi rwi = m_table;
 		for (size_t i = 0; i < tableSize; i++)
-			m_table[i] = patternLength;
+			rwi[i] = patternLength;
 
 		intptr_t last = patternLength - 1;
 		for (intptr_t i = 0, j = last; i < last; i++, j--)
-			m_table[(size_t)pattern[i] % tableSize] = j;
+			rwi[(size_t)pattern[i] % tableSize] = j;
 
 		return true;
 	}
@@ -86,18 +87,19 @@ public:
 		if (!result)
 			return false;
 
+		sl::Array<size_t>::Rwi rwi = m_table;
 		intptr_t lastPrefixPos = patternLength - 1;
 		for (intptr_t i = patternLength - 1; i >= 0; i--) {
 			if (isPrefix(pattern, patternLength, i + 1))
 				lastPrefixPos = i + 1;
 
-			m_table[i] = lastPrefixPos + patternLength - 1 - i;
+			rwi[i] = lastPrefixPos + patternLength - 1 - i;
 		}
 
 		for (intptr_t i = 0; i < patternLength - 1; i++) {
 			size_t suffixLength = calcSuffixLength(pattern, patternLength, i);
 			if (pattern[i - suffixLength] != pattern[patternLength - 1 - suffixLength])
-				m_table[patternLength - 1 - suffixLength] = patternLength - 1 - i + suffixLength;
+				rwi[patternLength - 1 - suffixLength] = patternLength - 1 - i + suffixLength;
 		}
 
 		return true;

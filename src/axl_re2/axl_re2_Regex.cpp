@@ -323,8 +323,8 @@ Regex::captureSubmatchesImpl(
 	StringPiece matchText_re2 = matchText_axl >> toRe2;
 
 	count = kind == RegexKind_Switch ?
-		m_impl->capture_submatches(switchCaseId, matchText_re2, submatchArray_re2, count) :
-		m_impl->capture_submatches(matchText_re2, submatchArray_re2, count);
+		m_impl->capture_submatches(switchCaseId, matchText_re2, submatchArray_re2.p(), count) :
+		m_impl->capture_submatches(matchText_re2, submatchArray_re2.p(), count);
 
 	if (count == -1)
 		return -1;

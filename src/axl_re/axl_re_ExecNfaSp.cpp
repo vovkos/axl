@@ -93,8 +93,9 @@ ExecNfaSpBase::openCapture(size_t captureId) {
 	if (captureId >= m_capturePosArray.getCount())
 		m_capturePosArray.setCount(captureId + 1);
 
-	m_capturePosArray[captureId].m_offset = m_offset;
-	m_capturePosArray[captureId].m_endOffset = m_offset;
+	MatchPos& pos = m_capturePosArray.rwi()[captureId];
+	pos.m_offset = m_offset;
+	pos.m_endOffset = m_offset;
 }
 
 void
@@ -102,7 +103,7 @@ ExecNfaSpBase::closeCapture(size_t captureId) {
 	AXL_RE_TRACE_CAPTURE("%p: close capture(%d)\n", m_offset, captureId);
 
 	ASSERT(captureId < m_capturePosArray.getCount());
-	m_capturePosArray[captureId].m_endOffset = m_offset;
+	m_capturePosArray.rwi()[captureId].m_endOffset = m_offset;
 }
 
 void

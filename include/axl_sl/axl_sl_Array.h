@@ -137,11 +137,6 @@ public:
 	}
 
 	const T*
-	getBegin() const {
-		return m_p;
-	}
-
-	const T*
 	getEnd() const {
 		return m_p + m_count;
 	}
@@ -248,6 +243,35 @@ public:
 	typedef typename Details::Construct Construct;
 	typedef typename Details::ZeroConstruct ZeroConstruct;
 
+	// read-write index (with bounds-checking in DEBUG builds)
+
+	class Rwi {
+		friend class Array;
+
+	protected:
+		T* m_p;
+#if (_AXL_DEBUG)
+		size_t m_count;
+#endif
+
+	public:
+		Rwi(Array& array) {
+			m_p = array.p();
+#if (_AXL_DEBUG)
+			m_count = array.getCount();
+#endif
+		}
+
+		T& operator [] (size_t i) {
+			ASSERT(i < m_count);
+			return m_p[i];
+		}
+
+		T* p() {
+			return m_p;
+		}
+	};
+
 public:
 	Array() {}
 
@@ -306,10 +330,6 @@ public:
 		return this->m_p;
 	}
 
-	operator T* () {
-		return p();
-	}
-
 #if (_AXL_CPP_HAS_RVALUE_REF)
 	Array&
 	operator = (Array&& src) {
@@ -341,37 +361,14 @@ public:
 		return ArrayRef::operator [] (i);
 	}
 
-	T&
-	operator [] (intptr_t i) {
-		bool result = ensureExclusive();
-		ASSERT(result);
-
-		return (T&)ArrayRef::operator [] (i);
-	}
-
 	T*
 	p() {
 		return ensureExclusive() ? this->m_p : NULL;
 	}
 
-	const T*
-	getBegin() const {
-		return this->cp();
-	}
-
-	T*
-	getBegin() {
-		return p();
-	}
-
-	const T*
-	getEnd() const {
-		return ArrayRef::getEnd();
-	}
-
-	T*
-	getEnd() {
-		return (T*)ArrayRef::getEnd();
+	Rwi
+	rwi() {
+		return Rwi(*this);
 	}
 
 	const T&
@@ -812,7 +809,7 @@ public:
 
 	bool
 	ensureExclusive() {
-		return this->m_count ? setCount(this->m_count) : true;
+		return isExclusive() ? true : setCount(this->m_count);
 	}
 
 	bool

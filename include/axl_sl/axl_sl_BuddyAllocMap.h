@@ -100,22 +100,22 @@ public:
 	clear();
 
 	size_t
-	getFreeSizeTop() {
+	getFreeSizeTop() const {
 		return m_freeSizeTop;
 	}
 
 	size_t
-	getFreeSizeBottom() {
+	getFreeSizeBottom() const {
 		return m_freeSizeBottom;
 	}
 
 	size_t
-	getTotalSize() {
+	getTotalSize() const {
 		return m_totalSize;
 	}
 
 	bool
-	isEmpty() {
+	isEmpty() const {
 		return m_freeSizeBottom == m_totalSize; // can compare either (top or bottom)
 	}
 
@@ -135,7 +135,7 @@ public:
 	);
 
 	bool
-	getBit(size_t address) {
+	getBit(size_t address) const {
 		return address < m_totalSize ? getBit(m_pageArray, address) : false;
 	}
 
@@ -143,7 +143,7 @@ protected:
 	static
 	bool
 	getBit(
-		Page* page,
+		const Page* page,
 		size_t bit
 	) {
 		size_t pageIdx = bit / AXL_PTR_BITS;

@@ -166,7 +166,7 @@ public:
 		if (!result)
 			return -1;
 
-		copyFrom(m_front, *buffer, length);
+		copyFrom(m_front, buffer->p(), length);
 		return length;
 	}
 
@@ -332,14 +332,15 @@ protected:
 		const C* p,
 		size_t length
 	) {
+		C* buffer = m_buffer.p();
 		if (i + length <= m_buffer.getCount())
-			sl::ArrayDetails<C>::copy(m_buffer + i, p, length);
+			sl::ArrayDetails<C>::copy(buffer + i, p, length);
 		else {
 			size_t tail = m_buffer.getCount() - i;
 			ASSERT(tail);
 
-			sl::ArrayDetails<C>::copy(m_buffer + i, p, tail);
-			sl::ArrayDetails<C>::copy(m_buffer, p + tail, length - tail);
+			sl::ArrayDetails<C>::copy(buffer + i, p, tail);
+			sl::ArrayDetails<C>::copy(buffer, p + tail, length - tail);
 		}
 	}
 };

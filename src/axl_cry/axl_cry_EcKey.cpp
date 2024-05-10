@@ -126,7 +126,7 @@ EcKey::signHash(
 	if (!result)
 		return false;
 
-	size_t size = signHash(*signature, maxSize, hash, hashSize);
+	size_t size = signHash(signature->p(), maxSize, hash, hashSize);
 	if (size == -1)
 		return false;
 

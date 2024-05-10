@@ -105,7 +105,7 @@ Rsa::signHash(
 	if (!result)
 		return false;
 
-	size_t size = signHash(type, *signature, signatureBufferSize, hash, hashSize);
+	size_t size = signHash(type, signature->p(), signatureBufferSize, hash, hashSize);
 	if (size == -1)
 		return false;
 

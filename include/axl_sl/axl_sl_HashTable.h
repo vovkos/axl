@@ -41,15 +41,20 @@ struct HashTableEntry: MapEntry<Key, Value> {
 	friend class HashTable;
 
 protected:
-	class BucketLink {
+	class GetBucketLink {
 	public:
 		ListLink*
 		operator () (HashTableEntry* entry) const {
 			return &entry->m_bucketLink;
 		}
+
+		const ListLink*
+		operator () (const HashTableEntry* entry) const {
+			return &entry->m_bucketLink;
+		}
 	};
 
-	typedef AuxList<HashTableEntry, BucketLink> Bucket;
+	typedef AuxList<HashTableEntry, GetBucketLink> Bucket;
 
 protected:
 	ListLink m_bucketLink;
@@ -185,14 +190,16 @@ public:
 		if (!result)
 			return false;
 
+		Array<Bucket>::Rwi oldRwi = m_table;
+		Array<Bucket>::Rwi newRwi = newTable;
 		size_t oldBucketCount = m_table.getCount();
 		for (size_t i = 0; i < oldBucketCount; i++) {
-			Bucket* oldBucket = &m_table[i];
+			Bucket* oldBucket = &oldRwi[i];
 			while (!oldBucket->isEmpty()) {
 				Entry* entry = oldBucket->removeHead();
 				size_t hash = m_hash(entry->m_key);
 
-				Bucket* newBucket = &newTable[hash % bucketCount];
+				Bucket* newBucket = &newRwi[hash % bucketCount];
 				entry->m_bucket = newBucket;
 				newBucket->insertTail(entry);
 			}
@@ -212,16 +219,14 @@ public:
 		m_resizeThreshold = resizeThreshold;
 	}
 
-	Iterator
-	find(KeyArg key) {
+	ConstIterator
+	find(KeyArg key) const {
 		size_t bucketCount = m_table.getCount();
 		if (!bucketCount)
 			return NULL;
 
 		size_t hash = m_hash(key);
-		Bucket* bucket = &m_table[hash % bucketCount];
-
-		typename Bucket::Iterator it = bucket->getHead();
+		typename Bucket::ConstIterator it = m_table[hash % bucketCount].getHead();
 		for (; it; it++) {
 			bool isEqual = m_eq(key, it->m_key);
 			if (isEqual)
@@ -231,9 +236,11 @@ public:
 		return NULL;
 	}
 
-	ConstIterator
-	find(KeyArg key) const {
-		return ((HashTable*)this)->find(key); // a simple const-cast
+	Iterator
+	find(KeyArg key) {
+		return m_table.ensureExclusive() ?
+			(Entry*)((const HashTable*)this)->find(key).getEntry() : // a simple const-cast
+			NULL;
 	}
 
 	Value
@@ -257,8 +264,7 @@ public:
 		}
 
 		size_t hash = m_hash(key);
-		Bucket* bucket = &m_table[hash % bucketCount];
-
+		Bucket* bucket = &m_table.rwi()[hash % bucketCount];
 		typename Bucket::Iterator it = bucket->getHead();
 		for (; it; it++) {
 			bool isEqual = m_eq(key, it->m_key);

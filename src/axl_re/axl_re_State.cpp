@@ -50,12 +50,12 @@ StateImpl::clone() {
 
 	size_t count = m_captureArray.getCount();
 	state->m_captureArray.setCount(count);
-
+	sl::Array<Match*>::Rwi rwi = state->m_captureArray;
 	sl::ConstBoxIterator<Match> it = m_captureList.getHead();
 	for (size_t i = 0; it; it++, i++) {
 		Match* match = state->m_captureList.insertTail().p();
 		*match = *it;
-		state->m_captureArray[i] = match;
+		rwi[i] = match;
 	}
 
 	return state;
@@ -156,7 +156,7 @@ StateImpl::createMatch(
 		return;
 
 	m_captureArray.setCountZeroConstruct(count);
-
+	sl::Array<Match*>::Rwi rwi = m_captureArray;
 	for (size_t i = 0; i < count; i++) {
 		const MatchPos& pos = capturePosArray[i];
 		if (pos.m_endOffset == -1)
@@ -173,7 +173,7 @@ StateImpl::createMatch(
 			match->m_p = (char*)lastExecData + (size_t)(pos.m_offset - lastExecOffset);
 		}
 
-		m_captureArray[i] = match;
+		rwi[i] = match;
 	}
 }
 

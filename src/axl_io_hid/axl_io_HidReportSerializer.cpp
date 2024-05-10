@@ -185,8 +185,9 @@ HidReportSerializer::loadReportDecodeInfo(
 			size_t auxUsageCount;
 			p = enc::decodeUleb128(&auxUsageCount, p, end);
 			field->m_auxUsageTable.setCount(auxUsageCount);
+			sl::Array<uint32_t>::Rwi rwi = field->m_auxUsageTable;
 			for (size_t i = 0; i < auxUsageCount; i++)
-				p = enc::decodeUleb128(&field->m_auxUsageTable[i], p, end);
+				p = enc::decodeUleb128(&rwi[i], p, end);
 		}
 	}
 

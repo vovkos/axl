@@ -876,6 +876,35 @@ public:
 	typedef typename StringRef::StringRef2 StringRef2;
 	typedef typename StringRef::StringRef3 StringRef3;
 
+	// read-write index (with bounds-checking in DEBUG builds)
+
+	class Rwi {
+		friend class StringBase;
+
+	protected:
+		C* m_p;
+#if (_AXL_DEBUG)
+		size_t m_length;
+#endif
+
+	public:
+		Rwi(StringBase& string) {
+			m_p = string.p();
+#if (_AXL_DEBUG)
+			m_length = string.getLength();
+#endif
+		}
+
+		C& operator [] (size_t i) {
+			ASSERT(i < m_length);
+			return m_p[i];
+		}
+
+		T* p() {
+			return m_p;
+		}
+	};
+
 public:
 	StringBase() {}
 
@@ -1074,22 +1103,14 @@ public:
 		return *this;
 	}
 
-	const C&
-	operator [] (intptr_t i) const {
-		return StringRef::operator [] (i);
-	}
-
-	C&
-	operator [] (intptr_t i) {
-		bool result = ensureExclusive();
-		ASSERT(result);
-
-		return (C&)StringRef::operator [] (i);
-	}
-
 	C*
 	p() {
 		return ensureExclusive() ? this->m_p : NULL;
+	}
+
+	Rwi
+	rwi() {
+		return Rwi(*this);
 	}
 
 	const C*

@@ -67,7 +67,7 @@ int*
 RagelRoot::prePush() {
 	size_t count = m_stack.getCount();
 	m_stack.setCount(count + 1);
-	stack = m_stack;
+	stack = m_stack.p();
 	return stack;
 }
 

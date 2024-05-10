@@ -30,8 +30,9 @@ ExecNfaVmBase::Thread::openCapture(
 	if (captureId >= m_capturePosArray.getCount())
 		m_capturePosArray.setCount(captureId + 1);
 
-	m_capturePosArray[captureId].m_offset = offset;
-	m_capturePosArray[captureId].m_endOffset = offset;
+	MatchPos& pos = m_capturePosArray.rwi()[captureId];
+	pos.m_offset = offset;
+	pos.m_endOffset = offset;
 }
 
 void
@@ -41,7 +42,7 @@ ExecNfaVmBase::Thread::closeCapture(
 ) {
 	ASSERT(captureId < m_capturePosArray.getCount());
 	AXL_RE_TRACE_CAPTURE("%p: close capture(%d)\n", offset, captureId);
-	m_capturePosArray[captureId].m_endOffset = offset;
+	m_capturePosArray.rwi()[captureId].m_endOffset = offset;
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

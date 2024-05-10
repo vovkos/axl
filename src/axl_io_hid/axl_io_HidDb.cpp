@@ -28,7 +28,7 @@ HidDbFileLoader::initialize(const sl::StringRef& fileName) {
 
 #if (_AXL_OS_WIN)
 	if (m_dir.isSuffix('\\'))
-		m_dir[m_dir.getLength() - 1] = '/';
+		m_dir.rwi()[m_dir.getLength() - 1] = '/';
 #endif
 
 	if (!m_dir.isSuffix('/'))
@@ -51,7 +51,7 @@ HidDbFileLoader::load(
 	if (!result)
 		return false;
 
-	memcpy(*buffer, file.p(), file.getMappingSize());
+	memcpy(buffer->p(), file.p(), file.getMappingSize());
 	return true;
 }
 

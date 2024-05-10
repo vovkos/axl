@@ -148,7 +148,7 @@ Package::append_va(
 	if (!result)
 		return oldSize;
 
-	packer->pack_va(m_buffer + oldSize, &size, va);
+	packer->pack_va(m_buffer.p() + oldSize, &size, va);
 	return newSize;
 }
 
@@ -166,7 +166,7 @@ Package::append(
 	if (!result)
 		return oldSize;
 
-	memcpy(m_buffer + oldSize, p, size);
+	memcpy(m_buffer.p() + oldSize, p, size);
 	return newSize;
 }
 

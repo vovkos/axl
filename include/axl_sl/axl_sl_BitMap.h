@@ -361,7 +361,7 @@ public:
 
 	void
 	clear() {
-		memset(m_map, 0, m_map.getCount() * sizeof(size_t));
+		memset(m_map.p(), 0, m_map.getCount() * sizeof(size_t));
 	}
 
 #if (_AXL_CPP_HAS_RVALUE_REF)
@@ -407,14 +407,14 @@ public:
 		return sl::getBit(m_map, m_map.getCount(), bit);
 	}
 
-	bool
+	void
 	setBit(size_t bit) {
-		return m_map.ensureExclusive() ? (sl::setBit(m_map, m_map.getCount(), bit), true) : false;
+		return sl::setBit(m_map.p(), m_map.getCount(), bit);
 	}
 
 	bool
 	setBitResize(size_t bit) {
-		return ensureBitCount(bit + 1) ? (sl::setBit(m_map, m_map.getCount(), bit), true) : false;
+		return ensureBitCount(bit + 1) ? (sl::setBit(m_map.p(), m_map.getCount(), bit), true) : false;
 	}
 
 	void
@@ -422,7 +422,7 @@ public:
 		size_t from,
 		size_t to
 	) {
-		sl::setBitRange(m_map, m_map.getCount(), from, to);
+		sl::setBitRange(m_map.p(), m_map.getCount(), from, to);
 	}
 
 	bool
@@ -430,25 +430,25 @@ public:
 		size_t from,
 		size_t to
 	) {
-		return ensureBitCount(to) ? (sl::setBitRange(m_map, m_map.getCount(), from, to), true) : false;
+		return ensureBitCount(to) ? (sl::setBitRange(m_map.p(), m_map.getCount(), from, to), true) : false;
 	}
 
-	bool
+	void
 	clearBit(size_t bit) {
-		return m_map.ensureExclusive() ? (sl::clearBit(m_map, m_map.getCount(), bit), true) : false;
+		return sl::clearBit(m_map.p(), m_map.getCount(), bit);
 	}
 
 	bool
 	clearBitResize(size_t bit) {
-		return ensureBitCount(bit + 1) ? (sl::clearBit(m_map, m_map.getCount(), bit), true) : false;
+		return ensureBitCount(bit + 1) ? (sl::clearBit(m_map.p(), m_map.getCount(), bit), true) : false;
 	}
 
-	bool
+	void
 	clearBitRange(
 		size_t from,
 		size_t to
 	) {
-		return m_map.ensureExclusive() ? (sl::clearBitRange(m_map, m_map.getCount(), from, to), true) : false;
+		return sl::clearBitRange(m_map.p(), m_map.getCount(), from, to);
 	}
 
 	bool
@@ -456,11 +456,11 @@ public:
 		size_t from,
 		size_t to
 	) {
-		return ensureBitCount(to) ? (sl::clearBitRange(m_map, m_map.getCount(), from, to), true) : false;
+		return ensureBitCount(to) ? (sl::clearBitRange(m_map.p(), m_map.getCount(), from, to), true) : false;
 	}
 
 	template <typename Op>
-	bool
+	void
 	merge(const BitMap& bitMap2);
 
 	template <typename Op>
@@ -475,9 +475,9 @@ public:
 	bool
 	mergeCmpResize(const BitMap& bitMap2);
 
-	bool
+	void
 	invert() {
-		return m_map.ensureExclusive() ? (sl::invertBitMap(m_map, m_map.getCount()), true) : false;
+		return sl::invertBitMap(m_map.p(), m_map.getCount());
 	}
 
 	size_t
@@ -516,55 +516,42 @@ BitMap::isEqual(const BitMap& src) const {
 }
 
 template <typename Op>
-bool
+void
 BitMap::merge(const BitMap& bitMap2) {
-	if (!m_map.ensureExclusive())
-		return false;
-
 	size_t pageCount = m_map.getCount();
 	size_t pageCount2 = bitMap2.m_map.getCount();
-	sl::mergeBitMaps<Op>(m_map, bitMap2.m_map, AXL_MIN(pageCount, pageCount2));
-	return true;
+	sl::mergeBitMaps<Op>(m_map.p(), bitMap2.m_map, AXL_MIN(pageCount, pageCount2));
 }
 
 template <typename Op>
 bool
 BitMap::mergeCmp(const BitMap& bitMap2) {
-	if (!m_map.ensureExclusive())
-		return false;
-
 	size_t pageCount = m_map.getCount();
 	size_t pageCount2 = bitMap2.m_map.getCount();
-	return sl::mergeCmpBitMaps<Op>(m_map, bitMap2.m_map, AXL_MIN(pageCount, pageCount2));
+	return sl::mergeCmpBitMaps<Op>(m_map.p(), bitMap2.m_map, AXL_MIN(pageCount, pageCount2));
 }
 
 template <typename Op>
 bool
 BitMap::mergeResize(const BitMap& bitMap2) {
-	if (!m_map.ensureExclusive())
-		return false;
-
 	size_t pageCount2 = bitMap2.m_map.getCount();
 	size_t pageCount = m_map.ensureCountZeroConstruct(pageCount2);
 	if (pageCount == -1)
 		return false;
 
-	sl::mergeBitMaps<Op>(m_map, bitMap2.m_map, AXL_MIN(pageCount, pageCount2));
+	sl::mergeBitMaps<Op>(m_map.p(), bitMap2.m_map, AXL_MIN(pageCount, pageCount2));
 	return true;
 }
 
 template <typename Op>
 bool
 BitMap::mergeCmpResize(const BitMap& bitMap2) {
-	if (!m_map.ensureExclusive())
-		return false;
-
 	size_t pageCount2 = bitMap2.m_map.getCount();
 	size_t pageCount = m_map.ensureCountZeroConstruct(pageCount2);
 	if (pageCount == -1)
 		return false;
 
-	return sl::mergeCmpBitMaps<Op>(m_map, bitMap2.m_map, AXL_MIN(pageCount, pageCount2));
+	return sl::mergeCmpBitMaps<Op>(m_map.p(), bitMap2.m_map, AXL_MIN(pageCount, pageCount2));
 }
 
 //..............................................................................

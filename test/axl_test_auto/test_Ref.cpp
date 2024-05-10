@@ -97,7 +97,7 @@ run_Buf() {
 	arr.setCount(10);
 
 	sl::Array<uchar_t> arr2 = arr;
-	arr2[0] = 10;
+	arr2.rwi()[0] = 10;
 
 #if (_AXL_OS_WIN)
 	rc::Buf<DCB, DcbGetSize> dcb;

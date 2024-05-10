@@ -104,7 +104,7 @@ public:
 	bool
 	getData(sl::Array<char>* data) {
 		size_t size = getSize();
-		return data->setCount(size) && getData(*data, size);
+		return data->setCount(size) && getData(data->p(), size);
 	}
 
 	sl::Array<char>

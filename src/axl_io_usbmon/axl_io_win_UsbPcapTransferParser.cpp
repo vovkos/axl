@@ -140,8 +140,9 @@ UsbPcapTransferParser::parseIsoPacketTable(
 
 	const char* p = (char*)p0;
 	const char* end = p + size;
-	UsbMonIsoPacket* packet = m_isoPacketArray + m_isoPacketIdx;
-	UsbMonIsoPacket* packetEnd = m_isoPacketArray + m_hdr.m_isoHdr.m_packetCount;
+	UsbMonIsoPacket* base = m_isoPacketArray.p();
+	UsbMonIsoPacket* packet = base + m_isoPacketIdx;
+	UsbMonIsoPacket* packetEnd = base + m_hdr.m_isoHdr.m_packetCount;
 	ASSERT(packetEnd == m_isoPacketArray.getEnd());
 
 	while (packet < packetEnd) {

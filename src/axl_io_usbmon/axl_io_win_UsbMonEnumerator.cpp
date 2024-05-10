@@ -157,6 +157,7 @@ UsbPcapDeviceEnumerator::enumerate(
 
 	sl::Array<char> dirBuffer;
 	dirBuffer.setCount(DirBufferSize);
+	char* dirBufferBase = dirBuffer.p();
 
 	BOOLEAN isFirstQuery = TRUE;
 	ULONG queryContext = 0;
@@ -166,7 +167,7 @@ UsbPcapDeviceEnumerator::enumerate(
 
 		status = ntQueryDirectoryObject(
 			deviceDir,
-			dirBuffer,
+			dirBufferBase,
 			DirBufferSize,
 			FALSE,
 			isFirstQuery,
@@ -182,7 +183,7 @@ UsbPcapDeviceEnumerator::enumerate(
 			return -1;
 		}
 
-		const OBJECT_DIRECTORY_INFORMATION* dirInfo = (OBJECT_DIRECTORY_INFORMATION*)dirBuffer.cp();
+		const OBJECT_DIRECTORY_INFORMATION* dirInfo = (OBJECT_DIRECTORY_INFORMATION*)dirBufferBase;
 		for (; dirInfo->Name.Buffer; dirInfo++) {
 			sl::StringRef_w name(dirInfo->Name.Buffer, dirInfo->Name.Length / sizeof(wchar_t), true);
 			sl::StringRef_w typeName(dirInfo->TypeName.Buffer, dirInfo->TypeName.Length / sizeof(wchar_t), true);

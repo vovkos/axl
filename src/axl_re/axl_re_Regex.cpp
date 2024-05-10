@@ -82,22 +82,21 @@ Regex::load(
 
 	sl::Array<NfaState*> stateArray;
 	stateArray.setCount(hdr->m_stateCount);
+	sl::Array<NfaState*>::Rwi stateRwi = stateArray;
 
 	for (size_t i = 0; i < hdr->m_stateCount; i++) {
 		NfaState* state = new NfaState;
 		state->m_id = i;
 		m_nfaProgram.m_stateList.insertTail(state);
-		stateArray[i] = state;
+		stateRwi[i] = state;
 	}
 
 	m_nfaProgram.m_matchStartState = stateArray[hdr->m_matchStartStateId];
 	m_nfaProgram.m_searchStartState = hdr->m_searchStartStateId != 1 ? stateArray[hdr->m_searchStartStateId] : NULL;
 	m_nfaProgram.m_captureCount = hdr->m_captureCount;
 
-	bool result = m_switchCaseArray.setCount(hdr->m_switchCaseCount);
-	if (!result)
-		return false;
-
+	m_switchCaseArray.setCount(hdr->m_switchCaseCount);
+	sl::Array<SwitchCase>::Rwi scaseRwi = m_switchCaseArray;
 	for (size_t i = 0; i < hdr->m_switchCaseCount; i++) {
 		const SwitchCaseStorage* caseStorage = (SwitchCaseStorage*)p;
 
@@ -106,7 +105,7 @@ Regex::load(
 			caseStorage->m_captureCount > hdr->m_captureCount)
 			return err::fail("invalid regex switch-case storage");
 
-		SwitchCase& scase = m_switchCaseArray[i];
+		SwitchCase& scase = scaseRwi[i];
 		scase.m_captureCount = caseStorage->m_captureCount;
 		scase.m_nfaMatchStartState = stateArray[caseStorage->m_matchStartStateId];
 		p += sizeof(SwitchCaseStorage);

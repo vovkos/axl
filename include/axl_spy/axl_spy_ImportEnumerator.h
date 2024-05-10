@@ -102,7 +102,7 @@ protected:
 		size_t m_end;
 
 		bool
-		isInside(size_t address) {
+		isInside(size_t address) const {
 			return address >= m_begin && address < m_end;
 		}
 	};

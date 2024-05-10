@@ -730,7 +730,7 @@ benchCodecs() {
 	static DataUtf::C data_utf[16 * 1024];
 	enc::ConvertResult<DataUtf::C, utf8_t> result = enc::Convert<DataUtf, enc::Utf8>::convert_u(
 		data_utf,
-		buffer1.p(),
+		buffer1.cp(),
 		buffer1.getEnd()
 	);
 	size_t length_utf = result.m_dst - data_utf;
@@ -829,11 +829,135 @@ benchCodecs() {
 	} while (0); */
 }
 
+
+#include <vector>
+#include <QVector>
+
+volatile size_t g_n = 0;
+volatile size_t* g_p = &g_n;
+
+template <typename T>
+void testArrayPerf(const char* typeName) {
+	enum {
+
+		RepeatCount = 400000,
+		ElementCount  = 1 * 1024,
+		ElementCount2 = 4 * 1024,
+	};
+
+	uint64_t time0, time;
+
+	time0 = sys::getTimestamp();
+
+	for (size_t i = 0; i < RepeatCount; i++) {
+		std::vector<T> v;
+		v.resize(ElementCount);
+
+// 		std::vector<T> v2 = v;
+
+		size_t n = v.size();
+		for (size_t j = 0; j < n; j++)
+			v[j] = j;
+
+		v.resize(ElementCount2);
+		n = v.size();
+		for (size_t j = 0; j < n; j++)
+			v[j] = j;
+	}
+
+	time = sys::getTimestamp() - time0;
+	printf("vector<%s> time: %s\n", typeName, sys::Time(time).format("%m:%s:%l").sz());
+
+	time0 = sys::getTimestamp();
+
+	for (size_t i = 0; i < RepeatCount; i++) {
+		QVector<T> v;
+		v.resize(ElementCount);
+
+// 		QVector<T> v2 = v;
+
+		size_t n = v.size();
+		for (size_t j = 0; j < n; j++)
+			v[j] = j;
+
+		v.resize(ElementCount2);
+		n = v.size();
+		for (size_t j = 0; j < n; j++)
+			v[j] = j;
+	}
+
+	time = sys::getTimestamp() - time0;
+	printf("QVector<%s> time: %s\n", typeName, sys::Time(time).format("%m:%s:%l").sz());
+
+	time0 = sys::getTimestamp();
+
+	for (size_t i = 0; i < RepeatCount; i++) {
+		sl::Array<T> v;
+		v.setCount(ElementCount);
+
+//		sl::Array<T> v2 = v;
+
+		sl::Array<T>::Rwi rwi = v;
+		size_t n = v.getCount();
+		for (size_t j = 0; j < n; j++)
+			rwi[j] = j;
+
+		v.setCount(ElementCount2);
+		n = v.getCount();
+		rwi = v;
+		for (size_t j = 0; j < n; j++)
+			rwi[j] = j;
+	}
+
+	time = sys::getTimestamp() - time0;
+	printf("sl::Array<%s> time: %s\n", typeName, sys::Time(time).format("%m:%s:%l").sz());
+}
+
 int
 main(
 	int argc,
 	char *argv[]
 ) {
+	testArrayPerf<char>("char");
+	testArrayPerf<int>("int");
+
+	struct Point {
+		size_t m_a;
+		size_t m_b;
+
+		void operator = (size_t a) {
+			m_a = m_b = a;
+		}
+	};
+
+	testArrayPerf<Point>("Point");
+
+	struct Point2: Point {
+		Point2() {
+			m_a = 0;
+			m_b = 0;
+		}
+
+		void operator = (size_t a) {
+			m_a = m_b = a;
+		}
+	};
+
+	testArrayPerf<Point2>("Point2");
+
+	struct Point3: Point2 {
+		~Point3() {
+			*g_p = m_a + m_b;
+		}
+
+		void operator = (size_t a) {
+			m_a = m_b = a;
+		}
+	};
+
+	testArrayPerf<Point3>("Point3");
+	return 0;
+
 #if (_AXL_OS_POSIX)
 	setvbuf(stdout, NULL, _IOLBF, 1024);
 #endif

@@ -101,11 +101,11 @@ TlsMgr::setSlotValue(
 			entry->m_value = value;
 		} else {
 			page->m_valueList.remove(entry);
-			page->m_array[slot] = NULL;
+			page->m_array.rwi()[slot] = NULL;
 		}
 	} else if (value) {
 		entry = page->m_valueList.insertTail(value).getEntry();
-		page->m_array[slot] = entry;
+		page->m_array.rwi()[slot] = entry;
 	}
 
 	return prev;

@@ -183,8 +183,8 @@ BuddyAllocMap::create(
 		return false;
 	}
 
-	page = m_pageArray;
-	level = m_levelArray;
+	page = m_pageArray.p();
+	level = m_levelArray.p();
 	end = level + height;
 
 	pageCount = width << (height - 1); // on the bottom level
@@ -219,8 +219,8 @@ BuddyAllocMap::close() {
 
 void
 BuddyAllocMap::clear() {
-	Page* page = m_pageArray;
-	Level* level = m_levelArray;
+	Page* page = m_pageArray.p();
+	Level* level = m_levelArray.p();
 	Level* end = level + m_height;
 
 	size_t pageCount = m_width << (m_height - 1); // on the bottom level
@@ -261,7 +261,7 @@ BuddyAllocMap::allocate(size_t size) {
 		levelIdx++;
 
 	ASSERT(levelIdx < m_height);
-	level = m_levelArray + levelIdx;
+	level = m_levelArray.p() + levelIdx;
 
 	page = level->getFirstAvailablePage();
 	if (!page) {
@@ -283,8 +283,8 @@ BuddyAllocMap::allocate(size_t size) {
 
 	// mark starting with the bottom level (level 0)
 
-	level = m_levelArray;
-	page = m_pageArray;
+	level = m_levelArray.p();
+	page = m_pageArray.p();
 	pageCount = m_width << (m_height - 1); // on the bottom level
 	bitSize = 1;
 
@@ -335,8 +335,8 @@ BuddyAllocMap::mark(
 	size_t address,
 	size_t size
 ) {
-	Level* level = m_levelArray;
-	Page* page = m_pageArray;
+	Level* level = m_levelArray.p();
+	Page* page = m_pageArray.p();
 
 	size_t pageCount = m_width << (m_height - 1); // on the bottom level
 	size_t bitSize = 1;
@@ -394,8 +394,8 @@ BuddyAllocMap::free(
 	size_t address,
 	size_t size
 ) {
-	Level* level = m_levelArray;
-	Page* page = m_pageArray;
+	Level* level = m_levelArray.p();
+	Page* page = m_pageArray.p();
 	Page* prevPage = NULL;
 
 	size_t pageCount = m_width << (m_height - 1); // on the bottom level

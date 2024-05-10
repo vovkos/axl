@@ -343,8 +343,9 @@ NfaStateSet::buildClosureImpl(uint_t anchors) {
 
 		size_t count = m_array.getCount();
 		stack.setCount(count);
+		sl::Array<const NfaState*>::Rwi rwi = stack;
 		for (size_t i = 0, j = count - 1; i < count; i++, j--)
-			stack[i] = m_array[j];
+			rwi[i] = m_array[j];
 	}
 
 	m_closureKind = UseAnchors()() ?

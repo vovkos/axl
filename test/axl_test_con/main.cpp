@@ -1766,7 +1766,7 @@ testRegex() {
 
 	regex.captureSubmatches(
 		match,
-		submatchArray,
+		submatchArray.p(),
 		submatchArray.getCount()
 	);
 
@@ -1939,6 +1939,7 @@ testNamedPipes() {
 
 	sl::Array<char> dirBuffer;
 	dirBuffer.setCount(BufferSize);
+	char* dirBufferBase = dirBuffer.p();
 
 	sl::String_utf16 fileName;
 
@@ -1953,7 +1954,7 @@ testNamedPipes() {
 			NULL,
 			0,
 			&ioStatus,
-			dirBuffer,
+			dirBufferBase,
 			dirBuffer.getCount(),
 			sys::win::FileDirectoryInformation,
 			FALSE,
@@ -1970,7 +1971,7 @@ testNamedPipes() {
 			return;
 		}
 
-		FILE_DIRECTORY_INFORMATION* dirInfo = (FILE_DIRECTORY_INFORMATION*)dirBuffer.p();
+		FILE_DIRECTORY_INFORMATION* dirInfo = (FILE_DIRECTORY_INFORMATION*)dirBufferBase;
 		for (;;) {
 			fileName.copy(dirInfo->FileName, dirInfo->FileNameLength / 2);
 
@@ -2077,6 +2078,7 @@ enumerateDirectory(
 
 	sl::Array<char> buffer;
 	buffer.setCount(BufferSize);
+	char* bufferBase = buffer.p();
 
 	ULONG queryContext = 0;
 	BOOLEAN isFirstQuery = TRUE;
@@ -2093,7 +2095,7 @@ enumerateDirectory(
 
 		status = ntQueryDirectoryObject(
 			dir,
-			buffer,
+			bufferBase,
 			buffer.getCount(),
 			FALSE,
 			isFirstQuery,
@@ -2110,7 +2112,7 @@ enumerateDirectory(
 			return;
 		}
 
-		OBJECT_DIRECTORY_INFORMATION* dirInfo = (OBJECT_DIRECTORY_INFORMATION*)buffer.p();
+		OBJECT_DIRECTORY_INFORMATION* dirInfo = (OBJECT_DIRECTORY_INFORMATION*)bufferBase;
 		for (; dirInfo->Name.Buffer; dirInfo++) {
 			dirName.copy(dirInfo->Name.Buffer, dirInfo->Name.Length / sizeof(wchar_t));
 			dirTypeName.copy(dirInfo->TypeName.Buffer, dirInfo->TypeName.Length / sizeof(wchar_t));
@@ -2474,17 +2476,18 @@ public:
 	threadFunc() {
 		sl::Array<char> buffer;
 		buffer.setCount(m_maxPacketSize);
+		char* p = buffer.p();
 
 		size_t totalSize = 0;
 		while (totalSize < 1024) {
 			size_t size;
 			switch (m_endpointType) {
 			case LIBUSB_TRANSFER_TYPE_BULK:
-				size = m_device->bulkTransfer(m_endpointId, buffer, m_maxPacketSize, m_timeout);
+				size = m_device->bulkTransfer(m_endpointId, p, m_maxPacketSize, m_timeout);
 				break;
 
 			case LIBUSB_TRANSFER_TYPE_INTERRUPT:
-				size = m_device->interruptTransfer(m_endpointId, buffer, m_maxPacketSize, m_timeout);
+				size = m_device->interruptTransfer(m_endpointId, p, m_maxPacketSize, m_timeout);
 				break;
 
 			default:
@@ -2528,7 +2531,7 @@ public:
 			m_transfer.fillBulkTransfer(
 				m_device->getOpenHandle(),
 				m_endpointId,
-				m_buffer,
+				m_buffer.p(),
 				m_maxPacketSize,
 				onCompleted,
 				this,
@@ -2541,7 +2544,7 @@ public:
 			m_transfer.fillInterruptTransfer(
 				m_device->getOpenHandle(),
 				m_endpointId,
-				m_buffer,
+				m_buffer.p(),
 				m_maxPacketSize,
 				onCompleted,
 				this,
@@ -2643,7 +2646,7 @@ testUsbMouse() {
 
 	sl::Array<char> buffer;
 	buffer.setCount(endpointDesc->wMaxPacketSize);
-	size_t size = device.interruptTransfer(EndpointId, buffer, endpointDesc->wMaxPacketSize);
+	size_t size = device.interruptTransfer(EndpointId, buffer.p(), endpointDesc->wMaxPacketSize);
 
 	if (size == -1) {
 		printf("Error: %s\n", err::getLastErrorDescription().sz());
@@ -4744,11 +4747,14 @@ testBase32() {
 
 	sl::Array<char> source;
 
+
 	for (int i = 0; i < 500; i++) {
 		size_t size = rand() % 64 + 16;
 		source.setCount(size);
+		sl::Array<char>::Rwi rwi = source;
+
 		for (size_t j = 0; j < size; j++)
-			source[j] = (char)rand();
+			rwi[j] = (char)rand();
 
 		sl::String enc = enc::Base32Encoding::encode(source, size);
 		sl::Array<char> dec = enc::Base32Encoding::decode(enc);
@@ -4774,8 +4780,10 @@ testBase64() {
 	for (int i = 0; i < 500; i++) {
 		size_t size = rand() % 64 + 16;
 		source.setCount(size);
+		sl::Array<char>::Rwi rwi = source;
+
 		for (size_t j = 0; j < size; j++)
-			source[j] = (char)rand();
+			rwi[j] = (char)rand();
 
 		sl::String enc = enc::Base64Encoding::encode(source, size);
 		sl::Array<char> dec = enc::Base64Encoding::decode(enc);
@@ -5643,7 +5651,7 @@ testIoPerformance() {
 		simpleFileSrc.read(&rec, sizeof(rec));
 		if (rec.m_dataSize) {
 			buffer.setCount(rec.m_dataSize);
-			simpleFileSrc.read(buffer, rec.m_dataSize);
+			simpleFileSrc.read(buffer.p(), rec.m_dataSize);
 		}
 
 #	if (!_READ_ONLY)
@@ -8265,6 +8273,7 @@ testUsbMon() {
 	sl::Array<char> buffer;
 	sl::Array<char> payload;
 	buffer.setCount(BufferSize);
+	char* bufferBase = buffer.p();
 
 	printf("Capturing USB on %s (buffer %d bytes)...\n", captureDevice->m_description.sz(), BufferSize);
 
@@ -8272,7 +8281,7 @@ testUsbMon() {
 		size_t size;
 
 #if (_AXL_OS_WIN)
-		size = monitor.read(buffer, BufferSize);
+		size = monitor.read(bufferBase, BufferSize);
 #elif (_AXL_OS_LINUX)
 		fd_set readSet = { 0 };
 		FD_SET(monitor, &readSet);
@@ -8282,7 +8291,7 @@ testUsbMon() {
 			return false;
 		}
 
-		size = monitor.read(buffer, BufferSize);
+		size = monitor.read(bufferBase, BufferSize);
 		if (!size) {
 			printf("EOF (?!)\n");
 			break;
@@ -8294,7 +8303,7 @@ testUsbMon() {
 			return false;
 		}
 
-		const char* p = buffer;
+		const char* p = bufferBase;
 		const char* end = p + size;
 
 		while (p < end) {
@@ -9178,7 +9187,6 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	testConn();
 	return 0;
 }
 

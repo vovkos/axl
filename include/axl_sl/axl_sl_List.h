@@ -306,20 +306,21 @@ public:
 		if (!result)
 			return false;
 
+		sl::Array<T*>::Rwi rwi = array;
 		Iterator it = getHead();
 		for (size_t i = 0; i < this->m_count; i++, it++)
-			array[i] = it.getEntry();
+			rwi[i] = it.getEntry();
 
 		ASSERT(!it);
-		std::sort(array.getBegin(), array.getEnd(), compare);
+
+		T** p = rwi.p();
+		T** end = p + this->m_count;
+		std::sort(p, end, compare);
 
 		// insertTail() would do a lot of unnecessary assignments:
 		//   link->m_next = NULL;
 		//   this->m_tail = link;
 		//   this->m_count++;
-
-		T** p = array;
-		T** end = p + this->m_count;
 
 		ListLink* link = GetLink()(*p++);
 		link->m_prev = NULL;
