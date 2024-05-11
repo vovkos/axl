@@ -162,7 +162,7 @@ getExeFilePath() {
 	if (!result)
 		return sl::String();
 
-	_NSGetExecutablePath(path, &size);
+	_NSGetExecutablePath(path.p(), &size);
 	return getFullFilePath(path.cp());
 #else
 #	error unsupported OS

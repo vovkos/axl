@@ -839,7 +839,6 @@ volatile size_t* g_p = &g_n;
 template <typename T>
 void testArrayPerf(const char* typeName) {
 	enum {
-
 		RepeatCount = 400000,
 		ElementCount  = 1 * 1024,
 		ElementCount2 = 4 * 1024,
@@ -848,6 +847,13 @@ void testArrayPerf(const char* typeName) {
 	uint64_t time0, time;
 
 	time0 = sys::getTimestamp();
+
+	io::File f;
+#if (_AXL_OS_WIN)
+	f.open("NUL");
+#elif (_AXL_OS_POSIX)
+	f.open("/dev/null");
+#endif
 
 	for (size_t i = 0; i < RepeatCount; i++) {
 		std::vector<T> v;
@@ -859,14 +865,18 @@ void testArrayPerf(const char* typeName) {
 		for (size_t j = 0; j < n; j++)
 			v[j] = j;
 
+		f.write(v.data(), v.size());
+
 		v.resize(ElementCount2);
 		n = v.size();
 		for (size_t j = 0; j < n; j++)
 			v[j] = j;
+
+		f.write(v.data(), v.size());
 	}
 
 	time = sys::getTimestamp() - time0;
-	printf("vector<%s> time: %s\n", typeName, sys::Time(time).format("%m:%s:%l").sz());
+	printf("vector<%s> time: %s\n", typeName, sys::Time(time, 0).format("%m:%s:%l").sz());
 
 	time0 = sys::getTimestamp();
 
@@ -880,14 +890,18 @@ void testArrayPerf(const char* typeName) {
 		for (size_t j = 0; j < n; j++)
 			v[j] = j;
 
+		f.write(v.data(), v.size());
+
 		v.resize(ElementCount2);
 		n = v.size();
 		for (size_t j = 0; j < n; j++)
 			v[j] = j;
+
+		f.write(v.data(), v.size());
 	}
 
 	time = sys::getTimestamp() - time0;
-	printf("QVector<%s> time: %s\n", typeName, sys::Time(time).format("%m:%s:%l").sz());
+	printf("QVector<%s> time: %s\n", typeName, sys::Time(time, 0).format("%m:%s:%l").sz());
 
 	time0 = sys::getTimestamp();
 
@@ -897,20 +911,24 @@ void testArrayPerf(const char* typeName) {
 
 //		sl::Array<T> v2 = v;
 
-		sl::Array<T>::Rwi rwi = v;
+		typename sl::Array<T>::Rwi rwi = v;
 		size_t n = v.getCount();
 		for (size_t j = 0; j < n; j++)
 			rwi[j] = j;
+
+		f.write(v, v.getCount());
 
 		v.setCount(ElementCount2);
 		n = v.getCount();
 		rwi = v;
 		for (size_t j = 0; j < n; j++)
 			rwi[j] = j;
+
+		f.write(v, v.getCount());
 	}
 
 	time = sys::getTimestamp() - time0;
-	printf("sl::Array<%s> time: %s\n", typeName, sys::Time(time).format("%m:%s:%l").sz());
+	printf("sl::Array<%s> time: %s\n", typeName, sys::Time(time, 0).format("%m:%s:%l").sz());
 }
 
 int

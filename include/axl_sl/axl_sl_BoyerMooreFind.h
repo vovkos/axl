@@ -266,7 +266,7 @@ public:
 			return false;
 
 		if (IsCaseFolded) {
-			Array<C>::Rwi rwi = this->m_pattern;
+			typename Array<typename Details::C>::Rwi rwi = this->m_pattern;
 			for (size_t i = 0; i < length; i++)
 				rwi[i] = CaseOp()(rwi[i]);
 		}

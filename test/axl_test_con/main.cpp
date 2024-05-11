@@ -6211,7 +6211,6 @@ exec(const sl::StringRef& commandLine) { // returns on failure only
 	sl::Array<char*> argv(rc::BufKind_Stack, buffer, sizeof(buffer));
 
 	sl::String string = commandLine;
-
 	size_t length = string.getLength();
 	for (;;) {
 		string.trimLeft();
@@ -6224,7 +6223,7 @@ exec(const sl::StringRef& commandLine) { // returns on failure only
 		if (pos == -1)
 			break;
 
-		string[pos] = 0;
+		string.rwi()[pos] = 0;
 		string = string.getSubString(pos + 1);
 	}
 

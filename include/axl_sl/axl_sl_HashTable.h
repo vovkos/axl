@@ -190,8 +190,8 @@ public:
 		if (!result)
 			return false;
 
-		Array<Bucket>::Rwi oldRwi = m_table;
-		Array<Bucket>::Rwi newRwi = newTable;
+		typename Array<Bucket>::Rwi oldRwi = m_table;
+		typename Array<Bucket>::Rwi newRwi = newTable;
 		size_t oldBucketCount = m_table.getCount();
 		for (size_t i = 0; i < oldBucketCount; i++) {
 			Bucket* oldBucket = &oldRwi[i];

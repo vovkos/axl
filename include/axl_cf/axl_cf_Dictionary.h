@@ -129,7 +129,7 @@ public:
 			if (!result)
 				return false;
 
-			keyBuffer = *keyArray;
+			keyBuffer = keyArray->p();
 		}
 
 		if (valueArray) {
@@ -137,7 +137,7 @@ public:
 			if (!result)
 				return false;
 
-			valueBuffer = *valueArray;
+			valueBuffer = valueArray->p();
 		}
 
 		::CFDictionaryGetKeysAndValues(this->m_p, keyBuffer, valueBuffer);

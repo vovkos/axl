@@ -301,12 +301,12 @@ public:
 		if (this->m_count < 2)
 			return true;
 
-		sl::Array<T*> array;
+		Array<T*> array;
 		bool result = array.setCount(this->m_count);
 		if (!result)
 			return false;
 
-		sl::Array<T*>::Rwi rwi = array;
+		typename Array<T*>::Rwi rwi = array;
 		Iterator it = getHead();
 		for (size_t i = 0; i < this->m_count; i++, it++)
 			rwi[i] = it.getEntry();
@@ -519,7 +519,7 @@ class ConstList: public ConstListBase<
 public:
 	ConstList() {}
 
-	ConstList(const ListBase<T, GetLink, sl::Iterator<T, GetLink>, sl::ConstIterator<T, GetLink> >& list) {
+	ConstList(const ListBase<T, GetLink, Iterator<T, GetLink>, ConstIterator<T, GetLink> >& list) {
 		this->m_listData = list.getListData();
 	}
 };
