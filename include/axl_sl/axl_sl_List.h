@@ -519,7 +519,7 @@ class ConstList: public ConstListBase<
 public:
 	ConstList() {}
 
-	ConstList(const ListBase<T, GetLink, Iterator<T, GetLink>, ConstIterator<T, GetLink> >& list) {
+	ConstList(const ListBase<T, GetLink, sl::Iterator<T, GetLink>, sl::ConstIterator<T, GetLink> >& list) {
 		this->m_listData = list.getListData();
 	}
 };
