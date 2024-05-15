@@ -30,7 +30,7 @@ setBitRange_u(
 	from -= pageIndex * AXL_PTR_BITS;
 	to -= pageIndex * AXL_PTR_BITS;
 
-	if (to < AXL_PTR_BITS) {
+	if (to <= AXL_PTR_BITS) {
 		*p |= getBitmask(from, to);
 		return;
 	}
@@ -39,7 +39,7 @@ setBitRange_u(
 	to -= AXL_PTR_BITS;
 	p++;
 
-	while (to >= AXL_PTR_BITS) {
+	while (to > AXL_PTR_BITS) {
 		*p = -1;
 		to -= AXL_PTR_BITS;
 		p++;
@@ -78,7 +78,7 @@ clearBitRange_u(
 	from -= pageIndex * AXL_PTR_BITS;
 	to -= pageIndex * AXL_PTR_BITS;
 
-	if (to < AXL_PTR_BITS) {
+	if (to <= AXL_PTR_BITS) {
 		*p &= ~getBitmask(from, to);
 		return;
 	}
@@ -87,7 +87,7 @@ clearBitRange_u(
 	to -= AXL_PTR_BITS;
 	p++;
 
-	while (to >= AXL_PTR_BITS) {
+	while (to > AXL_PTR_BITS) {
 		*p = 0;
 		to -= AXL_PTR_BITS;
 		p++;

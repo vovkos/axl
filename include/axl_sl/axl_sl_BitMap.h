@@ -394,7 +394,7 @@ public:
 
 	bool
 	setBitCount(size_t bitCount)  {
-		return m_map.setCountZeroConstruct(sl::align<AXL_PTR_BITS>(bitCount));
+		return m_map.setCountZeroConstruct(sl::align<AXL_PTR_BITS>(bitCount) / AXL_PTR_BITS);
 	}
 
 	bool
