@@ -13,6 +13,8 @@ set(
 	_LUA_LIB_NAME_LIST
 	lua
 	lua5
+	lua54
+	lua5.4
 	lua53
 	lua5.3
 	lua52
