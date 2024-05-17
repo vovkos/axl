@@ -9160,6 +9160,31 @@ void testSyncHidUsbMon() {
 
 //..............................................................................
 
+void testBitMask() {
+	static uint64_t lo64[][2] = {
+		{ 0,  0x0000000000000000LL },
+		{ 4,  0x000000000000000fLL },
+		{ 8,  0x00000000000000ffLL },
+		{ 12, 0x0000000000000fffLL },
+		{ 16, 0x000000000000ffffLL },
+		{ 31, 0x000000007fffffffLL },
+		{ 32, 0x00000000ffffffffLL },
+		{ 52, 0x000fffffffffffffLL },
+		{ 56, 0x00ffffffffffffffLL },
+		{ 60, 0x0fffffffffffffffLL },
+		{ 63, 0x7fffffffffffffffLL },
+		{ 64, 0xffffffffffffffffLL },
+	};
+
+	for (size_t i = 0; i < countof(lo64); i++) {
+		uint64_t shift = lo64[i][0];
+		uint64_t expected = lo64[i][1];
+		uint64_t result = sl::getLoBitmask64(shift);
+		printf("getLoBitmask64(%llu): 0x%016llx\n", shift, result);
+		ASSERT(result == expected);
+	}
+}
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -9186,6 +9211,7 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
+	testBitMask();
 	return 0;
 }
 

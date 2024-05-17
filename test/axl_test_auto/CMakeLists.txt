@@ -21,6 +21,7 @@ set(
 set(
 	APP_CPP_LIST
 	main.cpp
+	test_BitMask.cpp
 	test_BoyerMooreFind.cpp
 	test_CmdLineParser.cpp
 	test_Crypto.cpp

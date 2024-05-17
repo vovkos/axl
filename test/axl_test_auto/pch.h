@@ -18,6 +18,7 @@
 #include "axl_sl_Array.h"
 #include "axl_sl_HashTable.h"
 #include "axl_sl_BoxList.h"
+#include "axl_sl_BitMap.h"
 #include "axl_sl_Packer.h"
 #include "axl_sl_Unpacker.h"
 #include "axl_sl_HandleTable.h"

@@ -246,16 +246,18 @@ getHiBitIdx64(uint64_t x) {
 
 // bitmask generation
 
+// bit index 0..8
+
 inline
 uint8_t
 getLoBitmask8(size_t to) {
-	return ((uint8_t) 1 << (uint8_t)to) - 1;
+	return (1 << (to & 15)) - 1;
 }
 
 inline
 uint8_t
 getHiBitmask8(size_t from) {
-	return ~(((uint8_t) 1 << (uint8_t)from) - 1);
+	return ~((1 << (from & 15)) - 1);
 }
 
 inline
@@ -269,16 +271,18 @@ getBitmask8(
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+// bit index 0..16 (inclusive)
+
 inline
 uint16_t
 getLoBitmask16(size_t to) {
-	return ((uint16_t) 1 << (uint16_t)to) - 1;
+	return (1 << (to & 31)) - 1;
 }
 
 inline
 uint16_t
 getHiBitmask16(size_t from) {
-	return ~(((uint16_t) 1 << (uint16_t)from) - 1);
+	return ~((1 << (from & 31)) - 1);
 }
 
 inline
@@ -292,16 +296,18 @@ getBitmask16(
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+// bit index 0..32 (inclusive)
+
 inline
 uint32_t
 getLoBitmask32(size_t to) {
-	return ((uint32_t) 1 << (uint32_t)to) - 1;
+	return ~(((to & 32) >> 5) - 1) | ((1 << (to & 31)) - 1);
 }
 
 inline
 uint32_t
 getHiBitmask32(size_t from) {
-	return ~(((uint32_t) 1 << (uint32_t)from) - 1);
+	return (((from & 32) >> 5) - 1) & ~((1 << (from & 31)) - 1);
 }
 
 inline
@@ -315,16 +321,18 @@ getBitmask32(
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+// bit index 0..64 (inclusive)
+
 inline
 uint64_t
 getLoBitmask64(size_t to) {
-	return ((uint64_t) 1 << (uint64_t)to) - 1;
+	return ~(((to & 64ULL) >> 6) - 1) | ((1ULL << (to & 63)) - 1);
 }
 
 inline
 uint64_t
 getHiBitmask64(size_t from) {
-	return ~(((uint64_t) 1 << (uint64_t)from) - 1);
+	return (((from & 64ULL) >> 6) - 1) & ~((1ULL << (from & 63)) - 1);
 }
 
 inline
@@ -408,7 +416,7 @@ getAllocSize(size_t size) {
 inline
 size_t
 getAllocSize(size_t size) {
-	return getAllocSize<AXL_PTR_SIZE * 1024 * 1024> (size);
+	return getAllocSize<4 * 1024> (size); // 4K grow limit
 }
 
 //..............................................................................
