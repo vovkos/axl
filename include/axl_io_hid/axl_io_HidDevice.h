@@ -54,14 +54,14 @@ inline
 bool
 hidInit() {
 	int result = ::hid_init();
-	return hidComplete(result);
+	return hidComplete(result != -1);
 }
 
 inline
 bool
 hidExit() {
 	int result = ::hid_exit();
-	return hidComplete(result);
+	return hidComplete(result != -1);
 }
 
 const char*
@@ -176,7 +176,7 @@ public:
 	bool
 	setNonBlocking(bool isNonBlocking = true) {
 		int result = ::hid_set_nonblocking(m_h, isNonBlocking);
-		return hidComplete(result, m_h);
+		return hidComplete(result != -1, m_h);
 	}
 
 	size_t
