@@ -9160,6 +9160,8 @@ void testSyncHidUsbMon() {
 
 //..............................................................................
 
+#include "axl_enc_Leb128.h"
+
 void testBitMask() {
 	static uint64_t lo64[][2] = {
 		{ 0,  0x0000000000000000LL },
@@ -9182,6 +9184,21 @@ void testBitMask() {
 		uint64_t result = sl::getLoBitmask64(shift);
 		printf("getLoBitmask64(%llu): 0x%016llx\n", shift, result);
 		ASSERT(result == expected);
+	}
+}
+
+void testUleb() {
+	static uint64_t values[] = {
+		0x13AF12,
+		0x00270F,
+	};
+
+	char buffer[16];
+
+	for (size_t i = 0; i < countof(values); i++) {
+		uint64_t x = values[i];
+		char* p = enc::encodeUleb128(buffer, x);
+		printf("0x%llx (%d us, %d bps) -> %s\n", x, x, 1000000ULL * 10 / x, enc::HexEncoding::encode(buffer, p - buffer).sz());
 	}
 }
 
@@ -9211,7 +9228,7 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	testBitMask();
+	testUleb();
 	return 0;
 }
 
