@@ -135,8 +135,13 @@ syncExec(
 	return true;
 }
 
-sl::String_w
+sl::StringRef_w
 getProcessImageName(dword_t pid) {
+	if (pid == 0)
+		return L"System Idle Process";
+	else if (pid == 4)
+		return L"System";
+
 	HANDLE hProcess = ::OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pid);
 	if (!hProcess) {
 		if (::GetLastError() == ERROR_ACCESS_DENIED)
@@ -161,7 +166,6 @@ getProcessImageName(dword_t pid) {
 		sizeof(stackBuffer),
 		&length
 	);
-
 
 	if (status == STATUS_INFO_LENGTH_MISMATCH) {
 		bool result = heapBuffer.setCount(length);
