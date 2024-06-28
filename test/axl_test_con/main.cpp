@@ -9249,7 +9249,7 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	testPcap();
+	testUleb();
 	return 0;
 }
 
