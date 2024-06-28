@@ -17,6 +17,12 @@
 
 namespace axl {
 namespace io {
+namespace impl {
+
+extern "C" int axl_io_dlt_to_linktype(int dlt);
+extern "C" int axl_io_linktype_to_dlt(int linkType);
+
+} // namespace impl
 
 //..............................................................................
 
@@ -35,6 +41,20 @@ enum PcapLoopResult {
 	PcapLoopResult_Error   = -1,
 	PcapLoopResult_Break   = -2,
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+int
+getPcapLinkTypeFromDlt(int dlt) {
+	return impl::axl_io_dlt_to_linktype(dlt);
+}
+
+inline
+int
+getPcapDltFromLinkType(int linkType) {
+	return impl::axl_io_linktype_to_dlt(linkType);
+}
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -64,9 +84,14 @@ public:
 	activate();
 
 	int
-	getLinkType() {
+	getDlt() {
 		ASSERT(m_h);
 		return ::pcap_datalink(m_h);
+	}
+
+	int
+	getLinkType() {
+		return getPcapLinkTypeFromDlt(getDlt());
 	}
 
 	size_t

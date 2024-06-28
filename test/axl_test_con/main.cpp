@@ -5893,6 +5893,27 @@ testPcap() {
 	::SetDllDirectoryW(io::win::getSystemDir() + L"\\npcap");
 #endif
 
+	do {
+		const sl::StringRef fileName = "C:/Users/Vladimir/link-type-12.pcap";
+
+		io::Pcap pcap;
+		bool result = pcap.openFile(fileName);
+		if (!result) {
+			printf("error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		printf("DLT: %d\n", pcap.getDlt());
+		printf("LINKTYPE: %d\n", pcap.getLinkType());
+		printf("snapSize: 0x%x\n", pcap.getSnapshotSize());
+
+		char buffer[1024];
+		uint64_t timestamp;
+		size_t size = pcap.read(buffer, sizeof(buffer), &timestamp);
+		printf("%02x\n", buffer[0]);
+
+	} while (0);
+
 	const char* version = pcap_lib_version();
 	printf("version: %s\n", version);
 
@@ -9228,7 +9249,7 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	testUleb();
+	testPcap();
 	return 0;
 }
 

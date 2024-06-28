@@ -17,6 +17,7 @@ set(
 	LIB_H_LIST
 	${AXL_INC_DIR}/axl_io_pcap/axl_io_Pcap.h
 	${AXL_INC_DIR}/axl_io_pcap/axl_io_PcapFilter.h
+	dlt.h
 )
 
 set(
@@ -25,11 +26,17 @@ set(
 	axl_io_PcapFilter.cpp
 )
 
+set(
+	LIB_C_LIST
+	pcap-dlt.c
+)
+
 source_group(
 	lib
 	FILES
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
+	${LIB_C_LIST}
 )
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -69,12 +76,19 @@ add_library(
 	${PCH_H_LIST}
 	${LIB_H_LIST}
 	${LIB_CPP_LIST}
+	${LIB_C_LIST}
 )
 
 target_precompile_headers(
 	axl_io_pcap
 	PRIVATE
 	${PCH_H}
+)
+
+set_source_files_properties(
+	${LIB_C_LIST}
+	PROPERTIES
+	SKIP_PRECOMPILE_HEADERS TRUE
 )
 
 axl_install_redirected_includes(
