@@ -178,9 +178,15 @@ axl_create_msvc_settings)
 		"/Z7" "/Zi" "/ZI"
 	)
 
+	axl_create_compiler_flag_setting(
+		MSVC_FLAG_SANITIZE
+		DESCRIPTION "Compile with address sanitizer"
+		"/fsanitize=address"
+	)
+
 	axl_create_setting(
 		MSVC_LINK_FLAG_IGNORE4221
-		DESCRIPTION "Ignore linker warning LNK4221(object file doesn't define new symbols)"
+		DESCRIPTION "Ignore linker warning LNK4221 (object file doesn't define new symbols)"
 		DEFAULT "/IGNORE:4221"
 		" " "/IGNORE:4221"
 	)
