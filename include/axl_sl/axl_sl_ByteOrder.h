@@ -67,18 +67,19 @@ swapByteOrder(
 ) {
 	switch (size) {
 	case 1:
+		*(uint8_t*)dst = *(uint8_t*)src;
 		break;
 
 	case 2:
-		*(uint16_t*)dst = swapByteOrder16(*(uint16_t*)  src);
+		*(uint16_t*)dst = swapByteOrder16(*(uint16_t*)src);
 		break;
 
 	case 4:
-		*(uint32_t*)dst = swapByteOrder32(*(uint32_t*)  src);
+		*(uint32_t*)dst = swapByteOrder32(*(uint32_t*)src);
 		break;
 
 	case 8:
-		*(uint64_t*)dst = swapByteOrder64(*(uint64_t*)  src);
+		*(uint64_t*)dst = swapByteOrder64(*(uint64_t*)src);
 		break;
 
 	default:
