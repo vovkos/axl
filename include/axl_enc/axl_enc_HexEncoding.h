@@ -212,7 +212,7 @@ HexEncoding::encode(
 		return 0;
 	}
 
-	const uchar_t* src = (const uchar_t*) p;
+	const uchar_t* src = (const uchar_t*)p;
 
 	size_t length;
 	if (flags & HexEncodingFlag_NoSpace) {

@@ -98,7 +98,7 @@ public:
 		size_t size,
 		int padding = RSA_PKCS1_PADDING
 	) {
-		int result = RSA_public_encrypt(size, (const uchar_t*) src, (uchar_t*)dst, m_h, padding);
+		int result = RSA_public_encrypt(size, (const uchar_t*)src, (uchar_t*)dst, m_h, padding);
 		return completeWithLastCryptoError<size_t> (result, -1);
 	}
 
@@ -109,7 +109,7 @@ public:
 		size_t size,
 		int padding = RSA_PKCS1_PADDING
 	) {
-		int result = RSA_private_encrypt(size, (const uchar_t*) src, (uchar_t*)dst, m_h, padding);
+		int result = RSA_private_encrypt(size, (const uchar_t*)src, (uchar_t*)dst, m_h, padding);
 		return completeWithLastCryptoError<size_t> (result, -1);
 	}
 
@@ -120,7 +120,7 @@ public:
 		size_t size,
 		int padding = RSA_PKCS1_PADDING
 	) {
-		int result = RSA_public_decrypt(size, (const uchar_t*) src, (uchar_t*)dst, m_h, padding);
+		int result = RSA_public_decrypt(size, (const uchar_t*)src, (uchar_t*)dst, m_h, padding);
 		return completeWithLastCryptoError<size_t> (result, -1);
 	}
 
@@ -131,7 +131,7 @@ public:
 		size_t size,
 		int padding = RSA_PKCS1_PADDING
 	) {
-		int result = RSA_private_decrypt(size, (const uchar_t*) src, (uchar_t*)dst, m_h, padding);
+		int result = RSA_private_decrypt(size, (const uchar_t*)src, (uchar_t*)dst, m_h, padding);
 		return completeWithLastCryptoError<size_t> (result, -1);
 	}
 
@@ -170,7 +170,7 @@ public:
 		size_t size
 	) {
 		char hash[MD5_DIGEST_LENGTH];
-		MD5((const uchar_t*) p, size, (uchar_t*)hash);
+		MD5((const uchar_t*)p, size, (uchar_t*)hash);
 		return signHash(NID_md5, signature, hash, sizeof(hash));
 	}
 
@@ -194,9 +194,9 @@ public:
 	) {
 		return RSA_verify(
 			type,
-			(const uchar_t*) hash,
+			(const uchar_t*)hash,
 			(int)hashSize,
-			(const uchar_t*) signature,
+			(const uchar_t*)signature,
 			(int)signatureSize,
 			m_h
 		) == 1;
@@ -210,7 +210,7 @@ public:
 		size_t signatureSize
 	) {
 		char hash[MD5_DIGEST_LENGTH];
-		MD5((const uchar_t*) p, size, (uchar_t*)hash);
+		MD5((const uchar_t*)p, size, (uchar_t*)hash);
 		return verifyHash(NID_md5, hash, sizeof(hash), signature, signatureSize);
 	}
 };

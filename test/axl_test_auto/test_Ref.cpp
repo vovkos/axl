@@ -169,8 +169,8 @@ public:
 void
 run_WeakRef() {
 	rc::Ptr<MyClass2> p = AXL_RC_NEW(MyClass2);
-//	rc::CPtrT <MyClass2> p2 = rc::GetPtrOrClone ((MyClass2*) p);
-//	rc::CPtrT <MyClass2> p3 = rc::Clone (p);
+//	rc::CPtrT <MyClass2> p2 = rc::GetPtrOrClone((MyClass2*)p);
+//	rc::CPtrT <MyClass2> p3 = rc::Clone(p);
 	rc::WeakPtr<MyClass2> w = p;
 	p = rc::g_nullPtr;
 	p = w;

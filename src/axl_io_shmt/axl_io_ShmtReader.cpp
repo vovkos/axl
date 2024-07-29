@@ -74,7 +74,7 @@ ShmtReader::read(sl::Array<char>* buffer) {
 			return -1;
 		}
 
-		buffer->copy((const char*) (msgHdr + 1), readSize);
+		buffer->copy((const char*)(msgHdr + 1), readSize);
 
 		sys::atomicLock(&m_hdr->m_lock);
 		ASSERT(readEndOffset <= m_hdr->m_endOffset);

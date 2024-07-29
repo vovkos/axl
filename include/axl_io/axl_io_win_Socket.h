@@ -68,7 +68,7 @@ public:
 		void* p,
 		size_t size
 	) {
-		int result = ::getsockopt(m_h, level, option, (char*)p, (int*) &size);
+		int result = ::getsockopt(m_h, level, option, (char*)p, (int*)&size);
 		return complete(result != SOCKET_ERROR);
 	}
 
@@ -109,7 +109,7 @@ public:
 		const void* p,
 		size_t size
 	) {
-		int result = ::send(m_h, (const char*) p, (int)size, 0);
+		int result = ::send(m_h, (const char*)p, (int)size, 0);
 		return complete(result, SOCKET_ERROR);
 	}
 

@@ -1606,7 +1606,7 @@ Pcap::write(
 	ASSERT(m_h);
 
 #if (_AXL_OS_WIN)
-	int result = ::pcap_sendpacket(m_h, (const u_char*) p, (int)size);
+	int result = ::pcap_sendpacket(m_h, (const u_char*)p, (int)size);
 #else
 	int result = ::pcap_inject(m_h, p, (int)size);
 #endif

@@ -128,7 +128,7 @@ public:
 
 	const B*
 	operator () (const A* x) const {
-		return (const B*) x;
+		return (const B*)x;
 	}
 };
 
@@ -188,7 +188,7 @@ class OffsetOf {
 public:
 	size_t
 	operator () () const {
-		B* p = (C*) 1;
+		B* p = (C*)1;
 		return (size_t)p - 1;
 	}
 };

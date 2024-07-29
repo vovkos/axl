@@ -163,25 +163,25 @@ testWinNetworkAdapterList2() {
 		buffer.setCount(size);
 	}
 
-	const INTERFACE_INFO* iface = (const INTERFACE_INFO*) buffer.cp();
+	const INTERFACE_INFO* iface = (const INTERFACE_INFO*)buffer.cp();
 	size_t ifaceCount = actualSize / sizeof(INTERFACE_INFO);
 
 	for (size_t i = 0; i < ifaceCount; iface++, i++) {
 		printf("Interface #%d\n", i);
-		printf("  Address   = %s\n", io::getSockAddrString((const sockaddr*) &iface->iiAddress).sz());
-		printf("  Broadcast = %s\n", io::getSockAddrString((const sockaddr*) &iface->iiBroadcastAddress).sz());
-		printf("  Netmask   = %s\n", io::getSockAddrString((const sockaddr*) &iface->iiNetmask).sz());
+		printf("  Address   = %s\n", io::getSockAddrString((const sockaddr*)&iface->iiAddress).sz());
+		printf("  Broadcast = %s\n", io::getSockAddrString((const sockaddr*)&iface->iiBroadcastAddress).sz());
+		printf("  Netmask   = %s\n", io::getSockAddrString((const sockaddr*)&iface->iiNetmask).sz());
 
 /*		cout << endl;
 
 		sockaddr_in *pAddress;
-		pAddress = (sockaddr_in *) & (InterfaceList[i].iiAddress);
+		pAddress = (sockaddr_in*)&(InterfaceList[i].iiAddress);
 		cout << " " << inet_ntoa(pAddress->sin_addr);
 
-		pAddress = (sockaddr_in *) & (InterfaceList[i].iiBroadcastAddress);
+		pAddress = (sockaddr_in*)&(InterfaceList[i].iiBroadcastAddress);
 		cout << " has bcast " << inet_ntoa(pAddress->sin_addr);
 
-		pAddress = (sockaddr_in *) & (InterfaceList[i].iiNetmask);
+		pAddress = (sockaddr_in*)&(InterfaceList[i].iiNetmask);
 		cout << " and netmask " << inet_ntoa(pAddress->sin_addr) << endl;
 
 		cout << " Iface is ";
@@ -341,7 +341,7 @@ testParseFormatIp6() {
 	addr.sin6_family = AF_INET6;
 
 	for (;;) {
-		uint16_t* ip = (uint16_t*) &addr.sin6_addr;
+		uint16_t* ip = (uint16_t*)&addr.sin6_addr;
 
 		ip[0] = rand() % 2 ? rand() : 0;
 		ip[1] = rand() % 2 ? rand() : 0;
@@ -356,14 +356,14 @@ testParseFormatIp6() {
 		addr.sin6_scope_id = rand() % 2 ? rand() : 0;
 #endif
 
-		sl::String addrString = io::getSockAddrString((const sockaddr*) &addr).sz();
+		sl::String addrString = io::getSockAddrString((const sockaddr*)&addr).sz();
 		printf("addr1 = %s\n", addrString.sz());
 
 		char addrString2[1024] = { 0 };
 		dword_t size = sizeof(addrString2);
 
 #if (_AXL_OS_WIN)
-		WSAAddressToStringA((sockaddr*) &addr, sizeof(addr), NULL, addrString2, &size);
+		WSAAddressToStringA((sockaddr*)&addr, sizeof(addr), NULL, addrString2, &size);
 #elif (_AXL_OS_POSIX)
 		inet_ntop(AF_INET6, &addr.sin6_addr, addrString2, size);
 #endif
@@ -372,7 +372,7 @@ testParseFormatIp6() {
 		ASSERT(addrString.cmp(addrString2) == 0);
 
 		sockaddr_in6 addr2;
-		result = io::parseSockAddr((sockaddr*) &addr2, sizeof(addr2), addrString);
+		result = io::parseSockAddr((sockaddr*)&addr2, sizeof(addr2), addrString);
 		ASSERT(result && memcmp(&addr, &addr2, sizeof(addr)) == 0);
 	}
 }
@@ -2183,7 +2183,7 @@ testTcp() {
 	linger l;
 	l.l_onoff = 1;
 	l.l_linger = 0;
-	setsockopt(s, SOL_SOCKET, SO_LINGER, (const char*) &l, sizeof(l));
+	setsockopt(s, SOL_SOCKET, SO_LINGER, (const char*)&l, sizeof(l));
 
 	sockaddr_in a = { 0 };
 	a.sin_family = AF_INET;
@@ -2191,7 +2191,7 @@ testTcp() {
 	a.sin_port = htons(10001);
 
 	printf("connecting...\n");
-	int result = connect(s, (const sockaddr*) &a, sizeof(a));
+	int result = connect(s, (const sockaddr*)&a, sizeof(a));
 	printf("result = %d\n", result);
 
 	char buf[512];
@@ -2199,7 +2199,7 @@ testTcp() {
 
 	int error = 0;
 	socklen_t len = sizeof(error);
-	result = getsockopt(s, SOL_SOCKET, SO_ERROR, (char*) &error, &len);
+	result = getsockopt(s, SOL_SOCKET, SO_ERROR, (char*)&error, &len);
 
 	printf("receiving...\n");
 	result = recv(s, buf, sizeof(buf), 0);
@@ -2876,7 +2876,7 @@ public:
 
 	void
 	gcSafePoint() {
-		*(volatile int*) m_guardPage.p() = 0;
+		*(volatile int*)m_guardPage.p() = 0;
 	}
 
 	void
@@ -2999,7 +2999,7 @@ public:
 
 	void
 	gcSafePoint() {
-		sys::atomicXchg((volatile int*) m_guardPage.p(), 0);
+		sys::atomicXchg((volatile int*)m_guardPage.p(), 0);
 	}
 
 	void
@@ -3948,7 +3948,7 @@ uint16_t crc16_ansi(
 		0x8201, 0x42c0, 0x4380, 0x8341, 0x4100, 0x81c1, 0x8081, 0x4040,
 	};
 
-	uint8_t const* b = (uint8_t const*) p;
+	uint8_t const* b = (uint8_t const*)p;
 	uint16_t crc = seed;
 
 	for (; size; size--) {
@@ -3999,7 +3999,7 @@ uint16_t crc16_ccit(
 		0x6e17, 0x7e36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0,
 	};
 
-	uint8_t const* b = (uint8_t const*) p;
+	uint8_t const* b = (uint8_t const*)p;
 	uint16_t crc = seed;
 
 	for (; size; size--) {
@@ -4052,7 +4052,7 @@ uint_t calcChecksum16(
 	const uint8_t* p0,
 	size_t size
 ) {
-	uint16_t const* p = (uint16_t const*) p0;
+	uint16_t const* p = (uint16_t const*)p0;
 	void const* end = p0 + (size & ~1);
 
 	uint_t checksum = 0;
@@ -4061,7 +4061,7 @@ uint_t calcChecksum16(
 		checksum += htons(*p);
 
 	if (size & 1)
-		checksum += *(uint8_t const*) p << 8;
+		checksum += *(uint8_t const*)p << 8;
 
 	return checksum;
 }
@@ -7311,7 +7311,7 @@ iniTest() {
 		return;
 	}
 
-	const char* p = (const char*) file.view();
+	const char* p = (const char*)file.view();
 	uint64_t size = file.getSize();
 
 	MyParser parser;

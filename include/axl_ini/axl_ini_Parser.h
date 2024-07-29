@@ -28,7 +28,7 @@ public:
 		io::SimpleMappedFile file;
 		return
 			file.open(filePath, io::FileFlag_ReadOnly) &&
-			parse(filePath, sl::StringRef((const char*) file.p(), file.getMappingSize()));
+			parse(filePath, sl::StringRef((const char*)file.p(), file.getMappingSize()));
 	}
 
 	bool

@@ -203,7 +203,7 @@ public:
 		size_t size
 	) {
 		char hash[MD5_DIGEST_LENGTH];
-		MD5((const uchar_t*) p, size, (uchar_t*)hash);
+		MD5((const uchar_t*)p, size, (uchar_t*)hash);
 		return signHash(signature, hash, sizeof(hash));
 	}
 
@@ -226,9 +226,9 @@ public:
 	) {
 		return ECDSA_verify(
 			0,
-			(const uchar_t*) hash,
+			(const uchar_t*)hash,
 			(int)hashSize,
-			(const uchar_t*) signature,
+			(const uchar_t*)signature,
 			(int)signatureSize,
 			m_h
 		) == 1;
@@ -242,7 +242,7 @@ public:
 		size_t signatureSize
 	) {
 		char hash[MD5_DIGEST_LENGTH];
-		MD5((const uchar_t*) p, size, (uchar_t*)hash);
+		MD5((const uchar_t*)p, size, (uchar_t*)hash);
 		return verifyHash(hash, sizeof(hash), signature, signatureSize);
 	}
 };

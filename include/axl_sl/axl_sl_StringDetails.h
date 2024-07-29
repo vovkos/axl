@@ -124,7 +124,7 @@ public:
 		const T* subString,
 		size_t subStringLength
 	) {
-		const T* f = (const T*) memMem(p, length * sizeof(T), subString, subStringLength * sizeof(T));
+		const T* f = (const T*)memMem(p, length * sizeof(T), subString, subStringLength * sizeof(T));
 		return f ? f - p : -1;
 	}
 
@@ -333,7 +333,7 @@ public:
 		size_t length,
 		C c
 	) {
-		const C* f = (const C*) memchr(p, c, length);
+		const C* f = (const C*)memchr(p, c, length);
 		return f ? f - p : -1;
 	}
 

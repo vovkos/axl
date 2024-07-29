@@ -114,7 +114,7 @@ public:
 			if (string)
 				memcpy(p, string, stringSize);
 			else
-				*(T**) p = NULL;
+				*(T**)p = NULL;
 		}
 
 		return va;

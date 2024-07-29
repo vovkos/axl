@@ -82,7 +82,7 @@ run() {
 		return;
 	}
 
-	const char* p = (const char*) file.view();
+	const char* p = (const char*)file.view();
 	uint64_t size = file.getSize();
 
 	MyParser parser;

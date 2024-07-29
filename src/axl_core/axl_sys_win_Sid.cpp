@@ -48,7 +48,7 @@ Sid::parse(const sl::StringRef& string) {
 	bool_t result;
 	SID* sid;
 
-	result = ::ConvertStringSidToSidA(string.sz(), (PSID*) &sid);
+	result = ::ConvertStringSidToSidA(string.sz(), (PSID*)&sid);
 	if (!result)
 		return err::failWithLastSystemError();
 
@@ -62,7 +62,7 @@ Sid::parse(const sl::StringRef_w& string) {
 	bool_t result;
 	SID* sid;
 
-	result = ::ConvertStringSidToSidW(string.sz(), (PSID*) &sid);
+	result = ::ConvertStringSidToSidW(string.sz(), (PSID*)&sid);
 	if (!result)
 		return err::failWithLastSystemError();
 

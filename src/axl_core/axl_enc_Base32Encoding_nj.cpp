@@ -110,7 +110,7 @@ Base32Encoding_nj::encode(
 	uchar_t x = 0;
 	size_t i = 0;
 
-	const uchar_t* src = (const uchar_t*) p;
+	const uchar_t* src = (const uchar_t*)p;
 	const uchar_t* srcEnd = src + size;
 	for (; src < srcEnd; src++) {
 		uchar_t y = *src;

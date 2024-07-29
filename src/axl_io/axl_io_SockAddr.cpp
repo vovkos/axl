@@ -69,14 +69,14 @@ getSockProtoString(uint_t proto) {
 
 size_t
 getSockAddrNetMaskBitCount_ip4(const sockaddr_in* addr) {
-	size_t bitIdx = sl::findZeroBit((size_t*) &addr->sin_addr, 1, 0);
+	size_t bitIdx = sl::findZeroBit((size_t*)&addr->sin_addr, 1, 0);
 	return AXL_MIN(bitIdx, 32);
 }
 
 size_t
 getSockAddrNetMaskBitCount_ip6(const sockaddr_in6* addr) {
 	size_t bitIdx = sl::findZeroBit(
-		(size_t*) &addr->sin6_addr,
+		(size_t*)&addr->sin6_addr,
 		sizeof(addr->sin6_addr) / sizeof(size_t),
 		0
 	);
@@ -88,10 +88,10 @@ size_t
 getSockAddrNetMaskBitCount(const sockaddr* addr) {
 	switch (addr->sa_family) {
 	case AF_INET:
-		return getSockAddrNetMaskBitCount_ip4((const sockaddr_in*) addr);
+		return getSockAddrNetMaskBitCount_ip4((const sockaddr_in*)addr);
 
 	case AF_INET6:
-		return getSockAddrNetMaskBitCount_ip6((const sockaddr_in6*) addr);
+		return getSockAddrNetMaskBitCount_ip6((const sockaddr_in6*)addr);
 
 	default:
 		return 0;
@@ -112,7 +112,7 @@ createSockAddrNetMask_ip4(
 	if (bitCount > maxBitCount)
 		bitCount = maxBitCount;
 
-	sl::setBitRange((size_t*) &addr->sin_addr, 1, 0, bitCount);
+	sl::setBitRange((size_t*)&addr->sin_addr, 1, 0, bitCount);
 }
 
 void
@@ -128,7 +128,7 @@ createSockAddrNetMask_ip6(
 		bitCount = maxBitCount;
 
 	sl::setBitRange(
-		(size_t*) &addr->sin6_addr,
+		(size_t*)&addr->sin6_addr,
 		sizeof(addr->sin6_addr) / sizeof(size_t),
 		0,
 		bitCount
@@ -144,7 +144,7 @@ isSockAddrEqual_ip4(
 ) {
 	return
 		addr1->sin_port == addr2->sin_port &&
-		*(const uint32_t*) &addr1->sin_addr == *(const uint32_t*) &addr2->sin_addr;
+		*(const uint32_t*)&addr1->sin_addr == *(const uint32_t*)&addr2->sin_addr;
 }
 
 bool
@@ -168,10 +168,10 @@ isSockAddrEqual(
 
 	switch (addr1->sa_family) {
 	case AF_INET:
-		return isSockAddrEqual_ip4((const sockaddr_in*) addr1, (const sockaddr_in*) addr2);
+		return isSockAddrEqual_ip4((const sockaddr_in*)addr1, (const sockaddr_in*)addr2);
 
 	case AF_INET6:
-		return isSockAddrEqual_ip6((const sockaddr_in6*) addr1, (const sockaddr_in6*) addr2);
+		return isSockAddrEqual_ip6((const sockaddr_in6*)addr1, (const sockaddr_in6*)addr2);
 
 	default:
 		return false;
@@ -185,8 +185,8 @@ isSockAddrMatch_ip4(
 	const sockaddr_in* addr,
 	const sockaddr_in* filterAddr
 ) {
-	uint32_t ip = *(const uint32_t*) &addr->sin_addr;
-	uint32_t filterIp = *(const uint32_t*) &filterAddr->sin_addr;
+	uint32_t ip = *(const uint32_t*)&addr->sin_addr;
+	uint32_t filterIp = *(const uint32_t*)&filterAddr->sin_addr;
 
 	return
 		(!filterAddr->sin_port || addr->sin_port == filterAddr->sin_port) &&
@@ -214,15 +214,15 @@ isSockAddrMatch(
 	switch (filterAddr->sa_family) {
 	case AF_INET:
 		return
-			*(const uint32_t*) &((const sockaddr_in*) filterAddr)->sin_addr == 0 &&
-			((const sockaddr_in*) addr)->sin_port == ((const sockaddr_in*) filterAddr)->sin_port ||
+			*(const uint32_t*)&((const sockaddr_in*)filterAddr)->sin_addr == 0 &&
+			((const sockaddr_in*)addr)->sin_port == ((const sockaddr_in*)filterAddr)->sin_port ||
 			addr->sa_family == AF_INET &&
-			isSockAddrMatch_ip4((const sockaddr_in*) addr, (const sockaddr_in*) filterAddr);
+			isSockAddrMatch_ip4((const sockaddr_in*)addr, (const sockaddr_in*)filterAddr);
 
 	case AF_INET6:
 		return
 			addr->sa_family == AF_INET6 &&
-			isSockAddrMatch_ip6((const sockaddr_in6*) addr, (const sockaddr_in6*) filterAddr);
+			isSockAddrMatch_ip6((const sockaddr_in6*)addr, (const sockaddr_in6*)filterAddr);
 
 	default:
 		return false;
@@ -283,7 +283,7 @@ getAddrString_ip4(
 	sl::String* string,
 	const in_addr* addr
 ) {
-	const uchar_t* ip = (const uchar_t*) addr;
+	const uchar_t* ip = (const uchar_t*)addr;
 	return string->format("%d.%d.%d.%d", ip [0], ip [1], ip [2], ip [3]);
 }
 
@@ -294,7 +294,7 @@ getAddrString_ip6(
 ) {
 	string->clear();
 
-	const uint16_t* ip = (const uint16_t*) addr;
+	const uint16_t* ip = (const uint16_t*)addr;
 
 	size_t zeroRunIdx = -1;
 	size_t zeroRunLength = 0;
@@ -386,7 +386,7 @@ getSockAddrString_ip4(
 ) {
 	if (!addr->sin_port) {
 		getAddrString_ip4(string, &addr->sin_addr);
-	} else if (*(const uint32_t*) &addr->sin_addr) {
+	} else if (*(const uint32_t*)&addr->sin_addr) {
 		getAddrString_ip4(string, &addr->sin_addr);
 		string->appendFormat(":%d", sl::swapByteOrder16 (addr->sin_port));
 	} else {
@@ -421,10 +421,10 @@ getSockAddrString(
 ) {
 	switch (addr->sa_family) {
 	case AF_INET:
-		return getSockAddrString_ip4(string, (const sockaddr_in*) addr);
+		return getSockAddrString_ip4(string, (const sockaddr_in*)addr);
 
 	case AF_INET6:
-		return getSockAddrString_ip6(string, (const sockaddr_in6*) addr);
+		return getSockAddrString_ip6(string, (const sockaddr_in6*)addr);
 
 	default:
 		string->clear();
@@ -459,12 +459,12 @@ SockAddr::setup(
 	switch (family) {
 	case AF_INET:
 		if (size >= sizeof(in_addr))
-			setup_ip4((const in_addr*) addr);
+			setup_ip4((const in_addr*)addr);
 		break;
 
 	case AF_INET6:
 		if (size >= sizeof(in6_addr))
-			setup_ip6((const in6_addr*) addr);
+			setup_ip6((const in6_addr*)addr);
 		break;
 	}
 }

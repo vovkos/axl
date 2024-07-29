@@ -101,7 +101,7 @@ EcKey::signHash(
 	uint_t resultSize = (uint_t)signatureBufferSize;
 	int result = ECDSA_sign(
 		0,
-		(const uchar_t*) hash,
+		(const uchar_t*)hash,
 		(int)hashSize,
 		(uchar_t*)signatureBuffer,
 		&resultSize,

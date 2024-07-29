@@ -28,7 +28,7 @@ PacketizerRoot::writeImpl(
 	size_t bufferSize = m_buffer.getCount();
 
 	static uint32_t signatureBuffer = PacketHdrSignature;
-	const char* signature = (char*) &signatureBuffer;
+	const char* signature = (char*)&signatureBuffer;
 
 	while (bufferSize < sizeof(uint32_t)) { // append signature byte-by-byte
 		if (!size)
@@ -67,7 +67,7 @@ PacketizerRoot::writeImpl(
 		bufferSize = sizeof(uint64_t);
 	}
 
-	uint32_t dataSize = ((const uint32_t*) m_buffer.cp()) [1];
+	uint32_t dataSize = ((const uint32_t*)m_buffer.cp()) [1];
 	uint32_t packetSize = sizeof(uint64_t) + dataSize;
 
 	if (bufferSize < packetSize) {
@@ -96,7 +96,7 @@ LegacyPacketizerRoot::createHdr(size_t size) {
 	hdr.m_checksum = 0;
 	hdr.m_checksum = checksum16(&hdr, sizeof(hdr));
 
-	return *(uint64_t*) &hdr;
+	return *(uint64_t*)&hdr;
 }
 
 size_t
@@ -109,7 +109,7 @@ LegacyPacketizerRoot::writeImpl(
 	size_t bufferSize = m_buffer.getCount();
 
 	static uint32_t signatureBuffer = PacketHdrSignature;
-	const char* signature = (char*) &signatureBuffer;
+	const char* signature = (char*)&signatureBuffer;
 
 	while (bufferSize < sizeof(uint32_t)) { // append signature byte-by-byte
 		if (!size)
@@ -152,7 +152,7 @@ LegacyPacketizerRoot::writeImpl(
 		bufferSize = sizeof(uint64_t);
 	}
 
-	uint32_t dataSize = ((const PacketHdr*) m_buffer.cp())->m_dataSize;
+	uint32_t dataSize = ((const PacketHdr*)m_buffer.cp())->m_dataSize;
 	uint32_t packetSize = sizeof(uint64_t) + dataSize;
 
 	if (bufferSize < packetSize) {

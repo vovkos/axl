@@ -27,7 +27,7 @@ get_current_dir_name() {
 	size_t size = 128;
 
 	for (;;) {
-		char* buffer = (char*) ::malloc(size);
+		char* buffer = (char*)::malloc(size);
 		char* result = ::getcwd(buffer, size);
 		if (result == buffer)
 			return buffer;

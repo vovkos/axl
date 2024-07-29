@@ -119,7 +119,7 @@ public:
 		const void* p,
 		size_t size
 	) {
-		BIGNUM* result = BN_bin2bn((const uchar_t*) p, (int)size, m_h);
+		BIGNUM* result = BN_bin2bn((const uchar_t*)p, (int)size, m_h);
 		return completeWithLastCryptoError(result != NULL);
 	}
 

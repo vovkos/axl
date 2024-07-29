@@ -45,7 +45,7 @@ public:
 		size_t size,
 		T** value
 	) {
-		return operator () (p, size, (const T**) value);
+		return operator () (p, size, (const T**)value);
 	}
 };
 

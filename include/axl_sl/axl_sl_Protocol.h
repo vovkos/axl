@@ -458,7 +458,7 @@ struct ProtoMsg_4: ProtoMsg {
 		Msg* msg = (Msg*)p; \
 		if (size < sizeof(Msg)) \
 			break; \
-		handler((const axl::err::ErrorHdr*) (msg + 1)); \
+		handler((const axl::err::ErrorHdr*)(msg + 1)); \
 		break; \
 		}
 
@@ -503,7 +503,7 @@ struct ProtoMsg_4: ProtoMsg {
 		Msg* msg = (Msg*)p; \
 		if (size < sizeof(Msg)) \
 			break; \
-		handler(msg->m_arg1, (const axl::err::ErrorHdr*) (msg + 1)); \
+		handler(msg->m_arg1, (const axl::err::ErrorHdr*)(msg + 1)); \
 		break; \
 		}
 
@@ -548,7 +548,7 @@ struct ProtoMsg_4: ProtoMsg {
 		Msg* msg = (Msg*)p; \
 		if (size < sizeof(Msg)) \
 			break; \
-		handler(msg->m_arg1, msg->m_arg2, (const axl::err::ErrorHdr*) (msg + 1)); \
+		handler(msg->m_arg1, msg->m_arg2, (const axl::err::ErrorHdr*)(msg + 1)); \
 		break; \
 		}
 
@@ -594,7 +594,7 @@ struct ProtoMsg_4: ProtoMsg {
 		if (size < sizeof(Msg)) \
 			break; \
 		size_t extraSize = size - sizeof(Msg); \
-		handler(msg->m_arg1, msg->m_arg2, msg->m_arg3, (const axl::err::ErrorHdr*) (msg + 1)); \
+		handler(msg->m_arg1, msg->m_arg2, msg->m_arg3, (const axl::err::ErrorHdr*)(msg + 1)); \
 		break; \
 		}
 
@@ -639,7 +639,7 @@ struct ProtoMsg_4: ProtoMsg {
 		Msg* msg = (Msg*)p; \
 		if (size < sizeof(Msg)) \
 			break; \
-		handler(msg->m_arg1, msg->m_arg2, msg->m_arg3, msg->m_arg4, (const axl::err::ErrorHdr*) (msg + 1)); \
+		handler(msg->m_arg1, msg->m_arg2, msg->m_arg3, msg->m_arg4, (const axl::err::ErrorHdr*)(msg + 1)); \
 		break; \
 		}
 

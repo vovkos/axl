@@ -556,7 +556,7 @@ void benchFormat() {
 	baseTimestamp = sys::getTimestamp();
 
 	for (size_t i = 0; i < IterationCount; i++) {
-//		QString s ((QChar*) L"abcdefghijklmnopqrstuvwxyz");
+//		QString s ((QChar*)L"abcdefghijklmnopqrstuvwxyz");
 #if (_RETURN_STRING)
 		qtString = formatIntegerWithThousandSep_qt(i);
 #else
@@ -1050,7 +1050,7 @@ main(
 	addr.sun_family = AF_UNIX;
 	memcpy(addr.sun_path, sockName, sizeof(sockName));
 
-	result = bind(sockServer, (const sockaddr*) &addr, sizeof(addr));
+	result = bind(sockServer, (const sockaddr*)&addr, sizeof(addr));
 	if (result == -1) {
 		printf("bind error (%d): %s\n", errno, strerror (errno));
 		return -1;
@@ -1062,14 +1062,14 @@ main(
 		return -1;
 	}
 
-	result = connect(sockClient, (const sockaddr*) &addr, sizeof(addr));
+	result = connect(sockClient, (const sockaddr*)&addr, sizeof(addr));
 	if (result == -1) {
 		printf("connect error (%d): %s\n", errno, strerror (errno));
 		return -1;
 	}
 
 	socklen_t len = sizeof(addr);
-	int sockAccept = accept(sockServer, (sockaddr*) &addr, &len);
+	int sockAccept = accept(sockServer, (sockaddr*)&addr, &len);
 	if (sockAccept == -1) {
 		printf("accept error (%d): %s\n", errno, strerror (errno));
 		return -1;

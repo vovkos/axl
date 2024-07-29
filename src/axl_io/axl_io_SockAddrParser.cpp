@@ -65,7 +65,7 @@ SockAddrParser::parse(sockaddr_in* addr) {
 			return false;
 		}
 
-		*(uint32_t*) &addr->sin_addr = 0;
+		*(uint32_t*)&addr->sin_addr = 0;
 		addr->sin_port = sl::swapByteOrder16((uint16_t)port);
 		return true;
 	}

@@ -39,7 +39,7 @@ djb2(
 	const void* p0,
 	size_t size
 ) {
-	const uchar_t* p = (const uchar_t*) p0;
+	const uchar_t* p = (const uchar_t*)p0;
 	const uchar_t* end = p + size;
 
 	for (; p < end; p++)

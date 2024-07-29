@@ -123,7 +123,7 @@ public:
 		const void* buffer,
 		size_t size
 	) {
-		bool_t result = ::SetupDiSetDeviceRegistryPropertyW(m_devInfoSet, &m_devInfoData, propId, (const byte_t*) buffer, (dword_t)size);
+		bool_t result = ::SetupDiSetDeviceRegistryPropertyW(m_devInfoSet, &m_devInfoData, propId, (const byte_t*)buffer, (dword_t)size);
 		return err::complete(result != 0);
 	}
 

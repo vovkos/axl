@@ -31,7 +31,7 @@ struct AesKey: AES_KEY {
 		const void* p,
 		size_t bitCount
 	) {
-		int result = AES_set_encrypt_key((const uchar_t*) p, (int)bitCount, this);
+		int result = AES_set_encrypt_key((const uchar_t*)p, (int)bitCount, this);
 		return err::completeWithSystemError(result == 0, err::SystemErrorCode_InvalidParameter);
 	}
 
@@ -40,7 +40,7 @@ struct AesKey: AES_KEY {
 		const void* p,
 		size_t bitCount
 	) {
-		int result = AES_set_decrypt_key((const uchar_t*) p, (int)bitCount, this);
+		int result = AES_set_decrypt_key((const uchar_t*)p, (int)bitCount, this);
 		return err::completeWithSystemError(result == 0, err::SystemErrorCode_InvalidParameter);
 	}
 
@@ -51,7 +51,7 @@ struct AesKey: AES_KEY {
 		void* iv
 	) {
 		AES_cbc_encrypt(
-			(const uchar_t*) src,
+			(const uchar_t*)src,
 			(uchar_t*)dst,
 			size,
 			this,
@@ -67,7 +67,7 @@ struct AesKey: AES_KEY {
 		void* iv
 	) {
 		AES_cbc_encrypt(
-			(const uchar_t*) src,
+			(const uchar_t*)src,
 			(uchar_t*)dst,
 			size,
 			this,

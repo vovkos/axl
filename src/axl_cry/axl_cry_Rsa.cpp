@@ -79,7 +79,7 @@ Rsa::signHash(
 	uint_t signatureSize = (uint_t)signatureBufferSize;
 	int result = RSA_sign(
 		type,
-		(const uchar_t*) hash,
+		(const uchar_t*)hash,
 		(int)hashSize,
 		(uchar_t*)signatureBuffer,
 		&signatureSize,

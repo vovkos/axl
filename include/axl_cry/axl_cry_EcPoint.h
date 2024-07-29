@@ -80,7 +80,7 @@ public:
 		size_t size,
 		BN_CTX* ctx = NULL
 	) {
-		int result = EC_POINT_oct2point(group, m_h, (const uchar_t*) p, size, ctx);
+		int result = EC_POINT_oct2point(group, m_h, (const uchar_t*)p, size, ctx);
 		return completeWithLastCryptoError(result);
 	}
 

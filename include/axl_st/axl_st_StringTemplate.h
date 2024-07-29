@@ -101,7 +101,7 @@ public:
 			process(
 				output,
 				fileName,
-				sl::StringRef((const char*) file.p(), file.getMappingSize())
+				sl::StringRef((const char*)file.p(), file.getMappingSize())
 			);
 	}
 

@@ -235,7 +235,7 @@ StdErrorProvider::getErrorDescription(const ErrorRef& error) {
 		return "no error";
 
 	case StdErrorCode_String:
-		p = (const char*) (error + 1);
+		p = (const char*)(error + 1);
 		stringSize = error->m_size - sizeof(ErrorHdr);
 
 		return stringSize && !p[stringSize - 1] ?

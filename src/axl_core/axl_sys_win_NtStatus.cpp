@@ -27,7 +27,7 @@ RtlNtStatusToDosErrorFunc(long);
 sl::String
 NtStatusProvider::getErrorDescription(long status) {
 	static HMODULE ntDll = ::GetModuleHandleW(L"ntdll.dll");
-	static RtlNtStatusToDosErrorFunc* rtlNtStatusToDosErrorFunc = (RtlNtStatusToDosErrorFunc*) ::GetProcAddress(ntDll, "RtlNtStatusToDosError");
+	static RtlNtStatusToDosErrorFunc* rtlNtStatusToDosErrorFunc = (RtlNtStatusToDosErrorFunc*)::GetProcAddress(ntDll, "RtlNtStatusToDosError");
 
 	dword_t winError = status;
 

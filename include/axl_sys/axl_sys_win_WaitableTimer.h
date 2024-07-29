@@ -55,7 +55,7 @@ public:
 		void* completionContext = NULL,
 		bool resume = false
 	) {
-		bool_t result = ::SetWaitableTimer(m_h, (LARGE_INTEGER*) &dueTime, period, completionRoutine, completionContext, resume);
+		bool_t result = ::SetWaitableTimer(m_h, (LARGE_INTEGER*)&dueTime, period, completionRoutine, completionContext, resume);
 		return err::complete(result);
 	}
 

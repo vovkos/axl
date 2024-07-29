@@ -208,7 +208,7 @@ public:
 		size_t size,
 		bool isFinal
 	) {
-		XML_Status status = ::XML_Parse(m_h, (const char*) p, size, isFinal);
+		XML_Status status = ::XML_Parse(m_h, (const char*)p, size, isFinal);
 		return complete(status == XML_STATUS_OK, false);
 	}
 

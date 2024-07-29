@@ -150,7 +150,7 @@ public:
 	static
 	Entry*
 	getEntryFromLink(Link* p) {
-		return p ? (Entry*)((char*)p + 1 - (size_t)GetLink() ((Entry*) 1)) : NULL;
+		return p ? (Entry*)((char*)p + 1 - (size_t)GetLink()((Entry*)1)) : NULL;
 	}
 
 	static
