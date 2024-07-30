@@ -9305,7 +9305,7 @@ size_t encodeCobs(
 	return result;
 }
 
-void xor(
+void memxor(
 	void* p,
 	uint8_t c,
 	size_t size
@@ -9332,7 +9332,7 @@ void xor(
 void testCobs() {
 	char dst[128] = { 0 };
 	char src[10] = { 0 };
-	xor(src, 0x55, sizeof(src));
+	memxor(src, 0x55, sizeof(src));
 	size_t result = decodeCobs(dst, src, sizeof(src));
 	printf("result: %d\n", result);
 }
