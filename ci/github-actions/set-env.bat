@@ -89,8 +89,15 @@ if "%CONFIGURATION%" == "" (set CONFIGURATION=Release)
 if "%CMAKE_USE_ARCH_OPTIONS%" == "" (set CMAKE_GENERATOR=%CMAKE_GENERATOR%%CMAKE_ARCH_SUFFIX%)
 if not "%CMAKE_USE_ARCH_OPTIONS%" == "" (set CMAKE_OPTIONS=%CMAKE_OPTIONS%%CMAKE_ARCH_OPTIONS%)
 
+set EXPAT_VERSION=2.1.0
+set EXPAT_VERSION_TAG=R_2_1_0
+set EXPAT_DOWNLOAD_FILE=expat-%EXPAT_VERSION%.tar.gz
+set EXPAT_DOWNLOAD_URL=https://github.com/libexpat/libexpat/releases/download/%EXPAT_VERSION_TAG%/%EXPAT_DOWNLOAD_FILE%
+
 set LUA_VERSION=5.4.5
 set LUA_DOWNLOAD_URL=https://github.com/walterschell/Lua/archive/refs/tags/v%LUA_VERSION%.zip
+
+set OPENSSL_VERSION=1.1.1.2100
 
 set RAGEL_DOWNLOAD_URL=https://github.com/eloraiby/ragel-windows/raw/master/ragel.exe
 
@@ -104,6 +111,7 @@ set CMAKE_BUILD_FLAGS= ^
 	/consoleloggerparameters:Summary
 
 echo ---------------------------------------------------------------------------
-echo LUA_DOWNLOAD_URL:     %LUA_DOWNLOAD_URL%
-echo RAGEL_DOWNLOAD_URL:   %RAGEL_DOWNLOAD_URL%
+echo LUA_DOWNLOAD_URL:   %LUA_DOWNLOAD_URL%
+echo OPENSSL_VERSION:    %OPENSSL_VERSION%
+echo RAGEL_DOWNLOAD_URL: %RAGEL_DOWNLOAD_URL%
 echo ---------------------------------------------------------------------------

@@ -11,6 +11,7 @@
 
 brew install lua
 brew install libusb
+brew install hidapi
 brew install ragel
 
 # openssl is already installed, but not linked
