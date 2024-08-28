@@ -1582,15 +1582,7 @@ public:
 		const StringRef& from,
 		const StringRef& to
 	) {
-		return replace(from, from.getLength(), to, to.getLength());
-	}
-
-	size_t
-	replace(
-		const C* from,
-		const C* to
-	) {
-		return replace(from, Details::calcLength(from), to, Details::calcLength(to));
+		return replace(from.cp(), from.getLength(), to.cp(), to.getLength());
 	}
 
 	size_t
