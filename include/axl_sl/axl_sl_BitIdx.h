@@ -24,7 +24,7 @@ namespace sl {
 
 inline
 uint8_t
-geLoBit8(uint8_t x) {
+getLoBit8(uint8_t x) {
 	return x & -x;
 }
 
