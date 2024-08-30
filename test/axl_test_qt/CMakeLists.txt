@@ -111,6 +111,13 @@ qt5_use_modules_alt(
 	Network
 )
 
+if (UNIX AND NOT APPLE)
+	qt5_use_modules_alt(
+		axl_test_qt
+		DBus
+	)
+endif()
+
 target_precompile_headers(
 	axl_test_qt
 	PRIVATE

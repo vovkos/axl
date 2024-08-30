@@ -77,6 +77,14 @@ public:
 		return QSize(640, 480);
 	}
 
+private slots:
+	void onSettingChanged(const QString& location, const QString& key, const QDBusVariant& value);
+
+private:
+#if (_AXL_OS_LINUX)
+	bool connectDbus();
+#endif
+
 private:
 #if (_TEST_PAINT)
 	MyWidget m_myWidget;

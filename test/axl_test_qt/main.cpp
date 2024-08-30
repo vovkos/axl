@@ -936,6 +936,7 @@ main(
 	int argc,
 	char *argv[]
 ) {
+#if 0
 	testArrayPerf<char>("char");
 	testArrayPerf<int>("int");
 
@@ -975,6 +976,7 @@ main(
 
 	testArrayPerf<Point3>("Point3");
 	return 0;
+#endif
 
 #if (_AXL_OS_POSIX)
 	setvbuf(stdout, NULL, _IOLBF, 1024);
@@ -1106,6 +1108,7 @@ main(
 
 	addRootCaCertificates();
 
+/*
 	benchCodecs();
 	return 0;
 

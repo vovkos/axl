@@ -52,6 +52,12 @@
 #include <QSslSocket>
 #include <QSslCertificate>
 
+#if (_AXL_OS_LINUX)
+#	include <QtDBus>
+#else
+class QDBusVariant;
+#endif
+
 //..............................................................................
 
 // AXL

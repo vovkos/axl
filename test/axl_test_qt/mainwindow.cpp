@@ -199,8 +199,6 @@ protected:
 	}
 };
 
-
-
 MainWindow::MainWindow(QWidget* parent) :
 	QMainWindow(parent),
 #if (_TEST_PAINT)
@@ -215,7 +213,7 @@ MainWindow::MainWindow(QWidget* parent) :
 	f.setFixedPitch(true);
 	f.setStyleHint(
 		QFont::Monospace,
-		(QFont::StyleStrategy)(QFont::NoFontMerging | QFont::ForceIntegerMetrics)
+		(QFont::StyleStrategy) (QFont::NoFontMerging | QFont::ForceIntegerMetrics)
 	);
 
 	QWidget* client = new QWidget(this);
@@ -283,7 +281,7 @@ MainWindow::MainWindow(QWidget* parent) :
 	combo1->setItemData(2, "This is a tooltip for item[2]", Qt::ToolTipRole);
 	combo1->setItemData(3, "This is a tooltip for item[3]", Qt::ToolTipRole);
 
-	combo1->setModel(new MyItemModel(qobject_cast<QStandardItemModel*> (combo1->model())));
+	combo1->setModel(new MyItemModel(qobject_cast<QStandardItemModel*>(combo1->model())));
 
 	combo1->view()->setMinimumWidth(combo1->QComboBox::sizeHint().width());
 	hlayout->addWidget(combo1);
@@ -309,6 +307,85 @@ MainWindow::MainWindow(QWidget* parent) :
 
 	setFocusProxy(widget);
 	widget->setFocus();
+
+#if (_AXL_OS_LINUX)
+	connectDbus();
+#endif
+}
+
+#if (_AXL_OS_LINUX)
+
+static const QString DesktopService("org.freedesktop.portal.Desktop");
+static const QString DesktopPath("/org/freedesktop/portal/desktop");
+static const QString DesktopSettingsIface("org.freedesktop.portal.Settings");
+static const QString SettingsChangedSignal("SettingChanged");
+static const QString ReadOneMethod("ReadOne");
+static const QString AppearanceNspace("org.freedesktop.appearance");
+static const QString ColorSchemeKey("color-scheme");
+
+bool MainWindow::connectDbus() {
+	QDBusConnection dbus = QDBusConnection::sessionBus();
+	if (!dbus.isConnected())
+		return false;
+
+	printf(
+		"connecting %s %s %s %s\n",
+		DesktopService.toLatin1().data(),
+		DesktopPath.toLatin1().data(),
+		DesktopSettingsIface.toLatin1().data(),
+		SettingsChangedSignal.toLatin1().data()
+	);
+
+	QDBusInterface iface(DesktopService, DesktopPath, DesktopSettingsIface, dbus);
+	QDBusMessage msg = iface.call(ReadOneMethod, AppearanceNspace, ColorSchemeKey);
+	QList<QVariant> values = msg.arguments();
+	if (!values.isEmpty()) {
+		QVariant value = values.front().value<QDBusVariant>().variant();
+		printf(
+			"%s %s: %s %s\n",
+			AppearanceNspace.toLatin1().data(),
+			ColorSchemeKey.toLatin1().data(),
+			value.typeName(),
+			value.toString().toLatin1().data()
+		);
+	}
+
+	qRegisterMetaType<QDBusVariant>();
+	bool result = dbus.connect(
+		DesktopService,
+		DesktopPath,
+		DesktopSettingsIface,
+		SettingsChangedSignal,
+		this,
+		SLOT(onSettingChanged(const QString&, const QString&, const QDBusVariant&))
+	);
+
+	printf("dbus.connect -> %d\n", result);
+	return result;
+}
+#endif
+
+void MainWindow::onSettingChanged(const QString& nspace, const QString& key, const QDBusVariant& value) {
+#if (_AXL_OS_LINUX)
+	printf(
+		"onSettingChanged(namespace: %s, key: %s, value: %s)\n",
+		nspace.toLatin1().data(),
+		key.toLatin1().data(),
+		value.variant().toString().toLatin1().data()
+	);
+
+/*
+ if (location == QLatin1StringView("org.kde.kdeglobals.KDE")
+       && key == QLatin1StringView("widgetStyle"))
+     return SettingType::KdeApplicationStyle;
+ if (location == QLatin1StringView("org.kde.kdeglobals.General")
+       && key == QLatin1StringView("ColorScheme"))
+     return SettingType::KdeGlobalTheme;
+ if (location == QLatin1StringView("org.gnome.desktop.interface")
+       && key == QLatin1StringView("gtk-theme"))
+     return SettingType::GtkTheme;
+*/
+#endif
 }
 
 //..............................................................................
