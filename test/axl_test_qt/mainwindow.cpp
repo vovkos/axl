@@ -35,56 +35,314 @@ public:
 
 //..............................................................................
 
+enum UiColor {
+	// QT palette
+
+	UiColor_Text,
+	UiColor_TextSelected,
+	UiColor_TextDisabled,
+	UiColor_Back,
+	UiColor_BackAlt,
+	UiColor_BackDisabled,
+	UiColor_Window,
+	UiColor_Button,
+	UiColor_Tooltip,
+	UiColor_Link,
+	UiColor_LinkVisited,
+	UiColor_Light,
+	UiColor_Midlight,
+	UiColor_Mid,
+	UiColor_Dark,
+	UiColor_Selection,
+	UiColor_SelectionInactive,
+	UiColor_SelectionAlt,
+	UiColor_SelectionAltInactive,
+
+	// njscroll colors
+
+	UiColor_Timestamp,
+	UiColor_Offset,
+	UiColor_Highlight,
+	UiColor_Delimiter,
+	UiColor_DelimiterLight,
+
+	// ANSI colors
+
+	UiColor_Gray,
+	UiColor_Red,
+	UiColor_Green,
+	UiColor_Orange,
+	UiColor_Blue,
+	UiColor_Purple,
+	UiColor_Cyan,
+	UiColor_Yellow,
+
+	// log background colors
+
+	UiColor_PastelGray,
+	UiColor_PastelRed,
+	UiColor_PastelGreen,
+	UiColor_PastelOrange,
+	UiColor_PastelBlue,
+	UiColor_PastelPurple,
+	UiColor_PastelCyan,
+	UiColor_PastelYellow,
+
+	// syntax highlight
+
+	UiColor_Keyword,
+	UiColor_Constant,
+	UiColor_Comment,
+
+	UiColor__Count
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+uint_t backColors[] = {
+	UiColor_Back,
+	UiColor_BackAlt,
+	UiColor_BackDisabled,
+	UiColor_Window,
+	UiColor_Button,
+	UiColor_Tooltip,
+	UiColor_Selection,
+	UiColor_SelectionInactive,
+	UiColor_SelectionAlt,
+	UiColor_SelectionAltInactive,
+	UiColor_Highlight,
+	UiColor_PastelGray,
+	UiColor_PastelRed,
+	UiColor_PastelGreen,
+	UiColor_PastelOrange,
+	UiColor_PastelBlue,
+	UiColor_PastelPurple,
+	UiColor_PastelCyan,
+	UiColor_PastelYellow,
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+uint_t textColors[] = {
+	UiColor_Text,
+	UiColor_TextDisabled,
+	UiColor_Link,
+	UiColor_LinkVisited,
+	UiColor_Timestamp,
+	UiColor_Offset,
+	UiColor_Gray,
+	UiColor_Red,
+	UiColor_Green,
+	UiColor_Orange,
+	UiColor_Blue,
+	UiColor_Purple,
+	UiColor_Cyan,
+	UiColor_Yellow,
+	UiColor_Keyword,
+	UiColor_Constant,
+	UiColor_Comment,
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+const char* colorNames[UiColor__Count] = {
+	"text",
+	"text-selected",
+	"text-disabled",
+	"back",
+	"back-alt",
+	"back-disabled",
+	"window",
+	"button",
+	"tooltip",
+	"link",
+	"link-visited",
+	"light",
+	"midlight",
+	"mid",
+	"dark",
+	"selection",
+	"selection-inactive",
+	"selection-alt",
+	"selection-alt-inactive",
+	"timestamp",
+	"offset",
+	"highlight",
+	"delimiter",
+	"delimiter-light",
+	"gray",
+	"red",
+	"green",
+	"orange",
+	"blue",
+	"purple",
+	"cyan",
+	"yellow",
+	"pastel-gray",
+	"pastel-red",
+	"pastel-green",
+	"pastel-orange",
+	"pastel-blue",
+	"pastel-purple",
+	"pastel-cyan",
+	"pastel-yellow",
+	"keyword",
+	"constant",
+	"comment",
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+uint_t lightTheme[UiColor__Count] = {
+	0x000000, // text
+	0xffffff, // text-selected
+	0x787878, // text-disabled
+	0xffffff, // back
+	0xefefef, // back-alt
+	0xefefef, // back-disabled
+	0xf0f0f0, // window
+	0xf0f0f0, // button
+	0xffffdc, // tooltip
+	0x0000ff, // link
+	0xff00ff, // link-visited
+	0xffffff, // light
+	0xe3e3e3, // midlight
+	0xa0a0a0, // mid
+	0xa0a0a0, // dark
+	0x0078d7, // selection
+	0x8cb6d7, // selection-inactive
+	0x99c9ef, // selection-alt
+	0xe0e0e0, // selection-alt-inactive
+	0x808080, // timestamp
+	0x808080, // offset
+	0xddccff, // highlight
+	0xc0c0c0, // delimiter
+	0xdcdcdc, // delimiter-light
+	0x808080, // gray
+	0x800000, // red
+	0x008000, // green
+	0xa06000, // orange
+	0x000080, // blue
+	0x800080, // purple
+	0x008080, // cyan
+	0x808000, // yellow
+	0xefefef, // pastel-gray
+	0xffe4e1, // pastel-red
+	0xe1fada, // pastel-green
+	0xfffacd, // pastel-orange
+	0xe2edff, // pastel-blue
+	0xe2dafd, // pastel-purple
+	0xcdfaff, // pastel-cyan
+	0xffffc0, // pastel-yellow
+	0x0000ff, // keyword
+	0xce7b00, // constant
+	0x969696, // comment
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+uint_t darkTheme[UiColor__Count] = {
+	0xfdf9f3, // text
+	0xffffff, // text-selected
+	0x808080, // text-disabled
+	0x2c292d, // back
+	0x3c393d, // back-alt
+	0x3d3d3d, // back-disabled
+	0x222020, // window
+	0x424245, // button
+	0x3f3f36, // tooltip
+	0x0986d3, // link
+	0xa70b06, // link-visited
+	0x979797, // light
+	0x5e5c5b, // midlight
+	0x4a4947, // mid
+	0x302f2e, // dark
+	0x12608a, // selection
+	0x607b8a, // selection-inactive
+	0x405672, // selection-alt
+	0x304050, // selection-alt-inactive
+	0x7d7d7d, // timestamp
+	0x7d7d7d, // offset
+	0x835c42, // highlight
+	0x404040, // delimiter
+	0x202020, // delimiter-light
+	0xa5acb8, // gray
+	0xf56168, // red
+	0xa9dc76, // green
+	0xff7c5c, // orange
+	0x77dce8, // blue
+	0xca95c5, // purple
+	0x77dce8, // cyan
+	0xffaf5e, // yellow
+	0x595959, // pastel-gray
+	0x773f40, // pastel-red
+	0x3d6640, // pastel-green
+	0x835c42, // pastel-orange
+	0x405672, // pastel-blue
+	0x604266, // pastel-purple
+	0x367370, // pastel-cyan
+	0x747242, // pastel-yellow
+	0xca95c5, // keyword
+	0x94c796, // constant
+	0xa5acb8, // comment
+};
+
+//..............................................................................
+
 void
 MyWidget::paintEvent(QPaintEvent* e) {
-	printf(
-		"Qt::WA_StaticContents: %d, rect: { %d, %d, %d, %d }\n",
-		testAttribute(Qt::WA_StaticContents),
-		e->rect().x(),
-		e->rect().y(),
-		e->rect().width(),
-		e->rect().height()
-	);
+	enum {
+		Margin = 4,
+	};
 
 	QPainter painter(this);
-//	painter.drawText(QPointF(100, 200), QString::fromUtf16((const ushort*)L"\x25cc\x0301."));
 
-	uint8_t r = 0x80 + rand() % 0x80;
-	uint8_t g = 0x80 + rand() % 0x80;
-	uint8_t b = 0x80 + rand() % 0x80;
+	static const QString text = "Abc";
 
-	painter.fillRect(e->rect(), RGB(r, g, b));
+	const uint_t* theme = darkTheme;
+	QFontMetrics fm(font());
+	QRect rect = fm.boundingRect(text);
+	rect;
+	int width = rect.width() + Margin * 2;
+	int height = rect.height() + Margin * 2 + 1; // delimiter
+	int fullWidth = width * countof(textColors);
+	int halfWidth = fullWidth / 2;
+	int fullHeight = height * countof(backColors);
 
+	for (int i = 0; i < countof(backColors); i++) {
+		int y = i * height;
 
-/*	char str[] = "abcdefghijklmnopqrstuvwxyz";
+		uint_t backColor = backColors[i];
+		painter.fillRect(0, y, fullWidth, height, QColor(theme[backColor]));
+		painter.fillRect(0, y + height - 1, halfWidth, 1, QColor(theme[UiColor_Delimiter]));
+		painter.fillRect(halfWidth, y + height - 1, halfWidth, 1, QColor(theme[UiColor_DelimiterLight]));
 
-	gui::HyperText hyperText;
-	hyperText.setHyperText("\xd0\x91\xd0\xbe " "abc \x1b^pizda\x1b[4mdef\x1b[m suka");
+		painter.setPen(Qt::darkGray);
+		painter.drawText(fullWidth + Margin, y + height - Margin - 1, colorNames[backColor]);
 
-	const gui::TextAttrAnchorArray* attrArray = hyperText.getAttrArray();
-	sl::String_utf32 text = hyperText.getText();
+		for (int j = 0; j < countof(textColors); j++) {
+			uint_t textColor = textColors[j];
+			if (backColor == UiColor_Selection || backColor == UiColor_SelectionInactive)
+				textColor = UiColor_TextSelected; // override
 
-	const gui::HyperlinkAnchor* anchor = hyperText.findHyperlinkByOffset(1);
-
-	for (size_t i = 0; i < text.getLength(); i++) {
-		anchor = hyperText.findHyperlinkByOffset(i);
-		if (anchor)
-			printf("%d -- %s\n", i, anchor->m_hyperlink.sz());
+			int x = j * width;
+			painter.setPen(QColor(theme[textColor]));
+			painter.drawText(x + Margin, y + height - Margin - 1, text);
+		}
 	}
 
-	gui::QtCanvas canvas;
-	canvas.m_qtPainter.begin(this);
-	canvas.m_font = gui::getQtEngine()->getStdFont(gui::StdFontKind_Monospace);
-	canvas.m_palette = gui::getQtEngine()->getStdPalette();
+	painter.setPen(Qt::darkGray);
 
-	gui::TextPainter painter(&canvas);
+	for (int j = 0; j < countof(textColors); j++) {
+		uint_t textColor = textColors[j];
+		QPoint origin(j * width + Margin, fullHeight + Margin);
 
-	QSize s = size();
-	painter.m_bottom = s.height();
-
-	painter.drawHyperText_utf32(attrArray, text);
-
-	canvas.m_qtPainter.end(); */
+		painter.translate(origin);
+		painter.rotate(90);
+		painter.drawText(0, 0, colorNames[textColor]);
+		painter.rotate(-90);
+		painter.translate(-origin);
+	}
 }
 
 void
@@ -220,6 +478,7 @@ MainWindow::MainWindow(QWidget* parent) :
 	setCentralWidget(client);
 
 	QVBoxLayout* vlayout = new QVBoxLayout;
+	vlayout->setMargin(0);
 	client->setLayout(vlayout);
 
 #if (_TEST_PAINT)
@@ -255,6 +514,7 @@ MainWindow::MainWindow(QWidget* parent) :
 	vlayout->addWidget(&m_treeWidget);
 #endif
 
+#if (_TEST_LAYOUT)
 	QHBoxLayout* hlayout = new QHBoxLayout;
 	vlayout->addLayout(hlayout);
 
@@ -295,9 +555,11 @@ MainWindow::MainWindow(QWidget* parent) :
 	combo2->lineEdit()->setText("127.0.0.1:1001");
 	combo2->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	hlayout->addWidget(combo2);
+#endif
 
 #if (_TEST_PAINT)
 	QWidget* widget = &m_myWidget;
+	resize(700, 600);
 #elif (_TEST_EDIT)
 	QWidget* widget = &m_editWidget;
 #elif (_TEST_TREE)

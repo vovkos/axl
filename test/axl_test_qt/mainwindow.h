@@ -13,9 +13,10 @@
 
 #define MAINWINDOW_H
 
-#define _TEST_PAINT 1
-#define _TEST_EDIT  0
-#define _TEST_TREE  1
+#define _TEST_PAINT  1
+#define _TEST_EDIT   0
+#define _TEST_TREE   0
+#define _TEST_LAYOUT 0
 
 //..............................................................................
 
