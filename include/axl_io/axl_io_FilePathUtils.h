@@ -152,6 +152,5 @@ getSystemDir();
 
 #endif
 
-
 } // namespace io
 } // namespace axl

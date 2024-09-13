@@ -44,6 +44,11 @@ set(
 	axl_io_NetworkAdapter.cpp
 )
 
+axl_exclude_from_build(
+	axl_io_File.cpp
+	axl_io_Mapping.cpp
+) # these are built as part of axl_core
+
 source_group(
 	lib
 	FILES
@@ -76,6 +81,11 @@ set(
 	axl_io_psx_Socket.cpp
 	axl_io_psx_NetworkAdapterEnumerator.cpp
 )
+
+axl_exclude_from_build(
+	axl_io_psx_File.cpp
+	axl_io_psx_Mapping.cpp
+) # these are built as part of axl_core
 
 source_group(
 	lib_psx

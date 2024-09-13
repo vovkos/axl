@@ -262,12 +262,15 @@ set(
 	time64_limits.h
 )
 
+set (AXL_IO_DIR ${AXL_ROOT_DIR}/src/axl_io)
+
 set(
 	SYS_CPP_LIST
 	axl_sys_TlsMgr.cpp
 	axl_sys_Time.cpp
 	axl_sys_ReadWriteLock.cpp
 	axl_sys_ExceptionError.cpp
+	${AXL_IO_DIR}/axl_io_File.cpp
 )
 
 set(
@@ -404,6 +407,7 @@ endif()
 
 set(
 	SYS_LNX_H_LIST
+	${AXL_INC_DIR}/axl_sys_lnx_ModuleEnumerator.h
 	${AXL_INC_DIR}/axl_sys_lnx_udev/axl_sys_lnx_Udev.h
 	${AXL_INC_DIR}/axl_sys_lnx_udev/axl_sys_lnx_UdevDevice.h
 	${AXL_INC_DIR}/axl_sys_lnx_udev/axl_sys_lnx_UdevListEntry.h
@@ -413,6 +417,7 @@ set(
 
 set(
 	SYS_LNX_CPP_LIST
+	axl_sys_lnx_ModuleEnumerator.cpp
 	axl_sys_lnx_Udev.cpp
 )
 
@@ -454,6 +459,36 @@ source_group(
 if(NOT APPLE)
 	axl_exclude_from_build(${SYS_DRW_CPP_LIST})
 endif()
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+#
+# io folder
+#
+
+set (AXL_IO_DIR ${AXL_ROOT_DIR}/src/axl_io)
+
+set(
+	IO_CPP_LIST
+	${AXL_IO_DIR}/axl_io_File.cpp
+	${AXL_IO_DIR}/axl_io_Mapping.cpp
+)
+
+set(
+	IO_PSX_CPP_LIST
+	${AXL_IO_DIR}/axl_io_psx_File.cpp
+	${AXL_IO_DIR}/axl_io_psx_Mapping.cpp
+)
+
+if(NOT UNIX)
+	axl_exclude_from_build(${IO_PSX_CPP_LIST})
+endif()
+
+source_group(
+	sys
+	FILES
+	${IO_CPP_LIST}
+	${IO_PSX_CPP_LIST}
+)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 #
@@ -510,6 +545,8 @@ add_library(
 	${SYS_LNX_CPP_LIST}
 	${SYS_DRW_H_LIST}
 	${SYS_DRW_CPP_LIST}
+	${IO_CPP_LIST}
+	${IO_PSX_CPP_LIST}
 )
 
 target_precompile_headers(
@@ -529,7 +566,6 @@ axl_install_redirected_includes(
 	${ERR_H_LIST}
 	${SL_H_LIST}
 	${ENC_H_LIST}
-	${SYS_H_LIST}
 )
 
 if(WIN32)

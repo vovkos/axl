@@ -107,6 +107,28 @@ File::open(
 
 //..............................................................................
 
+size_t
+readFile(
+	sl::Array<char>* buffer,
+	io::File* file
+) {
+	buffer->clear();
+
+	for (;;) {
+		char block[1024]; // read in 1K blocks
+		size_t size = file->read(block, sizeof(block));
+		if (size == -1)
+			return -1;
+
+		if (size == 0)
+			break;
+
+		buffer->append(block, size);
+	}
+
+	return buffer->getCount();
+}
+
 uint64_t
 copyFile(
 	const sl::StringRef& srcFileName,

@@ -166,6 +166,12 @@ public:
 
 //..............................................................................
 
+size_t
+readFile(
+	sl::Array<char>* buffer,
+	io::File* file
+);
+
 #if (_AXL_OS_WIN)
 
 inline
