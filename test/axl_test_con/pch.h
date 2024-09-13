@@ -85,6 +85,7 @@
 #	elif (_AXL_OS_LINUX)
 #		include "axl_io_lnx_UsbMon.h"
 #		include "axl_io_lnx_UsbMonTransferParser.h"
+#		include "axl_sys_lnx_ModuleEnumerator.h"
 #	endif
 #endif
 

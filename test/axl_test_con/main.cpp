@@ -9469,6 +9469,52 @@ void testCrc32k() {
 
 //..............................................................................
 
+#if (_AXL_OS_LINUX)
+void testModuleEnum() {
+	sl::List<sys::lnx::ModuleDesc> moduleList;
+	size_t count = sys::lnx::enumerateModules(&moduleList);
+	if (count == -1) {
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	sl::ConstIterator<sys::lnx::ModuleDesc> it = moduleList.getHead();
+	for (; it; it++) {
+		printf(
+			"%s %zd %zd %s 0x%zx\n",
+			it->m_name.sz(),
+			it->m_size,
+			it->m_useCount,
+			sys::lnx::getModuleStateString(it->m_state),
+			it->m_offset
+		);
+	}
+
+	printf("Looking for usbmon...\n");
+
+	bool result = sys::lnx::findModule("usbmon");
+	printf(result ? "usbmon FOUND\n" : "ubsmon NOT FOUND\n");
+
+	printf("Looking for usbmon desc...\n");
+
+	sys::lnx::ModuleDesc moduleDesc;
+	result = sys::lnx::findModule("usbmon", &moduleDesc);
+	if (!result)
+		printf("usbmon NOT FOUND\n");
+	else
+		printf(
+			"%s %zd %zd %s 0x%zx\n",
+			moduleDesc.m_name.sz(),
+			moduleDesc.m_size,
+			moduleDesc.m_useCount,
+			sys::lnx::getModuleStateString(moduleDesc.m_state),
+			moduleDesc.m_offset
+		);
+};
+#endif
+
+//..............................................................................
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -9495,7 +9541,9 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	testCrc32k();
+#if (_AXL_OS_LINUX)
+	testModuleEnum();
+#endif
 	return 0;
 }
 
