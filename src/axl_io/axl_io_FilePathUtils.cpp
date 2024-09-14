@@ -450,36 +450,48 @@ findFilePath(
 
 #if (_AXL_OS_WIN)
 
+namespace win {
+
+using namespace sys::win;
+
 bool
-getSymbolicLinkTarget(
-	sl::String* targetName,
-	const sl::StringRef& linkName
-) {
-	using namespace axl::sys::win;
-
-	NTSTATUS status;
-
-	sl::String_w linkName_w = linkName;
-
+isSymbolicLink(const sl::StringRef_w& fileName) {
 	UNICODE_STRING uniLinkName;
-	uniLinkName.Buffer = linkName_w.p();
-	uniLinkName.Length = linkName_w.getLength() * sizeof(WCHAR);
-	uniLinkName.MaximumLength = linkName_w.getHdr()->m_bufferSize;
+	uniLinkName.Buffer = (WCHAR*)fileName.sz();
+	uniLinkName.Length = fileName.getLength() * sizeof(WCHAR);
+	uniLinkName.MaximumLength = uniLinkName.Length + sizeof(WCHAR);
 
 	OBJECT_ATTRIBUTES oa = { 0 };
 	oa.Length = sizeof(oa);
 	oa.RootDirectory = NULL;
 	oa.ObjectName = &uniLinkName;
 
-	sys::win::Handle link; // NT uses NULL for invalid handle value
-	status = ntOpenSymbolicLinkObject(
-		link.p(),
-		GENERIC_READ,
-		&oa
-	);
+	Handle link; // NT uses NULL for invalid handle value
+	NTSTATUS status = ntOpenSymbolicLinkObject(link.p(), GENERIC_READ, &oa);
+	return NT_SUCCESS(status);
+}
 
+bool
+getSymbolicLinkTarget(
+	sl::String_w* targetName,
+	const sl::StringRef_w& linkName
+) {
+	NTSTATUS status;
+
+	UNICODE_STRING uniLinkName;
+	uniLinkName.Buffer = (WCHAR*)linkName.sz();
+	uniLinkName.Length = linkName.getLength() * sizeof(WCHAR);
+	uniLinkName.MaximumLength = uniLinkName.Length + sizeof(WCHAR);
+
+	OBJECT_ATTRIBUTES oa = { 0 };
+	oa.Length = sizeof(oa);
+	oa.RootDirectory = NULL;
+	oa.ObjectName = &uniLinkName;
+
+	Handle link; // NT uses NULL for invalid handle value
+	status = ntOpenSymbolicLinkObject(link.p(), GENERIC_READ, &oa);
 	if (status < 0) {
-		err::setError(sys::win::NtStatus(status));
+		err::setError(NtStatus(status));
 		return false;
 	}
 
@@ -488,12 +500,11 @@ getSymbolicLinkTarget(
 
 	status = ntQuerySymbolicLinkObject(link, &uniTarget, &bufferSize);
 	if (status != STATUS_BUFFER_TOO_SMALL) {
-		err::setError(sys::win::NtStatus(status));
+		err::setError(NtStatus(status));
 		return false;
 	}
 
-	sl::String_w targetName_w;
-	wchar_t* p = targetName_w.createBuffer(bufferSize / sizeof(WCHAR));
+	wchar_t* p = targetName->createBuffer(bufferSize / sizeof(WCHAR));
 
 	uniTarget.Buffer = p;
 	uniTarget.Length = 0;
@@ -501,15 +512,16 @@ getSymbolicLinkTarget(
 
 	status = ntQuerySymbolicLinkObject(link, &uniTarget, &bufferSize);
 	if (status < 0) {
-		err::setError(sys::win::NtStatus(status));
+		err::setError(NtStatus(status));
 		return false;
 	}
 
 	ASSERT(uniTarget.Length <= uniTarget.MaximumLength);
-	targetName_w.overrideLength(uniTarget.Length / sizeof(WCHAR));
-	*targetName = targetName_w;
+	targetName->overrideLength(uniTarget.Length / sizeof(WCHAR));
 	return true;
 }
+
+} // namespace win
 
 #elif (_AXL_OS_POSIX)
 

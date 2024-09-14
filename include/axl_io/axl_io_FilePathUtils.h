@@ -142,6 +142,23 @@ matchWildcard(
 
 namespace win {
 
+bool
+isSymbolicLink(const sl::StringRef_w& fileName);
+
+bool
+getSymbolicLinkTarget(
+	sl::String_w* targetName,
+	const sl::StringRef_w& linkName
+);
+
+inline
+sl::String_w
+getSymbolicLinkTarget(const sl::StringRef_w& linkName) {
+	sl::String_w targetName;
+	getSymbolicLinkTarget(&targetName, linkName);
+	return targetName;
+}
+
 sl::String_w
 getWindowsDir();
 
@@ -149,6 +166,33 @@ sl::String_w
 getSystemDir();
 
 } // namespace win
+
+inline
+bool
+isSymbolicLink(const sl::StringRef& fileName) {
+	char buffer[256];
+	sl::String_w fileName_w(rc::BufKind_Stack, buffer, sizeof(buffer));
+	fileName_w = fileName;
+	return win::isSymbolicLink(fileName_w);
+}
+
+inline
+bool
+getSymbolicLinkTarget(
+	sl::String* targetName,
+	const sl::StringRef& linkName
+) {
+	char buffer[256];
+	sl::String_w linkName_w(rc::BufKind_Stack, buffer, sizeof(buffer));
+	sl::String_w targetName_w;
+	linkName_w = linkName;
+	bool result = win::getSymbolicLinkTarget(&targetName_w, linkName_w);
+	if (!result)
+		return false;
+
+	*targetName = targetName_w;
+	return true;
+}
 
 #endif
 
