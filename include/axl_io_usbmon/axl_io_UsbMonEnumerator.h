@@ -21,7 +21,7 @@ namespace io {
 //..............................................................................
 
 enum UsbMonEnumFlag {
-	UsbMonEnumFlag_Hubs             = UsbEnumFlag_Hubs,
+	UsbMonEnumFlag_Hubs = UsbEnumFlag_Hubs,
 	// OR-ed with UsbDeviceStringId
 };
 
@@ -52,6 +52,16 @@ struct UsbMonDeviceDesc:
 };
 
 //..............................................................................
+
+inline
+bool
+detectUsbMon() {
+#if (_AXL_OS_WIN)
+	return io::win::isSymbolicLink(L"\\DosDevices\\USBPcap1"); // starts with 1
+#elif (_AXL_OS_LINUX)
+	return sys::lnx::findModule("usbmon");
+#endif
+}
 
 size_t
 enumerateUsbMonDevices(
