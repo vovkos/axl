@@ -205,7 +205,9 @@ public:
 	setKernelBufferSize(size_t size);
 
 	bool
-	setFilter(uint_t deviceAddress);
+	setFilter(uint_t deviceAddress) {
+		return setFilter(&deviceAddress, 1);
+	}
 
 	bool
 	setFilter(
@@ -215,6 +217,9 @@ public:
 
 	bool
 	clearFilter();
+
+	bool
+	stopFiltering();
 
 	size_t
 	read(

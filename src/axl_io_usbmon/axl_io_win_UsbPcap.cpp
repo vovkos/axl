@@ -114,27 +114,6 @@ UsbPcap::setKernelBufferSize(size_t size) {
 }
 
 bool
-UsbPcap::setFilter(uint_t deviceAddress) {
-	deviceAddress &= 0x7f; // 1 .. 127
-
-	if (!deviceAddress)
-		return clearFilter();
-
-	USBPCAP_ADDRESS_FILTER filter = { 0 };
-	filter.addresses[deviceAddress / 32] = 1 << (deviceAddress % 32);
-
-	dword_t actualSize;
-	return m_device.overlappedIoctl(
-		IOCTL_USBPCAP_START_FILTERING,
-		&filter,
-		sizeof(filter),
-		NULL,
-		0,
-		(dword_t*)&actualSize
-	);
-}
-
-bool
 UsbPcap::setFilter(
 	const uint_t* deviceAddressTable,
 	size_t deviceCount
@@ -160,6 +139,22 @@ UsbPcap::setFilter(
 
 bool
 UsbPcap::clearFilter() {
+	USBPCAP_ADDRESS_FILTER filter = { 0 };
+	filter.filterAll = true;
+
+	dword_t actualSize;
+	return m_device.overlappedIoctl(
+		IOCTL_USBPCAP_START_FILTERING,
+		&filter,
+		sizeof(filter),
+		NULL,
+		0,
+		(dword_t*)&actualSize
+	);
+}
+
+bool
+UsbPcap::stopFiltering() {
 	dword_t actualSize;
 	return m_device.overlappedIoctl(
 		IOCTL_USBPCAP_STOP_FILTERING,
