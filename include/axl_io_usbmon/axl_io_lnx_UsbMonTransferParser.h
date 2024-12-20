@@ -14,7 +14,7 @@
 #define _AXL_IO_LNX_USBMONTRANSFERPARSER_H
 
 #include "axl_io_lnx_UsbMon.h"
-#include "axl_io_UsbMonTransferParser.h"
+#include "axl_io_UsbMonTransferParserBase.h"
 
 namespace axl {
 namespace io {

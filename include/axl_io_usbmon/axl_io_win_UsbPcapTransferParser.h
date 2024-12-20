@@ -14,7 +14,7 @@
 #define _AXL_IO_WIN_USBPCAPTRANSFERPARSER_H
 
 #include "axl_io_win_UsbPcap.h"
-#include "axl_io_UsbMonTransferParser.h"
+#include "axl_io_UsbMonTransferParserBase.h"
 
 namespace axl {
 namespace io {
