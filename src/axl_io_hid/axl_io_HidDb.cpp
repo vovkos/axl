@@ -72,7 +72,7 @@ HidUsagePage::getUsageName(uint_t usage) const {
 		return it->m_value;
 
 	if (m_format.isEmpty())
-		mutableSelf->m_format = "Usage 0x%02x";
+		mutableSelf->m_format = "Usage 0x%02X";
 
 	return sl::formatString(m_format.sz(), usage);
 }
@@ -115,7 +115,7 @@ HidDb::getUsagePage(uint_t pageId) const {
 	HidDb* mutableSelf = (HidDb*)this;
 	HidUsagePage* page = new HidUsagePage(NULL);
 	page->m_id = pageId;
-	page->m_name.format("Page 0x%02x", pageId);
+	page->m_name.format("Page 0x%02X", pageId);
 	mutableSelf->m_usagePageList.insertTail(page);
 	mutableSelf->m_usagePageMap[pageId] = page;
 	return page;
