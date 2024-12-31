@@ -85,7 +85,6 @@
 #	elif (_AXL_OS_LINUX)
 #		include "axl_io_lnx_UsbMon.h"
 #		include "axl_io_lnx_UsbMonTransferParser.h"
-#		include "axl_sys_lnx_ModuleEnumerator.h"
 #	endif
 #endif
 
@@ -143,7 +142,9 @@
 #	include "axl_io_psx_Mapping.h"
 #	include "axl_io_psx_Pty.h"
 #	include "axl_sys_psx_Sem.h"
-#	if (_AXL_OS_DARWIN)
+#	if (_AXL_OS_LINUX)
+#		include "axl_sys_lnx_ModuleEnumerator.h"
+#	elif (_AXL_OS_DARWIN)
 #		include "axl_sys_drw_Semaphore.h"
 #		include "axl_sec_Error.h"
 #		include "axl_cf_Url.h"
