@@ -146,7 +146,7 @@ public:
 		return isEmpty() || m_p->isNoError();
 	}
 
-	sl::String
+	sl::StringRef
 	getDescription() const;
 };
 

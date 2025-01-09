@@ -26,7 +26,7 @@ ErrorHdr::getDescription() const {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-sl::String
+sl::StringRef
 ErrorRef::getDescription() const {
 	return !isEmpty() ? m_p->getDescription() : g_noError.getDescription();
 }
