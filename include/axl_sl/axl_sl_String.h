@@ -1545,9 +1545,8 @@ public:
 	}
 
 	size_t
-	trimLeft() {
-		static StringRef whitespace(Details::getWhitespace(), 4);
-		size_t i = this->findNotOneOf(whitespace);
+	trimLeft(const StringRef& charSet) {
+		size_t i = this->findNotOneOf(charSet);
 		if (i == -1) {
 			clear();
 			return 0;
@@ -1559,9 +1558,14 @@ public:
 	}
 
 	size_t
-	trimRight() {
+	trimLeft() {
 		static StringRef whitespace(Details::getWhitespace(), 4);
-		size_t i = this->reverseFindNotOneOf(whitespace);
+		return trimLeft(whitespace);
+	}
+
+	size_t
+	trimRight(const StringRef& charSet) {
+		size_t i = this->reverseFindNotOneOf(charSet);
 		if (i == -1) {
 			clear();
 			return 0;
@@ -1569,6 +1573,12 @@ public:
 
 		overrideLength(i + 1);
 		return this->m_length;
+	}
+
+	size_t
+	trimRight() {
+		static StringRef whitespace(Details::getWhitespace(), 4);
+		return trimRight(whitespace);
 	}
 
 	size_t
