@@ -137,6 +137,20 @@ clearBitRange(
 	size_t to
 );
 
+void
+shrBitMap(
+	size_t* map,
+	size_t pageCount,
+	size_t n
+);
+
+void
+shlBitMap(
+	size_t* map,
+	size_t pageCount,
+	size_t n
+);
+
 template <typename Op>
 void
 mergeBitMaps(
@@ -188,7 +202,21 @@ findBit(
 );
 
 size_t
+findBitReverse(
+	const size_t* map,
+	size_t pageCount,
+	size_t from
+);
+
+size_t
 findZeroBit(
+	const size_t* map,
+	size_t pageCount,
+	size_t from
+);
+
+size_t
+findZeroBitReverse(
 	const size_t* map,
 	size_t pageCount,
 	size_t from
@@ -283,6 +311,16 @@ public:
 		sl::clearBitRange_u(m_map, from, to);
 	}
 
+	void
+	shr(size_t n) {
+		sl::shrBitMap(m_map, PageCount, n);
+	}
+
+	void
+	shl(size_t n) {
+		sl::shlBitMap(m_map, PageCount, n);
+	}
+
 	template <typename Op>
 	void
 	merge(const BitMapN& bitMap2) {
@@ -306,8 +344,18 @@ public:
 	}
 
 	size_t
+	findBitReverse(size_t start = -1) const {
+		return sl::findBitReverse(m_map, PageCount, start);
+	}
+
+	size_t
 	findZeroBit(size_t start = 0) const {
 		return sl::findZeroBit(m_map, PageCount, start);
+	}
+
+	size_t
+	findZeroBitReverse(size_t start = -1) const {
+		return sl::findZeroBitReverse(m_map, PageCount, start);
 	}
 };
 
@@ -321,8 +369,14 @@ public:
 	BitMap() {}
 
 	BitMap(size_t bitCount) {
-		create(bitCount);
+		setBitCount(bitCount);
 	}
+
+	BitMap(
+		rc::BufKind bufKind,
+		void* p,
+		size_t size
+	): m_map(bufKind, p, size) {}
 
 	bool
 	operator == (const BitMap& src) const {
@@ -381,6 +435,20 @@ public:
 		return m_map.copy(src.m_map) != -1;
 	}
 
+	bool
+	copy(
+		const size_t* p,
+		size_t pageCount
+	) {
+		return m_map.copy(p, pageCount) != -1;
+	}
+
+	bool
+	copy(
+		const char* p,
+		size_t size
+	);
+
 	size_t
 	hash() const {
 		return djb2(m_map, m_map.getCount() * sizeof(size_t));
@@ -388,9 +456,6 @@ public:
 
 	bool
 	isEqual(const BitMap& src) const;
-
-	bool
-	create(size_t bitCount);
 
 	bool
 	setBitCount(size_t bitCount)  {
@@ -414,7 +479,7 @@ public:
 
 	bool
 	setBitResize(size_t bit) {
-		return ensureBitCount(bit + 1) ? (sl::setBit(m_map.p(), m_map.getCount(), bit), true) : false;
+		return ensureBitCount(bit + 1) ? (sl::setBit_u(m_map.p(), bit), true) : false;
 	}
 
 	void
@@ -430,7 +495,7 @@ public:
 		size_t from,
 		size_t to
 	) {
-		return ensureBitCount(to) ? (sl::setBitRange(m_map.p(), m_map.getCount(), from, to), true) : false;
+		return from >= to ? true : ensureBitCount(to) ? (sl::setBitRange_u(m_map.p(), from, to), true) : false;
 	}
 
 	void
@@ -440,7 +505,7 @@ public:
 
 	bool
 	clearBitResize(size_t bit) {
-		return ensureBitCount(bit + 1) ? (sl::clearBit(m_map.p(), m_map.getCount(), bit), true) : false;
+		return ensureBitCount(bit + 1) ? (sl::clearBit_u(m_map.p(), bit), true) : false;
 	}
 
 	void
@@ -456,8 +521,24 @@ public:
 		size_t from,
 		size_t to
 	) {
-		return ensureBitCount(to) ? (sl::clearBitRange(m_map.p(), m_map.getCount(), from, to), true) : false;
+		return from >= to ? true : ensureBitCount(to) ? (sl::clearBitRange_u(m_map.p(), from, to), true) : false;
 	}
+
+	void
+	shr(size_t n) {
+		sl::shrBitMap(m_map.p(), m_map.getCount(), n);
+	}
+
+	bool
+	shrResize(size_t n);
+
+	void
+	shl(size_t n) {
+		sl::shlBitMap(m_map.p(), m_map.getCount(), n);
+	}
+
+	bool
+	shlResize(size_t n);
 
 	template <typename Op>
 	void
@@ -486,8 +567,18 @@ public:
 	}
 
 	size_t
+	findBitReverse(size_t start = -1) const {
+		return sl::findBitReverse(m_map, m_map.getCount(), start);
+	}
+
+	size_t
 	findZeroBit(size_t start = 0) const {
 		return sl::findZeroBit(m_map, m_map.getCount(), start);
+	}
+
+	size_t
+	findZeroBitReverse(size_t start = -1) const {
+		return sl::findZeroBitReverse(m_map, m_map.getCount(), start);
 	}
 
 protected:
@@ -513,6 +604,48 @@ BitMap::isEqual(const BitMap& src) const {
 		count == count2 ? memcmp(m_map, src.m_map, count * sizeof(size_t)) == 0 :
 		count < count2 ? isEqualImpl(m_map, count, src.m_map, count2) :
 		isEqualImpl(src.m_map, count2, m_map, count);
+}
+
+inline
+bool
+BitMap::copy(
+	const char* p,
+	size_t size
+) {
+	size_t pageCount = sl::align<sizeof(size_t)>(size) / sizeof(size_t);
+	bool result = m_map.setCountZeroConstruct(pageCount);
+	if (!result)
+		return false;
+
+	memcpy(m_map.p(), p, size);
+	return true;
+}
+
+inline
+bool
+BitMap::shlResize(size_t n) {
+	size_t i = findBitReverse();
+	if (i == -1)
+		return true;
+
+	if (!ensureBitCount(i + n + 1))
+		return false;
+
+	shlBitMap(m_map.p(), m_map.getCount(), n);
+	return true;
+}
+
+inline
+bool
+BitMap::shrResize(size_t n) {
+	shrBitMap(m_map.p(), m_map.getCount(), n);
+
+	intptr_t i = m_map.getCount() - 1;
+	for (; i > 0; i--)
+		if (m_map[i])
+			break;
+
+	return m_map.setCount(i + 1);
 }
 
 template <typename Op>
