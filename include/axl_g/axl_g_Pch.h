@@ -92,15 +92,19 @@
 #if (_AXL_CPU_X86)
 #	define AXL_CPU_STRING  "x86"
 #	define AXL_PTR_SIZE    4
+#	define AXL_PTR_POW     5 // 32 == 1 << 5
 #elif (_AXL_CPU_AMD64)
 #	define AXL_CPU_STRING  "amd64"
 #	define AXL_PTR_SIZE    8
+#	define AXL_PTR_POW     6 // 64 == 1 << 6
 #elif (_AXL_CPU_ARM32)
 #	define AXL_CPU_STRING  "arm32"
 #	define AXL_PTR_SIZE    4
+#	define AXL_PTR_POW     5 // 32 == 1 << 5
 #elif (_AXL_CPU_ARM64)
 #	define AXL_CPU_STRING  "arm64"
 #	define AXL_PTR_SIZE    8
+#	define AXL_PTR_POW     6 // 64 == 1 << 6
 #else
 #	error unsupported CPU architecture
 #endif
