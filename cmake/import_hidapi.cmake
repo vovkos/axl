@@ -42,7 +42,6 @@ elseif(NOT HIDAPI_LIB_NAME)
 endif()
 
 if(EXISTS ${HIDAPI_INC_DIR}/hidapi/hidapi.h AND HIDAPI_LIB_DIR)
-
 	axl_message("HIDAPI paths:")
 	axl_message("    Includes:"  "${HIDAPI_INC_DIR}")
 	axl_message("    Libraries:" "${HIDAPI_LIB_DIR}")

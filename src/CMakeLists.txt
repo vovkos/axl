@@ -169,7 +169,7 @@ endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-if(HIDAPI_FOUND)
+if(RAGEL_FOUND AND HIDAPI_FOUND)
 	option(
 		BUILD_AXL_IO_HID
 		"Build axl_io_hid library (HIDAPI wrappers)"
