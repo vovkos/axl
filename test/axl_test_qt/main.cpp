@@ -1112,7 +1112,6 @@ main(
 	benchCodecs();
 	return 0;
 
-	/*
 	QStringList items;
 	items.append("Hui");
 	items.append("Govno");
