@@ -23,6 +23,7 @@ elseif(EXISTS ${RE2S_INC_DIR}/re2/sm.h AND RE2S_LIB_DIR)
 	axl_find_file(
 		_VERSION_CMAKE
 		re2ConfigVersion.cmake
+		${RE2S_LIB_DIR}
 		${RE2S_CMAKE_DIR}
 		${RE2S_CMAKE_DIR}/re2
 	)
