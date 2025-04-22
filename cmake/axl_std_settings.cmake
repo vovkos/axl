@@ -744,6 +744,11 @@ axl_print_std_settings)
 
 	message(STATUS "CMake ${CMAKE_VERSION}:")
 	axl_message("    CMake executable:"   "${CMAKE_COMMAND}")
+
+	if(CMAKE_TOOLCHAIN_FILE)
+		axl_message("    CMake toolchain:" ${CMAKE_TOOLCHAIN_FILE})
+	endif()
+
 	axl_message("    Invoked from:"       ${AXL_CMAKE_ORIGIN_FILE})
 	axl_message("    dependencies.cmake:" ${AXL_CMAKE_ORIGIN_DIR}/dependencies.cmake)
 
