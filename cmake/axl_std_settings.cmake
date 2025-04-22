@@ -567,31 +567,38 @@ axl_apply_gcc_settings)
 
 		if(GCC_LINK_GLIBC_WRAPPERS)
 			set(_FORCE_FUNC_LIST)
+			set(_FUNC_LIST)
 
 			if(${TARGET_CPU} STREQUAL arm64)
 				set(
 					_FUNC_LIST
-					pow
+
+					# libm.so
 					exp
 					exp2
 					log
 					log2
 					log2f
+					pow
 				)
 			else() # x86/amd64
 				set(
 					_FUNC_LIST
+
+					# libc.so
+					clock_gettime
 					memcpy
 					posix_spawn
 					posix_spawnp
-					clock_gettime
 					secure_getenv
-					pow
+
+					# libm.so
 					exp
 					exp2
 					log
 					log2
 					log2f
+					pow
 				)
 
 				set(
@@ -620,8 +627,8 @@ axl_apply_gcc_settings)
 
 			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${_WRAPPER_FLAGS}")
 			set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${_WRAPPER_FLAGS}")
-			set(CMAKE_C_STANDARD_LIBRARIES "${CMAKE_C_STANDARD_LIBRARIES} -laxl_glibc -lrt")
-			set(CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES} -laxl_glibc -lrt")
+			set(CMAKE_C_STANDARD_LIBRARIES "${CMAKE_C_STANDARD_LIBRARIES} -laxl_glibc -lm")
+			set(CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES} -laxl_glibc -lm")
 		endif()
 	endif()
 
