@@ -859,7 +859,7 @@ axl_find_lib_dir_ex
 	if(NOT _LIB_DIR_LIST)
 		set(_OPTIONS)
 	else()
-		set(_OPTIONS PATHS ${_LIB_DIR_LIST} NO_DEFAULT_PATH)
+		set(_OPTIONS PATHS ${_LIB_DIR_LIST} NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
 	endif()
 
 	foreach(_LIB_NAME ${_LIB_NAME_LIST})
