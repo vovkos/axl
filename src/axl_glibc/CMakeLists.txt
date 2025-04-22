@@ -19,12 +19,7 @@ set(
 
 set(
 	LIB_C_LIST
-	axl_clock.c
-	axl_fcntl.c
-	axl_getenv.c
-	axl_math.c
-	axl_memcpy.c
-	axl_spawn.c
+	axl_glibc.c
 )
 
 source_group(
@@ -32,18 +27,6 @@ source_group(
 	FILES
 	${LIB_C_LIST}
 )
-
-if(${TARGET_CPU} STREQUAL arm64)
-	axl_exclude_from_build(
-		axl_clock.c
-		axl_fcntl.c
-		axl_getenv.c
-		axl_memcpy.c
-		axl_spawn.c
-	)
-elseif(NOT "${TARGET_CPU}" STREQUAL "x86")
-	axl_exclude_from_build(axl_fcntl.c)
-endif()
 
 #...............................................................................
 #
