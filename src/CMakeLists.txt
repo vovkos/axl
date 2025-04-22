@@ -153,7 +153,7 @@ endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-if((WIN32 OR LINUX) AND LIBUSB_FOUND)
+if(LIBUSB_FOUND AND (WIN32 OR LINUX AND PCAP_FOUND))
 	option(
 		BUILD_AXL_IO_USBMON
 		"Build axl_io_usbmon library (USB monitoring library)"
