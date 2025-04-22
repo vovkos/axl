@@ -137,12 +137,6 @@ target_link_libraries(
 )
 
 if(UNIX)
-	target_link_libraries(
-		axl_test_auto
-		pthread
-		dl
-	)
-
 	if(LINUX AND BUILD_AXL_IO_USB)
 		target_link_libraries(
 			axl_test_auto
@@ -164,6 +158,8 @@ if(UNIX)
 	else()
 		target_link_libraries(
 			axl_test_auto
+			pthread
+			dl
 			rt
 		)
 	endif()

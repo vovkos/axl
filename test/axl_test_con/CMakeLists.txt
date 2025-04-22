@@ -226,12 +226,6 @@ if(WIN32)
 endif()
 
 if(UNIX)
-	target_link_libraries(
-		axl_test_con
-		pthread
-		dl
-	)
-
 	if(LINUX AND BUILD_AXL_IO_USB)
 		target_link_libraries(
 			axl_test_con
@@ -264,6 +258,8 @@ if(UNIX)
 	else()
 		target_link_libraries(
 			axl_test_con
+			pthread
+			dl
 			rt
 		)
 	endif()

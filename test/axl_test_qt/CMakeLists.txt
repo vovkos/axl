@@ -137,19 +137,13 @@ target_link_libraries(
 	${OPENSSL_CRYPTO_LIB_NAME}
 )
 
-if(UNIX)
+if(UNIX AND NOT APPLE)
 	target_link_libraries(
 		axl_test_qt
 		pthread
+		dl
+		rt
 	)
-
-	if(NOT APPLE)
-		target_link_libraries(
-			axl_test_qt
-			dl
-			rt
-		)
-	endif()
 endif()
 
 if(WIN32 AND QT_DLL_DIR)
