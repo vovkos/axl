@@ -81,6 +81,20 @@ public:
 		return ::SSL_clear_options(m_h, options);
 	}
 
+#if (OPENSSL_VERSION_NUMBER >= 0x10100000L) // openssl-1.1.0
+	int
+	getSecurityLevel() {
+		ASSERT(m_h);
+		return ::SSL_get_security_level(m_h);
+	}
+
+	void
+	setSecurityLevel(int level) {
+		ASSERT(m_h);
+		::SSL_set_security_level(m_h, level);
+	}
+#endif
+
 	const char*
 	getHostname() {
 		ASSERT(m_h);

@@ -78,6 +78,20 @@ public:
 		return ::SSL_CTX_clear_options(m_h, options);
 	}
 
+#if (OPENSSL_VERSION_NUMBER >= 0x10100000L) // openssl-1.1.0
+	int
+	getSecurityLevel() {
+		ASSERT(m_h);
+		return ::SSL_CTX_get_security_level(m_h);
+	}
+
+	void
+	setSecurityLevel(int level) {
+		ASSERT(m_h);
+		::SSL_CTX_set_security_level(m_h, level);
+	}
+#endif
+
 	void
 	setInfoCallback(SslInfoCallbackFunc* callbackFunc) {
 		ASSERT(m_h);
