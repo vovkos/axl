@@ -749,6 +749,10 @@ axl_print_std_settings)
 		axl_message("    CMake toolchain:" ${CMAKE_TOOLCHAIN_FILE})
 	endif()
 
+	if(CMAKE_SYSROOT)
+		axl_message("    CMake sysroot:"  ${CMAKE_SYSROOT})
+	endif()
+
 	axl_message("    Invoked from:"       ${AXL_CMAKE_ORIGIN_FILE})
 	axl_message("    dependencies.cmake:" ${AXL_CMAKE_ORIGIN_DIR}/dependencies.cmake)
 
