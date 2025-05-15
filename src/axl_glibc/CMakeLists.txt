@@ -14,33 +14,45 @@
 #
 
 set(
-	LIB_H_LIST
+	LIBC_C_LIST
+	axl_glibc_libc.c
 )
 
 set(
-	LIB_C_LIST
-	axl_glibc.c
+	LIBM_C_LIST
+	axl_glibc_libm.c
 )
 
 source_group(
 	glibc
 	FILES
-	${LIB_C_LIST}
+	${LIBC_C_LIST}
+	${LIBM_C_LIST}
 )
 
 #...............................................................................
 #
-# axl_glibc library
+# axl_glibc libraries
 #
 
 add_library(
-	axl_glibc
-	${LIB_H_LIST}
-	${LIB_C_LIST}
+	axl_glibc_libc
+	${LIBC_C_LIST}
 )
 
 set_target_properties(
-	axl_glibc
+	axl_glibc_libc
+	PROPERTIES
+	LANGUAGE C
+)
+
+add_library(
+	axl_glibc_libm
+	${LIBM_C_LIST}
+)
+
+set_target_properties(
+	axl_glibc_libm
 	PROPERTIES
 	LANGUAGE C
 )
