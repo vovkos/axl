@@ -357,13 +357,11 @@ axl_create_gcc_settings)
 			ON
 		)
 
-		if(${TARGET_CPU} MATCHES "^(x86|amd64|arm64)$")
-			option(
-				GCC_LINK_GLIBC_WRAPPERS
-				"Add wraps to a set of versioned GLIBC functions for improved compatibility"
-				ON
-			)
-		endif()
+		option(
+			GCC_LINK_GLIBC_WRAPPERS
+			"Add wraps for versioned GLIBC functions to lower GLIBC version requirements"
+			ON
+		)
 	endif()
 
 	# alas, warning suppressions must be passed in command line, not pragma-ed
@@ -566,69 +564,64 @@ axl_apply_gcc_settings)
 		endif()
 
 		if(GCC_LINK_GLIBC_WRAPPERS)
-			set(_FORCE_FUNC_LIST)
-			set(_FUNC_LIST)
+			set(
+				_LIBM_FUNC_LIST
+				exp
+				exp2
+				log
+				log2
+				log2f
+				pow
+			)
 
-			if(${TARGET_CPU} STREQUAL arm64)
-				set(
-					_FUNC_LIST
-
-					# libm.so
-					exp
-					exp2
-					log
-					log2
-					log2f
-					pow
-				)
-			else() # x86/amd64
-				set(
-					_FUNC_LIST
-
-					# libc.so
+			if(${TARGET_CPU} STREQUAL "amd64")
+				list(
+					APPEND
+					_LIBC_FUNC_LIST
 					clock_gettime
 					memcpy
 					posix_spawn
 					posix_spawnp
 					secure_getenv
-
-					# libm.so
-					exp
-					exp2
-					log
-					log2
-					log2f
-					pow
 				)
-
-				set(
-					_FORCE_FUNC_LIST
+			elseif(${TARGET_CPU} STREQUAL "x86")
+				list(
+					APPEND
+					_LIBC_FUNC_LIST
+					clock_gettime
+					fcntl
 					memcpy
+					posix_spawn
+					posix_spawnp
 					secure_getenv
 				)
-
-				if(${TARGET_CPU} STREQUAL "x86")
-					list(APPEND _FUNC_LIST fcntl)
-					list(APPEND _FORCE_FUNC_LIST fcntl)
-				endif()
+			elseif(${TARGET_CPU} STREQUAL "arm32")
+				list(
+					APPEND
+					_LIBC_FUNC_LIST
+					clock_gettime
+					fcntl
+					posix_spawn
+					posix_spawnp
+					secure_getenv
+				)
+			else()
+				# so far so good -- GLIBC_2.17 is the oldest we can target on aarch64
+				set(_LIBC_FUNC_LIST)
 			endif()
 
-			set(_WRAPPER_FLAGS)
+			set(_WRAPPER_FLAGS "-Wl")
 
-			foreach (_FUNC ${_FORCE_FUNC_LIST})
-				string(APPEND _WRAPPER_FLAGS "-u __wrap_${_FUNC} ")
-			endforeach()
-
-			set(_WRAPPER_FLAGS "${_WRAPPER_FLAGS}-Wl")
-
-			foreach (_FUNC ${_FUNC_LIST})
+			foreach(_FUNC ${_LIBC_FUNC_LIST} ${_LIBM_FUNC_LIST})
 				string(APPEND _WRAPPER_FLAGS ",--wrap=${_FUNC}")
 			endforeach()
 
+			set(_AXL_GLIBC "-Wl,--whole-archive -laxl_glibc_libc -Wl,--no-whole-archive -laxl_glibc_libm -lm")
+
 			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${_WRAPPER_FLAGS}")
 			set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${_WRAPPER_FLAGS}")
-			set(CMAKE_C_STANDARD_LIBRARIES "${CMAKE_C_STANDARD_LIBRARIES} -laxl_glibc -lm")
-			set(CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES} -laxl_glibc -lm")
+			set(CMAKE_C_STANDARD_LIBRARIES "${CMAKE_C_STANDARD_LIBRARIES} ${_AXL_GLIBC}")
+			set(CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES} ${_AXL_GLIBC}")
 		endif()
 	endif()
 

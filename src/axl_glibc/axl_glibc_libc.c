@@ -39,6 +39,8 @@ __asm__(".symver secure_getenv, __secure_getenv@GLIBC_2.0");
 // so far so good -- GLIBC_2.17 is the oldest we can target on aarch64
 #elif (defined __arm__)
 __asm__(".symver clock_gettime, clock_gettime@GLIBC_2.4");
+__asm__(".symver posix_spawn,   posix_spawn@GLIBC_2.4");
+__asm__(".symver posix_spawnp,  posix_spawnp@GLIBC_2.4");
 __asm__(".symver fcntl,         fcntl@GLIBC_2.4");
 __asm__(".symver secure_getenv, __secure_getenv@GLIBC_2.4");
 #else
