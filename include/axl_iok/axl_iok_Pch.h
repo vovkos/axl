@@ -17,6 +17,5 @@
 #include <IOKit/IOKitKeys.h>
 #include <IOKit/IOBSD.h>
 #include <IOKit/usb/USBSpec.h>
-#include <IOKit/usb/IOUSBHostFamilyDefinitions.h>
 #include <IOKit/serial/IOSerialKeys.h>
 #include <IOKit/serial/ioss.h>
