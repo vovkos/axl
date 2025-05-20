@@ -193,7 +193,6 @@ axl_detect_target_cpu
 
 	get_filename_component(_CXX_FILE_NAME ${CMAKE_CXX_COMPILER} NAME)
 
-
 	if("${_CXX_FILE_NAME}${CMAKE_SYSTEM_PROCESSOR}" MATCHES "arm64|aarch64")
 		set(${_CPU} "arm64")
 	elseif("${_CXX_FILE_NAME}${CMAKE_SYSTEM_PROCESSOR}" MATCHES "arm")

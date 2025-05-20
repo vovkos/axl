@@ -147,6 +147,7 @@ if(UNIX)
 	if(APPLE)
 		find_library(CORE_FOUNDATION_FRAMEWORK CoreFoundation)
 		find_library(IOKIT_FRAMEWORK IOKit)
+		find_library(SECURITY_FRAMEWORK Security)
 
 		target_link_libraries(
 			axl_test_auto
@@ -154,6 +155,7 @@ if(UNIX)
 			axl_iok
 			${CORE_FOUNDATION_FRAMEWORK}
 			${IOKIT_FRAMEWORK}
+			${SECURITY_FRAMEWORK}
 		)
 	else()
 		target_link_libraries(
