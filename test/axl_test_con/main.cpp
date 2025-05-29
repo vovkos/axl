@@ -8201,11 +8201,12 @@ enum {
 	VidSerialTap = 0x16d0,
 	PidSerialTap = 0x0e26,
 	VidCamera    = 0x046d,
-	PidCamera    = 0x092e,
+	PidCamera    = 0x0825,
 	VidMouse     = 0x14a5,
 	PidMouse     = 0xa011,
-	Vid = VidMouse,
-	Pid = PidMouse,
+
+	Vid = VidCamera,
+	Pid = PidCamera,
 };
 
 bool
@@ -8258,10 +8259,11 @@ testUsbMon() {
 		return false;
 	}
 
-	bool result;
+	bool result = true;
 
 	enum {
-		BufferSize = 1 * 1024 * 1024,
+		KernelBufferSize = 1 * 1024 * 1024,
+		UserBufferSize   = 1 * 1024 * 1024,
 	};
 
 #if (_AXL_OS_WIN)
@@ -8271,7 +8273,7 @@ testUsbMon() {
 	result =
 		monitor.open(captureDevice->m_captureDeviceName) &&
 		monitor.setSnapshotLength(io::win::UsbPcap::DefaultSnapshotLength) &&
-		monitor.setKernelBufferSize(BufferSize) &&
+		monitor.setKernelBufferSize(KernelBufferSize) &&
 		monitor.setFilter(captureDevice->m_address) &&
 		monitor.readPcapHdr();
 
@@ -8281,7 +8283,7 @@ testUsbMon() {
 	io::lnx::UsbMon monitor;
 	result =
 		monitor.open(captureDevice->m_captureDeviceName) &&
-		monitor.setKernelBufferSize(BufferSize);
+		monitor.setKernelBufferSize(KernelBufferSize);
 #endif
 
 	if (!result) {
@@ -8292,16 +8294,19 @@ testUsbMon() {
 	sl::String string;
 	sl::Array<char> buffer;
 	sl::Array<char> payload;
-	buffer.setCount(BufferSize);
-	char* bufferBase = buffer.p();
+	buffer.setCount(UserBufferSize);
 
-	printf("Capturing USB on %s (buffer %d bytes)...\n", captureDevice->m_description.sz(), BufferSize);
+	printf("Capturing USB on %s (kernel buffer %d B; user buffer %d B)...\n",
+		captureDevice->m_description.sz(),
+		KernelBufferSize,
+		UserBufferSize
+	);
 
 	for (;;) {
 		size_t size;
 
 #if (_AXL_OS_WIN)
-		size = monitor.read(bufferBase, BufferSize);
+		size = monitor.read(buffer.p(), buffer.getCount());
 #elif (_AXL_OS_LINUX)
 		fd_set readSet = { 0 };
 		FD_SET(monitor, &readSet);
@@ -8311,7 +8316,7 @@ testUsbMon() {
 			return false;
 		}
 
-		size = monitor.read(bufferBase, BufferSize);
+		size = monitor.read(buffer.p(), buffer.getCount());
 		if (!size) {
 			printf("EOF (?!)\n");
 			break;
@@ -8323,7 +8328,7 @@ testUsbMon() {
 			return false;
 		}
 
-		const char* p = bufferBase;
+		const char* p = buffer;
 		const char* end = p + size;
 
 		while (p < end) {
@@ -8338,21 +8343,21 @@ testUsbMon() {
 			case io::UsbMonTransferParserState_CompleteHeader: {
 				const io::UsbMonTransferHdr* hdr = parser.getTransferHdr();
 				printf("\nUsbMonTransferHdr:\n");
-				printf("  m_id:           0x%016llx\n", hdr->m_id);
-				printf("  m_timestamp:    %s\n", sys::Time(hdr->m_timestamp).format("%Y-%M-%D %h:%m:%s.%l").sz());
+				printf("  m_id:               0x%016llx\n", hdr->m_id);
+				printf("  m_timestamp:        %s\n", sys::Time(hdr->m_timestamp).format("%Y-%M-%D %h:%m:%s.%l").sz());
 #if (_AXL_OS_WIN)
-				printf("  m_urbFunction:  0x%02x - %s\n", hdr->m_urbFunction, io::win::getUrbFunctionString(hdr->m_urbFunction));
-				printf("  m_status:       0x%08x - %s\n", hdr->m_status, io::win::getUsbdStatusString(hdr->m_status));
+				printf("  m_urbFunction:      0x%02x - %s\n", hdr->m_urbFunction, io::win::getUrbFunctionString(hdr->m_urbFunction));
+				printf("  m_status:           0x%08x - %s\n", hdr->m_status, io::win::getUsbdStatusString(hdr->m_status));
 #elif (_AXL_OS_LINUX)
-				printf("  m_status:       %d - %s\n", hdr->m_status, err::Errno(-hdr->m_status).getDescription().sz());
+				printf("  m_status:           %d - %s\n", hdr->m_status, err::Errno(-hdr->m_status).getDescription().sz());
 #endif
-				printf("  m_flags:        0x%02x %s\n", hdr->m_flags, io::getUsbMonTransferFlagsString(hdr->m_flags).sz());
-				printf("  m_transferType: %d - %s\n", hdr->m_transferType, io::getUsbTransferTypeString((libusb_transfer_type)hdr->m_transferType));
-				printf("  m_bus:          %d\n", hdr->m_bus);
-				printf("  m_address:      %d\n", hdr->m_address);
-				printf("  m_endpoint:     0x%02x\n", hdr->m_endpoint);
-				printf("  m_originalSize: %d\n", hdr->m_originalSize);
-				printf("  m_captureSize:  %d\n", hdr->m_captureSize);
+				printf("  m_flags:            0x%02x %s\n", hdr->m_flags, io::getUsbMonTransferFlagsString(hdr->m_flags).sz());
+				printf("  m_transferType:     %d - %s\n", hdr->m_transferType, io::getUsbTransferTypeString((libusb_transfer_type)hdr->m_transferType));
+				printf("  m_bus:              %d\n", hdr->m_bus);
+				printf("  m_address:          %d\n", hdr->m_address);
+				printf("  m_endpoint:         0x%02x\n", hdr->m_endpoint);
+				printf("  m_originalDataSize: %d\n", hdr->m_originalDataSize);
+				printf("  m_capturedDataSize: %d\n", hdr->m_capturedDataSize);
 
 				switch (hdr->m_transferType) {
 				case LIBUSB_TRANSFER_TYPE_CONTROL: {
@@ -8390,9 +8395,10 @@ testUsbMon() {
 				break;
 
 			case io::UsbMonTransferParserState_CompleteData:
+			case io::UsbMonTransferParserState_TruncatedData:
 				const io::UsbMonTransferHdr* hdr = parser.getTransferHdr();
 				payload.append(p, size);
-				ASSERT(payload.getCount() == hdr->m_captureSize);
+				ASSERT(payload.getCount() == hdr->m_capturedDataSize);
 				if (payload.isEmpty())
 					break;
 
@@ -8400,12 +8406,16 @@ testUsbMon() {
 				enc::HexEncoding::encode(
 					&string,
 					payload,
-					hdr->m_captureSize,
+					payload.getCount(),
 					enc::HexEncodingFlag_Multiline
 				);
 
 				printf("%s\n", string.sz());
 				payload.clear();
+
+				if (state == io::UsbMonTransferParserState_TruncatedData)
+					printf("(TRUNCATED)\n");
+
 				break;
 			}
 
@@ -9540,6 +9550,8 @@ main(
 #elif (_AXL_OS_POSIX)
 	signal(SIGPIPE, SIG_IGN);
 #endif
+
+	testUsbMon();
 
 #if (_AXL_OS_LINUX)
 	testModuleEnum();

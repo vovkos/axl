@@ -150,8 +150,8 @@ struct UsbMonTransferHdr {
 	uint8_t m_bus;
 	uint8_t m_address;
 	uint8_t m_endpoint;
-	uint32_t m_originalSize; // original payload size
-	uint32_t m_captureSize;  // payload captured by the driver
+	uint32_t m_originalDataSize; // original size
+	uint32_t m_capturedDataSize; // captured by the driver (could be truncated)
 	uint32_t _m_padding;
 
 	union {
@@ -160,7 +160,8 @@ struct UsbMonTransferHdr {
 	};
 };
 
-// for isochornous transfers, followed by UsbMonIsoPacket[m_isoHdr.m_packetCount]
+// followed by UsbMonIsoPacket[m_isoHdr.m_packetCount] for isochornous transfers
+// followed by payload data[m_capturedDataSize]
 
 //..............................................................................
 

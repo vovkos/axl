@@ -47,8 +47,8 @@ UsbMonTransferParser::parseHeader(
 	m_hdr.m_timestamp = sys::getTimestampFromTimeval(m_buffer.m_monHdr.ts_sec, m_buffer.m_monHdr.ts_usec);
 	m_hdr.m_id = m_buffer.m_monHdr.id;
 	m_hdr.m_status = m_buffer.m_monHdr.status;
-	m_hdr.m_originalSize = m_buffer.m_monHdr.len_urb;
-	m_hdr.m_captureSize = m_buffer.m_monHdr.len_cap;
+	m_hdr.m_originalDataSize = m_buffer.m_monHdr.len_urb;
+	m_hdr.m_capturedDataSize = m_buffer.m_monHdr.len_cap;
 	m_hdr.m_transferType = transferType;
 	m_hdr.m_bus = m_buffer.m_monHdr.busnum;
 	m_hdr.m_address = m_buffer.m_monHdr.devnum;
@@ -57,6 +57,9 @@ UsbMonTransferParser::parseHeader(
 	m_hdr.m_urbFunction = 0;
 
 	switch (transferType) {
+		bool result;
+		size_t isoDescTableSize;
+
 	case LIBUSB_TRANSFER_TYPE_CONTROL:
 		if (m_buffer.m_monHdr.type == 'S')
 			memcpy(&m_hdr.m_controlSetup, m_buffer.m_monHdr.s.setup, sizeof(UsbMonControlSetup));
@@ -66,9 +69,16 @@ UsbMonTransferParser::parseHeader(
 		m_hdr.m_isoHdr.m_packetCount = m_buffer.m_monHdr.s.iso.numdesc;
 		m_hdr.m_isoHdr.m_errorCount = m_buffer.m_monHdr.s.iso.error_count;
 
-		bool result = m_isoPacketArray.setCountZeroConstruct(m_hdr.m_isoHdr.m_packetCount);
+		result = m_isoPacketArray.setCountZeroConstruct(m_hdr.m_isoHdr.m_packetCount);
 		if (!result)
 			return -1;
+
+		isoDescTableSize = sizeof(usbmon::mon_bin_isodesc) * m_hdr.m_isoHdr.m_packetCount;
+		if (isoDescTableSize > m_hdr.m_capturedDataSize)
+			return fail("incomplete usbmon ISOCHRONOUS packet descriptor table");
+
+		m_hdr.m_originalDataSize -= isoDescTableSize;
+		m_hdr.m_capturedDataSize -= isoDescTableSize;
 
 		m_state = UsbMonTransferParserState_IncompleteIsoPacketArray;
 		m_isoPacketIdx = 0;
@@ -116,13 +126,8 @@ UsbMonTransferParser::parseIsoPacketTable(
 		m_offset = 0; // reset buffering of iso packet
 	}
 
-	m_hdr.m_captureSize -= sizeof(usbmon::mon_bin_isodesc) * m_hdr.m_isoHdr.m_packetCount;
-
-	bool isIncoming = (m_hdr.m_endpoint & 0x80) != 0;
-	bool isCompleted = (m_hdr.m_flags & UsbMonTransferFlag_Completed) != 0;
-	bool hasData = isIncoming == isCompleted;
-	if (hasData && m_isoDataSize != m_hdr.m_captureSize)
-		return err::fail<size_t>(-1, "invalid isochronous cumulative packet length");
+	if (hasData() && m_isoDataSize != m_hdr.m_originalDataSize)
+		return err::fail<size_t>(-1, "usbmon ISOCHROUNOUS data size mismatch");
 
 	m_state = UsbMonTransferParserState_CompleteHeader;
 	m_offset = 0;

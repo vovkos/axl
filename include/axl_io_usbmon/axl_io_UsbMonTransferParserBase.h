@@ -21,11 +21,13 @@ namespace io {
 //..............................................................................
 
 enum UsbMonTransferParserState {
-	UsbMonTransferParserState_IncompleteHeader = 0,
+	UsbMonTransferParserState_Error = -1,
+	UsbMonTransferParserState_IncompleteHeader,
 	UsbMonTransferParserState_IncompleteIsoPacketArray,
 	UsbMonTransferParserState_CompleteHeader,
 	UsbMonTransferParserState_IncompleteData,
 	UsbMonTransferParserState_CompleteData,
+	UsbMonTransferParserState_TruncatedData,
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -76,6 +78,19 @@ public:
 	);
 
 protected:
+	bool
+	hasData() const { // incomplete OUT-transfers and complete IN-transfers potentially carry data
+		return
+			((m_hdr.m_endpoint & 0x80) != 0) ==
+			((m_hdr.m_flags & UsbMonTransferFlag_Completed) != 0);
+	}
+
+	size_t
+	fail(const err::ErrorRef& error) {
+		m_state = UsbMonTransferParserState_Error;
+		return err::fail((size_t)-1, error);
+	}
+
 	size_t
 	parseData(size_t size);
 
@@ -96,6 +111,7 @@ template <
 UsbMonTransferParserBase<T, B>::UsbMonTransferParserBase() {
 	m_state = UsbMonTransferParserState_IncompleteHeader;
 	m_isoPacketIdx = 0;
+	m_isoDataSize = 0;
 	m_offset = 0;
 }
 
@@ -116,7 +132,7 @@ UsbMonTransferParserBase<T, B>::parse(
 		return static_cast<T*>(this)->parseIsoPacketTable(p, size);
 
 	case UsbMonTransferParserState_CompleteHeader:
-		if (m_hdr.m_captureSize)
+		if (m_hdr.m_originalDataSize)
 			return parseData(size);
 
 		reset();
@@ -126,12 +142,12 @@ UsbMonTransferParserBase<T, B>::parse(
 		return parseData(size);
 
 	case UsbMonTransferParserState_CompleteData:
+	case UsbMonTransferParserState_TruncatedData:
 		reset();
 		return static_cast<T*>(this)->parseHeader(p, size);
 
 	default:
-		ASSERT(false);
-		return err::fail<size_t>(-1, err::SystemErrorCode_InvalidDeviceState);
+		return fail(err::SystemErrorCode_InvalidDeviceState);
 	}
 }
 
@@ -141,14 +157,17 @@ template <
 >
 size_t
 UsbMonTransferParserBase<T, B>::parseData(size_t size) {
-	size_t leftover = m_hdr.m_captureSize - m_offset;
+	size_t leftover = m_hdr.m_capturedDataSize - m_offset;
 	size_t taken;
 
 	if (size < leftover) {
 		m_state = UsbMonTransferParserState_IncompleteData;
 		taken = size;
-	} else {
-		m_state = UsbMonTransferParserState_CompleteData;
+	} else  {
+		m_state = m_hdr.m_capturedDataSize < m_hdr.m_originalDataSize ?
+			UsbMonTransferParserState_TruncatedData :
+			UsbMonTransferParserState_CompleteData;
+
 		taken = leftover;
 	}
 
