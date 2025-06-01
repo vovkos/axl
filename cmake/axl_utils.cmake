@@ -828,7 +828,6 @@ macro(
 axl_find_lib_dir_ex
 	# ...
 )
-
 	set(_ARG_LIST ${ARGN})
 
 	set(_RESULT_LIB_DIR)
@@ -862,7 +861,7 @@ axl_find_lib_dir_ex
 	endif()
 
 	foreach(_LIB_NAME ${_LIB_NAME_LIST})
-		axl_find_lib_dir(_LIB_DIR ${_LIB_NAME} ${_OPTIONS})
+		axl_find_lib(_LIB_DIR _ACTUAL_LIB_NAME ${_LIB_NAME} ${_OPTIONS})
 
 		if(_LIB_DIR)
 			if(_RESULT_LIB_DIR)
@@ -870,7 +869,7 @@ axl_find_lib_dir_ex
 			endif()
 
 			if(_RESULT_LIB_NAME)
-				set(${_RESULT_LIB_NAME} ${_LIB_NAME})
+				set(${_RESULT_LIB_NAME} ${_ACTUAL_LIB_NAME})				
 			endif()
 
 			break()
@@ -883,25 +882,32 @@ axl_find_lib_dir
 	_RESULT
 	_LIB_NAME
 	# ... _OPTIONS
+)	# backward-compatible signature
+
+	axl_find_lib(${_RESULT} _UNUSED ${_LIB_NAME} ${ARGN})
+endmacro()
+
+macro(
+axl_find_lib
+	_RESULT_LIB_DIR
+	_RESULT_LIB_NAME
+	_LIB_NAME
+	# ... _OPTIONS
 )
 
 	unset(_PATH)
 	find_library(_PATH ${_LIB_NAME} ${ARGN})
 
 	if(NOT _PATH)
-		set(${_RESULT} ${_RESULT}-NOTFOUND)
+		set(${_RESULT_LIB_DIR} ${_RESULT_LIB_DIR}-NOTFOUND)
+		set(${_RESULT_LIB_NAME} ${_RESULT_LIB_NAME}-NOTFOUND)
 	else()
 		if(WIN32)
 			string(REPLACE "\\" "/" _PATH "${_PATH}")
 		endif()
 
-		get_filename_component(
-			_DIR
-			${_PATH}
-			DIRECTORY
-		)
-
-		set(${_RESULT} ${_DIR})
+		get_filename_component(${_RESULT_LIB_DIR} ${_PATH} DIRECTORY)
+		get_filename_component(${_RESULT_LIB_NAME} ${_PATH} NAME)
 	endif()
 
 	unset(_PATH CACHE)
