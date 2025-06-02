@@ -137,7 +137,7 @@ UsbPcapTransferParser::parseHeader(
 	case USBPCAP_TRANSFER_IRP_INFO:
 	case USBPCAP_TRANSFER_UNKNOWN:
 	default:
-		err::setFormatStringError("unsupported USBPcap transfer type: 0x%02x\n", m_buffer.m_packetHdr.transfer);
+		err::setFormatStringError("unsupported USBPcap transfer type: 0x%02x", m_buffer.m_packetHdr.transfer);
 		return -1;
 	}
 
