@@ -134,7 +134,7 @@ public:
 	sl::StringRef
 	getText() const {
 		ASSERT(m_p && m_codec);
- 		return !m_text.isEmpty() ? m_text : cacheText();
+		return !m_text.isEmpty() ? m_text : cacheText();
 	}
 
 protected:

@@ -346,7 +346,7 @@ public:
 				decoderState
 			);
 
- 			ASSERT(state->getBinTailSize() >= state->getTailLength());
+			ASSERT(state->getBinTailSize() >= state->getTailLength());
 			p = p2;
 		}
 

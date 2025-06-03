@@ -295,7 +295,7 @@ BitMap::isEqualImpl(
 	const size_t* p1,
 	size_t count1,
 	const size_t* p2,
- 	size_t count2
+	size_t count2
 ) {
 	ASSERT(count1 < count2);
 

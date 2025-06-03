@@ -50,7 +50,7 @@ enum NfaStateKind {
 	NfaStateKind_Split,
 	NfaStateKind_Link,
 	NfaStateKind_Sequence,
- 	NfaStateKind_OpenCapture,
+	NfaStateKind_OpenCapture,
 	NfaStateKind_CloseCapture,
 	NfaStateKind_MatchAnchor,
 	NfaStateKind_MatchChar,

@@ -33,7 +33,7 @@ class HidRdParser {
 		size_t size
 	);
 
- protected:
+protected:
 	typedef
 	void
 	(HidRdParser::*ProcessTagFunc)(uint32_t data);

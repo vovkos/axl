@@ -51,7 +51,7 @@ CharCodec::encode_utf8(
 	buffer->clear();
 
 	const utf8_t* p = string.cp();
- 	const utf8_t* end = string.getEnd();
+	const utf8_t* end = string.getEnd();
 	while (p < end) {
 		char tmpBuffer[256];
 		ConvertLengthResult result = encode_utf8(

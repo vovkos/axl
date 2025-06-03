@@ -27,7 +27,7 @@ getNfaStateKindCodeString(NfaStateKind stateKind) {
 		"|", // NfaStateKind_Split,
 		"+", // NfaStateKind_Link,
 		">", // NfaStateKind_Sequence,
- 		"(", // NfaStateKind_OpenCapture,
+		"(", // NfaStateKind_OpenCapture,
 		")", // NfaStateKind_CloseCapture,
 		"m", // NfaStateKind_MatchAnchor,
 		"m", // NfaStateKind_MatchChar,

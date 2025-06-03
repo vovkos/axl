@@ -188,7 +188,7 @@ void
 ExecNfaVmBase::advanceConsumingThreads(utf32_t c) {
 	while (!m_consumingThreadList.isEmpty()) {
 		Thread* thread = m_consumingThreadList.removeHead();
- 		switch (thread->m_state->m_stateKind) {
+		switch (thread->m_state->m_stateKind) {
 		case NfaStateKind_MatchChar:
 			if (thread->m_state->m_char == c)
 				continueConsumingThread(thread);

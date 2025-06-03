@@ -121,8 +121,8 @@ template <
 >
 size_t
 UsbMonTransferParserBase<T, B>::parse(
- 	const void* p,
- 	size_t size
+	const void* p,
+	size_t size
 ) {
 	switch (m_state) {
 	case UsbMonTransferParserState_IncompleteHeader:
