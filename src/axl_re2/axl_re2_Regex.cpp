@@ -42,6 +42,19 @@ calcRe2OptionsFromRegexFlags(uint_t flags) {
 	return options;
 }
 
+inline
+void
+buildRe2StringPieceArray(
+	sl::Array<re2::StringPiece>* array,
+	const sl::StringRef* p,
+	size_t count
+) {
+	array->setCount(count);
+	sl::Array<re2::StringPiece>::Rwi rwi = array->rwi();
+	for (size_t i = 0; i < count; i++)
+		rwi[i] = p[i] >> toRe2;
+}
+
 //..............................................................................
 
 class Regex::Impl: public RE2::SM {
@@ -297,6 +310,28 @@ Regex::exec(
 }
 
 ExecResult
+Regex::exec(
+	State* state,
+	size_t chunkOffset,
+	size_t chunkCount,
+	const sl::StringRef* chunkTable_axl
+) const {
+	if (state->m_match)
+		state->m_match.reset();
+
+	char buffer[256];
+	sl::Array<re2::StringPiece> chunkTable_re2(rc::BufKind_Stack, buffer, sizeof(buffer));
+	buildRe2StringPieceArray(&chunkTable_re2, chunkTable_axl, chunkCount);
+
+	return (ExecResult)m_impl->exec(
+		(RE2::SM::State*)state->m_impl,
+		chunkOffset,
+		chunkCount,
+		chunkTable_re2
+	);
+}
+
+ExecResult
 Regex::execEof(
 	State* state,
 	const sl::StringRef& lastChunk,
@@ -305,6 +340,30 @@ Regex::execEof(
 	if (state->m_match)
 		state->m_match.reset();
 	return (ExecResult)m_impl->exec_eof((RE2::SM::State*)state->m_impl, lastChunk >> toRe2, eofChar);
+}
+
+ExecResult
+Regex::execEof(
+	State* state,
+	size_t chunkOffset,
+	size_t chunkCount,
+	const sl::StringRef* chunkTable_axl,
+	int eofChar
+) const {
+	if (state->m_match)
+		state->m_match.reset();
+
+	char buffer[256];
+	sl::Array<re2::StringPiece> chunkTable_re2(rc::BufKind_Stack, buffer, sizeof(buffer));
+	buildRe2StringPieceArray(&chunkTable_re2, chunkTable_axl, chunkCount);
+
+	return (ExecResult)m_impl->exec_eof(
+		(RE2::SM::State*)state->m_impl,
+		chunkOffset,
+		chunkCount,
+		chunkTable_re2,
+		eofChar
+	);
 }
 
 size_t

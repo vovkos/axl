@@ -1,4 +1,4 @@
- //..............................................................................
+//..............................................................................
 //
 //  This file is part of the AXL library.
 //
@@ -146,11 +146,35 @@ public:
 		uint_t execFlags = 0
 	) const;
 
+	Match
+	exec(
+		size_t chunkCount,
+		const sl::StringRef* chunkTable,
+		uint_t execFlags = 0
+	) const;
+
 	ExecResult
 	exec(
 		State* state,
 		const sl::StringRef& chunk
 	) const;
+
+	ExecResult
+	exec(
+		State* state,
+		size_t chunkOffset,
+		size_t chunkCount,
+		const sl::StringRef* chunkTable
+	) const;
+
+	ExecResult
+	exec(
+		State* state,
+		size_t chunkCount,
+		const sl::StringRef* chunkTable
+	) const {
+		return exec(state, 0, chunkCount, chunkTable);
+	}
 
 	ExecResult
 	execEof(
@@ -165,6 +189,25 @@ public:
 		int eofChar = EofChar
 	) const {
 		return execEof(state, sl::StringRef(), eofChar);
+	}
+
+	ExecResult
+	execEof(
+		State* state,
+		size_t chunkOffset,
+		size_t chunkCount,
+		const sl::StringRef* chunkTable,
+		int eofChar = EofChar
+	) const;
+
+	ExecResult
+	execEof(
+		State* state,
+		size_t chunkCount,
+		const sl::StringRef* chunkTable,
+		int eofChar = EofChar
+	) const {
+		return execEof(state, 0, chunkCount, chunkTable, eofChar);
 	}
 
 	size_t
@@ -293,6 +336,18 @@ Regex::exec(
 ) const {
 	State state(execFlags);
 	execEof(&state, text);
+	return state.isMatch() ? state.getMatch() : Match();
+}
+
+inline
+Match
+Regex::exec(
+	size_t chunkCount,
+	const sl::StringRef* chunkTable,
+	uint_t execFlags
+) const {
+	State state(execFlags);
+	execEof(&state, chunkCount, chunkTable);
 	return state.isMatch() ? state.getMatch() : Match();
 }
 
