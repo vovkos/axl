@@ -9551,11 +9551,14 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
+#if (_AXL_IO_USBMON)
 	testUsbMon();
+#endif
 
 #if (_AXL_OS_LINUX)
 	testModuleEnum();
 #endif
+	
 	return 0;
 }
 
