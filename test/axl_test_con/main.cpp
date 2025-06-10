@@ -8207,6 +8207,8 @@ enum {
 
 	Vid = VidCamera,
 	Pid = PidCamera,
+	// Vid = VidMouse,
+	// Pid = PidMouse,
 };
 
 bool
@@ -9555,10 +9557,6 @@ main(
 	testUsbMon();
 #endif
 
-#if (_AXL_OS_LINUX)
-	testModuleEnum();
-#endif
-	
 	return 0;
 }
 

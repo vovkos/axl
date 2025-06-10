@@ -77,12 +77,12 @@ UsbMonTransferParser::parseHeader(
 		if (isoDescTableSize > m_hdr.m_capturedDataSize)
 			return fail("incomplete usbmon ISOCHRONOUS packet descriptor table");
 
-		m_hdr.m_originalDataSize -= isoDescTableSize;
 		m_hdr.m_capturedDataSize -= isoDescTableSize;
 
 		m_state = UsbMonTransferParserState_IncompleteIsoPacketArray;
 		m_isoPacketIdx = 0;
 		m_isoDataSize = 0;
+		m_isoDataEnd = 0;
 		m_offset = 0;
 		return p - (char*)p0;
 	}
@@ -123,11 +123,18 @@ UsbMonTransferParser::parseIsoPacketTable(
 		packet++;
 
 		m_isoDataSize += m_buffer.m_isoDesc.iso_len;
+
+		size_t end = m_buffer.m_isoDesc.iso_off + m_buffer.m_isoDesc.iso_len;
+		if (end > m_isoDataEnd)
+			m_isoDataEnd = end;
+
 		m_offset = 0; // reset buffering of iso packet
 	}
 
 	if (hasData() && m_isoDataSize != m_hdr.m_originalDataSize)
 		return err::fail<size_t>(-1, "usbmon ISOCHROUNOUS data size mismatch");
+
+	m_hdr.m_originalDataSize = m_isoDataEnd;
 
 	m_state = UsbMonTransferParserState_CompleteHeader;
 	m_offset = 0;

@@ -43,6 +43,7 @@ protected:
 	sl::Array<UsbMonIsoPacket> m_isoPacketArray;
 	size_t m_isoPacketIdx;
 	size_t m_isoDataSize;
+	size_t m_isoDataEnd;
 	size_t m_offset;
 	B m_buffer;
 
@@ -112,6 +113,7 @@ UsbMonTransferParserBase<T, B>::UsbMonTransferParserBase() {
 	m_state = UsbMonTransferParserState_IncompleteHeader;
 	m_isoPacketIdx = 0;
 	m_isoDataSize = 0;
+	m_isoDataEnd = 0;
 	m_offset = 0;
 }
 

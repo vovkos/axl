@@ -85,6 +85,7 @@ UsbPcapTransferParser::parseHeader(
 		m_state = UsbMonTransferParserState_IncompleteIsoPacketArray;
 		m_isoPacketIdx = 0;
 		m_isoDataSize = 0;
+		m_isoDataEnd = 0;
 		m_offset = 0;
 		return p - (char*)p0;
 		}
@@ -180,11 +181,18 @@ UsbPcapTransferParser::parseIsoPacketTable(
 		packet++;
 
 		m_isoDataSize += m_buffer.m_isoPacket.length;
+
+		size_t end = m_buffer.m_isoPacket.offset + m_buffer.m_isoPacket.length;
+		if (end > m_isoDataEnd)
+			m_isoDataEnd = end;
+
 		m_offset = 0; // reset buffering of iso packet
 	}
 
 	if (hasData() && m_isoDataSize != m_hdr.m_originalDataSize)
 		return fail("USBPcap ISOCHRONOUS data length mismatch");
+
+	m_hdr.m_originalDataSize = m_isoDataEnd;
 
 	m_state = UsbMonTransferParserState_CompleteHeader;
 	m_offset = 0;
