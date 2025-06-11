@@ -2668,6 +2668,56 @@ testUsbMouse() {
 	device.releaseInterface(InterfaceId);
 }
 
+void
+testUsbSerialTapPro() {
+	enum {
+		VendorId  = 0x326f,
+		ProductId = 0x0005,
+
+		InterfaceId    = 0,
+		InEndpointId   = 0x86,
+		OutEndpointId  = 0x02,
+	};
+
+	bool result;
+
+	io::registerUsbErrorProvider();
+	io::getUsbDefaultContext()->createDefault();
+	io::getUsbDefaultContextEventThread()->start();
+
+	printf("Opening device...\n");
+
+	io::UsbDevice device;
+	result = device.open(VendorId, ProductId);
+	if (!result) {
+		printf("Error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	printf("Reading device properties...\n");
+	printUsbDevice(&device);
+
+	printf("Claiming interface #%d...\n", InterfaceId);
+	result = device.claimInterface(InterfaceId);
+	if (!result) {
+		printf("Error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	io::UsbConfigDescriptor configDesc;
+	device.getActiveConfigDescriptor(&configDesc);
+	const libusb_endpoint_descriptor* endpointDesc = io::findUsbEndpointDescriptor(configDesc, OutEndpointId);
+	ASSERT(endpointDesc);
+
+	printf("Writing to EP %02x...\n", OutEndpointId);
+
+	char buffer[] = "Hello";
+	size_t size = device.bulkTransfer(OutEndpointId, buffer, sizeof(buffer));
+
+	printf("Result: %d\n", size);
+	sys::sleep(1000);
+}
+
 #endif
 
 //..............................................................................
