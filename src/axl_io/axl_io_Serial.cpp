@@ -322,20 +322,16 @@ Serial::setSettings(
 	}
 
 	if (mask & SerialSettingId_Parity) {
+		attr.c_cflag &= ~(PARENB | PARODD | CMSPAR);
 		attr.c_iflag &= ~(PARMRK | INPCK);
 		attr.c_iflag |= IGNPAR;
 
 		switch (settings->m_parity) {
-		case SerialParity_None:
-			attr.c_cflag &= ~PARENB;
-			break;
-
 		case SerialParity_Odd:
 			attr.c_cflag |= PARENB | PARODD;
 			break;
 
 		case SerialParity_Even:
-			attr.c_cflag &= ~PARODD;
 			attr.c_cflag |= PARENB;
 			break;
 
@@ -345,15 +341,9 @@ Serial::setSettings(
 			break;
 
 		case SerialParity_Space:
-			attr.c_cflag &= ~PARODD;
 			attr.c_cflag |= PARENB | CMSPAR;
 			break;
 #endif
-
-		default:
-			attr.c_cflag |= PARENB;
-			attr.c_iflag |= PARMRK | INPCK;
-			attr.c_iflag &= ~IGNPAR;
 		}
 	}
 

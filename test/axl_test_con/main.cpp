@@ -4638,7 +4638,7 @@ testConn() {
 
 bool
 testSerial() {
-	char const* port = "COM6";
+	char const* port = "/dev/ttyS0";
 
 	printf("opening %s...\n", port);
 
@@ -4646,8 +4646,8 @@ testSerial() {
 	settings.m_baudRate = 38400;
 	settings.m_dataBits = 8;
 	settings.m_stopBits = io::SerialStopBits_1;
-	settings.m_flowControl = io::SerialFlowControl_RtsCts;
-	settings.m_parity = io::SerialParity_None;
+	settings.m_flowControl = io::SerialFlowControl_None;
+	settings.m_parity = io::SerialParity_Even;
 
 	io::Serial serial;
 	bool result =
@@ -4660,8 +4660,8 @@ testSerial() {
 	}
 
 	printf("writing data...\n");
-	char data[] = "abcd";
-	size_t size = serial.write(data, sizeof(data));
+	char data[] = "abcdefghijklmnop";
+	size_t size = serial.write(data, lengthof(data));
 	printf("written: %d byte(s)\n", size);
 
 #if (_AXL_OS_WIN)
@@ -9603,10 +9603,7 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-#if (_AXL_IO_USBMON)
-	testUsbMon();
-#endif
-
+	testSerial();
 	return 0;
 }
 
