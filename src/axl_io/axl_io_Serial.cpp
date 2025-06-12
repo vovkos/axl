@@ -396,16 +396,21 @@ Serial::setSettings(
 	}
 #endif
 
-	if (mask & SerialSettingId_FlowControl) { // also, adjust DTR & RTS lines
-		result = m_serial.setDtr(settings->m_dtr);
+	if (mask & SerialSettingId_FlowControl) {
+		// adjust DTR & RTS lines
+
+		result =
+			m_serial.setDtr(settings->m_dtr) &&
+			m_serial.setRts(
+				// most drivers don't auto-adjust RTS line with CRTSSTS
+				// enable it manually when RTS/CTS control is requested
+				// otherwise, the other side will never be able to send
+				settings->m_flowControl == SerialFlowControl_RtsCts ||
+				settings->m_rts
+			);
+
 		if (!result)
 			return false;
-
-		if (settings->m_flowControl != SerialFlowControl_RtsCts) {
-			result = m_serial.setRts(settings->m_rts);
-			if (!result)
-				return false;
-		}
 	}
 
 	return true;

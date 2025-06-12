@@ -4646,8 +4646,10 @@ testSerial() {
 	settings.m_baudRate = 38400;
 	settings.m_dataBits = 8;
 	settings.m_stopBits = io::SerialStopBits_1;
-	settings.m_flowControl = io::SerialFlowControl_None;
-	settings.m_parity = io::SerialParity_Even;
+	settings.m_flowControl = io::SerialFlowControl_RtsCts;
+	settings.m_parity = io::SerialParity_None;
+	settings.m_dtr = false;
+	settings.m_rts = false;
 
 	io::Serial serial;
 	bool result =
@@ -4688,6 +4690,8 @@ testSerial() {
 		}
 	}
 #endif
+
+	serial.setBreakCondition(true);
 
 	printf("purging port...\n");
 	serial.purge();
