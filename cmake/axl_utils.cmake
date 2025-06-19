@@ -192,10 +192,11 @@ axl_detect_target_cpu
 	# TODO: replace with try_run and CPU detection C pre-processor code
 
 	get_filename_component(_CXX_FILE_NAME ${CMAKE_CXX_COMPILER} NAME)
+	string(TOLOWER "${_CXX_FILE_NAME}${CMAKE_SYSTEM_PROCESSOR}${CMAKE_GENERATOR_PLATFORM}" _CPUID)
 
-	if("${_CXX_FILE_NAME}${CMAKE_SYSTEM_PROCESSOR}" MATCHES "arm64|aarch64")
+	if("${_CPUID}" MATCHES "arm64|aarch64")
 		set(${_CPU} "arm64")
-	elseif("${_CXX_FILE_NAME}${CMAKE_SYSTEM_PROCESSOR}" MATCHES "arm")
+	elseif("${_CPUID}" MATCHES "arm")
 		set(${_CPU} "arm32")
 	else()
 		if(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -869,7 +870,7 @@ axl_find_lib_dir_ex
 			endif()
 
 			if(_RESULT_LIB_NAME)
-				set(${_RESULT_LIB_NAME} ${_ACTUAL_LIB_NAME})				
+				set(${_RESULT_LIB_NAME} ${_ACTUAL_LIB_NAME})
 			endif()
 
 			break()

@@ -414,7 +414,7 @@ axl_create_gcc_settings)
 			DEFAULT "-Wno-stringop-overread"
 			"-Wstringop-overread"
 			"-Wno-stringop-overread"
-		)		
+		)
 	endif()
 
 	axl_create_compiler_flag_setting(

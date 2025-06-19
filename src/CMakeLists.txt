@@ -74,7 +74,7 @@ if(RAGEL_FOUND)
 else()
 	unset(BUILD_AXL_RE CACHE)
 endif()
-	
+
 if(BUILD_AXL_RE)
 	add_subdirectory(axl_re)
 endif()
