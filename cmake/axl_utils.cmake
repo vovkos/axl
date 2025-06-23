@@ -191,8 +191,19 @@ axl_detect_target_cpu
 
 	# TODO: replace with try_run and CPU detection C pre-processor code
 
-	get_filename_component(_CXX_FILE_NAME ${CMAKE_CXX_COMPILER} NAME)
-	string(TOLOWER "${_CXX_FILE_NAME}${CMAKE_SYSTEM_PROCESSOR}${CMAKE_GENERATOR_PLATFORM}" _CPUID)
+	get_filename_component(_CXX_COMPILER_NAME ${CMAKE_CXX_COMPILER} NAME)
+
+	set(_CPUID)
+
+	string(
+		APPEND _CPUID
+		${_CXX_COMPILER_NAME}
+		${CMAKE_CXX_COMPILER_ARCHITECTURE_ID}
+		${CMAKE_GENERATOR_PLATFORM}
+		${CMAKE_SYSTEM_PROCESSOR}
+	)
+
+	string(TOLOWER "${_CPUID}" _CPUID)
 
 	if("${_CPUID}" MATCHES "arm64|aarch64")
 		set(${_CPU} "arm64")
