@@ -146,6 +146,7 @@
 #		include "axl_sys_lnx_ModuleEnumerator.h"
 #	elif (_AXL_OS_DARWIN)
 #		include "axl_sys_drw_Semaphore.h"
+#		include "axl_sys_drw_Kqueue.h"
 #		include "axl_sec_Error.h"
 #		include "axl_cf_Url.h"
 #	endif

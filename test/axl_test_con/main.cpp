@@ -9581,6 +9581,65 @@ void testModuleEnum() {
 
 //..............................................................................
 
+#if (_AXL_OS_DARWIN)
+
+bool testKqueue() {
+	char const* port = "/dev/cu.usbserial-FT9O84I3";
+
+	printf("opening %s...\n", port);
+
+	io::SerialSettings settings;
+	settings.m_baudRate = 38400;
+	settings.m_dataBits = 8;
+	settings.m_stopBits = io::SerialStopBits_1;
+	settings.m_flowControl = io::SerialFlowControl_RtsCts;
+	settings.m_parity = io::SerialParity_None;
+	settings.m_dtr = false;
+	settings.m_rts = false;
+
+	io::Serial serial;
+	bool result =
+		serial.open(port) &&
+		serial.setSettings(&settings);
+
+	if (!result) {
+		printf("serial failed: %s\n", err::getLastErrorDescription().sz());
+		return false;
+	}
+
+	sys::drw::Kqueue kq;
+
+	struct kevent ke;
+	EV_SET(&ke, serial.m_serial, EVFILT_READ, EV_ADD | EV_DISABLE, 0, 0, (void*)0xabcd);
+	result = kq.change(&ke);
+	if (!result) {
+		printf("kq.change failed: %s\n", err::getLastErrorDescription().sz());
+		return false;
+	}
+
+	sys::sleep(1000);
+
+	EV_SET(&ke, serial.m_serial, EVFILT_READ, EV_ENABLE, 0, 0, (void*)0x1234);
+	result = kq.change(&ke);
+	if (!result) {
+		printf("kq.change failed: %s\n", err::getLastErrorDescription().sz());
+		return false;
+	}
+
+	size_t count = kq.wait(&ke, 1);
+	if (count == -1) {
+		printf("kq.wait failed: %s\n", err::getLastErrorDescription().sz());
+		return false;
+	}
+
+	printf("kq.wait: %d -> 0x%x\n", count, ke.udata);
+	return true;
+}
+
+#endif
+
+//..............................................................................
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -9607,7 +9666,10 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	testSerial();
+#if (_AXL_OS_DARWIN)
+	testKqueue();
+#endif
+
 	return 0;
 }
 

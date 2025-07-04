@@ -253,6 +253,7 @@
 #		include <mach/task.h>
 #		include <mach/semaphore.h>
 #		include <sys/time.h>
+#		include <sys/event.h>
 #	else
 #		include <byteswap.h>
 #	endif
