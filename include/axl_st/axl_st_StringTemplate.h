@@ -165,7 +165,7 @@ protected:
 			const Token* token = lexer.getToken();
 
 			if (token->m_token == TokenKind_Error) {
-				err::setFormatStringError("invalid character '\\x%02x'", (uchar_t) token->m_data.m_integer);
+				err::setFormatStringError("invalid character '\\x%02x'", (uchar_t)token->m_data.m_integer);
 				return false;
 			}
 

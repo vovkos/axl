@@ -23,19 +23,19 @@ public:
 
 public:
 	MyClass() {
-		printf("MyClass::MyClass ()\n");
+		printf("MyClass::MyClass()\n");
 		m_x = 0;
 		m_y = 0;
 	}
 
 	MyClass(const MyClass& src) {
-		printf("MyClass::MyClass (const MyClass&)\n");
+		printf("MyClass::MyClass(const MyClass&)\n");
 		m_x = src.m_x;
 		m_y = src.m_y;
 	}
 
 	~MyClass() {
-		printf("MyClass::~MyClass ()\n");
+		printf("MyClass::~MyClass()\n");
 	}
 
 	MyClass&
@@ -71,13 +71,13 @@ public:
 
 public:
 	Point() {
-		printf("Point::Point ()\n");
+		printf("Point::Point()\n");
 		x = 10;
 		y = 20;
 	}
 
 	~Point() {
-		printf("Point::~Point ()\n");
+		printf("Point::~Point()\n");
 	}
 };
 
@@ -133,8 +133,8 @@ run_Buf() {
 
 	PointBuf point2 = point;
 
-	printf("point: %p, %d, %d\n", point.cp (), point->x, point->y);
-	printf("point2: %p, %d, %d\n", point.cp (), point2->x, point2->y);
+	printf("point: %p, %d, %d\n", point.cp(), point->x, point->y);
+	printf("point2: %p, %d, %d\n", point.cp(), point2->x, point2->y);
 
 	point2->x *= 10;
 	point2->y *= 10;
@@ -156,11 +156,11 @@ run_Buf() {
 class MyClass2: public rc::RefCount {
 public:
 	MyClass2() {
-		printf("MyClass2::MyClass2 ()\n");
+		printf("MyClass2::MyClass2()\n");
 	}
 
 	~MyClass2() {
-		printf("MyClass2::MyClass2 ()\n");
+		printf("MyClass2::MyClass2()\n");
 	}
 };
 
@@ -189,19 +189,19 @@ struct IMyInterface {
 class MyClass4: public IMyInterface {
 public:
 	MyClass4()
-		{ printf("MyClass4::MyClass4 ()\n"); }
+		{ printf("MyClass4::MyClass4()\n"); }
 
 	~MyClass4()
-		{ printf("MyClass4::~MyClass4 ()\n"); }
+		{ printf("MyClass4::~MyClass4()\n"); }
 
 	rc::Ptr<IMyInterface> getChild(int i)
 		{ return rc::g_nullPtr; }
 
 	virtual void doSomething()
-		{ printf("MyClass4::doSomething ()\n"); }
+		{ printf("MyClass4::doSomething()\n"); }
 
 	virtual void doSomethingElse()
-		{ printf("MyClass4::doSomethingElse ()\n"); }
+		{ printf("MyClass4::doSomethingElse()\n"); }
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -219,10 +219,10 @@ public:
 		m_child1(this),
 		m_child2(this),
 		m_child3(this)
-		{ printf("MyContainer::MyContainer ()\n"); }
+		{ printf("MyContainer::MyContainer()\n"); }
 
 	~MyContainer()
-		{ printf("MyContainer::~MyContainer ()\n"); }
+		{ printf("MyContainer::~MyContainer()\n"); }
 
 	rc::Ptr<IMyInterface> getChild(int i) {
 		switch (i) {
@@ -241,10 +241,10 @@ public:
 	}
 
 	virtual void doSomething()
-		{ printf("MyContainer::doSomething ()\n"); }
+		{ printf("MyContainer::doSomething()\n"); }
 
 	virtual void doSomethingElse()
-		{ printf("MyContainer::doSomethingElse ()\n"); }
+		{ printf("MyContainer::doSomethingElse()\n"); }
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -262,10 +262,10 @@ public:
 		m_child1(this),
 		m_child2(this),
 		m_child3(this)
-		{ printf("MySuperContainer::MySuperContainer ()\n"); }
+		{ printf("MySuperContainer::MySuperContainer()\n"); }
 
 	~MySuperContainer()
-		{ printf("MySuperContainer::~MySuperContainer ()\n"); }
+		{ printf("MySuperContainer::~MySuperContainer()\n"); }
 
 	rc::Ptr<IMyInterface> getChild(int i) {
 		switch (i) {
@@ -284,10 +284,10 @@ public:
 	}
 
 	virtual void doSomething()
-		{ printf("MySuperContainer::doSomething ()\n"); }
+		{ printf("MySuperContainer::doSomething()\n"); }
 
 	virtual void doSomethingElse()
-		{ printf("MySuperContainer::doSomethingElse ()\n"); }
+		{ printf("MySuperContainer::doSomethingElse()\n"); }
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

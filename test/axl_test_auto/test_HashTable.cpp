@@ -31,7 +31,7 @@ void test_IntHashTable() {
 
 	it = map.getHead();
 	for (; it; it++)
-		printf("%d = %d\n", it->getKey (), it->m_value);
+		printf("%d = %d\n", it->getKey(), it->m_value);
 
 	printf(".........\n");
 
@@ -86,13 +86,13 @@ void test_StringHashTableIgnoreCase() {
 		for (size_t j = 0; j < length; j++)
 			stringTable[i][j] = (rand() & 1) ? tolower(stringTable[i][j]) : toupper(stringTable[i][j]);
 
-		printf("map_pcu: looking for %s...", stringTable [i]);
+		printf("map_pcu: looking for %s...", stringTable[i]);
 		it = map_pcu.find(stringTable[i]);
 		ASSERT(it && it->m_value == length);
 
 		printf("found\n");
 
-		printf("map_pcp: looking for %s...", stringTable [i]);
+		printf("map_pcp: looking for %s...", stringTable[i]);
 		it = map_pcp.find(stringTable[i]);
 		ASSERT(it && it->m_value == length);
 

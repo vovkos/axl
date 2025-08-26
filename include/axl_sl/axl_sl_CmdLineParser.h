@@ -241,7 +241,7 @@ protected:
 		for (size_t i = 1; i < length; i++) {
 			const SwitchInfo* switchInfo = SwitchTable::findSwitch(arg[i]);
 			if (!switchInfo) {
-				err::setFormatStringError("unknown switch -%c", (uchar_t) arg [i]);
+				err::setFormatStringError("unknown switch -%c", (uchar_t)arg[i]);
 				return false;
 			}
 

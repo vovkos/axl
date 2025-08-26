@@ -87,7 +87,6 @@ public:
 		attach(hdr, (T*)p, (const T*)end - p);
 	}
 
-
 	~ArrayRef() {
 		release();
 	}

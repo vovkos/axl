@@ -155,7 +155,7 @@ testWinNetworkAdapterList2() {
 
 		dword_t error = ::WSAGetLastError();
 		if (error != WSAENOBUFS) {
-			printf("WSAIoctl failed (%s)\n", err::Error (error).getDescription().sz());
+			printf("WSAIoctl failed (%s)\n", err::Error(error).getDescription().sz());
 			return;
 		}
 
@@ -222,7 +222,7 @@ getFileTimes_nt(const char* fileName) {
 	);
 
 	if (status < 0) {
-		printf("can't query file information: %s: %s\n", fileName, sys::win::NtStatus (status).getDescription().sz());
+		printf("can't query file information: %s: %s\n", fileName, sys::win::NtStatus(status).getDescription().sz());
 		return false;
 	}
 
@@ -448,7 +448,7 @@ testAddrInfoIp6() {
 
 	size_t count = addrArray.getCount();
 	for (size_t i = 0; i < count; i++)
-		printf("    %s\n", addrArray [i].getString().sz());
+		printf("    %s\n", addrArray[i].getString().sz());
 }
 
 //..............................................................................
@@ -2380,7 +2380,7 @@ printUsbDevice(io::UsbDevice* device) {
 		printf("ERROR (%s)\n", err::getLastErrorDescription().sz());
 	} else if (pathLength != -1) {
 		for (size_t i = 0; i < pathLength; i++)
-			printf("-> %d", path [i]);
+			printf("-> %d", path[i]);
 
 		printf("\n");
 	}
@@ -4343,7 +4343,7 @@ public:
 
 			while (*attributes) {
 				printIndent();
-				printf("%s = %s\n", attributes [0], attributes [1]);
+				printf("%s = %s\n", attributes[0], attributes[1]);
 				attributes += 2;
 			}
 

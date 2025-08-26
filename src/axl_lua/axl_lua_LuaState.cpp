@@ -116,15 +116,15 @@ LuaState::trace() {
 			break;
 
 		case LUA_TBOOLEAN:
-			TRACE("%08x %s\n", p, getBoolean (i) ? "true" : "false");
+			TRACE("%08x %s\n", p, getBoolean(i) ? "true" : "false");
 			break;
 
 		case LUA_TNUMBER:
-			TRACE("%08x %g\n", p, getNumber (i));
+			TRACE("%08x %g\n", p, getNumber(i));
 			break;
 
 		default:
-			TRACE("%08x %s\n", p, getTypeName (type).sz());
+			TRACE("%08x %s\n", p, getTypeName(type).sz());
 			break;
 
 		}

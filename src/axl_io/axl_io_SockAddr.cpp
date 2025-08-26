@@ -284,7 +284,7 @@ getAddrString_ip4(
 	const in_addr* addr
 ) {
 	const uchar_t* ip = (const uchar_t*)addr;
-	return string->format("%d.%d.%d.%d", ip [0], ip [1], ip [2], ip [3]);
+	return string->format("%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
 }
 
 size_t
@@ -327,10 +327,10 @@ getAddrString_ip6(
 	}
 
 	if (maxZeroRunIdx == -1) {
-		string->appendFormat("%x", sl::swapByteOrder16 (ip [0]));
+		string->appendFormat("%x", sl::swapByteOrder16(ip[0]));
 
 		for (size_t i = 1; i < 8; i++)
-			string->appendFormat(":%x", sl::swapByteOrder16 (ip [i]));
+			string->appendFormat(":%x", sl::swapByteOrder16(ip[i]));
 	} else {
 		bool isIp4 = false;
 
@@ -352,7 +352,7 @@ getAddrString_ip6(
 			}
 		} else {
 			for (size_t i = 0; i < maxZeroRunIdx; i++)
-				string->appendFormat("%x:", sl::swapByteOrder16 (ip [i]));
+				string->appendFormat("%x:", sl::swapByteOrder16(ip[i]));
 		}
 
 		if (isIp4) {
@@ -369,7 +369,7 @@ getAddrString_ip6(
 				string->append(':');
 			} else {
 				for (size_t i = maxZeroRunEndIdx; i < 8; i++)
-					string->appendFormat(":%x", sl::swapByteOrder16 (ip [i]));
+					string->appendFormat(":%x", sl::swapByteOrder16(ip[i]));
 			}
 		}
 	}
@@ -388,9 +388,9 @@ getSockAddrString_ip4(
 		getAddrString_ip4(string, &addr->sin_addr);
 	} else if (*(const uint32_t*)&addr->sin_addr) {
 		getAddrString_ip4(string, &addr->sin_addr);
-		string->appendFormat(":%d", sl::swapByteOrder16 (addr->sin_port));
+		string->appendFormat(":%d", sl::swapByteOrder16(addr->sin_port));
 	} else {
-		string->format("%d", sl::swapByteOrder16 (addr->sin_port));
+		string->format("%d", sl::swapByteOrder16(addr->sin_port));
 	}
 
 	return string->getLength();
@@ -408,7 +408,7 @@ getSockAddrString_ip6(
 
 	if (addr->sin6_port) {
 		string->insert(0, '[');
-		string->appendFormat("]:%d", sl::swapByteOrder16 (addr->sin6_port));
+		string->appendFormat("]:%d", sl::swapByteOrder16(addr->sin6_port));
 	}
 
 	return string->getLength();

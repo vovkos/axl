@@ -78,7 +78,7 @@ void run() {
 	cry::BigNum privateKey = key.getPrivateKey();
 	cry::EcPoint publicKey = key.getPublicKey();
 	printf("private: %s\n", privateKey.getHexString().sz());
-	printf("public:  %s\n", publicKey.getHexString(key.getGroup ()).sz());
+	printf("public:  %s\n", publicKey.getHexString(key.getGroup()).sz());
 
 	const char* userName = "Vovkos";
 

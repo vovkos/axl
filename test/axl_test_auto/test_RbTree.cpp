@@ -57,7 +57,7 @@ run() {
 
 	it = tree.getHead();
 	for (; it; it++)
-		printf("%d\n", it->getKey ());
+		printf("%d\n", it->getKey());
 
 	printf(".........\n");
 
@@ -66,7 +66,7 @@ run() {
 
 	it = tree.getHead();
 	for (; it; it++)
-		printf("%d\n", it->getKey ());
+		printf("%d\n", it->getKey());
 
 	printf(".........\n");
 }

@@ -267,46 +267,46 @@ testUtf() {
 
 	for (uint_t c = 0; c < 0x10ffff; c++) {
 		if (axl::enc::isDigit(c) != QChar::isDigit(c))
-			printf("%x\taxl::enc::isDigit -> %d\tQChar::isDigit -> %d\n", c, axl::enc::isDigit (c), QChar::isDigit (c));
+			printf("%x\taxl::enc::isDigit -> %d\tQChar::isDigit -> %d\n", c, axl::enc::isDigit(c), QChar::isDigit(c));
 
 		if (axl::enc::isLetter(c) != QChar::isLetter(c))
-			printf("%x\taxl::enc::isLetter -> %d\tQChar::isLetter -> %d\n", c, axl::enc::isLetter (c), QChar::isLetter (c));
+			printf("%x\taxl::enc::isLetter -> %d\tQChar::isLetter -> %d\n", c, axl::enc::isLetter(c), QChar::isLetter(c));
 
 		if (axl::enc::isNumber(c) != QChar::isNumber(c))
-			printf("%x\taxl::enc::isNumber -> %d\tQChar::isNumber -> %d\n", c, axl::enc::isNumber (c), QChar::isNumber (c));
+			printf("%x\taxl::enc::isNumber -> %d\tQChar::isNumber -> %d\n", c, axl::enc::isNumber(c), QChar::isNumber(c));
 
 		if (axl::enc::isLetterOrDigit(c) != (QChar::isLetter(c) || QChar::isDigit(c)))
-			printf("%x\taxl::enc::isLetterOrDigit -> %d\tQChar::isLetter -> %d\tQChar::isDigit -> %d\n", c, axl::enc::isLetterOrDigit (c), QChar::isLetter (c), QChar::isDigit (c));
+			printf("%x\taxl::enc::isLetterOrDigit -> %d\tQChar::isLetter -> %d\tQChar::isDigit -> %d\n", c, axl::enc::isLetterOrDigit(c), QChar::isLetter(c), QChar::isDigit(c));
 
 		if (axl::enc::isLetterOrNumber(c) != QChar::isLetterOrNumber(c))
-			printf("%x\taxl::enc::isLetterOrNumber -> %d\tQChar::isLetterOrNumber  -> %d\n", c, axl::enc::isLetterOrNumber (c), QChar::isLetterOrNumber  (c));
+			printf("%x\taxl::enc::isLetterOrNumber -> %d\tQChar::isLetterOrNumber  -> %d\n", c, axl::enc::isLetterOrNumber(c), QChar::isLetterOrNumber(c));
 
 		if (axl::enc::isPunctuation(c) != QChar::isPunct(c))
-			printf("%x\taxl::enc::isPunctuation -> %d\tQChar::isPunct -> %d\n", c, axl::enc::isPunctuation (c), QChar::isPunct (c));
+			printf("%x\taxl::enc::isPunctuation -> %d\tQChar::isPunct -> %d\n", c, axl::enc::isPunctuation(c), QChar::isPunct(c));
 
 		if (axl::enc::isSpace(c) != QChar::isSpace(c))
-			printf("%x\taxl::enc::isSpace -> %d\tQChar::isDigit -> %d\n", c, axl::enc::isSpace (c), QChar::isSpace (c));
+			printf("%x\taxl::enc::isSpace -> %d\tQChar::isDigit -> %d\n", c, axl::enc::isSpace(c), QChar::isSpace(c));
 
 		if (axl::enc::isPrintable(c) != QChar::isPrint(c))
-			printf("%x\taxl::enc::isPrintable -> %d\tQChar::isPrint -> %d\n", c, axl::enc::isPrintable (c), QChar::isPrint (c));
+			printf("%x\taxl::enc::isPrintable -> %d\tQChar::isPrint -> %d\n", c, axl::enc::isPrintable(c), QChar::isPrint(c));
 
 		if (axl::enc::isPrintableNonMark(c) != (QChar::isPrint(c) && !QChar::isMark(c)))
-			printf("%x\taxl::enc::isPrintableNonMark -> %d\tQChar::isPrint -> %d\tQChar::isMark -> %d\n", c, axl::enc::isPrintableNonMark (c), QChar::isPrint (c), QChar::isMark (c));
+			printf("%x\taxl::enc::isPrintableNonMark -> %d\tQChar::isPrint -> %d\tQChar::isMark -> %d\n", c, axl::enc::isPrintableNonMark(c), QChar::isPrint(c), QChar::isMark(c));
 
 		if (axl::enc::isLowerCase(c) != QChar::isLower(c))
-			printf("%x\taxl::enc::isLowerCase -> %d\tQChar::isLower -> %d\n", c, axl::enc::isLowerCase (c), QChar::isLower (c));
+			printf("%x\taxl::enc::isLowerCase -> %d\tQChar::isLower -> %d\n", c, axl::enc::isLowerCase(c), QChar::isLower(c));
 
 		if (axl::enc::isUpperCase(c) != QChar::isUpper(c))
-			printf("%x\taxl::enc::isUpperCase -> %d\tQChar::isUpper -> %d\n", c, axl::enc::isUpperCase (c), QChar::isUpper (c));
+			printf("%x\taxl::enc::isUpperCase -> %d\tQChar::isUpper -> %d\n", c, axl::enc::isUpperCase(c), QChar::isUpper(c));
 
 		if (axl::enc::toLowerCase(c) != QChar::toLower(c))
-			printf("%x\taxl::enc::toLowerCase -> %x\tQChar::toLower -> %x\n", c, axl::enc::toLowerCase (c), QChar::toLower (c));
+			printf("%x\taxl::enc::toLowerCase -> %x\tQChar::toLower -> %x\n", c, axl::enc::toLowerCase(c), QChar::toLower(c));
 
 		if (axl::enc::toUpperCase(c) != QChar::toUpper(c))
-			printf("%x\taxl::enc::toUpperCase -> %x\tQChar::toUpper -> %x\n", c, axl::enc::toUpperCase (c), QChar::toUpper (c));
+			printf("%x\taxl::enc::toUpperCase -> %x\tQChar::toUpper -> %x\n", c, axl::enc::toUpperCase(c), QChar::toUpper(c));
 
 		if (axl::enc::toCaseFolded(c) != QChar::toCaseFolded(c))
-			printf("%x\taxl::enc::toCaseFolded -> %x\tQChar::toCaseFolded -> %x\n", c, axl::enc::toCaseFolded (c), QChar::toCaseFolded (c));
+			printf("%x\taxl::enc::toCaseFolded -> %x\tQChar::toCaseFolded -> %x\n", c, axl::enc::toCaseFolded(c), QChar::toCaseFolded(c));
 	}
 
 	printf("Done\n");
@@ -1023,7 +1023,7 @@ main(
 #if 0
 	int fd = open("/home/vladimir/suka-bla", O_RDWR | O_CREAT, 0666);
 	if (fd == -1) {
-		printf("error (%d): %s\n", errno, strerror (errno));
+		printf("error (%d): %s\n", errno, strerror(errno));
 		return -1;
 	}
 
@@ -1040,7 +1040,7 @@ main(
 
 	result = mkfifo(fifoName, 0666);
 	if (result == -1) {
-		printf("mkfifo error (%d): %s\n", errno, strerror (errno));
+		printf("mkfifo error (%d): %s\n", errno, strerror(errno));
 		return -1;
 	}
 
@@ -1054,45 +1054,45 @@ main(
 
 	result = bind(sockServer, (const sockaddr*)&addr, sizeof(addr));
 	if (result == -1) {
-		printf("bind error (%d): %s\n", errno, strerror (errno));
+		printf("bind error (%d): %s\n", errno, strerror(errno));
 		return -1;
 	}
 
 	result = listen(sockServer, 8);
 	if (result == -1) {
-		printf("listen error (%d): %s\n", errno, strerror (errno));
+		printf("listen error (%d): %s\n", errno, strerror(errno));
 		return -1;
 	}
 
 	result = connect(sockClient, (const sockaddr*)&addr, sizeof(addr));
 	if (result == -1) {
-		printf("connect error (%d): %s\n", errno, strerror (errno));
+		printf("connect error (%d): %s\n", errno, strerror(errno));
 		return -1;
 	}
 
 	socklen_t len = sizeof(addr);
 	int sockAccept = accept(sockServer, (sockaddr*)&addr, &len);
 	if (sockAccept == -1) {
-		printf("accept error (%d): %s\n", errno, strerror (errno));
+		printf("accept error (%d): %s\n", errno, strerror(errno));
 		return -1;
 	}
 
 	result = sendFd(sockClient, fd);
 	if (result == -1) {
-		printf("sendmsg error (%d): %s\n", errno, strerror (errno));
+		printf("sendmsg error (%d): %s\n", errno, strerror(errno));
 		return -1;
 	}
 
 	int fd2 = recvFd(sockAccept);
 	if (fd2 == -1) {
-		printf("recvmsg error (%d): %s\n", errno, strerror (errno));
+		printf("recvmsg error (%d): %s\n", errno, strerror(errno));
 		return -1;
 	}
 
 	char buffer[256] = { 0 };
 	result = read(fd2, buffer, sizeof(buffer));
 	if (result == -1) {
-		printf("read error (%d): %s\n", errno, strerror (errno));
+		printf("read error (%d): %s\n", errno, strerror(errno));
 		return -1;
 	}
 

@@ -29,7 +29,7 @@ public:
 
 void
 run() {
-	printf("test_Packetizer::Run ()\n");
+	printf("test_Packetizer::run()\n");
 
 	MyPacketizer packetizer;
 

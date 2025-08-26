@@ -96,7 +96,7 @@ public:
 	static
 	bool
 	parseBoolValue(const sl::StringRef& value) {
-		return _stricmp(value.sz(), "true") == 0 || atoi (value.sz()) != 0;
+		return _stricmp(value.sz(), "true") == 0 || atoi(value.sz()) != 0;
 	}
 };
 
