@@ -36,7 +36,8 @@ public:
 		Def_MaxBaudRate       = 256000,
 		Def_BaudGridCellCount = 10000,
 		Def_Horizon           = 30000000, // 3 sec
-		Def_TimerPrecision    = 10 // 1 mcs
+		Def_TimerPrecision    = 10, // 1 mcs
+		Def_HarmonicTolerance = 5,  // 5% off is still a harmonic
 	};
 
 protected:
@@ -75,12 +76,11 @@ protected:
 #if (_AXL_ABR_GCD)
 	struct Interval {
 		double m_time;
-		double m_interval;
+		double m_dtime;
 	};
 #endif
 
 protected:
-	size_t m_edgeCount;
 	double m_horizon;
 	double m_horizonTime;
 	double m_time;
@@ -113,7 +113,7 @@ public:
 	addEdge(double dtime);
 
 	AutoBaudRateResult
-	calculate();
+	calculate(double harmonicTolerance = Def_HarmonicTolerance / 100.);
 
 #if (_AXL_ABR_GCD)
 	uint_t
@@ -139,7 +139,6 @@ protected:
 
 inline
 AutoBaudRate::AutoBaudRate() {
-	m_edgeCount = 0;
 	m_horizon = 0;
 	m_horizonTime = 0;
 	m_time = 0;

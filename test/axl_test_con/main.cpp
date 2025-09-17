@@ -9728,26 +9728,12 @@ testAutoBaudRate() {
 
 #if (_AXL_AB_EXTERNAL_SAMPLES)
 	uint64_t dtime[] = {
-		20532968,
-		80,
-		80,
-		80,
-		80,
-		80,
-		80,
-		80,
-		80,
-		80,
-		50233806,
-		80,
-		80,
-		80,
-		80,
-		80,
-		80,
-		80,
-		80,
-		80,
+		23981490,
+		2350,
+		130,
+		2340,
+		130,
+		2340,
 	};
 
 	for (size_t i = 0; i < countof(dtime); i++)
@@ -9771,7 +9757,9 @@ testAutoBaudRate() {
 	}
 #endif
 
+#if (_AXL_DEBUG)
 	autoBaud.print();
+#endif
 
 	abr::AutoBaudRateResult result = autoBaud.calculate();
 	uint_t baudGcd = autoBaud.calculate_gcd();

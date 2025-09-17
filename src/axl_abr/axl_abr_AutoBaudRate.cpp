@@ -105,7 +105,7 @@ AutoBaudRate::reset(bool uart) {
 			u->m_frameErrorCount = 0;
 			u->m_edgeOverflowCount = 0;
 			u->m_frameEdgeCount = 0;
-			u->m_frameTime = -1;
+			u->m_frameTime = 0;
 			u->m_edgeError = 0;
 
 			h->m_frameCount = 0;
@@ -121,30 +121,24 @@ AutoBaudRate::reset(bool uart) {
 	}
 
 	m_intervalArray.clear();
-	m_edgeCount = 0;
 	m_time = 0;
 	m_horizonTime = 0;
-	m_uart = false;
-
-	if (uart)
-		addEdge(0.);
+	m_uart = uart;
 }
 
 void
 AutoBaudRate::addEdge(double dtime) {
+	if (dtime > m_horizon)
+		reset(m_uart); // forget everything
+
 	double time = m_time += dtime;
-	m_edgeCount++;
 	m_uart = !m_uart;
 
 	if (m_time - m_horizonTime > m_horizon)
 		maintainHorizon();
 
 	if (m_uart && dtime >= 1) {
-		Interval interval = {
-			time,
-			dtime
-		};
-
+		Interval interval = { time, dtime };
 		m_intervalArray.append(interval);
 	}
 
@@ -159,34 +153,37 @@ AutoBaudRate::addEdge(double dtime) {
 		double bitLength = 10000000. / b->m_baudRate;
 
 		UartSim* u = b->m_uartSim;
-		for (size_t j = 0; j < countof(b->m_uartSim); j++, u++) {
-			if (u->m_frameTime >= 0) {
+		for (size_t j = 0; j < countof(b->m_uartSim); j++, u++)
+			if (!u->m_frameEdgeCount) {
+				if (m_uart) // start bit is not set
+					u->m_frameErrorCount++;
+				else {
+					u->m_frameTime = time;
+					u->m_frameEdgeCount++;
+				}
+			} else {
 				double frameLength = time - u->m_frameTime;
 				uint_t bitCount = j + 7; // 5 bits + start + stop
 				uint_t bitIdx = std::round(frameLength / bitLength);
 				if (bitIdx < u->m_frameEdgeCount) // can't go back in time
 					bitIdx = u->m_frameEdgeCount;
 
-				u->m_frameEdgeCount++;
-
-				if (bitIdx < bitCount)
+				if (bitIdx < bitCount) {
 					u->m_edgeError += fabs(frameLength - bitIdx * bitLength) / bitLength;
-				else {
+					u->m_frameEdgeCount++;
+				} else {
+					u->m_frameCount++;
 					if (u->m_frameEdgeCount > bitCount + 1) // too many edges per frame
 						u->m_edgeOverflowCount++;
 
 					if (m_uart) // stop bit was not set
 						u->m_frameErrorCount++;
-
-					u->m_frameCount++;
-					u->m_frameTime = -1;
-					u->m_frameEdgeCount = 0;
+					else {
+						u->m_frameTime = m_time;
+						u->m_frameEdgeCount = 1;
+					}
 				}
 			}
-
-			if (u->m_frameTime < 0 && !m_uart)
-				u->m_frameTime = time;
-		}
 
 #if (_AXL_ABR_FOURIER)
 		double x =  fmod(t * b->m_baudRate, 2 * M_PI);
@@ -241,15 +238,16 @@ AutoBaudRate::maintainHorizon() {
 bool
 isHarmonic(
 	double base,
-	double harmonic
+	double harmonic,
+	double tolerance
 ) {
 	ASSERT(base < harmonic);
 	double n = std::round(harmonic / base);
-	return n >= 2 && std::fabs(harmonic - base * n) / base < 0.01; // less than 1% off
+	return n >= 2 && std::fabs(harmonic - base * n) / base < tolerance;
 }
 
 AutoBaudRateResult
-AutoBaudRate::calculate() {
+AutoBaudRate::calculate(double harmonicTolerance) {
 	BaudGridCell sentinelBaud = { 0	};
 	sentinelBaud.m_uartSim[0].m_edgeOverflowCount = -1;
 	sentinelBaud.m_uartSim[0].m_frameErrorCount = -1;
@@ -262,15 +260,26 @@ AutoBaudRate::calculate() {
 	const BaudGridCell* b = m_baudGrid.p();
 	for (size_t i = 0; i < count; i++, b++) {
 		const UartSim* u = b->m_uartSim;
-		for (size_t j = 0; j < countof(b->m_uartSim); j++, u++)
-			if (u->m_frameCount && (
-					u->m_edgeOverflowCount < bestSim->m_edgeOverflowCount ||
-					u->m_edgeOverflowCount == bestSim->m_edgeOverflowCount && (
-						u->m_frameErrorCount < bestSim->m_frameErrorCount ||
-						u->m_frameErrorCount == bestSim->m_frameErrorCount && (
-							bestBaud == b && j > bestSimIdx || // prefer more bits of the same baud
-							bestSim->m_edgeError > u->m_edgeError &&
-							!isHarmonic(bestBaud->m_baudRate, b->m_baudRate)
+		for (size_t j = 0; j < countof(b->m_uartSim); j++, u++) {
+			UartSimStats us = *u;
+			if (u->m_frameEdgeCount) {
+				us.m_frameCount++;
+				uint_t bitCount = j + 7; // 5 bits + start + stop
+				if (u->m_frameEdgeCount > bitCount + 1) // too many edges per frame
+					us.m_edgeOverflowCount++;
+
+				if (!m_uart) // stop bit was not set
+					us.m_frameErrorCount++;
+			}
+
+			if (us.m_frameCount && (
+					us.m_edgeOverflowCount < bestSim->m_edgeOverflowCount ||
+					us.m_edgeOverflowCount == bestSim->m_edgeOverflowCount && (
+						us.m_frameErrorCount < bestSim->m_frameErrorCount ||
+						us.m_frameErrorCount == bestSim->m_frameErrorCount && (
+							bestBaud == b || // prefer more bits of the same baud
+							us.m_edgeError < bestBaud->m_uartSim[j].m_edgeError && // compare edge error for the same bit count!
+							!isHarmonic(bestBaud->m_baudRate, b->m_baudRate, harmonicTolerance)
 						)
 					)
 				)
@@ -279,6 +288,7 @@ AutoBaudRate::calculate() {
 				bestSim = u;
 				bestSimIdx = j;
 			}
+		}
 	}
 
 	AutoBaudRateResult result;
@@ -298,10 +308,10 @@ AutoBaudRate::calculate_gcd(double precision) {
 
 	size_t count = m_intervalArray.getCount();
 	if (count) {
-		baudGcd = m_intervalArray[0].m_interval;
+		baudGcd = m_intervalArray[0].m_dtime;
 
 		for (size_t i = 1; i < count; i++)
-			baudGcd = approximateGcd(baudGcd, m_intervalArray[i].m_interval, precision);
+			baudGcd = approximateGcd(baudGcd, m_intervalArray[i].m_dtime, precision);
 	}
 
 	return std::round(10000000. / baudGcd);
