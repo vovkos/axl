@@ -1072,6 +1072,20 @@ axl_enum_directories
 	set(${_RESULT} ${_DIR_LIST})
 endmacro()
 
+macro(
+axl_touch_if_changed
+	_FILE
+	# ...
+)
+	set(_DEPENDENCY_LIST ${ARGN})
+
+	add_custom_command(
+		OUTPUT ${_FILE}
+		COMMAND ${CMAKE_COMMAND} -E touch ${_FILE}
+		DEPENDS ${_DEPENDENCY_LIST}
+	)
+endmacro()
+
 #...............................................................................
 
 # imports -- CMake' find_package replacement with support for manual override
