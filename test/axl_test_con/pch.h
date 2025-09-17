@@ -130,6 +130,10 @@
 #	include "axl_sys_CodeAuthenticator.h"
 #endif
 
+#ifdef _AXL_ABR
+#	include "axl_abr_AutoBaudRate.h"
+#endif
+
 #if (_AXL_OS_WIN)
 #	include "axl_sys_win_VirtualMemory.h"
 #	include "axl_sys_win_Process.h"

@@ -349,3 +349,15 @@ if(BUILD_AXL_SYS_CA)
 endif()
 
 #...............................................................................
+
+option(
+	BUILD_AXL_ABR
+	"Build axl_abr library (ABR, or automatic baud rate detection from signal edges)"
+	ON
+)
+
+if(BUILD_AXL_ABR)
+	add_subdirectory(axl_abr)
+endif()
+
+#...............................................................................

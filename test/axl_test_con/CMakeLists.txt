@@ -183,6 +183,11 @@ if(BUILD_AXL_ZIP)
 	list(APPEND OPT_LIB_LIST axl_zip)
 endif()
 
+if(BUILD_AXL_ABR)
+	add_definitions(-D_AXL_ABR=1)
+	list(APPEND OPT_LIB_LIST axl_abr)
+endif()
+
 add_executable(
 	axl_test_con
 	${PCH_H}

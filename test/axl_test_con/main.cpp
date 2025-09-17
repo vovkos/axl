@@ -9640,6 +9640,146 @@ bool testKqueue() {
 
 //..............................................................................
 
+#if (_AXL_ABR)
+
+#define _AXL_ABR_INT_TIME 1
+#define _AXL_AB_JITTER    0
+
+class Uart {
+protected:
+	abr::AutoBaudRate* m_autoBaud;
+	double m_time;
+	double m_bitLength;
+
+public:
+	Uart(
+		abr::AutoBaudRate* autoBaud,
+		uint_t baudRate
+	) {
+		m_autoBaud = autoBaud;
+		m_time = 0;
+		m_bitLength = 10000000. / baudRate;
+	}
+
+	void
+	wait(double time) {
+		m_time += time;
+	}
+
+	void
+	emitByte(uint8_t c) {
+		addEdge(); // start bit -- always emitted
+		m_time = m_bitLength;
+		uint8_t signal = 0;
+
+		for (size_t i = 0; i < 8; i++) {
+			uint8_t bit = c & 1;
+			if (bit == signal)
+				m_time += m_bitLength;
+			else {
+				addEdge();
+				m_time = m_bitLength;
+				signal = bit;
+			}
+
+			c >>= 1;
+		}
+
+		if (signal)
+			m_time += m_bitLength;
+		else {
+			addEdge();
+			m_time = m_bitLength;
+		}
+	}
+
+	void
+	finalize() {
+		addEdge();
+	}
+
+	void addEdge() {
+#if (_AXL_AB_JITTER > 0)
+		double time = m_time + rand() % (_AXL_AB_JITTER + 1);
+#else
+		double time = m_time;
+#endif
+
+#if (_AXL_ABR_INT_TIME)
+		time = round(time);
+#endif
+
+		m_autoBaud->addEdge(time);
+	}
+};
+
+#define _AXL_AB_EXTERNAL_SAMPLES 1
+
+void
+testAutoBaudRate() {
+	enum {
+		ByteCount = 50,
+	};
+
+	char data[] = "Hel^ lo,^ World!^ I'm^ tes^ ting ^auto-b ^aud via^ Fourier^ Trans^ form here\n";
+
+	abr::AutoBaudRate autoBaud;
+	autoBaud.create(256000, 10000, 30000000.);
+
+#if (_AXL_AB_EXTERNAL_SAMPLES)
+	uint64_t dtime[] = {
+		20532968,
+		80,
+		80,
+		80,
+		80,
+		80,
+		80,
+		80,
+		80,
+		80,
+		50233806,
+		80,
+		80,
+		80,
+		80,
+		80,
+		80,
+		80,
+		80,
+		80,
+	};
+
+	for (size_t i = 0; i < countof(dtime); i++)
+		autoBaud.addEdge(dtime[i]);
+#else
+	Uart uart(&autoBaud, 115200);
+
+	srand(1);
+
+	for (size_t i = 0; i < ByteCount; i++) {
+		uint8_t c = data[i % sizeof(data)];
+		// uint8_t c = rand() % 256;
+		// uint8_t c = 0;
+		// uint8_t c = 0xff;
+		// uint8_t c = 0x55;
+
+		uart.emitByte(c);
+
+		if (c == '^')
+			uart.wait((rand() % 5) * 10000000.); // wait 1 second
+	}
+#endif
+
+	autoBaud.print();
+
+	abr::AutoBaudRateResult result = autoBaud.calculate();
+	uint_t baudGcd = autoBaud.calculate_gcd();
+	printf("baud: %d/%d bits: %d\n", result.m_baudRate, baudGcd, result.m_frameBits);
+}
+
+#endif
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -9668,6 +9808,10 @@ main(
 
 #if (_AXL_OS_DARWIN)
 	testKqueue();
+#endif
+
+#if (_AXL_ABR)
+	testAutoBaudRate();
 #endif
 
 	return 0;
