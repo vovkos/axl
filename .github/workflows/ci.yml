@@ -36,7 +36,7 @@ jobs:
             run: |
                 set CONFIGURATION=${{matrix.CONFIGURATION}}
 
-                call ci\github-actions\set-env.bat msvc16 ${{matrix.TARGET_CPU}}
+                call ci\github-actions\set-env.bat ${{matrix.TARGET_CPU}}
                 call ci\github-actions\build-re2s.bat
                 call ci\github-actions\build-lua.bat
                 call ci\github-actions\build-expat.bat
