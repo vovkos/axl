@@ -37,16 +37,47 @@ approximateGcd(
 	}
 }
 
+bool
+isHarmonic(
+	double base,
+	double harmonic,
+	double tolerance
+) {
+	ASSERT(base < harmonic);
+	double n = std::round(harmonic / base);
+	return n >= 2 && std::fabs(harmonic - base * n) / base < tolerance;
+}
+
 //..............................................................................
+
+#if (_AXL_DEBUG)
+#	define _AXL_ABR_TEST_SPECIFIC_BAUD_RATES 0
+#endif
 
 bool
 AutoBaudRate::create(
 	uint_t maxBaudRate,
 	size_t baudGridCellCount,
-	double horizon,
 	bool uart
 ) {
-	static double stdBaudTable[] = {
+#if (_AXL_ABR_TEST_SPECIFIC_BAUD_RATES)
+	static double baudRateTable[] = {
+		299.715,
+		2697.535,
+	};
+
+	bool result =
+		m_baudGrid.setCount(countof(baudRateTable)) &&
+		m_baudCandidateArray.reserve(countof(baudRateTable));
+
+	if (!result)
+		return false;
+
+	BaudGridCell* b = m_baudGrid.p();
+	for (size_t i = 0; i < countof(baudRateTable); i++, b++)
+		b->m_baudRate = baudRateTable[i];
+#else
+	static double stdBaudRateTable[] = {
 		110.,
 		300.,
 		600.,
@@ -68,14 +99,17 @@ AutoBaudRate::create(
 		921600.,
 	};
 
-	size_t count = baudGridCellCount + countof(stdBaudTable);
-	bool result = m_baudGrid.setCount(count);
+	size_t count = baudGridCellCount + countof(stdBaudRateTable);
+	bool result =
+		m_baudGrid.setCount(count) &&
+		m_baudCandidateArray.reserve(count);
+
 	if (!result)
 		return false;
 
 	BaudGridCell* b = m_baudGrid.p();
-	for (size_t i = 0; i < countof(stdBaudTable); i++, b++)
-		b->m_baudRate = stdBaudTable[i];
+	for (size_t i = 0; i < countof(stdBaudRateTable); i++, b++)
+		b->m_baudRate = stdBaudRateTable[i];
 
 	double minBaudRate = 10; // important: not 1 -- we ignore harmonics
 	double baudRateLogStep = log(maxBaudRate - minBaudRate) / baudGridCellCount;
@@ -85,10 +119,10 @@ AutoBaudRate::create(
 	std::sort(
 		m_baudGrid.p(),
 		m_baudGrid.p() + count,
-		BaudLt()
+		BaudGridCell::Lt()
 	);
+#endif
 
-	m_horizon = horizon;
 	reset(uart);
 	return true;
 }
@@ -101,17 +135,8 @@ AutoBaudRate::reset(bool uart) {
 		UartSim* u = b->m_uartSim;
 		UartSimStats* h = b->m_uartSimHorizon;
 		for (size_t j = 0; j < countof(b->m_uartSim); j++, u++, h++) {
-			u->m_frameCount = 0;
-			u->m_frameErrorCount = 0;
-			u->m_edgeOverflowCount = 0;
-			u->m_frameEdgeCount = 0;
-			u->m_frameTime = 0;
-			u->m_edgeError = 0;
-
-			h->m_frameCount = 0;
-			h->m_frameErrorCount = 0;
-			h->m_edgeOverflowCount = 0;
-			h->m_edgeError = 0;
+			u->reset();
+			h->reset();
 		}
 
 #if (_AXL_ABR_FOURIER)
@@ -169,16 +194,23 @@ AutoBaudRate::addEdge(double dtime) {
 					bitIdx = u->m_frameEdgeCount;
 
 				if (bitIdx < bitCount) {
-					u->m_edgeError += fabs(frameLength - bitIdx * bitLength) / bitLength;
+					double delta = fabs(frameLength - bitIdx * bitLength);
+					if (delta / bitLength > m_edgeErrorTolerance)
+						u->m_edgeErrorCount++;
+
+					u->m_edgeError += delta;
 					u->m_frameEdgeCount++;
 				} else {
 					u->m_frameCount++;
+					u->m_edgeCount += u->m_frameEdgeCount;
+
 					if (u->m_frameEdgeCount > bitCount + 1) // too many edges per frame
 						u->m_edgeOverflowCount++;
 
-					if (m_uart) // stop bit was not set
+					if (m_uart) { // stop bit was not set
 						u->m_frameErrorCount++;
-					else {
+						u->m_frameEdgeCount = 0;
+					} else {
 						u->m_frameTime = m_time;
 						u->m_frameEdgeCount = 1;
 					}
@@ -203,19 +235,14 @@ AutoBaudRate::maintainHorizon() {
 			ASSERT(
 				u->m_frameCount >= h->m_frameCount &&
 				u->m_frameErrorCount >= h->m_frameErrorCount &&
+				u->m_edgeCount >= h->m_edgeCount &&
 				u->m_edgeOverflowCount >= h->m_edgeOverflowCount &&
+				u->m_edgeErrorCount >= h->m_edgeErrorCount &&
 				u->m_edgeError >= h->m_edgeError
 			);
 
-			u->m_frameCount -= h->m_frameCount;
-			u->m_frameErrorCount -= h->m_frameErrorCount;
-			u->m_edgeOverflowCount -= h->m_edgeOverflowCount;
-			u->m_edgeError -= h->m_edgeError;
-
-			h->m_frameCount = u->m_frameCount;
-			h->m_frameErrorCount = u->m_frameErrorCount;
-			h->m_edgeOverflowCount = u->m_edgeOverflowCount;
-			h->m_edgeError = u->m_edgeError;
+			u->subtract(*h);
+			*h = *u;
 		}
 
 #if (_AXL_ABR_FOURIER)
@@ -235,19 +262,28 @@ AutoBaudRate::maintainHorizon() {
 	m_horizonTime = m_time;
 }
 
-bool
-isHarmonic(
-	double base,
-	double harmonic,
-	double tolerance
+AutoBaudRate::UartSimStats
+AutoBaudRate::finalizeUartSimStats(
+	uint_t bitCount,
+	const UartSim& sim
 ) {
-	ASSERT(base < harmonic);
-	double n = std::round(harmonic / base);
-	return n >= 2 && std::fabs(harmonic - base * n) / base < tolerance;
+	UartSimStats stats = sim;
+	if (sim.m_frameEdgeCount) {
+		stats.m_frameCount++;
+		if (sim.m_frameEdgeCount > bitCount + 1) // too many edges per frame
+			stats.m_edgeOverflowCount++;
+
+		if (!m_uart) // stop bit was not set
+			stats.m_frameErrorCount++;
+
+		stats.m_edgeCount += sim.m_frameEdgeCount;
+	}
+
+	return stats;
 }
 
 AutoBaudRateResult
-AutoBaudRate::calculate(double harmonicTolerance) {
+AutoBaudRate::calculate() {
 	BaudGridCell sentinelBaud = { 0	};
 	sentinelBaud.m_uartSim[0].m_edgeOverflowCount = -1;
 	sentinelBaud.m_uartSim[0].m_frameErrorCount = -1;
@@ -261,25 +297,21 @@ AutoBaudRate::calculate(double harmonicTolerance) {
 	for (size_t i = 0; i < count; i++, b++) {
 		const UartSim* u = b->m_uartSim;
 		for (size_t j = 0; j < countof(b->m_uartSim); j++, u++) {
-			UartSimStats us = *u;
-			if (u->m_frameEdgeCount) {
-				us.m_frameCount++;
-				uint_t bitCount = j + 7; // 5 bits + start + stop
-				if (u->m_frameEdgeCount > bitCount + 1) // too many edges per frame
-					us.m_edgeOverflowCount++;
-
-				if (!m_uart) // stop bit was not set
-					us.m_frameErrorCount++;
-			}
-
+			UartSimStats us = finalizeUartSimStats(j + 7, *u); // 5 bits + start + stop
 			if (us.m_frameCount && (
 					us.m_edgeOverflowCount < bestSim->m_edgeOverflowCount ||
 					us.m_edgeOverflowCount == bestSim->m_edgeOverflowCount && (
 						us.m_frameErrorCount < bestSim->m_frameErrorCount ||
 						us.m_frameErrorCount == bestSim->m_frameErrorCount && (
-							bestBaud == b || // prefer more bits of the same baud
-							us.m_edgeError < bestBaud->m_uartSim[j].m_edgeError && // compare edge error for the same bit count!
-							!isHarmonic(bestBaud->m_baudRate, b->m_baudRate, harmonicTolerance)
+							us.m_edgeErrorCount < bestSim->m_edgeErrorCount ||
+							us.m_edgeErrorCount == bestSim->m_edgeErrorCount && (
+								bestBaud == b || // prefer more bits of the same baud
+								us.m_edgeCount > us.m_frameCount &&
+								bestSim->m_edgeCount > bestSim->m_frameCount &&
+								us.m_edgeError / (us.m_edgeCount - us.m_frameCount) <
+								bestSim->m_edgeError / (bestSim->m_edgeCount - bestSim->m_frameCount) &&
+								!isHarmonic(bestBaud->m_baudRate, b->m_baudRate, m_harmonicTolerance) // ignore harmonics
+							)
 						)
 					)
 				)
@@ -292,7 +324,88 @@ AutoBaudRate::calculate(double harmonicTolerance) {
 	}
 
 	AutoBaudRateResult result;
-	result.m_baudRate = bestBaud->m_baudRate;
+	result.m_baudRate = (uint_t)bestBaud->m_baudRate;
+	result.m_frameBits = bestSimIdx + 5;
+	return result;
+}
+
+AutoBaudRateResult
+AutoBaudRate::calculate_alt() {
+	BaudGridCell sentinelBaud = { 0	};
+	sentinelBaud.m_uartSim[0].m_edgeOverflowCount = -1;
+	sentinelBaud.m_uartSim[0].m_frameErrorCount = -1;
+
+	const BaudGridCell* bestBaud = &sentinelBaud;
+	const UartSim* bestSim = bestBaud->m_uartSim;
+	size_t bestSimIdx = 0;
+
+	m_baudCandidateArray.clear();
+
+	size_t count = m_baudGrid.getCount();
+	const BaudGridCell* b = m_baudGrid.p();
+	for (size_t i = 0; i < count; i++, b++) {
+		const UartSim* u = b->m_uartSim;
+
+		for (size_t j = 0; j < countof(b->m_uartSim); j++, u++) {
+			UartSimStats us = finalizeUartSimStats(j + 7, *u); // 5 bits + start + stop
+			if (us.m_frameCount &&
+				!us.m_edgeOverflowCount &&
+				!us.m_frameErrorCount &&
+				!us.m_edgeErrorCount
+			) {
+				m_baudCandidateArray.append(b);
+				break;
+			}
+		}
+	}
+
+	if (m_baudCandidateArray.isEmpty()) {
+		AutoBaudRateResult result = { 0 };
+		return result;
+	}
+
+	bestBaud = m_baudCandidateArray[0];
+	double bestError = DBL_MAX;
+	count = m_baudCandidateArray.getCount();
+	for (size_t i = 0; i < count; i++) {
+		const BaudGridCell* b = m_baudCandidateArray[i];
+		double error = 0;
+		for (size_t j = 0; j < count; j++) {
+			double n = std::round(m_baudCandidateArray[j]->m_baudRate / b->m_baudRate);
+			if (n < 1)
+				n = 1;
+
+			error += fabs(m_baudCandidateArray[j]->m_baudRate - b->m_baudRate * n);
+		}
+
+		if (error < bestError) {
+			bestBaud = b;
+			bestError = error;
+		}
+	}
+
+	bestSim = bestBaud->m_uartSim;
+	bestSimIdx = 0;
+
+	const UartSim* u = bestBaud->m_uartSim;
+	for (size_t j = 0; j < countof(bestBaud->m_uartSim); j++, u++) {
+		UartSimStats us = finalizeUartSimStats(j + 7, *u); // 5 bits + start + stop
+		if (us.m_frameCount && (
+				us.m_edgeOverflowCount < bestSim->m_edgeOverflowCount ||
+				us.m_edgeOverflowCount == bestSim->m_edgeOverflowCount && (
+					us.m_frameErrorCount < bestSim->m_frameErrorCount ||
+					us.m_frameErrorCount == bestSim->m_frameErrorCount &&
+					us.m_edgeErrorCount <= bestSim->m_edgeErrorCount
+				)
+			)
+		) {
+			bestSim = u;
+			bestSimIdx = j;
+		}
+	}
+
+	AutoBaudRateResult result;
+	result.m_baudRate = (uint_t)bestBaud->m_baudRate;
 	result.m_frameBits = bestSimIdx + 5;
 	return result;
 }
@@ -300,10 +413,7 @@ AutoBaudRate::calculate(double harmonicTolerance) {
 #if (_AXL_ABR_GCD)
 
 uint_t
-AutoBaudRate::calculate_gcd(double precision) {
-	if (precision < 1)
-		precision = 1;
-
+AutoBaudRate::calculate_gcd() {
 	double baudGcd = 1;
 
 	size_t count = m_intervalArray.getCount();
@@ -311,7 +421,7 @@ AutoBaudRate::calculate_gcd(double precision) {
 		baudGcd = m_intervalArray[0].m_dtime;
 
 		for (size_t i = 1; i < count; i++)
-			baudGcd = approximateGcd(baudGcd, m_intervalArray[i].m_dtime, precision);
+			baudGcd = approximateGcd(baudGcd, m_intervalArray[i].m_dtime, m_timerPrecision);
 	}
 
 	return std::round(10000000. / baudGcd);
@@ -327,16 +437,21 @@ AutoBaudRate::print() {
 	const BaudGridCell* b = m_baudGrid.p();
 	for (size_t i = 0; i < count; i++, b++) {
 		const UartSim* u = b->m_uartSim;
-		for (size_t j = 0; j < countof(b->m_uartSim); j++, u++)
+		for (size_t j = 0; j < countof(b->m_uartSim); j++, u++) {
+			UartSimStats us = finalizeUartSimStats(j + 7, *u); // 5 bits + start + stop
 			printf(
-				"%f, %d, %d, %d, %d, %f\n",
+				"%f, %d, %d, %d, %d, %d, %d, %f, %f\n",
 				b->m_baudRate,
 				j + 5,
-				u->m_frameCount,
-				u->m_frameErrorCount,
-				u->m_edgeOverflowCount,
-				u->m_edgeError
+				us.m_frameCount,
+				us.m_frameErrorCount,
+				us.m_edgeCount,
+				us.m_edgeOverflowCount,
+				us.m_edgeErrorCount,
+				us.m_edgeError,
+				us.m_edgeCount > us.m_frameCount ? us.m_edgeError / (us.m_edgeCount - us.m_frameCount) : 0.
 			);
+		}
 	}
 }
 

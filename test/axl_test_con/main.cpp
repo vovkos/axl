@@ -9724,16 +9724,40 @@ testAutoBaudRate() {
 	char data[] = "Hel^ lo,^ World!^ I'm^ tes^ ting ^auto-b ^aud via^ Fourier^ Trans^ form here\n";
 
 	abr::AutoBaudRate autoBaud;
-	autoBaud.create(256000, 10000, 30000000.);
+	autoBaud.create(256000, 10000);
 
 #if (_AXL_AB_EXTERNAL_SAMPLES)
 	uint64_t dtime[] = {
-		23981490,
-		2350,
-		130,
-		2340,
-		130,
-		2340,
+		17845200,
+		33360, // 0
+		33370, // 1
+		33360, // 2
+		33370, // 3
+		33360, // 4
+		33370, // 5
+		33370, // 6
+		33370, // 7
+		33360, // stop
+		33370,
+		33360, // 0
+		33370, // 1
+		33360, // 2
+		33360, // 3
+		33360, // 4
+		33370, // 5
+		33360, // 6
+		33370, // 7
+		33360, // stop
+		33370,
+		33360, // 0
+		33370, // 1
+		33360, // 2
+		33370, // 3
+		33360, // 4
+		33360, // 5
+		33360, // 6
+		33370, // 7
+		33360, // stop
 	};
 
 	for (size_t i = 0; i < countof(dtime); i++)
@@ -9762,8 +9786,12 @@ testAutoBaudRate() {
 #endif
 
 	abr::AutoBaudRateResult result = autoBaud.calculate();
-	uint_t baudGcd = autoBaud.calculate_gcd();
-	printf("baud: %d/%d bits: %d\n", result.m_baudRate, baudGcd, result.m_frameBits);
+	abr::AutoBaudRateResult result2 = autoBaud.calculate_alt();
+	uint_t result3 = autoBaud.calculate_gcd();
+
+	printf("(A) baud: %d bits: %d\n", result.m_baudRate, result.m_frameBits);
+	printf("(B) baud: %d bits: %d\n", result2.m_baudRate, result2.m_frameBits);
+	printf("(C) baud: %d\n", result3);
 }
 
 #endif
