@@ -15,6 +15,38 @@
 namespace axl {
 namespace abr {
 
+#if (_AXL_DEBUG)
+#	define _AXL_ABR_TEST_SPECIFIC_BAUD_RATES 0
+#endif
+
+//..............................................................................
+
+static const double g_stdBaudRateTable[] = {
+#if (_AXL_ABR_TEST_SPECIFIC_BAUD_RATES)
+	116101.,
+#else
+	110.,
+	300.,
+	600.,
+	1200.,
+	2400.,
+	4800.,
+	9600.,
+	14400.,
+	19200.,
+	38400.,
+	56000.,
+	57600.,
+	115200.,
+	128000.,
+	153600.,
+	230400.,
+	256000.,
+	460800.,
+	921600.,
+#endif
+};
+
 //..............................................................................
 
 double
@@ -50,9 +82,11 @@ isHarmonic(
 
 //..............................................................................
 
-#if (_AXL_DEBUG)
-#	define _AXL_ABR_TEST_SPECIFIC_BAUD_RATES 0
-#endif
+size_t
+AutoBaudRate::getBaudGridCellCount() const {
+	size_t count = m_baudGrid.getCount();
+	return count > countof(g_stdBaudRateTable) ? count - countof(g_stdBaudRateTable) : 0;
+}
 
 bool
 AutoBaudRate::create(
@@ -61,44 +95,9 @@ AutoBaudRate::create(
 	bool uart
 ) {
 #if (_AXL_ABR_TEST_SPECIFIC_BAUD_RATES)
-	static double baudRateTable[] = {
-		116101,
-	};
-
-	bool result =
-		m_baudGrid.setCount(countof(baudRateTable)) &&
-		m_baudCandidateArray.reserve(countof(baudRateTable));
-
-	if (!result)
-		return false;
-
-	BaudGridCell* b = m_baudGrid.p();
-	for (size_t i = 0; i < countof(baudRateTable); i++, b++)
-		b->m_baudRate = baudRateTable[i];
+	baudGridCellCount = 0;
 #else
-	static double stdBaudRateTable[] = {
-		110.,
-		300.,
-		600.,
-		1200.,
-		2400.,
-		4800.,
-		9600.,
-		14400.,
-		19200.,
-		38400.,
-		56000.,
-		57600.,
-		115200.,
-		128000.,
-		153600.,
-		230400.,
-		256000.,
-		460800.,
-		921600.,
-	};
-
-	size_t count = baudGridCellCount + countof(stdBaudRateTable);
+	size_t count = baudGridCellCount + countof(g_stdBaudRateTable);
 	bool result =
 		m_baudGrid.setCount(count) &&
 		m_baudCandidateArray.reserve(count);
@@ -107,8 +106,8 @@ AutoBaudRate::create(
 		return false;
 
 	BaudGridCell* b = m_baudGrid.p();
-	for (size_t i = 0; i < countof(stdBaudRateTable); i++, b++)
-		b->m_baudRate = stdBaudRateTable[i];
+	for (size_t i = 0; i < countof(g_stdBaudRateTable); i++, b++)
+		b->m_baudRate = g_stdBaudRateTable[i];
 
 	if (baudGridCellCount) {
 		double minBaudRate = 10; // important: not 1 -- we ignore harmonics
@@ -445,7 +444,7 @@ AutoBaudRate::calculate_alt() {
 
 	AutoBaudRateResult result;
 	result.m_baudRate = (uint_t)bestBaud->m_baudRate;
-	result.m_frameBits = bestSimIdx + 5;
+	result.m_frameBits = bestBaud != &sentinelBaud ? bestSimIdx + 5 : 0;
 	return result;
 }
 #endif

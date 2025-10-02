@@ -129,6 +129,19 @@ public:
 	AutoBaudRate();
 
 	bool
+	isCreated() const {
+		return !m_baudGrid.isEmpty();
+	}
+
+	double
+	getMaxBaudRate() const {
+		return !m_baudGrid.isEmpty() ? m_baudGrid.getBack().m_baudRate : 0.;
+	}
+
+	size_t
+	getBaudGridCellCount() const;
+
+	bool
 	getUart() const {
 		return m_uart;
 	}
