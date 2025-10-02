@@ -19,6 +19,7 @@ namespace axl {
 namespace abr {
 
 #define _AXL_ABR_FOURIER 0
+#define _AXL_ABR_ALT     1
 #define _AXL_ABR_GCD     1
 
 //..............................................................................
@@ -26,6 +27,10 @@ namespace abr {
 struct AutoBaudRateResult {
 	uint_t m_baudRate;
 	uint_t m_frameBits; // data bits + parity
+
+	operator bool() const {
+		return m_frameBits != 0;
+	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -36,9 +41,13 @@ public:
 		Def_MaxBaudRate        = 256000,
 		Def_BaudGridCellCount  = 10000,
 		Def_Horizon            = 30000000, // 3 sec
-		Def_TimerPrecision     = 10, // 1 mcs
 		Def_EdgeErrorTolerance = 10, // 10% off is not an edge error
+#if (_AXL_ABR_ALT)
 		Def_HarmonicTolerance  = 10, // 10% off is still a harmonic
+#endif
+#if (_AXL_ABR_GCD)
+		Def_TimerPrecision     = 10, // 1 mcs
+#endif
 	};
 
 protected:
@@ -48,7 +57,9 @@ protected:
 		size_t m_edgeCount;
 		size_t m_edgeOverflowCount;
 		size_t m_edgeErrorCount;
+#if (_AXL_ABR_ALT)
 		double m_edgeError;
+#endif
 
 		void
 		reset();
@@ -105,10 +116,14 @@ protected:
 public:
 	// freely adjustible
 
-	double m_timerPrecision;
-	double m_edgeErrorTolerance;
-	double m_harmonicTolerance;
 	double m_horizon;
+	double m_edgeErrorTolerance;
+#if (_AXL_ABR_ALT)
+	double m_harmonicTolerance;
+#endif
+#if (_AXL_ABR_GCD)
+	double m_timerPrecision;
+#endif
 
 public:
 	AutoBaudRate();
@@ -121,7 +136,7 @@ public:
 	bool
 	create(
 		uint_t maxBaudRate = Def_MaxBaudRate,
-		size_t baudGridCellCount = Def_BaudGridCellCount,
+		size_t baudGridCellCount = Def_BaudGridCellCount, // pass 0 to only detect std baud rates
 		bool uart = true
 	);
 
@@ -134,8 +149,10 @@ public:
 	AutoBaudRateResult
 	calculate();
 
+#if (_AXL_ABR_ALT)
 	AutoBaudRateResult
 	calculate_alt();
+#endif
 
 #if (_AXL_ABR_GCD)
 	uint_t
@@ -173,7 +190,9 @@ AutoBaudRate::UartSimStats::reset() {
 	m_edgeCount = 0;
 	m_edgeOverflowCount = 0;
 	m_edgeErrorCount = 0;
+#if (_AXL_ABR_ALT)
 	m_edgeError = 0.;
+#endif
 }
 
 inline
@@ -184,7 +203,9 @@ AutoBaudRate::UartSimStats::subtract(const UartSimStats& stats) {
 	m_edgeCount -= stats.m_edgeCount;
 	m_edgeOverflowCount -= stats.m_edgeOverflowCount;
 	m_edgeErrorCount -= stats.m_edgeErrorCount;
+#if (_AXL_ABR_ALT)
 	m_edgeError -= stats.m_edgeError;
+#endif
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -201,10 +222,14 @@ AutoBaudRate::UartSim::reset() {
 
 inline
 AutoBaudRate::AutoBaudRate() {
-	m_timerPrecision = Def_TimerPrecision;
 	m_edgeErrorTolerance = Def_EdgeErrorTolerance / 100.;
-	m_harmonicTolerance = Def_HarmonicTolerance / 100.;
 	m_horizon = Def_Horizon;
+#if (_AXL_ABR_ALT)
+	m_harmonicTolerance = Def_HarmonicTolerance / 100.;
+#endif
+#if (_AXL_ABR_GCD)
+	m_timerPrecision = Def_TimerPrecision;
+#endif
 	m_horizonTime = 0;
 	m_time = 0;
 	m_uart = false;

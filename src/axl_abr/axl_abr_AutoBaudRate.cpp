@@ -62,8 +62,7 @@ AutoBaudRate::create(
 ) {
 #if (_AXL_ABR_TEST_SPECIFIC_BAUD_RATES)
 	static double baudRateTable[] = {
-		299.715,
-		2697.535,
+		116101,
 	};
 
 	bool result =
@@ -111,16 +110,18 @@ AutoBaudRate::create(
 	for (size_t i = 0; i < countof(stdBaudRateTable); i++, b++)
 		b->m_baudRate = stdBaudRateTable[i];
 
-	double minBaudRate = 10; // important: not 1 -- we ignore harmonics
-	double baudRateLogStep = log(maxBaudRate - minBaudRate) / baudGridCellCount;
-	for (size_t i = 1; i <= baudGridCellCount; i++, b++)
-		b->m_baudRate = minBaudRate + exp(i * baudRateLogStep);
+	if (baudGridCellCount) {
+		double minBaudRate = 10; // important: not 1 -- we ignore harmonics
+		double baudRateLogStep = log(maxBaudRate - minBaudRate) / baudGridCellCount;
+		for (size_t i = 1; i <= baudGridCellCount; i++, b++)
+			b->m_baudRate = minBaudRate + exp(i * baudRateLogStep);
 
-	std::sort(
-		m_baudGrid.p(),
-		m_baudGrid.p() + count,
-		BaudGridCell::Lt()
-	);
+		std::sort(
+			m_baudGrid.p(),
+			m_baudGrid.p() + count,
+			BaudGridCell::Lt()
+		);
+	}
 #endif
 
 	reset(uart);
@@ -145,7 +146,9 @@ AutoBaudRate::reset(bool uart) {
 #endif
 	}
 
+#if (_AXL_ABR_GCD)
 	m_intervalArray.clear();
+#endif
 	m_time = 0;
 	m_horizonTime = 0;
 	m_uart = uart;
@@ -162,10 +165,12 @@ AutoBaudRate::addEdge(double dtime) {
 	if (m_time - m_horizonTime > m_horizon)
 		maintainHorizon();
 
+#if (_AXL_ABR_GCD)
 	if (m_uart && dtime >= 1) {
 		Interval interval = { time, dtime };
 		m_intervalArray.append(interval);
 	}
+#endif
 
 #if (_AXL_ABR_FOURIER)
 	double t = 2 * M_PI * time / 10000000ULL;
@@ -197,8 +202,9 @@ AutoBaudRate::addEdge(double dtime) {
 					double delta = fabs(frameLength - bitIdx * bitLength);
 					if (delta / bitLength > m_edgeErrorTolerance)
 						u->m_edgeErrorCount++;
-
+#if (_AXL_ABR_ALT)
 					u->m_edgeError += delta;
+#endif
 					u->m_frameEdgeCount++;
 				} else {
 					u->m_frameCount++;
@@ -237,10 +243,11 @@ AutoBaudRate::maintainHorizon() {
 				u->m_frameErrorCount >= h->m_frameErrorCount &&
 				u->m_edgeCount >= h->m_edgeCount &&
 				u->m_edgeOverflowCount >= h->m_edgeOverflowCount &&
-				u->m_edgeErrorCount >= h->m_edgeErrorCount &&
-				u->m_edgeError >= h->m_edgeError
+				u->m_edgeErrorCount >= h->m_edgeErrorCount
 			);
-
+#if (_AXL_ABR_ALT)
+			ASSERT(u->m_edgeError >= h->m_edgeError);
+#endif
 			u->subtract(*h);
 			*h = *u;
 		}
@@ -251,6 +258,7 @@ AutoBaudRate::maintainHorizon() {
 #endif
 	}
 
+#if (_AXL_ABR_GCD)
 	count = m_intervalArray.getCount();
 	for (size_t i = 0; i < count; i++) {
 		if (m_intervalArray[i].m_time >= m_horizonTime) {
@@ -258,6 +266,7 @@ AutoBaudRate::maintainHorizon() {
 			break;
 		}
 	}
+#endif
 
 	m_horizonTime = m_time;
 }
@@ -284,6 +293,117 @@ AutoBaudRate::finalizeUartSimStats(
 
 AutoBaudRateResult
 AutoBaudRate::calculate() {
+	// (1) find best error count stats
+
+	BaudGridCell sentinelBaud = { 0	};
+	sentinelBaud.m_uartSim[0].m_edgeOverflowCount = -1;
+	sentinelBaud.m_uartSim[0].m_frameErrorCount = -1;
+
+	UartSimStats bestErrorStats = { 0 };
+	bestErrorStats.m_frameErrorCount = -1;
+	bestErrorStats.m_edgeOverflowCount = -1;
+	bestErrorStats.m_edgeErrorCount = -1;
+
+	size_t count = m_baudGrid.getCount();
+	const BaudGridCell* b = m_baudGrid.p();
+	for (size_t i = 0; i < count; i++, b++) {
+		const UartSim* u = b->m_uartSim;
+		for (size_t j = 0; j < countof(b->m_uartSim); j++, u++) {
+			UartSimStats us = finalizeUartSimStats(j + 7, *u); // 5 bits + start + stop
+			if (us.m_frameCount && (
+					us.m_edgeOverflowCount < bestErrorStats.m_edgeOverflowCount ||
+					us.m_edgeOverflowCount == bestErrorStats.m_edgeOverflowCount && (
+						us.m_frameErrorCount < bestErrorStats.m_frameErrorCount ||
+						us.m_frameErrorCount == bestErrorStats.m_frameErrorCount &&
+						us.m_edgeErrorCount < bestErrorStats.m_edgeErrorCount
+					)
+				)
+			)
+				bestErrorStats = us;
+		}
+	}
+
+	// (2) build candidate array
+
+	m_baudCandidateArray.clear();
+
+	count = m_baudGrid.getCount();
+	b = m_baudGrid.p();
+	for (size_t i = 0; i < count; i++, b++) {
+		const UartSim* u = b->m_uartSim;
+
+		for (size_t j = 0; j < countof(b->m_uartSim); j++, u++) {
+			UartSimStats us = finalizeUartSimStats(j + 7, *u); // 5 bits + start + stop
+			if (us.m_frameCount &&
+				us.m_edgeOverflowCount <= bestErrorStats.m_edgeOverflowCount &&
+				us.m_frameErrorCount <= bestErrorStats.m_frameErrorCount &&
+				us.m_edgeErrorCount <= bestErrorStats.m_edgeOverflowCount
+			) {
+				m_baudCandidateArray.append(b);
+				break;
+			}
+		}
+	}
+
+	if (m_baudCandidateArray.isEmpty()) {
+		AutoBaudRateResult result = { 0 };
+		return result;
+	}
+
+	// (3) pick the best baud
+
+	const BaudGridCell* bestBaud = m_baudCandidateArray[0];
+	double bestError = DBL_MAX;
+
+	count = m_baudCandidateArray.getCount();
+	for (size_t i = 0; i < count; i++) {
+		const BaudGridCell* b = m_baudCandidateArray[i];
+		double error = 0;
+		for (size_t j = 0; j < count; j++) {
+			double n = std::round(m_baudCandidateArray[j]->m_baudRate / b->m_baudRate);
+			if (n < 1)
+				n = 1;
+
+			error += fabs(m_baudCandidateArray[j]->m_baudRate - b->m_baudRate * n);
+		}
+
+		if (error < bestError) {
+			bestBaud = b;
+			bestError = error;
+		}
+	}
+
+	// (4) pick the best frame size
+
+	const UartSim* bestSim = bestBaud->m_uartSim;
+	size_t bestSimIdx = 0;
+
+	const UartSim* u = bestBaud->m_uartSim;
+	for (size_t j = 0; j < countof(bestBaud->m_uartSim); j++, u++) {
+		UartSimStats us = finalizeUartSimStats(j + 7, *u); // 5 bits + start + stop
+		if (us.m_frameCount && (
+				us.m_edgeOverflowCount < bestSim->m_edgeOverflowCount ||
+				us.m_edgeOverflowCount == bestSim->m_edgeOverflowCount && (
+					us.m_frameErrorCount < bestSim->m_frameErrorCount ||
+					us.m_frameErrorCount == bestSim->m_frameErrorCount &&
+					us.m_edgeErrorCount <= bestSim->m_edgeErrorCount
+				)
+			)
+		) {
+			bestSim = u;
+			bestSimIdx = j;
+		}
+	}
+
+	AutoBaudRateResult result;
+	result.m_baudRate = (uint_t)bestBaud->m_baudRate;
+	result.m_frameBits = bestSimIdx + 5;
+	return result;
+}
+
+#if (_AXL_ABR_ALT)
+AutoBaudRateResult
+AutoBaudRate::calculate_alt() {
 	BaudGridCell sentinelBaud = { 0	};
 	sentinelBaud.m_uartSim[0].m_edgeOverflowCount = -1;
 	sentinelBaud.m_uartSim[0].m_frameErrorCount = -1;
@@ -328,90 +448,9 @@ AutoBaudRate::calculate() {
 	result.m_frameBits = bestSimIdx + 5;
 	return result;
 }
-
-AutoBaudRateResult
-AutoBaudRate::calculate_alt() {
-	BaudGridCell sentinelBaud = { 0	};
-	sentinelBaud.m_uartSim[0].m_edgeOverflowCount = -1;
-	sentinelBaud.m_uartSim[0].m_frameErrorCount = -1;
-
-	const BaudGridCell* bestBaud = &sentinelBaud;
-	const UartSim* bestSim = bestBaud->m_uartSim;
-	size_t bestSimIdx = 0;
-
-	m_baudCandidateArray.clear();
-
-	size_t count = m_baudGrid.getCount();
-	const BaudGridCell* b = m_baudGrid.p();
-	for (size_t i = 0; i < count; i++, b++) {
-		const UartSim* u = b->m_uartSim;
-
-		for (size_t j = 0; j < countof(b->m_uartSim); j++, u++) {
-			UartSimStats us = finalizeUartSimStats(j + 7, *u); // 5 bits + start + stop
-			if (us.m_frameCount &&
-				!us.m_edgeOverflowCount &&
-				!us.m_frameErrorCount &&
-				!us.m_edgeErrorCount
-			) {
-				m_baudCandidateArray.append(b);
-				break;
-			}
-		}
-	}
-
-	if (m_baudCandidateArray.isEmpty()) {
-		AutoBaudRateResult result = { 0 };
-		return result;
-	}
-
-	bestBaud = m_baudCandidateArray[0];
-	double bestError = DBL_MAX;
-	count = m_baudCandidateArray.getCount();
-	for (size_t i = 0; i < count; i++) {
-		const BaudGridCell* b = m_baudCandidateArray[i];
-		double error = 0;
-		for (size_t j = 0; j < count; j++) {
-			double n = std::round(m_baudCandidateArray[j]->m_baudRate / b->m_baudRate);
-			if (n < 1)
-				n = 1;
-
-			error += fabs(m_baudCandidateArray[j]->m_baudRate - b->m_baudRate * n);
-		}
-
-		if (error < bestError) {
-			bestBaud = b;
-			bestError = error;
-		}
-	}
-
-	bestSim = bestBaud->m_uartSim;
-	bestSimIdx = 0;
-
-	const UartSim* u = bestBaud->m_uartSim;
-	for (size_t j = 0; j < countof(bestBaud->m_uartSim); j++, u++) {
-		UartSimStats us = finalizeUartSimStats(j + 7, *u); // 5 bits + start + stop
-		if (us.m_frameCount && (
-				us.m_edgeOverflowCount < bestSim->m_edgeOverflowCount ||
-				us.m_edgeOverflowCount == bestSim->m_edgeOverflowCount && (
-					us.m_frameErrorCount < bestSim->m_frameErrorCount ||
-					us.m_frameErrorCount == bestSim->m_frameErrorCount &&
-					us.m_edgeErrorCount <= bestSim->m_edgeErrorCount
-				)
-			)
-		) {
-			bestSim = u;
-			bestSimIdx = j;
-		}
-	}
-
-	AutoBaudRateResult result;
-	result.m_baudRate = (uint_t)bestBaud->m_baudRate;
-	result.m_frameBits = bestSimIdx + 5;
-	return result;
-}
+#endif
 
 #if (_AXL_ABR_GCD)
-
 uint_t
 AutoBaudRate::calculate_gcd() {
 	double baudGcd = 1;
@@ -426,11 +465,9 @@ AutoBaudRate::calculate_gcd() {
 
 	return std::round(10000000. / baudGcd);
 }
-
 #endif
 
 #if (_AXL_DEBUG)
-
 void
 AutoBaudRate::print() {
 	size_t count = m_baudGrid.getCount();
@@ -439,6 +476,8 @@ AutoBaudRate::print() {
 		const UartSim* u = b->m_uartSim;
 		for (size_t j = 0; j < countof(b->m_uartSim); j++, u++) {
 			UartSimStats us = finalizeUartSimStats(j + 7, *u); // 5 bits + start + stop
+
+#if (_AXL_ABR_ALT)
 			printf(
 				"%f, %d, %d, %d, %d, %d, %d, %f, %f\n",
 				b->m_baudRate,
@@ -451,6 +490,18 @@ AutoBaudRate::print() {
 				us.m_edgeError,
 				us.m_edgeCount > us.m_frameCount ? us.m_edgeError / (us.m_edgeCount - us.m_frameCount) : 0.
 			);
+#else
+			printf(
+				"%f, %d, %d, %d, %d, %d, %d\n",
+				b->m_baudRate,
+				j + 5,
+				us.m_frameCount,
+				us.m_frameErrorCount,
+				us.m_edgeCount,
+				us.m_edgeOverflowCount,
+				us.m_edgeErrorCount
+			);
+#endif
 		}
 	}
 }
