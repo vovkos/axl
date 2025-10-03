@@ -159,6 +159,12 @@ public:
 	void
 	addEdge(double dtime);
 
+	void
+	addEdgeArray(
+		const double* p,
+		size_t count
+	);
+
 	AutoBaudRateResult
 	calculate();
 
@@ -183,6 +189,12 @@ public:
 #endif
 
 protected:
+	void
+	processEdge(
+		double time,
+		bool uart
+	);
+
 	void
 	maintainHorizon();
 

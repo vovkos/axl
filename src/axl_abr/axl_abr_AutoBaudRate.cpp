@@ -155,25 +155,65 @@ AutoBaudRate::reset(bool uart) {
 
 void
 AutoBaudRate::addEdge(double dtime) {
-	if (dtime > m_horizon)
-		reset(m_uart); // forget everything
+	bool uart = m_uart = !m_uart;
 
-	double time = m_time += dtime;
-	m_uart = !m_uart;
-
-	if (m_time - m_horizonTime > m_horizon)
-		maintainHorizon();
+	double time;
+	if (dtime > m_horizon) {
+		reset(uart); // forget everything (easier than maintaining horizon)
+		time = 0;
+	} else {
+		time = m_time += dtime;
+		if (time - m_horizonTime > m_horizon) {
+			maintainHorizon();
+			m_horizonTime = time;
+		}
+	}
 
 #if (_AXL_ABR_GCD)
-	if (m_uart && dtime >= 1) {
+	if (uart && dtime >= 1) {
 		Interval interval = { time, dtime };
 		m_intervalArray.append(interval);
 	}
 #endif
 
+	processEdge(time, uart);
+}
+
+void
+AutoBaudRate::addEdgeArray(
+	const double* p,
+	size_t count
+) {
+	const double* end = p + count;
+	for (; p < end; p++) {
+		double dtime = *p;
+		double time = m_time += dtime;
+		bool uart = m_uart = !m_uart;
+
+#if (_AXL_ABR_GCD)
+		if (uart && dtime >= 1) {
+			Interval interval = { time, dtime };
+			m_intervalArray.append(interval);
+		}
+#endif
+
+		processEdge(time, uart);
+	}
+
+	if (m_time - m_horizonTime > m_horizon) {
+		maintainHorizon();
+		m_horizonTime = m_time;
+	}
+}
+
+void
+AutoBaudRate::processEdge(
+	double time,
+	bool uart
+) {
 #if (_AXL_ABR_FOURIER)
 	double t = 2 * M_PI * time / 10000000ULL;
-	double m = m_uart ? 1.0 : -1.0;
+	double m = uart ? 1.0 : -1.0;
 #endif
 
 	size_t baudBinCount = m_baudGrid.getCount();
@@ -184,7 +224,7 @@ AutoBaudRate::addEdge(double dtime) {
 		UartSim* u = b->m_uartSim;
 		for (size_t j = 0; j < countof(b->m_uartSim); j++, u++)
 			if (!u->m_frameEdgeCount) {
-				if (m_uart) // start bit is not set
+				if (uart) // start bit is not set
 					u->m_frameErrorCount++;
 				else {
 					u->m_frameTime = time;
@@ -212,7 +252,7 @@ AutoBaudRate::addEdge(double dtime) {
 					if (u->m_frameEdgeCount > bitCount + 1) // too many edges per frame
 						u->m_edgeOverflowCount++;
 
-					if (m_uart) { // stop bit was not set
+					if (uart) { // stop bit was not set
 						u->m_frameErrorCount++;
 						u->m_frameEdgeCount = 0;
 					} else {
@@ -266,8 +306,6 @@ AutoBaudRate::maintainHorizon() {
 		}
 	}
 #endif
-
-	m_horizonTime = m_time;
 }
 
 AutoBaudRate::UartSimStats
@@ -336,7 +374,7 @@ AutoBaudRate::calculate() {
 			if (us.m_frameCount &&
 				us.m_edgeOverflowCount <= bestErrorStats.m_edgeOverflowCount &&
 				us.m_frameErrorCount <= bestErrorStats.m_frameErrorCount &&
-				us.m_edgeErrorCount <= bestErrorStats.m_edgeOverflowCount
+				us.m_edgeErrorCount <= bestErrorStats.m_edgeErrorCount
 			) {
 				m_baudCandidateArray.append(b);
 				break;
