@@ -514,7 +514,7 @@ AutoBaudRate::print() {
 		for (size_t j = 0; j < countof(b->m_uartSim); j++, u++) {
 			UartSimStats us = finalizeUartSimStats(j + 7, *u); // 5 bits + start + stop
 
-#if (_AXL_ABR_ALT)
+#	if (_AXL_ABR_ALT)
 			printf(
 				"%f, %d, %d, %d, %d, %d, %d, %f, %f\n",
 				b->m_baudRate,
@@ -527,7 +527,7 @@ AutoBaudRate::print() {
 				us.m_edgeError,
 				us.m_edgeCount > us.m_frameCount ? us.m_edgeError / (us.m_edgeCount - us.m_frameCount) : 0.
 			);
-#else
+#	else
 			printf(
 				"%f, %d, %d, %d, %d, %d, %d\n",
 				b->m_baudRate,
@@ -538,7 +538,7 @@ AutoBaudRate::print() {
 				us.m_edgeOverflowCount,
 				us.m_edgeErrorCount
 			);
-#endif
+#	endif
 		}
 	}
 }
