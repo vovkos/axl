@@ -257,7 +257,7 @@ Compiler::quantifier(NfaState* start) {
 		tokenCount.m_number == 0 ||
 		token != TokenKind_EndQuantifier
 	) {
-		err::setFormatStringError("invalid quantifier (only simple quantifiers are currently supported)");
+		err::setError("invalid quantifier (only simple quantifiers are currently supported)");
 		return NULL;
 	}
 
