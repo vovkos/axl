@@ -262,14 +262,14 @@ public:
 		return m_mapping;
 	}
 
-	uint64_t
-	getFileSize() {
-		return m_file.getSize();
-	}
-
 	size_t
 	getMappingSize() {
 		return m_mapping.getSize();
+	}
+
+	uint64_t
+	getFileSize() {
+		return m_file.getSize();
 	}
 
 	bool
@@ -296,13 +296,25 @@ public:
 		return m_mapping.open(&m_file, offset, size, m_openFlags);
 	}
 
-	void
-	close() {
-		m_file.close();
+	bool
+	unmapAndSetFileSize(uint64_t size) {
 		m_mapping.close();
-		m_openFlags = 0;
+		return m_file.setSize(size);
 	}
+
+	void
+	close();
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+void
+SimpleMappedFile::close() {
+	m_file.close();
+	m_mapping.close();
+	m_openFlags = 0;
+}
 
 //..............................................................................
 
