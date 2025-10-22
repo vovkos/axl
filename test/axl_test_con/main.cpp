@@ -8882,8 +8882,8 @@ testHid() {
 			(strings[1] = it->product_string).sz(),
 			(strings[2] = it->serial_number).sz(),
 			it->release_number,
-			page->getName().sz(),
-			page->getUsageName(it->usage).sz(),
+			page->getString().sz(),
+			page->getUsageString(it->usage).sz(),
 			it->interface_number
 		);
 
@@ -9087,8 +9087,8 @@ void testSyncHidUsbMon() {
 				(strings[1] = it->product_string).sz(),
 				(strings[2] = it->serial_number).sz(),
 				it->release_number,
-				page->getName().sz(),
-				page->getUsageName(it->usage).sz(),
+				page->getString().sz(),
+				page->getUsageString(it->usage).sz(),
 				io::getHidBusTypeString(it->bus_type),
 				it->interface_number
 			);
@@ -9215,8 +9215,8 @@ void testSyncHidUsbMon() {
 				printf("  serial number*: %s\n", it->m_serialNumberDescriptor.sz());
 
 			printf("  release:        %d\n", it->m_releaseNumber);
-			printf("  usage page:     %s\n", page->getName().sz());
-			printf("  usage:          %s\n", page->getUsageName(it->m_usage).sz());
+			printf("  usage page:     %s\n", page->getString().sz());
+			printf("  usage:          %s\n", page->getUsageString(it->m_usage).sz());
 #if (_AXL_OS_WIN)
 			printf("  devInst:        0x%04x\n", it->m_devInst);
 #endif

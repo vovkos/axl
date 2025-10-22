@@ -89,12 +89,13 @@ protected:
 	union {
 		uint_t m_flags;
 		struct {
-			uint_t m_id             : 31;
-			uint_t m_isNameMapReady : 1;
+			uint_t m_id       : 31;
+			uint_t m_isLoaded : 1;
 		};
 	};
 
 	sl::String m_name;
+	mutable sl::String m_string;
 	sl::String m_fileName;
 	sl::String m_format;
 
@@ -116,13 +117,45 @@ public:
 		return m_name;
 	}
 
+	const sl::String&
+	getString() const;
+
 	sl::String
 	getUsageName(uint_t usage) const;
+
+	sl::String
+	getUsageString(uint_t usage) const{
+		sl::String name = getUsageName(usage);
+		return !name.isEmpty() ? name : createUnnamedUsageString(usage);
+	}
+
+	static
+	sl::String
+	createUnnamedPageString(uint_t id) {
+		return sl::formatString("Page 0x%02X", id);
+	}
+
+	static
+	sl::String
+	createUnnamedUsageString(uint_t id) {
+		return sl::formatString("Usage 0x%02X", id);
+	}
 
 protected:
 	bool
 	load();
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+const sl::String&
+HidUsagePage::getString() const {
+	if (m_string.isEmpty())
+		m_string = !m_name.isEmpty() ? m_name : createUnnamedPageString(m_id);
+
+	return m_string;
+}
 
 //..............................................................................
 

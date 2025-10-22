@@ -61,20 +61,18 @@ sl::String
 HidUsagePage::getUsageName(uint_t usage) const {
 	HidUsagePage* mutableSelf = (HidUsagePage*)this;
 
-	if (!m_isNameMapReady) {
+	if (!m_isLoaded) {
 		if (!m_fileName.isEmpty())
 			mutableSelf->load();
-		mutableSelf->m_isNameMapReady = true;
+
+		mutableSelf->m_isLoaded = true;
 	}
 
 	sl::ConstMapIterator<uint_t, sl::String> it = m_usageNameMap.find(usage);
-	if (it)
-		return it->m_value;
-
-	if (m_format.isEmpty())
-		mutableSelf->m_format = "Usage 0x%02X";
-
-	return sl::formatString(m_format.sz(), usage);
+	return
+		it ? it->m_value :
+		!m_format.isEmpty() ? sl::formatString(m_format.sz(), usage) :
+		sl::String();
 }
 
 bool
@@ -115,7 +113,6 @@ HidDb::getUsagePage(uint_t pageId) const {
 	HidDb* mutableSelf = (HidDb*)this;
 	HidUsagePage* page = new HidUsagePage(NULL);
 	page->m_id = pageId;
-	page->m_name.format("Page 0x%02X", pageId);
 	mutableSelf->m_usagePageList.insertTail(page);
 	mutableSelf->m_usagePageMap[pageId] = page;
 	return page;

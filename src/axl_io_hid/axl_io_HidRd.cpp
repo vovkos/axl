@@ -198,7 +198,7 @@ decodeVariable(
 ) {
 	const HidUsagePage* page = field.getUsagePage();
 	uint_t usage = field.getUsage(i);
-	printf("%s: %d\n", page->getUsageName(usage).sz(), value);
+	printf("%s: %d\n", page->getUsageString(usage).sz(), value);
 }
 
 void
@@ -209,7 +209,7 @@ decodeArray(
 ) {
 	const HidUsagePage* page = field.getUsagePage();
 	uint_t usage = field[HidRdItemId_UsageMinimum] + value;
-	printf("[%d]: %s\n", i, page->getUsageName(usage).sz());
+	printf("[%d]: %s\n", i, page->getUsageString(usage).sz());
 }
 
 inline
@@ -255,7 +255,7 @@ printFieldArray(
 		printf(
 			"%sUsagePage: %s\n",
 			indent->sz(),
-			page->getName().sz()
+			page->getString().sz()
 		);
 
 		if (field.isSet(HidRdItemId_Usage)) {
@@ -265,7 +265,7 @@ printFieldArray(
 				printf(
 					"%sUsage: %s\n",
 					indent->sz(),
-					page->getUsageName(usage).sz()
+					page->getUsageString(usage).sz()
 				);
 			}
 		}
@@ -274,14 +274,14 @@ printFieldArray(
 			printf(
 				"%sUsageMinimum: %s\n",
 				indent->sz(),
-				page->getUsageName(field[HidRdItemId_UsageMinimum]).sz()
+				page->getUsageString(field[HidRdItemId_UsageMinimum]).sz()
 			);
 
 		if (field.isSet(HidRdItemId_UsageMaximum))
 			printf(
 				"%sUsageMaximum: %s\n",
 				indent->sz(),
-				page->getUsageName(field[HidRdItemId_UsageMaximum]).sz()
+				page->getUsageString(field[HidRdItemId_UsageMaximum]).sz()
 			);
 
 		printItem(*indent, field, HidRdItemId_LogicalMinimum);
@@ -308,8 +308,8 @@ printCollection(
 		"%sCollection: %s (%s: %s)\n",
 		indent->sz(),
 		getHidRdCollectionKindString(collection->getCollectionKind()).sz(),
-		page->getName().sz(),
-		page->getUsageName(usage).sz()
+		page->getString().sz(),
+		page->getUsageString(usage).sz()
 	);
 
 	indent->append(' ', 4);
