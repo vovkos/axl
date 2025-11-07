@@ -402,7 +402,7 @@ concatFilePath(
 		return *filePath;
 	}
 
-	char last = (*filePath) [filePath->getLength() - 1];
+	char last = (*filePath)[filePath->getLength() - 1];
 
 #if (_AXL_OS_WIN)
 	if (last != '\\' && last != '/')

@@ -67,7 +67,7 @@ PacketizerRoot::writeImpl(
 		bufferSize = sizeof(uint64_t);
 	}
 
-	uint32_t dataSize = ((const uint32_t*)m_buffer.cp()) [1];
+	uint32_t dataSize = ((const uint32_t*)m_buffer.cp())[1];
 	uint32_t packetSize = sizeof(uint64_t) + dataSize;
 
 	if (bufferSize < packetSize) {

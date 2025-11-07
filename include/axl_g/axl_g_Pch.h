@@ -338,7 +338,7 @@ typedef wchar_t           utf32_t;
 // sizeof/countof/lengthof/offsetof/containerof
 
 #ifndef countof
-#	define countof(a) (sizeof(a) / sizeof((a) [0]))
+#	define countof(a) (sizeof(a) / sizeof((a)[0]))
 #endif
 
 #ifndef lengthof

@@ -187,7 +187,7 @@ ZipReader::extractFileToMem(
 	if (!result)
 		return false;
 
-	buffer->p() [(size_t)stat.m_uncomp_size] = 0; // ensure zero termination
+	buffer->p()[(size_t)stat.m_uncomp_size] = 0; // ensure zero termination
 	buffer->setCount((size_t)stat.m_uncomp_size);
 
 	return extractFileToMem(index, buffer->p(), (size_t)stat.m_uncomp_size);
