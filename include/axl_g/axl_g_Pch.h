@@ -77,7 +77,7 @@
 #		define _AXL_CPU_ARM64 1
 #	endif
 #elif (_AXL_CPP_GCC)
-#	if defined __i386__
+#	if (defined __i386__)
 #		define _AXL_CPU_IA32  1
 #		define _AXL_CPU_X86   1
 #	elif (defined __amd64__)

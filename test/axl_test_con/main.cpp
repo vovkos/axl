@@ -4638,7 +4638,7 @@ testConn() {
 
 bool
 testSerial() {
-	char const* port = "/dev/ttyS0";
+	char const* port = "/dev/ttyUSB1";
 
 	printf("opening %s...\n", port);
 
@@ -4646,7 +4646,7 @@ testSerial() {
 	settings.m_baudRate = 38400;
 	settings.m_dataBits = 8;
 	settings.m_stopBits = io::SerialStopBits_1;
-	settings.m_flowControl = io::SerialFlowControl_RtsCts;
+	settings.m_flowControl = io::SerialFlowControl_None;
 	settings.m_parity = io::SerialParity_None;
 	settings.m_dtr = false;
 	settings.m_rts = false;
@@ -4663,8 +4663,18 @@ testSerial() {
 
 	printf("writing data...\n");
 	char data[] = "abcdefghijklmnop";
-	size_t size = serial.write(data, lengthof(data));
-	printf("written: %d byte(s)\n", size);
+
+	uint_t baudRates[] = { 38400, 57600, 115200, 256000 };
+
+	for (size_t i = 0;; i++) {
+		settings.m_baudRate = baudRates[i % countof(baudRates)];
+		printf("baud: %d\n", settings.m_baudRate);
+		serial.setSettings(&settings, io::SerialSettingId_BaudRate);
+		size_t size = serial.write(data, lengthof(data));
+		printf("written: %d byte(s)\n", size);
+		sys::sleep(1000);
+	}
+
 
 #if (_AXL_OS_WIN)
 	printf("reading data...\n");
@@ -9810,14 +9820,7 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-#if (_AXL_OS_DARWIN)
-	testKqueue();
-#endif
-
-#if (_AXL_ABR)
-	testAutoBaudRate();
-#endif
-
+	testSerial();
 	return 0;
 }
 

@@ -137,215 +137,68 @@ Serial::open(
 	return m_serial.open(name, posixFlags);
 }
 
+template <typename T>
 bool
-Serial::setSettings(
+prepareTermios(
+	T* attr,
 	const SerialSettings* settings,
 	uint_t mask
 ) {
-#if (_AXL_IO_PSX_TERMIOS2)
-	termios2 attr;
-#else
-	termios attr;
-#endif
-
-	bool result = m_serial.getAttr(&attr);
-	if (!result)
-		return false;
-
-	speed_t stdSpeed = -1;
-
-	if (mask & SerialSettingId_BaudRate) {
-		switch (settings->m_baudRate) {
-		case 110:
-			stdSpeed = B110;
-			break;
-
-		case 300:
-			stdSpeed = B300;
-			break;
-
-		case 600:
-			stdSpeed = B600;
-			break;
-
-		case 1200:
-			stdSpeed = B1200;
-			break;
-
-		case 2400:
-			stdSpeed = B2400;
-			break;
-
-		case 4800:
-			stdSpeed = B4800;
-			break;
-
-		case 9600:
-			stdSpeed = B9600;
-			break;
-
-		case 19200:
-			stdSpeed = B19200;
-			break;
-
-		case 38400:
-			stdSpeed = B38400;
-			break;
-
-		case 57600:
-			stdSpeed = B57600;
-			break;
-
-		case 115200:
-			stdSpeed = B115200;
-			break;
-
-#ifdef B230400
-		case 230400:
-			stdSpeed = B230400;
-			break;
-#endif
-#ifdef B460800
-		case 460800:
-			stdSpeed = B460800;
-			break;
-#endif
-#ifdef B500000
-		case 500000:
-			stdSpeed = B500000;
-			break;
-#endif
-#ifdef B576000
-		case 576000:
-			stdSpeed = B576000;
-			break;
-#endif
-#ifdef B921600
-		case 921600:
-			stdSpeed = B921600;
-			break;
-#endif
-#ifdef B1000000
-		case 1000000:
-			stdSpeed = B1000000;
-			break;
-#endif
-#ifdef B1152000
-		case 1152000:
-			stdSpeed = B1152000;
-			break;
-#endif
-#ifdef B1500000
-		case 1500000:
-			stdSpeed = B1500000;
-			break;
-#endif
-#ifdef B2000000
-		case 2000000:
-			stdSpeed = B2000000;
-			break;
-#endif
-#ifdef B2500000
-		case 2500000:
-			stdSpeed = B2500000;
-			break;
-#endif
-#ifdef B3000000
-		case 3000000:
-			stdSpeed = B3000000;
-			break;
-#endif
-#ifdef B3500000
-		case 3500000:
-			stdSpeed = B3500000;
-			break;
-#endif
-#ifdef B4000000
-		case 4000000:
-			stdSpeed = B4000000;
-			break;
-#endif
-		default:
-			stdSpeed = 0;
-
-#if (_AXL_IO_PSX_TERMIOS2)
-			attr.c_cflag &= ~CBAUD;
-			attr.c_cflag |= CBAUDEX;
-			attr.c_ispeed = settings->m_baudRate;
-			attr.c_ospeed = settings->m_baudRate;
-#elif (!defined IOSSIOSPEED)
-			return err::fail(err::SystemErrorCode_InvalidParameter);
-#endif
-		}
-
-		if (stdSpeed != 0) {
-#if (_AXL_IO_PSX_TERMIOS2)
-			attr.c_cflag &= ~(CBAUD | CBAUDEX);
-			attr.c_cflag |= stdSpeed;
-			attr.c_ispeed = stdSpeed;
-			attr.c_ospeed = stdSpeed;
-#else
-			cfsetispeed(&attr, stdSpeed);
-			cfsetospeed(&attr, stdSpeed);
-#endif
-		}
-	}
-
 	if (mask & SerialSettingId_DataBits) {
-		attr.c_cflag &= ~CSIZE;
+		attr->c_cflag &= ~CSIZE;
 
 		switch (settings->m_dataBits) {
 		case 5:
-			attr.c_cflag |= CS5;
+			attr->c_cflag |= CS5;
 			break;
 
 		case 6:
-			attr.c_cflag |= CS6;
+			attr->c_cflag |= CS6;
 			break;
 
 		case 7:
-			attr.c_cflag |= CS7;
+			attr->c_cflag |= CS7;
 			break;
 
 		case 8:
 		default:
-			attr.c_cflag |= CS8;
+			attr->c_cflag |= CS8;
 			break;
 		}
 	}
 
 	if (mask & SerialSettingId_StopBits) {
 		if (settings->m_stopBits == SerialStopBits_2)
-			attr.c_cflag |= CSTOPB;
+			attr->c_cflag |= CSTOPB;
 		else
-			attr.c_cflag &= ~CSTOPB;
+			attr->c_cflag &= ~CSTOPB;
 	}
 
 	if (mask & SerialSettingId_Parity) {
 #ifdef CMSPAR
-		attr.c_cflag &= ~(PARENB | PARODD | CMSPAR);
+		attr->c_cflag &= ~(PARENB | PARODD | CMSPAR);
 #else
-		attr.c_cflag &= ~(PARENB | PARODD);
+		attr->c_cflag &= ~(PARENB | PARODD);
 #endif
-		attr.c_iflag &= ~(PARMRK | INPCK);
-		attr.c_iflag |= IGNPAR;
+		attr->c_iflag &= ~(PARMRK | INPCK);
+		attr->c_iflag |= IGNPAR;
 
 		switch (settings->m_parity) {
 		case SerialParity_Odd:
-			attr.c_cflag |= PARENB | PARODD;
+			attr->c_cflag |= PARENB | PARODD;
 			break;
 
 		case SerialParity_Even:
-			attr.c_cflag |= PARENB;
+			attr->c_cflag |= PARENB;
 			break;
 
 #ifdef CMSPAR
 		case SerialParity_Mark:
-			attr.c_cflag |= PARENB | CMSPAR | PARODD;
+			attr->c_cflag |= PARENB | CMSPAR | PARODD;
 			break;
 
 		case SerialParity_Space:
-			attr.c_cflag |= PARENB | CMSPAR;
+			attr->c_cflag |= PARENB | CMSPAR;
 			break;
 #else
 		case SerialParity_Mark:
@@ -357,44 +210,200 @@ Serial::setSettings(
 	}
 
 	if (mask & SerialSettingId_FlowControl) {
-		attr.c_cflag &= ~CRTSCTS;
-		attr.c_iflag &= ~(IXON | IXOFF | IXANY);
+		attr->c_cflag &= ~CRTSCTS;
+		attr->c_iflag &= ~(IXON | IXOFF | IXANY);
 
 		switch (settings->m_flowControl) {
 		case SerialFlowControl_RtsCts:
-			attr.c_cflag |= CRTSCTS;
+			attr->c_cflag |= CRTSCTS;
 			break;
 
 		case SerialFlowControl_XonXoff:
-			attr.c_iflag |= IXON | IXOFF | IXANY;
+			attr->c_iflag |= IXON | IXOFF | IXANY;
 			break;
 		}
 	}
 
 	// ensure some extra default flags
 
-	attr.c_iflag |= IGNBRK;
-	attr.c_iflag &= ~(BRKINT | IGNCR | INLCR | ICRNL | ISTRIP);
-	attr.c_oflag = 0;
-	attr.c_cflag |= CREAD | CLOCAL;
-	attr.c_lflag = 0;
+	attr->c_iflag |= IGNBRK;
+	attr->c_iflag &= ~(BRKINT | IGNCR | INLCR | ICRNL | ISTRIP);
+	attr->c_oflag = 0;
+	attr->c_cflag |= CREAD | CLOCAL;
+	attr->c_lflag = 0;
 
-	memset(attr.c_cc, _POSIX_VDISABLE, sizeof(attr.c_cc));
-	attr.c_cc[VTIME] = settings->m_readInterval / 100; // milliseconds -> deciseconds
-	attr.c_cc[VMIN]  = 1;
+	memset(attr->c_cc, _POSIX_VDISABLE, sizeof(attr->c_cc));
+	attr->c_cc[VTIME] = settings->m_readInterval / 100; // milliseconds -> deciseconds
+	attr->c_cc[VMIN]  = 1;
+	return true;
+}
 
-	result = m_serial.setAttr(&attr);
+bool
+setTermiosSpeed(
+	termios* attr,
+	speed_t speed
+) {
+	return err::complete(
+		cfsetispeed(attr, speed) != -1 &&
+		cfsetospeed(attr, speed) != -1
+	);
+}
+
+#if (_AXL_IO_PSX_TERMIOS2)
+bool
+setTermiosSpeed(
+	termios2* attr,
+	uint_t speed
+) {
+	attr->c_cflag &= ~CBAUD;
+#ifdef BOTHER
+	attr->c_cflag |= BOTHER;
+#else
+	attr->c_cflag |= CBAUDEX;
+#endif
+	attr->c_ispeed = speed;
+	attr->c_ospeed = speed;
+	return true;
+}
+#endif
+
+speed_t
+getTermiosStdSpeed(uint_t baudRate) {
+	switch (baudRate) {
+	case 110:
+		return B110;
+
+	case 300:
+		return B300;
+
+	case 600:
+		return B600;
+
+	case 1200:
+		return B1200;
+
+	case 2400:
+		return B2400;
+
+	case 4800:
+		return B4800;
+
+	case 9600:
+		return B9600;
+
+	case 19200:
+		return B19200;
+
+	case 38400:
+		return B38400;
+
+	case 57600:
+		return B57600;
+
+	case 115200:
+		return B115200;
+
+#ifdef B230400
+	case 230400:
+		return B230400;
+#endif
+#ifdef B460800
+	case 460800:
+		return B460800;
+#endif
+#ifdef B500000
+	case 500000:
+		return B500000;
+#endif
+#ifdef B576000
+	case 576000:
+		return B576000;
+#endif
+#ifdef B921600
+	case 921600:
+		return B921600;
+#endif
+#ifdef B1000000
+	case 1000000:
+		return B1000000;
+#endif
+#ifdef B1152000
+	case 1152000:
+		return B1152000;
+#endif
+#ifdef B1500000
+	case 1500000:
+		return B1500000;
+#endif
+#ifdef B2000000
+	case 2000000:
+		return B2000000;
+#endif
+#ifdef B2500000
+	case 2500000:
+		return B2500000;
+#endif
+#ifdef B3000000
+	case 3000000:
+		return B3000000;
+#endif
+#ifdef B3500000
+	case 3500000:
+		return B3500000;
+#endif
+#ifdef B4000000
+	case 4000000:
+		return B4000000;
+#endif
+
+	default:
+		return 0;
+	}
+}
+
+bool
+Serial::setSettings(
+	const SerialSettings* settings,
+	uint_t mask
+) {
+	bool result = false;
+
+	if (!(mask & SerialSettingId_BaudRate)) {
+		termios attr;
+		result =
+			m_serial.getAttr(&attr) &&
+			prepareTermios(&attr, settings, mask) &&
+			m_serial.setAttr(&attr);
+	} else if (speed_t stdSpeed = getTermiosStdSpeed(settings->m_baudRate)) {
+		termios attr;
+		result =
+			m_serial.getAttr(&attr) &&
+			prepareTermios(&attr, settings, mask) &&
+			setTermiosSpeed(&attr, stdSpeed) &&
+			m_serial.setAttr(&attr);
+	} else {
+#if (_AXL_IO_PSX_TERMIOS2)
+		termios2 attr;
+		result =
+			m_serial.getAttr(&attr) &&
+			prepareTermios(&attr, settings, mask) &&
+			setTermiosSpeed(&attr, settings->m_baudRate) &&
+			m_serial.setAttr(&attr);
+#elif (defined IOSSIOSPEED)
+		termios attr;
+		speed_t speed = settings->m_baudRate;
+		result =
+			m_serial.getAttr(&attr) &&
+			prepareTermios(&attr, settings, mask) &&
+			m_serial.setAttr(&attr) &&;
+			m_serial.ioctl(IOSSIOSPEED, &speed) != -1;
+#else
+		return err::fail(err::SystemErrorCode_InvalidParameter);
+#endif
+	}
+
 	if (!result)
 		return false;
-
-#ifdef IOSSIOSPEED
-	if (!stdSpeed) {
-		speed_t speed = settings->m_baudRate;
-		result = m_serial.ioctl(IOSSIOSPEED, &speed) != -1;
-		if (!result)
-			return false;
-	}
-#endif
 
 	if (mask & SerialSettingId_FlowControl) {
 		// adjust DTR & RTS lines
