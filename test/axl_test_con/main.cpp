@@ -4691,7 +4691,7 @@ testSerial() {
 	printf("wait result: %d\n", result);
 
 	if (result) {
-		size = serial.m_serial.getOverlappedResult(&overlapped);
+		size_t size = serial.m_serial.getOverlappedResult(&overlapped);
 		printf("overlapped result: %d\n", size);
 
 		if (size != -1) {
