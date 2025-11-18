@@ -702,7 +702,12 @@ addRootCaCertificates() {
 
 	long versionNumber = QSslSocket::sslLibraryVersionNumber();
 	QString versionString = QSslSocket::sslLibraryVersionString();
-	printf("SSL used by QT: 0x%lx %s (%d)\n", versionNumber, versionString.toUtf8().data(), versionString.length());
+	printf(
+		"SSL used by QT: 0x%lx %s (%d)\n",
+		versionNumber,
+		versionString.toUtf8().constData(),
+		versionString.length()
+	);
 
 	QByteArray pem = QByteArray::fromRawData(data, lengthof(data));
 	QList<QSslCertificate> list = QSslCertificate::fromData(pem, QSsl::Pem);

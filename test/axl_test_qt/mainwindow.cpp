@@ -347,7 +347,12 @@ MyWidget::paintEvent(QPaintEvent* e) {
 
 void
 MyWidget::keyPressEvent(QKeyEvent *event) {
-	printf("MyWidget::keyPressEvent(mod: %x, key:%x, text: %s)\n", event->modifiers(), event->key(), event->text().toLatin1().data());
+	printf(
+		"MyWidget::keyPressEvent(mod: %x, key:%x, text: %s)\n",
+		event->modifiers(),
+		event->key(),
+		event->text().toLatin1().constData()
+	);
 
 	if (event->modifiers() & Qt::AltModifier)
 		printf("ALT mod\n");
@@ -592,10 +597,10 @@ bool MainWindow::connectDbus() {
 
 	printf(
 		"connecting %s %s %s %s\n",
-		DesktopService.toLatin1().data(),
-		DesktopPath.toLatin1().data(),
-		DesktopSettingsIface.toLatin1().data(),
-		SettingsChangedSignal.toLatin1().data()
+		DesktopService.toLatin1().constData(),
+		DesktopPath.toLatin1().constData(),
+		DesktopSettingsIface.toLatin1().constData(),
+		SettingsChangedSignal.toLatin1().constData()
 	);
 
 	QDBusInterface iface(DesktopService, DesktopPath, DesktopSettingsIface, dbus);
@@ -605,10 +610,10 @@ bool MainWindow::connectDbus() {
 		QVariant value = values.front().value<QDBusVariant>().variant();
 		printf(
 			"%s %s: %s %s\n",
-			AppearanceNspace.toLatin1().data(),
-			ColorSchemeKey.toLatin1().data(),
+			AppearanceNspace.toLatin1().constData(),
+			ColorSchemeKey.toLatin1().constData(),
 			value.typeName(),
-			value.toString().toLatin1().data()
+			value.toString().toLatin1().constData()
 		);
 	}
 
@@ -631,9 +636,9 @@ void MainWindow::onSettingChanged(const QString& nspace, const QString& key, con
 #if (_AXL_OS_LINUX)
 	printf(
 		"onSettingChanged(namespace: %s, key: %s, value: %s)\n",
-		nspace.toLatin1().data(),
-		key.toLatin1().data(),
-		value.variant().toString().toLatin1().data()
+		nspace.toLatin1().constData(),
+		key.toLatin1().constData(),
+		value.variant().toString().toLatin1().constData()
 	);
 
 /*
