@@ -191,11 +191,35 @@ axl_create_msvc_settings)
 		" " "/IGNORE:4221"
 	)
 
+	axl_create_setting(
+		MSVC_LINK_FLAG_IGNORE4300
+		DESCRIPTION "Ignore linker warning LNK4300 (ignoring '/INCREMENTAL' with ASAN metadata)"
+		DEFAULT "/IGNORE:4300"
+		" " "/IGNORE:4300"
+	)
+
 	option(
 		MSVC_LINK_DEBUG_INFO_RELEASE
 		"Generate linker debug information in Release builds"
 		ON
 	)
+endmacro()
+
+macro(
+axl_apply_msvc_link_settings
+	# ...
+)
+	set(_SETTING_LIST ${ARGN})
+
+	foreach(_SETTING ${_SETTING_LIST})
+		axl_apply_compiler_flag_setting_to_list(
+			${_SETTING}
+			CMAKE_EXE_LINKER_FLAGS
+			CMAKE_MODULE_LINKER_FLAGS
+			CMAKE_SHARED_LINKER_FLAGS
+			CMAKE_STATIC_LINKER_FLAGS
+		)
+	endforeach()
 endmacro()
 
 macro(
@@ -221,12 +245,9 @@ axl_apply_msvc_settings)
 		set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} ${_RELEASE_DEBUG_FLAGS}")
 	endif()
 
-	axl_apply_compiler_flag_setting_to_list(
+	axl_apply_msvc_link_settings(
 		MSVC_LINK_FLAG_IGNORE4221
-		CMAKE_EXE_LINKER_FLAGS
-		CMAKE_MODULE_LINKER_FLAGS
-		CMAKE_SHARED_LINKER_FLAGS
-		CMAKE_STATIC_LINKER_FLAGS
+		MSVC_LINK_FLAG_IGNORE4300
 	)
 endmacro()
 

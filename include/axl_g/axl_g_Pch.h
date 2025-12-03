@@ -382,7 +382,13 @@ wcslen_s(const wchar_t* p) {
 
 #	define AXL_GCC_ALIGN(n)
 #	define AXL_GCC_MSC_STRUCT
-#	define AXL_GCC_NO_ASAN
+
+#	ifdef __SANITIZE_ADDRESS__
+#		define _AXL_ASAN 1
+#		define _DISABLE_VECTOR_ANNOTATION 1 // suppress STL ASAN-vs-no-ASAN errors
+#		define _DISABLE_STRING_ANNOTATION 1 // suppress STL ASAN-vs-no-ASAN errors
+#	endif
+#	define AXL_NO_ASAN // no analogue of __attribute__((no_sanitize_address))
 #elif (_AXL_CPP_GCC)
 #	if (_AXL_CPU_X86)
 #		define AXL_CDECL   __attribute__((cdecl))
@@ -408,13 +414,13 @@ wcslen_s(const wchar_t* p) {
 
 #	ifdef __has_feature
 #		if (__has_feature(address_sanitizer))
-#	 		define _AXL_GCC_ASAN 1
+#	 		define _AXL_ASAN 1
 #		endif
 #	elif (defined(__SANITIZE_ADDRESS__))
-# 		define _AXL_GCC_ASAN 1
+# 		define _AXL_ASAN 1
 #	endif
 
-#	define AXL_GCC_NO_ASAN __attribute__((no_sanitize_address))
+#	define AXL_NO_ASAN __attribute__((no_sanitize_address))
 #endif
 
 #if (__cpp_noexcept_function_type)
