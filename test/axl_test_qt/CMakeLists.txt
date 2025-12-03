@@ -111,7 +111,7 @@ qt5_use_modules_alt(
 	Network
 )
 
-if (UNIX AND NOT APPLE)
+if(UNIX AND NOT APPLE)
 	qt5_use_modules_alt(
 		axl_test_qt
 		DBus

@@ -262,7 +262,7 @@ set(
 	time64_limits.h
 )
 
-set (AXL_IO_DIR ${AXL_ROOT_DIR}/src/axl_io)
+set(AXL_IO_DIR ${AXL_ROOT_DIR}/src/axl_io)
 
 set(
 	SYS_CPP_LIST
@@ -465,7 +465,7 @@ endif()
 # io folder
 #
 
-set (AXL_IO_DIR ${AXL_ROOT_DIR}/src/axl_io)
+set(AXL_IO_DIR ${AXL_ROOT_DIR}/src/axl_io)
 
 set(
 	IO_CPP_LIST

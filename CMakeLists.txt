@@ -17,7 +17,7 @@ include(cmake/axl_cmake.cmake NO_POLICY_SCOPE)
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-if (NOT "${GCC_FLAG_CPP_STANDARD}" MATCHES "-std=")
+if(NOT "${GCC_FLAG_CPP_STANDARD}" MATCHES "-std=")
 	set(CMAKE_CXX_STANDARD 11)
 endif()
 
