@@ -416,6 +416,13 @@ axl_create_gcc_settings)
 		)
 
 		axl_create_compiler_flag_setting(
+			GCC_FLAG_WARNING_PARENTHESES
+			DESCRIPTION "Warn about assignements in 'if' or 'while'"
+			DEFAULT "-Wno-logical-op-parentheses"
+			"-Wlogical-op-parentheses" "-Wno-logical-op-parentheses"
+		)
+
+		axl_create_compiler_flag_setting(
 			GCC_FLAG_WARNING_INCOMPATIBLE_MS_STRUCT
 			DESCRIPTION "Warn about possible layout incompatibilities with MS compilers"
 			DEFAULT "-Wno-incompatible-ms-struct"
