@@ -253,7 +253,7 @@ axl_apply_msvc_settings)
 		set(
 			MSVC_ASAN_DLL
 			${_DLL}
-			CACHE FILEPATH "Path to MSVC address sanitizer DLL (required with /fsanitize=address)"
+			CACHE FILEPATH "Path to MSVC ASAN runtime (required with /fsanitize=address)"
 		)
 	endif()
 

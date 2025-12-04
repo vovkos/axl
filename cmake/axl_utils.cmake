@@ -1280,3 +1280,45 @@ axl_add_twin_library
 endmacro()
 
 #...............................................................................
+
+macro(
+axl_copy_dlls_for_target
+	_TARGET
+	# ...
+)
+
+	set(_DLL_LIST ${ARGN})
+	if (_DLL_LIST)
+		add_custom_command(
+			TARGET ${_TARGET}
+			POST_BUILD
+			COMMAND
+				${CMAKE_COMMAND} -E copy
+				${_DLL_LIST}
+				${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>
+			COMMENT "Copying DLLs for ${_TARGET}..."
+			VERBATIM
+		)
+	endif()
+endmacro()
+
+macro(
+axl_copy_msvc_asan_dll)
+
+	if (MSVC_ASAN_DLL)
+		get_filename_component(_NAME "${MSVC_ASAN_DLL}" NAME)
+
+		add_custom_target(
+			axl_msvc_asan
+			ALL
+			COMMAND
+				${CMAKE_COMMAND} -E copy_if_different
+				${MSVC_ASAN_DLL}
+				${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIG>/${_NAME}
+			COMMENT "Copying ASAN runtime DLL..."
+			VERBATIM
+		)
+	endif()
+endmacro()
+
+#...............................................................................

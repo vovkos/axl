@@ -182,18 +182,7 @@ if(WIN32)
 		list(APPEND _DLL_LIST ${LUA_DLL_DIR}/${LUA_LIB_NAME}.dll)
 	endif()
 
-	if(_DLL_LIST)
-		add_custom_command(
-			TARGET axl_test_auto
-			POST_BUILD
-			COMMAND
-				echo Copying DLL files for axl_test_auto...
-			COMMAND
-				${CMAKE_COMMAND} -E copy
-				${_DLL_LIST}
-				${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CONFIGURATION}
-			)
-	endif()
+	axl_copy_dlls_for_target(axl_test_auto ${_DLL_LIST})
 endif()
 
 #...............................................................................

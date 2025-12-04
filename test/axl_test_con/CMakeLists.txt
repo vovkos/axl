@@ -271,6 +271,8 @@ if(UNIX)
 endif()
 
 if(WIN32)
+	set(_DLL_LIST)
+
 	if(BUILD_AXL_IO_USB AND LIBUSB_DLL_DIR)
 		list(APPEND _DLL_LIST ${LIBUSB_DLL_DIR}/libusb-1.0.dll)
 	endif()
@@ -291,18 +293,7 @@ if(WIN32)
 		list(APPEND _DLL_LIST ${EXPAT_DLL_DIR}/expat.dll)
 	endif()
 
-	if(_DLL_LIST)
-		add_custom_command(
-			TARGET axl_test_con
-			POST_BUILD
-			COMMAND
-				echo Copying DLL files for axl_test_con...
-			COMMAND
-				${CMAKE_COMMAND} -E copy
-				${_DLL_LIST}
-				${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CONFIGURATION}
-			)
-	endif()
+	axl_copy_dlls_for_target(axl_test_con ${_DLL_LIST})
 endif()
 
 #...............................................................................

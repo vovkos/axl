@@ -33,7 +33,7 @@ endif()
 
 find_package(Qt5Core QUIET ${_FIND_PACKAGE_FLAGS})
 if(Qt5Core_FOUND)
- 	set(QT_FOUND TRUE)
+	set(QT_FOUND TRUE)
 	set(QTCORE_FOUND TRUE)
 	set(QTCORE_CMAKE_DIR ${Qt5Core_DIR})
 endif()
