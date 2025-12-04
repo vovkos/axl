@@ -245,6 +245,18 @@ axl_apply_msvc_settings)
 		set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} ${_RELEASE_DEBUG_FLAGS}")
 	endif()
 
+	if ("${MSVC_FLAG_SANITIZE}" STREQUAL "/fsanitize=address")
+		get_filename_component(_MSVC_BIN_DIR "${CMAKE_CXX_COMPILER}" DIRECTORY)
+		file(GLOB _DLL_CANDIDATES "${_MSVC_BIN_DIR}/clang_rt.asan_dynamic-*.dll")
+		list(POP_FRONT _DLL_CANDIDATES _DLL)
+
+		set(
+			MSVC_ASAN_DLL
+			${_DLL}
+			CACHE FILEPATH "Path to MSVC address sanitizer DLL (required with /fsanitize=address)"
+		)
+	endif()
+
 	axl_apply_msvc_link_settings(
 		MSVC_LINK_FLAG_IGNORE4221
 		MSVC_LINK_FLAG_IGNORE4300
