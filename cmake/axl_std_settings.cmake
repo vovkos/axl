@@ -154,26 +154,26 @@ axl_create_msvc_settings)
 
 	axl_create_compiler_flag_setting(
 		MSVC_FLAG_EH
-		DESCRIPTION "Microsoft Visual C++ EH(exception handling) model"
+		DESCRIPTION "Microsoft Visual C++ EH (exception handling) model"
 		"/EHsc" "/EHs-c-"
 	)
 
 	axl_create_compiler_flag_setting(
 		MSVC_FLAG_RTTI
-		DESCRIPTION "Microsoft Visual C++ RTTI(run-time type information) support"
+		DESCRIPTION "Microsoft Visual C++ RTTI (run-time type information) support"
 		"/GR" "/GR-"
 	)
 
 	axl_create_compiler_flag_setting(
 		MSVC_FLAG_DEBUG_INFO_DEBUG
-		DESCRIPTION "Microsoft Visual C++ debug information format(Debug)"
+		DESCRIPTION "Microsoft Visual C++ debug information format (Debug)"
 		DEFAULT "/Zi"
 		"/Z7" "/Zi" "/ZI"
 	)
 
 	axl_create_compiler_flag_setting(
 		MSVC_FLAG_DEBUG_INFO_RELEASE
-		DESCRIPTION "Microsoft Visual C++ debug information format(Release)"
+		DESCRIPTION "Microsoft Visual C++ debug information format (Release)"
 		DEFAULT "/Zi"
 		"/Z7" "/Zi" "/ZI"
 	)
@@ -346,7 +346,7 @@ axl_create_gcc_settings)
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_VISIBILITY
-		DESCRIPTION "GNU C++ doesn't export all symbols by default(-fvisibility=hidden)"
+		DESCRIPTION "GNU C++ doesn't export all symbols by default (-fvisibility=hidden)"
 		DEFAULT "-fvisibility=hidden"
 		"-fvisibility=default" "-fvisibility=hidden"
 	)
@@ -447,7 +447,7 @@ axl_create_gcc_settings)
 
 	axl_create_compiler_flag_setting(
 		GCC_FLAG_WARNING_MULTICHAR
-		DESCRIPTION "Warn if a multicharacter constant(‘'FOOF'’) is used"
+		DESCRIPTION "Warn if a multicharacter constant (‘'FOOF'’) is used"
 		DEFAULT "-Wno-multichar"
 		"-Wmultichar" "-Wno-multichar"
 	)

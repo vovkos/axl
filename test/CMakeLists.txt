@@ -21,7 +21,7 @@ endif()
 
 option(
 	BUILD_AXL_TEST_AUTO
-	"Build axl_test_auto(misc automated tests - smoke, unit, integration etc)"
+	"Build axl_test_auto (misc automated tests - smoke, unit, integration etc)"
 	ON
 )
 
@@ -34,7 +34,7 @@ endif()
 if(${QT_FOUND})
 	option(
 		BUILD_AXL_TEST_QT
-		"Build axl_test_qt(QT GUI general-purpose testig app)"
+		"Build axl_test_qt (QT GUI general-purpose testig app)"
 		ON
 	)
 
