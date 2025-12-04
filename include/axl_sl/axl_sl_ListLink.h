@@ -53,7 +53,10 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-AXL_SELECT_ANY ListLink g_nullListLink = { };
+// older clangs won't allow initializing it with = { }
+// but it's static so it's guaranteed to be zero-initialized anyway
+
+AXL_SELECT_ANY ListLink g_nullListLink;
 
 //..............................................................................
 
