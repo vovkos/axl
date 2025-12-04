@@ -423,6 +423,13 @@ axl_create_gcc_settings)
 		)
 
 		axl_create_compiler_flag_setting(
+			GCC_FLAG_WARNING_DELETE_ABSTRACT_NON_VIRTUAL_DTOR
+			DESCRIPTION "Warn about deleting abstract classes without virtual destructors"
+			DEFAULT "-Wno-delete-abstract-non-virtual-dtor"
+			"-Wdelete-abstract-non-virtual-dtor" "-Wno-delete-abstract-non-virtual-dtor"
+		)
+
+		axl_create_compiler_flag_setting(
 			GCC_FLAG_WARNING_INCOMPATIBLE_MS_STRUCT
 			DESCRIPTION "Warn about possible layout incompatibilities with MS compilers"
 			DEFAULT "-Wno-incompatible-ms-struct"
