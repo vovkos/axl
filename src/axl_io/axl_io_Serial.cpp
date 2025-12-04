@@ -395,7 +395,7 @@ Serial::setSettings(
 		result =
 			m_serial.getAttr(&attr) &&
 			prepareTermios(&attr, settings, mask) &&
-			m_serial.setAttr(&attr) &&;
+			m_serial.setAttr(&attr) &&
 			m_serial.ioctl(IOSSIOSPEED, &speed) != -1;
 #else
 		return err::fail(err::SystemErrorCode_InvalidParameter);
