@@ -14,7 +14,9 @@ brew install libusb
 brew install hidapi
 brew install ragel
 
+BREW_PREFIX=$(brew --prefix)
+
 # openssl is already installed, but not linked
 
-echo "set(OPENSSL_INC_DIR /usr/local/opt/openssl/include)" >> paths.cmake
-echo "set(OPENSSL_LIB_DIR /usr/local/opt/openssl/lib)" >> paths.cmake
+echo "set(OPENSSL_INC_DIR $BREW_PREFIX/opt/openssl/include)" >> paths.cmake
+echo "set(OPENSSL_LIB_DIR $BREW_PREFIX/opt/openssl/lib)" >> paths.cmake
