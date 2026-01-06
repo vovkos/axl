@@ -82,6 +82,35 @@ const struct ZeroInit_t {} ZeroInit;
 
 //..............................................................................
 
+inline
+bool
+isZeroMemory(
+	const void* p0,
+	size_t size
+) {
+	enum {
+		BlockSize = 4 * 1024
+	};
+
+	static char block[BlockSize] = { 0 };
+
+	const char* p = (char*)p0;
+	while (size) {
+		if (size <= BlockSize)
+			return memcmp(p, block, size) == 0;
+
+		if (memcmp(p, block, BlockSize))
+			return false;
+
+		p += BlockSize;
+		size -= BlockSize;
+	}
+
+	return true;
+}
+
+//..............................................................................
+
 } // namespace mem
 } // namespace axl
 
