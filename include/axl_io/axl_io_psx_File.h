@@ -37,7 +37,7 @@ public:
 	File() {}
 
 	File(int h):
-		sl::Handle<int, CloseFile, sl::MinusOne<int> > (h) {}
+		sl::Handle<int, CloseFile, sl::MinusOne<int> >(h) {}
 
 	bool
 	open(

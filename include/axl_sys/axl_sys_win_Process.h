@@ -63,7 +63,7 @@ public:
 	dword_t
 	getProcessId() {
 		dword_t id = ::GetProcessId(m_h);
-		return err::complete<dword_t> (id, -1);
+		return err::complete<dword_t>(id, -1);
 	}
 
 	bool

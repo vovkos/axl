@@ -37,7 +37,7 @@ public:
 	}
 
 	EcPoint(EC_POINT* h):
-		sl::Handle<EC_POINT*, FreeEcPoint> (h) {}
+		sl::Handle<EC_POINT*, FreeEcPoint>(h) {}
 
 	bool
 	create(EC_GROUP* group);

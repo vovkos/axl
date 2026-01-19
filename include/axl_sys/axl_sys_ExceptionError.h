@@ -122,7 +122,7 @@ void
 registerExceptionErrorProvider() {
 	err::getErrorMgr()->registerProvider(
 		g_exceptionErrorGuid,
-		sl::getSimpleSingleton<ExceptionErrorProvider> ()
+		sl::getSimpleSingleton<ExceptionErrorProvider>()
 	);
 }
 

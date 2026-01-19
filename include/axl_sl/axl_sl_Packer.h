@@ -103,7 +103,7 @@ public:
 	static
 	PackerImpl*
 	getSingleton() {
-		return sl::getSimpleSingleton<PackerImpl> ();
+		return sl::getSimpleSingleton<PackerImpl>();
 	}
 };
 

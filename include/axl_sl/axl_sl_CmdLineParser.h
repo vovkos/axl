@@ -313,7 +313,7 @@ public: \
 	static \
 	Class* \
 	getSingleton() { \
-		return axl::sl::getSingleton<Class> (); \
+		return axl::sl::getSingleton<Class>(); \
 	} \
 	static \
 	axl::sl::ConstList<axl::sl::SwitchInfo> \

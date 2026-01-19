@@ -42,7 +42,7 @@ public:
 	}
 
 	EcKey(EC_KEY* h):
-		sl::Handle<EC_KEY*, FreeEcKey> (h) {}
+		sl::Handle<EC_KEY*, FreeEcKey>(h) {}
 
 	bool
 	create();

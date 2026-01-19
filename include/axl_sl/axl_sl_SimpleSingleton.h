@@ -37,7 +37,7 @@ template <typename T>
 T*
 getSimpleSingleton(volatile int32_t* flag = NULL) {
 	static uchar_t buffer[sizeof(T)] = { 0 };
-	callOnce(ConstructSimpleSingleton<T> (), buffer, flag);
+	callOnce(ConstructSimpleSingleton<T>(), buffer, flag);
 	return (T*)buffer;
 }
 

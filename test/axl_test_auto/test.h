@@ -25,7 +25,7 @@ inline
 TestSet*
 getTestCaseSet() {
 	static int32_t flag = 0;
-	return sl::getSingleton<TestSet> (&flag);
+	return sl::getSingleton<TestSet>(&flag);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

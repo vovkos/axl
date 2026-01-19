@@ -65,7 +65,7 @@ inline
 UsbContext*
 getUsbDefaultContext() {
 	static int32_t flag = 0;
-	return sl::getSingleton<UsbContext> (&flag);
+	return sl::getSingleton<UsbContext>(&flag);
 }
 
 inline

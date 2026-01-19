@@ -69,7 +69,7 @@ PackerSeq::appendFormat(const char* formatString) {
 		case 'u':
 		case 'x':
 		case 'X':
-			append<Pack<int> > ();
+			append<Pack<int> >();
 			break;
 
 		case 'e':
@@ -77,51 +77,51 @@ PackerSeq::appendFormat(const char* formatString) {
 		case 'f':
 		case 'g':
 		case 'G':
-			append<Pack<double> > ();
+			append<Pack<double> >();
 			break;
 
 		case 'p':
-			append<Pack<size_t> > ();
+			append<Pack<size_t> >();
 			break;
 
 		case 's':
-			append<PackString> ();
+			append<PackString>();
 			break;
 
 		case 'c':
-			append<Pack<char> > ();
+			append<Pack<char> >();
 			break;
 
 		case 'S':
-			append<PackString_w> ();
+			append<PackString_w>();
 			break;
 
 		case 'C':
-			append<Pack<wchar_t> > ();
+			append<Pack<wchar_t> >();
 			break;
 
 		case 'B':
-			append<Pack<uint8_t> > ();
+			append<Pack<uint8_t> >();
 			break;
 
 		case 'W':
-			append<Pack<uint16_t> > ();
+			append<Pack<uint16_t> >();
 			break;
 
 		case 'D':
-			append<Pack<uint32_t> > ();
+			append<Pack<uint32_t> >();
 			break;
 
 		case 'Z':
-			append<Pack<size_t> > ();
+			append<Pack<size_t> >();
 			break;
 
 		case 'P':
-			append<PackPtrSize> ();
+			append<PackPtrSize>();
 			break;
 
 		case 'R':
-			append<PackLastError> ();
+			append<PackLastError>();
 			break;
 		}
 	}

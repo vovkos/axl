@@ -48,7 +48,7 @@ void
 registerUsbErrorProvider() {
 	err::getErrorMgr()->registerProvider(
 		g_usbErrorGuid,
-		sl::getSimpleSingleton<UsbErrorProvider> ()
+		sl::getSimpleSingleton<UsbErrorProvider>()
 	);
 }
 

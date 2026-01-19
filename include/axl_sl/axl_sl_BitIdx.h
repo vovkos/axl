@@ -447,13 +447,13 @@ template <size_t growLimit>
 size_t
 getAllocSize(size_t size) {
 	ASSERT(isPowerOf2(growLimit));
-	return size < growLimit ? getPowerOf2Ge(size) : align<growLimit> (size);
+	return size < growLimit ? getPowerOf2Ge(size) : align<growLimit>(size);
 }
 
 inline
 size_t
 getAllocSize(size_t size) {
-	return getAllocSize<4 * 1024> (size); // 4K grow limit
+	return getAllocSize<4 * 1024>(size); // 4K grow limit
 }
 
 //..............................................................................

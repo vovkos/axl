@@ -257,7 +257,7 @@ protected:
 	static
 	bool
 	complete(int result) {
-		return complete<bool> (result != 0, false);
+		return complete<bool>(result != 0, false);
 	}
 
 	static

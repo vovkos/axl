@@ -230,7 +230,7 @@ public:
 	void*
 	getBuffer(size_t size) {
 		void* p = ::XML_GetBuffer(m_h, size);
-		return complete<void*> (p, NULL);
+		return complete<void*>(p, NULL);
 	}
 
 protected:

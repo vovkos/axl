@@ -31,7 +31,7 @@ public:
 		size_t* size,
 		axl_va_list va
 	) {
-		T a = va.arg<T> ();
+		T a = va.arg<T>();
 
 		*size = sizeof(T);
 
@@ -53,7 +53,7 @@ public:
 		size_t* size,
 		axl_va_list va
 	) {
-		int n = va.arg<int> ();
+		int n = va.arg<int>();
 
 		*size = sizeof(T);
 
@@ -103,7 +103,7 @@ public:
 		size_t* size,
 		axl_va_list va
 	) {
-		T* string = va.arg<T*> ();
+		T* string = va.arg<T*>();
 
 		size_t length = StringDetailsBase<T>::calcLength(string);
 		size_t stringSize = (length + 1) * sizeof(T);
@@ -160,7 +160,7 @@ public:
 		size_t* size,
 		axl_va_list va
 	) {
-		T* obj = va.arg<T*> ();
+		T* obj = va.arg<T*>();
 
 		*size = sizeof(T);
 
@@ -191,9 +191,9 @@ public:
 		size_t* size,
 		axl_va_list va
 	) {
-		T* obj = va.arg<T*> ();
+		T* obj = va.arg<T*>();
 
-		size_t objSize = obj ? SizeOf() (obj) : sizeof(T);
+		size_t objSize = obj ? SizeOf()(obj) : sizeof(T);
 
 		*size = objSize;
 
@@ -261,8 +261,8 @@ public:
 		size_t* size,
 		axl_va_list va
 	) {
-		void* obj = va.arg<void*> ();
-		size_t objSize = va.arg<size_t> ();
+		void* obj = va.arg<void*>();
+		size_t objSize = va.arg<size_t>();
 
 		*size = objSize;
 
@@ -476,7 +476,7 @@ createPackage(
 	...
 ) {
 	AXL_VA_DECL(va, unused);
-	return createPackage_va<T> (va);
+	return createPackage_va<T>(va);
 }
 
 //..............................................................................

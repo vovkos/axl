@@ -52,7 +52,7 @@ void
 registerParseErrorProvider() {
 	err::getErrorMgr()->registerProvider(
 		g_parseErrorGuid,
-		sl::getSimpleSingleton<ParseErrorProvider> ()
+		sl::getSimpleSingleton<ParseErrorProvider>()
 	);
 }
 
@@ -63,7 +63,7 @@ pushSrcPosError(
 	int line,
 	int col = 0
 ) {
-	return err::pushPackError<sl::PackSeq_3<const char*, int, int> > (
+	return err::pushPackError<sl::PackSeq_3<const char*, int, int> >(
 		g_parseErrorGuid,
 		ParseErrorCode_SrcPos,
 		filePath.sz(),
@@ -162,7 +162,7 @@ setSyntaxError() {
 inline
 size_t
 setSyntaxError(const sl::StringRef& location) {
-	return err::setPackError<sl::Pack<const char*> > (
+	return err::setPackError<sl::Pack<const char*> >(
 		g_parseErrorGuid,
 		ParseErrorCode_InvalidSyntaxIn,
 		location.sz()
@@ -175,7 +175,7 @@ setExpectedTokenError(
 	const sl::StringRef& expectedToken,
 	const sl::StringRef& actualToken
 ) {
-	return err::setPackError<sl::PackSeq_2<const char*, const char*> > (
+	return err::setPackError<sl::PackSeq_2<const char*, const char*> >(
 		g_parseErrorGuid,
 		ParseErrorCode_ExpectedToken,
 		expectedToken.sz(),
@@ -186,7 +186,7 @@ setExpectedTokenError(
 inline
 size_t
 setUnexpectedTokenError(const sl::StringRef& token) {
-	return err::setPackError<sl::Pack<const char*> > (
+	return err::setPackError<sl::Pack<const char*> >(
 		g_parseErrorGuid,
 		ParseErrorCode_UnexpectedToken,
 		token.sz()
@@ -199,7 +199,7 @@ setUnexpectedTokenError(
 	const sl::StringRef& token,
 	const sl::StringRef& location
 ) {
-	return err::setPackError<sl::PackSeq_2<const char*, const char*> > (
+	return err::setPackError<sl::PackSeq_2<const char*, const char*> >(
 		g_parseErrorGuid,
 		ParseErrorCode_UnexpectedTokenIn,
 		token.sz(),

@@ -441,7 +441,7 @@ public: \
 	static \
 	Iterator \
 	find(KeyArg key) { \
-		return axl::sl::getSingleton<Map> ()->find(key); \
+		return axl::sl::getSingleton<Map>()->find(key); \
 	} \
 	static \
 	Value \
@@ -449,7 +449,7 @@ public: \
 		KeyArg key, \
 		ValueArg undefinedValue \
 	) { \
-		return axl::sl::getSingleton<Map> ()->findValue(key, undefinedValue); \
+		return axl::sl::getSingleton<Map>()->findValue(key, undefinedValue); \
 	} \
 protected: \
 	class Map: public MapBase { \

@@ -21,12 +21,12 @@ void
 registerCryptoErrorProviders() {
 	err::getErrorMgr()->registerProvider(
 		g_cryptoErrorGuid,
-		sl::getSimpleSingleton<CryptoErrorProvider> ()
+		sl::getSimpleSingleton<CryptoErrorProvider>()
 	);
 
 	err::getErrorMgr()->registerProvider(
 		g_x509ErrorGuid,
-		sl::getSimpleSingleton<X509ErrorProvider> ()
+		sl::getSimpleSingleton<X509ErrorProvider>()
 	);
 
 	ERR_load_crypto_strings();

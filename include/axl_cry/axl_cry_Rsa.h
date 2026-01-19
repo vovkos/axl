@@ -99,7 +99,7 @@ public:
 		int padding = RSA_PKCS1_PADDING
 	) {
 		int result = RSA_public_encrypt(size, (const uchar_t*)src, (uchar_t*)dst, m_h, padding);
-		return completeWithLastCryptoError<size_t> (result, -1);
+		return completeWithLastCryptoError<size_t>(result, -1);
 	}
 
 	size_t
@@ -110,7 +110,7 @@ public:
 		int padding = RSA_PKCS1_PADDING
 	) {
 		int result = RSA_private_encrypt(size, (const uchar_t*)src, (uchar_t*)dst, m_h, padding);
-		return completeWithLastCryptoError<size_t> (result, -1);
+		return completeWithLastCryptoError<size_t>(result, -1);
 	}
 
 	size_t
@@ -121,7 +121,7 @@ public:
 		int padding = RSA_PKCS1_PADDING
 	) {
 		int result = RSA_public_decrypt(size, (const uchar_t*)src, (uchar_t*)dst, m_h, padding);
-		return completeWithLastCryptoError<size_t> (result, -1);
+		return completeWithLastCryptoError<size_t>(result, -1);
 	}
 
 	size_t
@@ -132,7 +132,7 @@ public:
 		int padding = RSA_PKCS1_PADDING
 	) {
 		int result = RSA_private_decrypt(size, (const uchar_t*)src, (uchar_t*)dst, m_h, padding);
-		return completeWithLastCryptoError<size_t> (result, -1);
+		return completeWithLastCryptoError<size_t>(result, -1);
 	}
 
 	size_t

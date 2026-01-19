@@ -31,15 +31,15 @@ ErrorMgr::ErrorMgr() {
 	m_tlsSlot = sys::getTlsMgr()->createSlot();
 	m_router = NULL;
 
-	registerProvider(g_stdErrorGuid, sl::getSimpleSingleton<StdErrorProvider> ());
-	registerProvider(g_errnoGuid, sl::getSimpleSingleton<ErrnoProvider> ());
+	registerProvider(g_stdErrorGuid, sl::getSimpleSingleton<StdErrorProvider>());
+	registerProvider(g_errnoGuid, sl::getSimpleSingleton<ErrnoProvider>());
 
 #if (_AXL_OS_WIN)
-	registerProvider(sys::win::g_winErrorGuid, sl::getSimpleSingleton<sys::win::WinErrorProvider> ());
-	registerProvider(sys::win::g_ntStatusGuid, sl::getSimpleSingleton<sys::win::NtStatusProvider> ());
-	registerProvider(sys::win::g_cfgMgrErrorGuid, sl::getSimpleSingleton<sys::win::CfgMgrErrorProvider> ());
+	registerProvider(sys::win::g_winErrorGuid, sl::getSimpleSingleton<sys::win::WinErrorProvider>());
+	registerProvider(sys::win::g_ntStatusGuid, sl::getSimpleSingleton<sys::win::NtStatusProvider>());
+	registerProvider(sys::win::g_cfgMgrErrorGuid, sl::getSimpleSingleton<sys::win::CfgMgrErrorProvider>());
 #elif (_AXL_OS_DARWIN)
-	registerProvider(sys::drw::g_MachErrorGuid, sl::getSimpleSingleton<sys::drw::MachErrorProvider> ());
+	registerProvider(sys::drw::g_MachErrorGuid, sl::getSimpleSingleton<sys::drw::MachErrorProvider>());
 #endif
 }
 

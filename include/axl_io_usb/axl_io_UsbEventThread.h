@@ -61,7 +61,7 @@ inline
 UsbEventThread*
 getUsbDefaultContextEventThread() {
 	static int32_t flag = 0;
-	return sl::getSingleton<UsbEventThread> (&flag);
+	return sl::getSingleton<UsbEventThread>(&flag);
 }
 
 //..............................................................................

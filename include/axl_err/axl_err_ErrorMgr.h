@@ -106,7 +106,7 @@ protected:
 inline
 ErrorMgr*
 getErrorMgr() {
-	return sl::getSingleton<ErrorMgr> ();
+	return sl::getSingleton<ErrorMgr>();
 }
 
 //..............................................................................

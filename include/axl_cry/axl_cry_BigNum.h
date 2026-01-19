@@ -35,7 +35,7 @@ public:
 	BnCtx() {}
 
 	BnCtx(BN_CTX* h):
-		sl::Handle<BN_CTX*, FreeBnCtx> (h) {}
+		sl::Handle<BN_CTX*, FreeBnCtx>(h) {}
 
 	void
 	start() {
@@ -71,7 +71,7 @@ public:
 	}
 
 	BigNum(BIGNUM* h):
-		sl::Handle<BIGNUM*, FreeBigNum> (h) {}
+		sl::Handle<BIGNUM*, FreeBigNum>(h) {}
 
 	bool
 	create();

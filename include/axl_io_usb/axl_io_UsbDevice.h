@@ -357,7 +357,7 @@ UsbDevice::getMaxPacketSize(uint_t endpointId) const {
 	ASSERT(m_device);
 
 	int result = libusb_get_max_packet_size(m_device, (uchar_t)endpointId);
-	return result >= 0 ? result : err::fail<size_t> (-1, UsbError(result));
+	return result >= 0 ? result : err::fail<size_t>(-1, UsbError(result));
 }
 
 inline
@@ -365,7 +365,7 @@ size_t
 UsbDevice::getMaxIsoPacketSize(uint_t endpointId) const {
 	ASSERT(m_device);
 	int result = libusb_get_max_iso_packet_size(m_device, (uchar_t)endpointId);
-	return result >= 0 ? result : err::fail<size_t> (-1, UsbError(result));
+	return result >= 0 ? result : err::fail<size_t>(-1, UsbError(result));
 }
 
 #if (_AXL_IO_USBDEVICE_GETPORTPATH)
@@ -378,7 +378,7 @@ UsbDevice::getPortPath(
 ) const {
 	ASSERT(m_device);
 	int result = libusb_get_port_path(context, m_device, path, (uint8_t)maxLength);
-	return result >= 0 ? result : err::fail<size_t> (-1, UsbError(result));
+	return result >= 0 ? result : err::fail<size_t>(-1, UsbError(result));
 }
 #endif
 
@@ -391,7 +391,7 @@ UsbDevice::getPortNumbers(
 ) const {
 	ASSERT(m_device);
 	int result = libusb_get_port_numbers(m_device, path, (int)maxLength);
-	return result >= 0 ? result : err::fail<size_t> (-1, UsbError(result));
+	return result >= 0 ? result : err::fail<size_t>(-1, UsbError(result));
 }
 #endif
 
@@ -413,7 +413,7 @@ UsbDevice::getDescriptor(
 		size
 	);
 
-	return result >= 0 ? result : err::fail<size_t> (-1, UsbError(result));
+	return result >= 0 ? result : err::fail<size_t>(-1, UsbError(result));
 }
 
 inline
@@ -460,7 +460,7 @@ UsbDevice::getConfiguration() const {
 	ASSERT(m_openHandle);
 	int configurationId;
 	int result = libusb_get_configuration(m_openHandle, &configurationId);
-	return result == 0 ? configurationId : err::fail<uint_t> (-1, UsbError(result));
+	return result == 0 ? configurationId : err::fail<uint_t>(-1, UsbError(result));
 }
 
 inline
@@ -616,7 +616,7 @@ UsbDevice::interruptTransfer(
 		timeout != -1 ? timeout : 0
 	);
 
-	return result == 0 ? actualSize : err::fail<size_t> (-1, UsbError(result));
+	return result == 0 ? actualSize : err::fail<size_t>(-1, UsbError(result));
 }
 
 //..............................................................................

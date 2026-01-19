@@ -308,7 +308,7 @@ File::getPosition() const {
 	LARGE_INTEGER offset = { 0 };
 	offset.LowPart = ::SetFilePointer(m_h, 0, &offset.HighPart, FILE_CURRENT);
 	if (offset.LowPart == INVALID_FILE_SIZE)
-		return err::failWithLastSystemError<uint64_t> (-1);
+		return err::failWithLastSystemError<uint64_t>(-1);
 
 	return offset.QuadPart;
 }

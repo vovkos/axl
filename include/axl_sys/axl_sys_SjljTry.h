@@ -29,7 +29,7 @@ struct SjljFrame {
 inline
 void
 sjljThrow() {
-	SjljFrame* sjljFrame = getTlsPtrSlotValue<SjljFrame> ();
+	SjljFrame* sjljFrame = getTlsPtrSlotValue<SjljFrame>();
 	ASSERT(sjljFrame);
 	longjmp(sjljFrame->m_jmpBuf, -1);
 }
@@ -39,25 +39,25 @@ sjljThrow() {
 #define AXL_SYS_BEGIN_SJLJ_TRY() \
 { \
 	axl::sys::SjljFrame __axlSjljFrame; \
-	axl::sys::SjljFrame* __axlSjljPrevFrame = axl::sys::setTlsPtrSlotValue<axl::sys::SjljFrame> (&__axlSjljFrame); \
+	axl::sys::SjljFrame* __axlSjljPrevFrame = axl::sys::setTlsPtrSlotValue<axl::sys::SjljFrame>(&__axlSjljFrame); \
 	int __axlSjljBranch = setjmp(__axlSjljFrame.m_jmpBuf); \
 	if (!__axlSjljBranch) {
 
 #define AXL_SYS_SJLJ_CATCH() \
 	} else { { \
-			axl::sys::SjljFrame* prev = axl::sys::setTlsPtrSlotValue<axl::sys::SjljFrame> (__axlSjljPrevFrame); \
+			axl::sys::SjljFrame* prev = axl::sys::setTlsPtrSlotValue<axl::sys::SjljFrame>(__axlSjljPrevFrame); \
 			ASSERT(prev == &__axlSjljFrame); \
 		}
 
 #define AXL_SYS_SJLJ_FINALLY() \
 	} { { \
-			axl::sys::SjljFrame* prev = axl::sys::setTlsPtrSlotValue<axl::sys::SjljFrame> (__axlSjljPrevFrame); \
+			axl::sys::SjljFrame* prev = axl::sys::setTlsPtrSlotValue<axl::sys::SjljFrame>(__axlSjljPrevFrame); \
 			ASSERT(prev == &__axlSjljFrame || prev == __axlSjljPrevFrame); \
 		}
 
 #define AXL_SYS_END_SJLJ_TRY_IMPL() \
 	} { \
-		axl::sys::SjljFrame* prev = axl::sys::setTlsPtrSlotValue<axl::sys::SjljFrame> (__axlSjljPrevFrame); \
+		axl::sys::SjljFrame* prev = axl::sys::setTlsPtrSlotValue<axl::sys::SjljFrame>(__axlSjljPrevFrame); \
 		ASSERT(prev == &__axlSjljFrame || prev == __axlSjljPrevFrame); \
 	} \
 

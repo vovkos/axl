@@ -843,12 +843,12 @@ public:
 
 	bool
 	setCount(size_t count) {
-		return setCountImpl<Construct> (count);
+		return setCountImpl<Construct>(count);
 	}
 
 	bool
 	setCountZeroConstruct(size_t count) {
-		return setCountImpl<ZeroConstruct> (count);
+		return setCountImpl<ZeroConstruct>(count);
 	}
 
 	size_t

@@ -65,8 +65,8 @@ ShmtReader::read(sl::Array<char>* buffer) {
 		size_t readEndOffset = readOffset + sizeof(ShmtMessageHdr) + msgHdr->m_size;
 
 #if (_AXL_IO_SHMT_ALIGN_MESSAGES)
-		ASSERT(sl::isAligned<AXL_PTR_SIZE> (readOffset));
-		readEndOffset = sl::align<AXL_PTR_SIZE> (readEndOffset);
+		ASSERT(sl::isAligned<AXL_PTR_SIZE>(readOffset));
+		readEndOffset = sl::align<AXL_PTR_SIZE>(readEndOffset);
 #endif
 
 		if (msgHdr->m_signature != ShmtConst_MessageSignature || readEndOffset > endOffset) {

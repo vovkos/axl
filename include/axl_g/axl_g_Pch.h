@@ -602,12 +602,12 @@ public:
 	va_start(*(va).initialize(), a)
 
 #define axl_va_arg(va, T) \
-	((va).arg<T> ())
+	((va).arg<T>())
 
 #define axl_va_end(va) \
 	((va).end())
 
-// ...or use this single-line macro and then iterate via va.arg <T> ()
+// ...or use this single-line macro and then iterate via va.arg<T>()
 
 #define AXL_VA_DECL(va, a) \
 	axl_va_list va; \

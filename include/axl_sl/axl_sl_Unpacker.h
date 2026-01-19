@@ -241,7 +241,7 @@ public:
 	template <typename T>
 	bool
 	unpack(T* value) {
-		return unpack<T, Unpack<T> > (value);
+		return unpack<T, Unpack<T> >(value);
 	}
 
 	size_t

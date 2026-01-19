@@ -51,7 +51,7 @@ void
 registerExpatErrorProvider() {
 	err::getErrorMgr()->registerProvider(
 		g_expatErrorGuid,
-		sl::getSimpleSingleton<ExpatErrorProvider> ()
+		sl::getSimpleSingleton<ExpatErrorProvider>()
 	);
 }
 

@@ -279,7 +279,7 @@ public:
 		...
 	) {
 		AXL_VA_DECL(va, code);
-		return pack_va<Pack> (guid, code, va);
+		return pack_va<Pack>(guid, code, va);
 	}
 
 	template <typename Pack>
@@ -290,10 +290,10 @@ public:
 		axl_va_list va
 	) {
 		if (!m_p)
-			return pack_va<Pack> (guid, code, va);
+			return pack_va<Pack>(guid, code, va);
 
 		Error error;
-		error.pack_va<Pack> (guid, code, va);
+		error.pack_va<Pack>(guid, code, va);
 		return push(error);
 	}
 
@@ -305,7 +305,7 @@ public:
 		...
 	) {
 		AXL_VA_DECL(va, code);
-		return pushPack_va<Pack> (guid, code, va);
+		return pushPack_va<Pack>(guid, code, va);
 	}
 
 	// format
@@ -500,7 +500,7 @@ setPackError_va(
 	axl_va_list va
 ) {
 	Error error;
-	size_t result = error.pack_va<Pack> (guid, code, va);
+	size_t result = error.pack_va<Pack>(guid, code, va);
 	return result != -1 ? setError(error) : -1;
 }
 
@@ -512,7 +512,7 @@ setPackError(
 	...
 ) {
 	AXL_VA_DECL(va, code);
-	return setPackError_va<Pack> (guid, code, va);
+	return setPackError_va<Pack>(guid, code, va);
 }
 
 template <typename Pack>
@@ -523,7 +523,7 @@ pushPackError_va(
 	axl_va_list va
 ) {
 	Error error;
-	size_t result = error.pack_va<Pack> (guid, code, va);
+	size_t result = error.pack_va<Pack>(guid, code, va);
 	return result != -1 ? pushError(error) : -1;
 }
 
@@ -535,7 +535,7 @@ pushPackError(
 	...
 ) {
 	AXL_VA_DECL(va, code);
-	return pushPackError_va<Pack> (guid, code, va);
+	return pushPackError_va<Pack>(guid, code, va);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -676,7 +676,7 @@ failWithLastSystemError(T failResult) {
 inline
 bool
 failWithLastSystemError() {
-	return failWithLastSystemError<bool> (false);
+	return failWithLastSystemError<bool>(false);
 }
 
 template <typename T>
@@ -698,7 +698,7 @@ completeWithSystemError(
 	int result,
 	uint_t errorCode
 ) {
-	return completeWithSystemError<bool> (result != 0, false, errorCode);
+	return completeWithSystemError<bool>(result != 0, false, errorCode);
 }
 
 template <typename T>
@@ -716,7 +716,7 @@ complete(
 inline
 bool
 complete(int result) {
-	return complete<bool> (result != 0, false);
+	return complete<bool>(result != 0, false);
 }
 
 //..............................................................................

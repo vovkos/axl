@@ -49,7 +49,7 @@ void
 registerErrorProvider() {
 	err::getErrorMgr()->registerProvider(
 		g_errorGuid,
-		sl::getSimpleSingleton<ErrorProvider> ()
+		sl::getSimpleSingleton<ErrorProvider>()
 	);
 }
 

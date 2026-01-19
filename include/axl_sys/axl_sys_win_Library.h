@@ -40,7 +40,7 @@ public:
 	void*
 	getProcAddress(const sl::StringRef& name) {
 		void* p = ::GetProcAddress(m_h, name.sz());
-		return err::complete<void*> (p, NULL);
+		return err::complete<void*>(p, NULL);
 	}
 };
 

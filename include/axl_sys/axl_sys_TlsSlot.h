@@ -65,19 +65,19 @@ public:
 template <typename T>
 T*
 getTlsPtrSlotValue() {
-	return sl::getSimpleSingleton<TlsPtrSlot<T> > ()->getValue();
+	return sl::getSimpleSingleton<TlsPtrSlot<T> >()->getValue();
 }
 
 template <typename T>
 T*
 setTlsPtrSlotValue(T* p) {
-	return sl::getSimpleSingleton<TlsPtrSlot<T> > ()->setValue(p);
+	return sl::getSimpleSingleton<TlsPtrSlot<T> >()->setValue(p);
 }
 
 template <typename T>
 T*
 setTlsPtrSlotValue(const rc::Ptr<T>& ptr) {
-	return sl::getSimpleSingleton<TlsPtrSlot<T> > ()->setValue(ptr);
+	return sl::getSimpleSingleton<TlsPtrSlot<T> >()->setValue(ptr);
 }
 
 //..............................................................................

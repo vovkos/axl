@@ -71,7 +71,7 @@ ShmtWriter::write(
 	if (m_flags & ShmtFlag_Message) {
 		writeSize += sizeof(ShmtMessageHdr);
 #if (_AXL_IO_SHMT_ALIGN_MESSAGES)
-		writeSize = sl::align<AXL_PTR_SIZE> (writeSize);
+		writeSize = sl::align<AXL_PTR_SIZE>(writeSize);
 #endif
 	}
 
@@ -116,7 +116,7 @@ ShmtWriter::write(
 
 	if (m_flags & ShmtFlag_Message) {
 #if (_AXL_IO_SHMT_ALIGN_MESSAGES)
-		ASSERT(sl::isAligned<AXL_PTR_SIZE> (writeOffset));
+		ASSERT(sl::isAligned<AXL_PTR_SIZE>(writeOffset));
 #endif
 
 		ShmtMessageHdr* msgHdr = (ShmtMessageHdr*)(m_data + writeOffset);

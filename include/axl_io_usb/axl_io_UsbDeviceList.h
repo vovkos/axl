@@ -45,7 +45,7 @@ UsbDeviceList::enumerateDevices(libusb_context* context) {
 	close();
 
 	ssize_t result = libusb_get_device_list(context, &m_h);
-	return result >= 0 ? result : err::fail<size_t> (-1, UsbError((int)result));
+	return result >= 0 ? result : err::fail<size_t>(-1, UsbError((int)result));
 }
 
 //..............................................................................

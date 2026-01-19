@@ -130,7 +130,7 @@ protected:
 inline
 TlsMgr*
 getTlsMgr() {
-	return sl::getSingleton<TlsMgr> ();
+	return sl::getSingleton<TlsMgr>();
 }
 
 //..............................................................................
