@@ -156,83 +156,120 @@ getPowerOf2Ge64(uint64_t x) {
 
 //..............................................................................
 
-// finding lowest/highest bit's index with binary search (re-write with DeBruijn sequennces?)
+// finding lowest/highest bit's index using compiler intrinsics
 
-inline
-uint8_t
-getLoBitIdx8(uint8_t x) {
-	return (x & 0x0f) ?
-		(x & 0x03) ?
-			(x & 0x01) ? 0 : 1 :
-			(x & 0x04) ? 2 : 3 :
-		(x & 0x30) ?
-			(x & 0x10) ? 4 : 5 :
-			(x & 0x40) ? 6 : 7;
-}
-
-inline
-uint8_t
-getLoBitIdx16(uint16_t x) {
-	return (x & 0x00ff) ?
-		getLoBitIdx8((uint8_t)x) :
-		(8 + getLoBitIdx8((uint8_t)(x >> 8)));
-}
+#if (_AXL_CPP_GCC)
 
 inline
 uint8_t
 getLoBitIdx32(uint32_t x) {
-	return (x & 0x0000ffff) ?
-		getLoBitIdx16((uint16_t)x) :
-		(16 + getLoBitIdx16((uint16_t)(x >> 16)));
+	ASSERT(x);
+    return (uint8_t)__builtin_ctz(x);
 }
 
 inline
 uint8_t
 getLoBitIdx64(uint64_t x) {
-	return (x & 0x00000000ffffffffLL) ?
-		getLoBitIdx32((uint32_t)x) :
-		(32 + getLoBitIdx32((uint32_t)(x >> 32)));
-}
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-inline
-uint8_t
-getHiBitIdx8(uint8_t x) {
-	return (x & 0xf0) ?
-		(x & 0xc0) ?
-			(x & 0x80) ? 7 : 6 :
-			(x & 0x20) ? 5 : 4 :
-		(x & 0x0c) ?
-			(x & 0x08) ? 3 : 2 :
-			(x & 0x02) ? 1 : 0;
-}
-
-inline
-uint8_t
-getHiBitIdx16(uint16_t x) {
-	return (x & 0xff00) ?
-		(8 + getHiBitIdx8((uint8_t)(x >> 8))) :
-		getHiBitIdx8((uint8_t)x);
+	ASSERT(x);
+    return (uint8_t)__builtin_ctzll(x);
 }
 
 inline
 uint8_t
 getHiBitIdx32(uint32_t x) {
-	return (x & 0xffff0000) ?
-		(16 + getHiBitIdx16((uint16_t)(x >> 16))) :
-		getHiBitIdx16((uint16_t)x);
+	ASSERT(x);
+    return (uint8_t)(31 - __builtin_clz(x));
 }
 
 inline
 uint8_t
 getHiBitIdx64(uint64_t x) {
-	return (x & 0xffffffff00000000LL) ?
-		(32 + getHiBitIdx32((uint32_t)(x >> 32))) :
-		getHiBitIdx32((uint32_t)x);
+	ASSERT(x);
+	return (uint8_t)(63 - __builtin_clzll(x));
 }
 
+#elif (_AXL_CPP_MSC)
+
+inline
+uint8_t
+getLoBitIdx32(uint32_t x) {
+	ASSERT(x);
+    ulong_t i;
+    _BitScanForward(&i, x);
+    return (uint8_t)i;
+}
+
+inline
+uint8_t
+getHiBitIdx32(uint32_t x) {
+	ASSERT(x);
+    ulong_t i;
+    _BitScanReverse(&i, x);
+    return (uint8_t)i;
+}
+
+inline
+uint8_t
+getLoBitIdx64(uint64_t x) {
+	ASSERT(x);
+    ulong_t i;
+#if (_AXL_CPU_AMD64 || _AXL_CPU_ARM64)
+    _BitScanForward64(&i, x);
+#else
+	if (x & 0xffffffff)
+		_BitScanForward(&i, (uint32_t)x);
+	else {
+		_BitScanForward(&i, (uint32_t)(x >> 32));
+		i += 32;
+	}
+#endif
+    return (uint8_t)i;
+}
+
+inline
+uint8_t
+getHiBitIdx64(uint64_t x) {
+	ASSERT(x);
+    ulong_t i;
+#if (_AXL_CPU_AMD64 || _AXL_CPU_ARM64)
+    _BitScanReverse64(&i, x);
+#else
+	if (x & 0xffffffff00000000) {
+		_BitScanReverse(&i, (uint32_t)(x >> 32));
+		i += 32;
+	} else
+		_BitScanReverse(&i, (uint32_t)x);
+#endif
+    return (uint8_t)i;
+}
+
+#endif
+
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+uint8_t
+getLoBitIdx8(uint8_t x) {
+    return getLoBitIdx32(x);
+}
+
+inline
+uint8_t
+getHiBitIdx8(uint8_t x) {
+    return getHiBitIdx32(x);
+}
+
+inline
+uint8_t
+getLoBitIdx16(uint16_t x) {
+    return getLoBitIdx32(x);
+}
+
+inline
+uint8_t
+getHiBitIdx16(uint16_t x) {
+    return getHiBitIdx32(x);
+}
 
 #if (AXL_PTR_BITS == 64)
 #	define getLoBitIdx  getLoBitIdx64
