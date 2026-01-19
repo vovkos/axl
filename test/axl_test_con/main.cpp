@@ -9794,6 +9794,39 @@ testAutoBaudRate() {
 
 #endif
 
+void
+testRbTree() {
+	uint64_t timestamp = sys::getTimestamp();
+	printf("seed: %llx\n", timestamp);
+	srand(timestamp);
+
+	sl::RbTree<int, int> tree;
+
+	for (;;) {
+		int a[10] = { 0 };
+		for (size_t i = 0; i < countof(a); i++) {
+			a[i] = rand() % 100;
+			tree.visit(a[i]);
+		}
+
+		for (size_t i = 0; i < countof(a); i++) {
+			sl::RbTreeIterator<int, int> it = tree.find(a[i]);
+			ASSERT(it);
+		}
+
+		for (size_t i = 0; i < countof(a); i++) {
+			tree.eraseKey(a[i]);
+			for (size_t j = 0; j < countof(a); j++) {
+				sl::RbTreeIterator<int, int> it = tree.find(a[j]);
+				if (j <= i)
+					ASSERT(!it);
+			}
+		}
+
+		ASSERT(tree.isEmpty());
+	}
+}
+
 #if (_AXL_OS_WIN)
 int
 wmain(

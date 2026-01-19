@@ -242,8 +242,11 @@ protected:
 	}
 
 	void
-	onErase(Node* node) {
-		Node* x = this->replaceWithChild(node);
+	onErase(
+		Node* node,
+		Node* child
+	) {
+		Node* x = child;
 		Node* p = node->m_parent;
 
 		// no need to fixup red node deletion

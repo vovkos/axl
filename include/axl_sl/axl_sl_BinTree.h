@@ -283,12 +283,19 @@ public:
 		Node* node = *it;
 
 		if (node->m_left && node->m_right) {
-			Node* next = (Node*)node->m_next;
-			ASSERT(next == getLeftmostChild(node->m_right));
-			xcg(node, next);
+			ASSERT(node->m_prev == getRightmostChild(node->m_left));
+			ASSERT(node->m_next == getLeftmostChild(node->m_right));
+
+			xcg(node, (Node*)node->m_next);
+			ASSERT(!node->m_left);
+
+			// same effect:
+			// xcg((Node*)node->m_prev, node);
+			// ASSERT(!node->m_right);
 		}
 
-		static_cast<T*>(this)->onErase(node);
+		Node* child = replaceWithChild(node);
+		static_cast<T*>(this)->onErase(node, child);
 		m_nodeList.erase(node);
 	}
 
@@ -327,88 +334,81 @@ protected:
 
 	void
 	xcg(
-		Node* node1,
-		Node* node2
+		Node* prev,
+		Node* next
 	) {
-		Node* oldParent = node1->m_parent;
-		Node* oldLeft = node1->m_left;
-		Node* oldRight = node1->m_right;
+		ASSERT(prev != next->m_right);
+		ASSERT(next != prev->m_left);
 
-		// special cases: direct parent-child relations
+		// handle direct parent-child relations
 
-		if (node1 == node2->m_left) {
-			node1->m_left = node2;
-			node1->m_right = node2->m_right;
-			node1->m_parent = node2->m_parent;
+		if (prev == next->m_left) {
+			Node* oldLeft = prev->m_left;
+			Node* oldRight = prev->m_right;
 
-			node2->m_left = oldLeft;
-			node2->m_right = oldRight;
-			node2->m_parent = node1;
-		} else if (node1 == node2->m_right) {
-			node1->m_left = node2->m_left;
-			node1->m_right = node2;
-			node1->m_parent = node2->m_parent;
+			prev->m_left = next;
+			prev->m_right = next->m_right;
+			prev->m_parent = next->m_parent;
 
-			node2->m_left = oldLeft;
-			node2->m_right = oldRight;
-			node2->m_parent = node1;
-		} else if (node2 == node1->m_left) {
-			node1->m_left = node2->m_left;
-			node1->m_right = node2->m_right;
-			node1->m_parent = node2;
+			next->m_left = oldLeft;
+			next->m_right = oldRight;
+			next->m_parent = prev;
+		} else if (next == prev->m_right) {
+			Node* oldParent = prev->m_parent;
+			Node* oldLeft = prev->m_left;
 
-			node2->m_left = node1;
-			node2->m_right = oldRight;
-			node2->m_parent = oldParent;
-		} else if (node2 == node1->m_right) {
-			node1->m_left = node2->m_left;
-			node1->m_right = node2->m_right;
-			node1->m_parent = node2;
+			prev->m_left = next->m_left;
+			prev->m_right = next->m_right;
+			prev->m_parent = next;
 
-			node2->m_left = oldLeft;
-			node2->m_right = node1;
-			node2->m_parent = oldParent;
+			next->m_left = oldLeft;
+			next->m_right = prev;
+			next->m_parent = oldParent;
 		} else {
-			node1->m_left = node2->m_left;
-			node1->m_right = node2->m_right;
-			node1->m_parent = node2->m_parent;
+			Node* oldParent = prev->m_parent;
+			Node* oldLeft = prev->m_left;
+			Node* oldRight = prev->m_right;
 
-			node2->m_left = oldLeft;
-			node2->m_right = oldRight;
-			node2->m_parent = oldParent;
+			prev->m_left = next->m_left;
+			prev->m_right = next->m_right;
+			prev->m_parent = next->m_parent;
+
+			next->m_left = oldLeft;
+			next->m_right = oldRight;
+			next->m_parent = oldParent;
 		}
 
 		// fixup parents
 
-		if (!node1->m_parent)
-			m_root = node1;
-		else if (node1->m_parent->m_left == node2)
-			node1->m_parent->m_left = node1;
+		if (!prev->m_parent)
+			m_root = prev;
+		else if (prev->m_parent->m_left == next)
+			prev->m_parent->m_left = prev;
 		else
-			node1->m_parent->m_right = node1;
+			prev->m_parent->m_right = prev;
 
-		if (!node2->m_parent)
-			m_root = node2;
-		else if (node2->m_parent->m_left == node1)
-			node2->m_parent->m_left = node2;
+		if (!next->m_parent)
+			m_root = next;
+		else if (next->m_parent->m_left == prev)
+			next->m_parent->m_left = next;
 		else
-			node2->m_parent->m_right = node2;
+			next->m_parent->m_right = next;
 
 		// fixup children
 
-		if (node1->m_left)
-			node1->m_left->m_parent = node1;
+		if (prev->m_left)
+			prev->m_left->m_parent = prev;
 
-		if (node1->m_right)
-			node1->m_right->m_parent = node1;
+		if (prev->m_right)
+			prev->m_right->m_parent = prev;
 
-		if (node2->m_left)
-			node2->m_left->m_parent = node2;
+		if (next->m_left)
+			next->m_left->m_parent = next;
 
-		if (node2->m_right)
-			node2->m_right->m_parent = node2;
+		if (next->m_right)
+			next->m_right->m_parent = next;
 
-		Node::onXcg(node1, node2);
+		Node::onXcg(prev, next);
 	}
 
 	Node*
@@ -491,8 +491,10 @@ protected:
 	onInsert(Node* node) {}
 
 	void
-	onErase(Node* node) {
-		replaceWithChild(node);
+	onErase(
+		Node* node,
+		Node* child
+	) {
 	}
 };
 
