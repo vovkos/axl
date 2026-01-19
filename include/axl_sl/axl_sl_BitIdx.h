@@ -428,7 +428,7 @@ align(
 	size_t factor
 ) {
 	ASSERT(isPowerOf2(factor));
-	return (x + factor - 1) & ~(factor - 1);
+	return (x + factor - 1) & ~((T)factor - 1);
 }
 
 template <
@@ -438,7 +438,7 @@ template <
 T
 align(T x) {
 	ASSERT(isPowerOf2(factor));
-	return (x + factor - 1) & ~(factor - 1);
+	return (x + factor - 1) & ~((T)factor - 1);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

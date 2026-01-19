@@ -303,7 +303,7 @@ MappedFile::viewImpl(
 	const g::SystemInfo* systemInfo = g::getModule()->getSystemInfo();
 	ASSERT(sl::isPowerOf2(systemInfo->m_mappingAlignFactor));
 
-	uint64_t viewBegin = offset & ~(systemInfo->m_mappingAlignFactor - 1);
+	uint64_t viewBegin = offset & ~((uint64_t)systemInfo->m_mappingAlignFactor - 1);
 	uint64_t viewEnd = sl::align(end + m_readAheadSize, systemInfo->m_pageSize);
 
 	// make sure we don't overextend beyond the end of read-only file
