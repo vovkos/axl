@@ -561,12 +561,7 @@ public:
 	}
 
 	void
-	end() {
-		if (m_isInitialized) {
-			va_end(m_va);
-			m_isInitialized = false;
-		}
-	}
+	end();
 
 	void
 	copy(const axl_va_list& src) {
@@ -574,16 +569,7 @@ public:
 	}
 
 	void
-	copy(va_list va) {
-		end();
-
-#ifdef va_copy
-		va_copy(m_va, va);
-#else
-		m_va = va;
-#endif
-		m_isInitialized = true;
-	}
+	copy(va_list va);
 
 	template <typename T>
 	T
@@ -591,7 +577,49 @@ public:
 		ASSERT(m_isInitialized);
 		return va_arg(m_va, T);
 	}
+
+	template <typename T>
+	size_t
+	count(T terminator) const;
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+void
+axl_va_list::end() {
+	if (!m_isInitialized)
+		return;
+
+	va_end(m_va);
+	m_isInitialized = false;
+}
+
+inline
+void
+axl_va_list::copy(va_list va) {
+	end();
+
+#ifdef va_copy
+	va_copy(m_va, va);
+#else
+	m_va = va;
+#endif
+	m_isInitialized = true;
+}
+
+template <typename T>
+size_t
+axl_va_list::count(T terminator) const {
+	ASSERT(m_isInitialized);
+
+	axl_va_list tmp = *this;
+	size_t n = 0;
+	while (tmp.arg<T>() != terminator)
+		n++;
+
+	return n;
+}
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
