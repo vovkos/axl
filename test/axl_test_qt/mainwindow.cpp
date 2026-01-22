@@ -476,7 +476,7 @@ MainWindow::MainWindow(QWidget* parent) :
 	f.setFixedPitch(true);
 	f.setStyleHint(
 		QFont::Monospace,
-		(QFont::StyleStrategy) (QFont::NoFontMerging | QFont::ForceIntegerMetrics)
+		(QFont::StyleStrategy)(QFont::NoFontMerging | QFont::ForceIntegerMetrics)
 	);
 
 	QWidget* client = new QWidget(this);

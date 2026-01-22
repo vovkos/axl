@@ -229,6 +229,22 @@ endif()
 
 #...............................................................................
 
+if(PYTHON_API_FOUND)
+	option(
+		BUILD_AXL_PY
+		"Build axl_py library"
+		ON
+	)
+else()
+	unset(BUILD_AXL_PY CACHE)
+endif()
+
+if(BUILD_AXL_PY)
+	add_subdirectory(axl_py)
+endif()
+
+#...............................................................................
+
 if(RAGEL_FOUND AND LUA_FOUND)
 	option(
 		BUILD_AXL_ST

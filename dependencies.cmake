@@ -15,6 +15,9 @@ set(
 	LUA_INC_DIR
 	LUA_LIB_DIR
 	LUA_LIB_NAME
+	PYTHON_INC_DIR
+	PYTHON_LIB_DIR
+	PYTHON_LIB_NAME
 	PCAP_INC_DIR
 	PCAP_LIB_DIR
 	LIBSSH2_INC_DIR
@@ -48,6 +51,7 @@ set(
 
 	OPTIONAL
 		lua
+		python_api
 		pcap
 		libusb
 		hidapi

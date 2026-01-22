@@ -1111,7 +1111,7 @@ axl_include_import_file
 
 		string(TOUPPER ${_IMPORT} _IMPORT_UC)
 		if(NOT ${_IMPORT_UC}_FOUND)
-			string(TOUPPER ${_IMPORT} _FILTER)
+			string(REGEX REPLACE "[-_].*" "" _FILTER ${_IMPORT_UC})
 			axl_filter_list(_FILTERED_PATH_LIST ${_FILTER} ${AXL_PATH_LIST})
 
 			if(_FILTERED_PATH_LIST)

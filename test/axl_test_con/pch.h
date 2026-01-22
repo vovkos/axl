@@ -66,6 +66,19 @@
 #	include "axl_xml_ExpatParser.h"
 #endif
 
+#ifdef _AXL_LUA
+#	include "axl_lua_LuaState.h"
+#endif
+
+#ifdef _AXL_PY
+#	include "axl_py_Init.h"
+#	include "axl_py_Config.h"
+#	include "axl_py_Long.h"
+#	include "axl_py_Dict.h"
+#	include "axl_py_Module.h"
+#	include "axl_py_CFunction.h"
+#endif
+
 #ifdef _AXL_IO_USB
 #	include "axl_io_UsbContext.h"
 #	include "axl_io_UsbEventThread.h"

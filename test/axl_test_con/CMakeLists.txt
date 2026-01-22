@@ -58,6 +58,20 @@ add_definitions(
 
 set(OPT_LIB_LIST)
 
+if(BUILD_AXL_LUA)
+	include_directories(${LUA_INC_DIR})
+	link_directories(${LUA_LIB_DIR})
+	add_definitions(-D_AXL_LUA=1)
+	list(APPEND OPT_LIB_LIST axl_lua)
+endif()
+
+if(BUILD_AXL_PY)
+	include_directories(${PYTHON_INC_DIR})
+	link_directories(${PYTHON_LIB_DIR})
+	add_definitions(-D_AXL_PY=1)
+	list(APPEND OPT_LIB_LIST axl_py)
+endif()
+
 if(BUILD_AXL_IO_SHMT)
 	add_definitions(-D_AXL_IO_SHMT=1)
 	list(APPEND OPT_LIB_LIST axl_io_shmt)
@@ -272,6 +286,18 @@ endif()
 
 if(WIN32)
 	set(_DLL_LIST)
+
+	if(BUILD_AXL_LUA AND LUA_DLL_DIR)
+		list(APPEND _DLL_LIST ${LUA_DLL_DIR}/${LUA_LIB_NAME}.dll)
+	endif()
+
+	if(BUILD_AXL_PY AND PYTHON_DLL_DIR)
+		list(
+			APPEND _DLL_LIST
+			${PYTHON_DLL_DIR}/${PYTHON_LIB_NAME}.dll
+			${PYTHON_DLL_DIR}/${PYTHON_LIB_NAME}_d.dll
+		)
+	endif()
 
 	if(BUILD_AXL_IO_USB AND LIBUSB_DLL_DIR)
 		list(APPEND _DLL_LIST ${LIBUSB_DLL_DIR}/libusb-1.0.dll)

@@ -1,4 +1,4 @@
-//..............................................................................
+﻿//..............................................................................
 //
 //  This file is part of the AXL library.
 //
@@ -2791,7 +2791,7 @@ static void signal_segv(int signum, siginfo_t* info, void*ptr) {
 			symname = tmp;
 #endif
 
-		sigsegv_outp("% 2d: %p <%s+%lu> (%s)",
+		sigsegv_outp("% 2d: %p <%s+%lu>(%s)",
 				 ++f,
 				 ip,
 				 symname,
@@ -9794,6 +9794,8 @@ testAutoBaudRate() {
 
 #endif
 
+//..............................................................................
+
 void
 testRbTree() {
 	uint64_t timestamp = sys::getTimestamp();
@@ -9827,6 +9829,77 @@ testRbTree() {
 	}
 }
 
+//..............................................................................
+
+PyObject* py_hello(PyObject*, PyObject*)
+{
+    printf("Hello from C++!\n");
+    Py_RETURN_NONE;
+}
+
+static PyMethodDef MyModule_methods[] = {
+    {
+		"hello",
+		py_hello,
+		METH_NOARGS,
+		"Say hello from C++"
+	},
+    { 0 }
+};
+
+static PyModuleDef MyModule = {
+    PyModuleDef_HEAD_INIT,
+    "embed",   // module name
+    NULL,
+    -1,
+    MyModule_methods
+};
+
+PyObject*
+initMyModule() {
+	return ::PyModule_Create(&MyModule);
+}
+
+void
+testPython() {
+	wchar_t* paths[] = {
+		L"C:/Develop/python/python-3.14.2-embed/python314.zip",
+	};
+
+	py::IsolatedConfig config;
+	config.module_search_paths_set = 1;
+	config.setWideStringList(&config.module_search_paths, countof(paths), paths);
+
+	bool result = py::initialize(&config);
+	if (!result) {
+		printf("Python initialization failed: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	py::Module mymod = py::addModule("mymod");
+	py::Dict myDict = mymod.getDict();
+	myDict.setItem("hello", py::CFunction::fromMethodDef(&MyModule_methods[0]));
+
+	py::Module main = py::addModule("__main__");
+	py::Dict mainDict = main.getDict();
+	mainDict.update(myDict);
+
+	result = py::run(
+		"print('Hello world!')\n"
+		"printttt();"
+		"hello()\n",
+		mainDict,
+		NULL
+	);
+
+	if (!result) {
+		printf("run failed: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+}
+
+//..............................................................................
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -9853,7 +9926,7 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	testSerial();
+	testPython();
 	return 0;
 }
 
