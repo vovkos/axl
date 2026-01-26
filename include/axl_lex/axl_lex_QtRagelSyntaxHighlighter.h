@@ -46,6 +46,32 @@ public:
 	}
 
 protected:
+	bool
+	isLastTokenPrefix(const sl::StringRef& suffix) {
+		return sl::StringRef(ts, te - ts).isPrefix(suffix);
+	}
+
+	bool
+	isLastTokenPrefix(
+		const char* p,
+		size_t length
+	) {
+		return isLastTokenPrefix(sl::StringRef(p, length));
+	}
+
+	bool
+	isLastTokenSuffix(const sl::StringRef& suffix) {
+		return sl::StringRef(ts, te - ts).isSuffix(suffix);
+	}
+
+	bool
+	isLastTokenSuffix(
+		const char* p,
+		size_t length
+	) {
+		return isLastTokenSuffix(sl::StringRef(p, length));
+	}
+
 	void
 	highlightLastToken(const QTextCharFormat& format) {
 		setFormat(ts - m_begin, te - ts, format);
