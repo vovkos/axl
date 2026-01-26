@@ -20,16 +20,19 @@ namespace lex {
 
 //..............................................................................
 
-template <typename T>
+template <
+	typename T,
+	typename B = QSyntaxHighlighter
+>
 class QtRagelSyntaxHighlighter:
-	public QSyntaxHighlighter,
+	public B,
 	public Ragel {
 public:
 	QtRagelSyntaxHighlighter(QObject* parent):
-		QSyntaxHighlighter(parent) {}
+		B(parent) {}
 
 	QtRagelSyntaxHighlighter(QTextDocument* parent):
-		QSyntaxHighlighter(parent) {}
+		B(parent) {}
 
 	virtual
 	void
