@@ -35,9 +35,12 @@ createPyErrError(
 	if (!type)
 		return &err::g_noError;
 
+	;
+
 	ExceptionClass exceptionClass = type;
-	ASSERT(exceptionClass.check());
-	sl::String string = exceptionClass.getName();
+	sl::String string = exceptionClass.check() ?
+		exceptionClass.getName() :
+		exceptionClass.getStr().getUtf8();
 
 	if (!value)
 		return string;
@@ -71,7 +74,7 @@ setLastPyErr() {
 	Object traceback;
 
     ::PyErr_Fetch(&type, &value, &traceback);
-    ::PyErr_NormalizeException(&type, &value, &traceback);
+    ::PyErr_NormalizeException(type.p(), value.p(), traceback.p());
 	err::Error error = createPyErrError(type, value, traceback);
 	return err::setError(error);
 }

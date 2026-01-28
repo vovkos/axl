@@ -11,30 +11,30 @@
 
 #pragma once
 
-#define _AXL_PY_TUPLE_H
+#define _AXL_PY_LIST_H
 
-#include "axl_py_Object.h"
+#include "axl_py_Tuple.h"
 
 namespace axl {
 namespace py {
 
 //..............................................................................
 
-class TupleBase: public ObjectBase {
+class ListBase: public ObjectBase {
 public:
 	bool
 	check() const {
-		return m_p && PyTuple_Check(m_p);
+		return m_p && PyList_Check(m_p);
 	}
 
 	bool
 	checkExact() const {
-		return m_p && PyTuple_CheckExact(m_p);
+		return m_p && PyList_CheckExact(m_p);
 	}
 
 	bool
 	createNew(size_t size) {
-		return finalizeCreate(::PyTuple_New(size));
+		return finalizeCreate(::PyList_New(size));
 	}
 
 	bool
@@ -53,14 +53,14 @@ public:
 	}
 
 	static
-	ObjectImpl<TupleBase>
+	ObjectImpl<ListBase>
 	fromVarArgs_va(
 		PyObject* arg,
 		axl_va_list va
 	);
 
 	static
-	ObjectImpl<TupleBase>
+	ObjectImpl<ListBase>
 	fromVarArgs(
 		PyObject* arg,
 		...
@@ -72,13 +72,13 @@ public:
 	size_t
 	getSize() const {
 		ASSERT(m_p);
-		return PyTuple_Size(m_p);
+		return PyList_Size(m_p);
 	}
 
 	PyObject*
 	getItem(size_t index) const {
 		ASSERT(m_p);
-		return PyTuple_GetItem(m_p, index); // borrowed reference
+		return PyList_GetItem(m_p, index); // borrowed reference
 	}
 
 	bool
@@ -88,27 +88,69 @@ public:
 	) const;
 
 	bool
+	insert(
+		size_t index,
+		PyObject* item
+	) const {
+		ASSERT(m_p);
+		return completeWithLastPyErr(PyList_Insert(m_p, index, item) != -1);
+	}
+
+	bool
+	append(PyObject* item) const {
+		ASSERT(m_p);
+		return completeWithLastPyErr(PyList_Append(m_p, item) != -1);
+	}
+
+	bool
 	getSlice(
 		PyObject** result,
 		intptr_t from,
 		intptr_t to
 	) const {
 		ASSERT(m_p);
-		return completeWithLastPyErr((*result = PyTuple_GetSlice(m_p, from, to)) != NULL);
+		return completeWithLastPyErr((*result = PyList_GetSlice(m_p, from, to)) != NULL);
 	}
 
-	ObjectImpl<TupleBase>
+	ObjectImpl<ListBase>
 	getSlice(
 		intptr_t from,
 		intptr_t to
 	) const;
+
+	bool
+	getTuple(PyObject** result) const {
+		ASSERT(m_p);
+		return completeWithLastPyErr((*result = PyList_AsTuple(m_p)) != NULL);
+	}
+
+	ObjectImpl<Tuple>
+	getTuple() const;
+
+	bool
+	clear() const {
+		ASSERT(m_p);
+		return completeWithLastPyErr(PyList_Clear(m_p) != -1);
+	}
+
+	bool
+	sort() const {
+		ASSERT(m_p);
+		return completeWithLastPyErr(PyList_Sort(m_p) != -1);
+	}
+
+	bool
+	reverse() const {
+		ASSERT(m_p);
+		return completeWithLastPyErr(PyList_Reverse(m_p) != -1);
+	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
 bool
-TupleBase::createFromVarArgs_va(
+ListBase::createFromVarArgs_va(
 	PyObject* arg,
 	axl_va_list va
 ) {
@@ -128,55 +170,49 @@ TupleBase::createFromVarArgs_va(
 }
 
 inline
-ObjectImpl<TupleBase>
-TupleBase::fromVarArgs_va(
+ObjectImpl<ListBase>
+ListBase::fromVarArgs_va(
 	PyObject* arg,
 	axl_va_list va
 ) {
-	ObjectImpl<TupleBase> result;
+	ObjectImpl<ListBase> result;
 	result.createFromVarArgs_va(arg, va);
 	return result;
 }
 
 inline
 bool
-TupleBase::setItem(
+ListBase::setItem(
 	size_t index,
 	PyObject* item
 ) const {
-	int result = PyTuple_SetItem(m_p, index, item);
+	int result = PyList_SetItem(m_p, index, item);
 	if (result == -1)
 		return failWithLastPyErr();
 
-	Py_XINCREF(item); // PyTuple_SetItem steals a reference
+	Py_XINCREF(item); // PyList_SetItem steals a reference
 	return true;
 }
 
-ObjectImpl<TupleBase>
-TupleBase::getSlice(
+ObjectImpl<ListBase>
+ListBase::getSlice(
 	intptr_t from,
 	intptr_t to
 ) const {
-	ObjectImpl<TupleBase> result;
+	ObjectImpl<ListBase> result;
 	getSlice(&result, from, to);
 	return result;
 }
 
+ObjectImpl<Tuple>
+ListBase::getTuple() const {
+	ObjectImpl<Tuple> result;
+	getTuple(&result);
+	return result;
+}
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef ObjectImpl<TupleBase> Tuple;
-
-//..............................................................................
-
-bool
-ObjectBase::callObjArgs_va(
-	PyObject** result,
-	PyObject* arg,
-	axl_va_list va
-) const {
-	ASSERT(m_p);
-	return completeWithLastPyErr((*result = ::PyObject_Call(m_p, Tuple::fromVarArgs_va(arg, va), NULL)) != NULL);
-}
+typedef ObjectImpl<ListBase> List;
 
 //..............................................................................
 

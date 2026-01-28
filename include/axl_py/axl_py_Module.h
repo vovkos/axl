@@ -42,6 +42,30 @@ public:
 		return finalizeCreate(::PyModule_NewObject(name));
 	}
 
+	bool
+	create(PyModuleDef* moduleDef) {
+		return finalizeCreate(::PyModule_Create(moduleDef));
+	}
+
+	bool
+	create(
+		PyModuleDef* moduleDef,
+		int apiVersion
+	) {
+		return finalizeCreate(::PyModule_Create2(moduleDef, apiVersion));
+	}
+
+	static
+	ObjectImpl<ModuleBase>
+	fromModuleDef(PyModuleDef* moduleDef);
+
+	static
+	ObjectImpl<ModuleBase>
+	fromModuleDef(
+		PyModuleDef* moduleDef,
+		int apiVersion
+	);
+
 	PyObject*
 	getDict() const {
 		ASSERT(m_p);
@@ -86,6 +110,27 @@ public:
 		return name;
 	}
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+ObjectImpl<ModuleBase>
+ModuleBase::fromModuleDef(PyModuleDef* moduleDef) {
+	ObjectImpl<ModuleBase> result;
+	result.create(moduleDef);
+	return result;
+}
+
+inline
+ObjectImpl<ModuleBase>
+ModuleBase::fromModuleDef(
+	PyModuleDef* moduleDef,
+	int apiVersion
+) {
+	ObjectImpl<ModuleBase> result;
+	result.create(moduleDef, apiVersion);
+	return result;
+}
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 

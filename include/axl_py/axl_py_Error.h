@@ -81,6 +81,37 @@ completeWithLastPyErr(int result) {
 	return completeWithLastPyErr<bool>(result != 0, false);
 }
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+void
+raiseException(
+	PyObject* exception,
+	const char* description
+) {
+	::PyErr_SetString(exception, description);
+}
+
+inline
+void
+raiseException(
+	PyObject* exception,
+	const sl::StringRef& description
+) {
+	::PyErr_SetString(exception, description.sz());
+}
+
+// later add a dedicated error object that would get description on demand
+
+inline
+void
+raiseException(
+	PyObject* exception,
+	const err::ErrorRef& error = err::getLastError()
+) {
+	::PyErr_SetString(exception, error.getDescription().sz());
+}
+
 //..............................................................................
 
 } // namespace lua

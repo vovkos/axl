@@ -202,10 +202,7 @@ public:
 	}
 
 	bool
-	append(PyObject* object) {
-		::PyUnicode_Append(&m_p, object);
-		return completeWithLastPyErr(m_p != NULL);
-	}
+	append(PyObject* object);
 
 	bool
 	getSubstring(
@@ -310,11 +307,20 @@ UnicodeBase::join(
 
 inline
 bool
+UnicodeBase::append(PyObject* object) {
+	ASSERT(m_p);
+	::PyUnicode_Append(&m_p, object);
+	return completeWithLastPyErr(m_p != NULL);
+}
+
+inline
+bool
 UnicodeBase::getSubstring(
 	PyObject** result,
 	size_t index,
 	size_t length
 ) const {
+	ASSERT(m_p);
 	PyObject* slice = ::PyUnicode_Substring(m_p, index, index + length);
 	if (!slice)
 		return failWithLastPyErr();
@@ -340,6 +346,7 @@ UnicodeBase::getUcs4(
 	Py_UCS4* buffer,
 	size_t length
 ) const {
+	ASSERT(m_p);
 	Py_UCS4* p = ::PyUnicode_AsUCS4(m_p, buffer, length, 0);
 	if (!p)
 		return failWithLastPyErr<size_t>(-1);
@@ -350,6 +357,7 @@ UnicodeBase::getUcs4(
 inline
 sl::StringRef
 UnicodeBase::getUtf8() const {
+	ASSERT(m_p);
 	Py_ssize_t length;
 	const char* p = ::PyUnicode_AsUTF8AndSize(m_p, &length);
 	if (!p)
@@ -361,6 +369,7 @@ UnicodeBase::getUtf8() const {
 inline
 bool
 UnicodeBase::getUtf8String(PyObject** result) const {
+	ASSERT(m_p);
 	PyObject* p = ::PyUnicode_AsUTF8String(m_p);
 	if (!p)
 		return failWithLastPyErr<size_t>(-1);
@@ -380,6 +389,7 @@ UnicodeBase::getUtf8String() const {
 inline
 bool
 UnicodeBase::getUtf16String(PyObject** result) const {
+	ASSERT(m_p);
 	PyObject* p = ::PyUnicode_AsUTF16String(m_p);
 	if (!p)
 		return failWithLastPyErr<size_t>(-1);
@@ -399,6 +409,7 @@ UnicodeBase::getUtf16String() const {
 inline
 bool
 UnicodeBase::getUtf32String(PyObject** result) const {
+	ASSERT(m_p);
 	PyObject* p = ::PyUnicode_AsUTF32String(m_p);
 	if (!p)
 		return failWithLastPyErr<size_t>(-1);

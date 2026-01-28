@@ -48,8 +48,13 @@ public:
 		moveConstruct(std::move(src));
 	}
 
+	~ObjectImpl() {
+		Py_XDECREF(m_p);
+	}
+
 	PyObject**
 	operator & () {
+		ASSERT(!m_p);
 		return &m_p;
 	}
 
@@ -84,19 +89,6 @@ public:
 		move(std::move(src));
 		return *this;
 	}
-
-protected:
-	void
-	construct(PyObject* p) {
-		Py_XINCREF(p);
-		m_p = p;
-	}
-
-	void
-	moveConstruct(ObjectImpl&& src) {
-		m_p = src.m_p;
-		src.m_p = NULL;
-	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -106,10 +98,6 @@ protected:
 	PyObject* m_p;
 
 public:
-	~ObjectBase() {
-		Py_XDECREF(m_p);
-	}
-
 	operator PyObject* () const {
 		return m_p;
 	}
@@ -136,6 +124,12 @@ public:
 
 	void
 	move(ObjectBase&& src);
+
+	PyTypeObject*
+	getType() const {
+		ASSERT(m_p);
+		return Py_TYPE(m_p);
+	}
 
 	bool
 	getStr(PyObject** result) const {
@@ -407,6 +401,18 @@ public:
 	}
 
 protected:
+	void
+	construct(PyObject* p) {
+		Py_XINCREF(p);
+		m_p = p;
+	}
+
+	void
+	moveConstruct(ObjectBase&& src) {
+		m_p = src.m_p;
+		src.m_p = NULL;
+	}
+
 	bool
 	finalizeCreate(PyObject* p) {
 		if (!p)

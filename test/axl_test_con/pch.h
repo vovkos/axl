@@ -73,7 +73,9 @@
 #ifdef _AXL_PY
 #	include "axl_py_Init.h"
 #	include "axl_py_Config.h"
+#	include "axl_py_Type.h"
 #	include "axl_py_Long.h"
+#	include "axl_py_List.h"
 #	include "axl_py_Dict.h"
 #	include "axl_py_Module.h"
 #	include "axl_py_CFunction.h"

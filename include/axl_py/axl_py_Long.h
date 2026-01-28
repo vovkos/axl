@@ -51,27 +51,27 @@ public:
 	}
 
 	bool
-	createLong(long value) {
+	createFromLong(long value) {
 		return finalizeCreate(::PyLong_FromLong(value));
 	}
 
 	bool
-	createUnsignedLong(ulong_t value) {
+	createFromUnsignedLong(ulong_t value) {
 		return finalizeCreate(::PyLong_FromUnsignedLong(value));
 	}
 
 	bool
-	createSizeT(size_t value) {
+	createFromSizeT(size_t value) {
 		return finalizeCreate(::PyLong_FromSize_t(value));
 	}
 
 	bool
-	createLongLong(long long value) {
+	createFromLongLong(long long value) {
 		return finalizeCreate(::PyLong_FromLongLong(value));
 	}
 
 	bool
-	createUnsignedLongLong(unsigned long long value) {
+	createFromUnsignedLongLong(unsigned long long value) {
 		return finalizeCreate(::PyLong_FromUnsignedLongLong(value));
 	}
 
@@ -139,6 +139,81 @@ public:
 	) {
 		return finalizeCreate(::PyLong_FromUnsignedNativeBytes(p, size, flags));
 	}
+
+	static
+	ObjectImpl<LongBase>
+	fromLong(long value);
+
+	static
+	ObjectImpl<LongBase>
+	fromUnsignedLong(ulong_t value);
+
+	static
+	ObjectImpl<LongBase>
+	fromSizeT(size_t value);
+
+	static
+	ObjectImpl<LongBase>
+	fromLongLong(long long value);
+
+	static
+	ObjectImpl<LongBase>
+	fromUnsignedLongLong(unsigned long long value);
+
+	static
+	ObjectImpl<LongBase>
+	fromInt32(int32_t value);
+
+	static
+	ObjectImpl<LongBase>
+	fromUInt32(uint32_t value);
+
+	static
+	ObjectImpl<LongBase>
+	fromInt64(int64_t value);
+
+	static
+	ObjectImpl<LongBase>
+	fromUInt64(uint64_t value);
+
+	static
+	ObjectImpl<LongBase>
+	fromDouble(double value);
+
+	static
+	ObjectImpl<LongBase>
+	fromString(
+		const char* string,
+		const char** end = NULL,
+		int base = 0
+	);
+
+	static
+	ObjectImpl<LongBase>
+	fromUnicode(
+		PyObject* unicode,
+		int base = 0
+	);
+
+	static
+	ObjectImpl<LongBase>
+	fromVoidPtr(void* p);
+
+	static
+	ObjectImpl<LongBase>
+	fromNativeBytes(
+		const void* p,
+		size_t size,
+		int flags = Py_ASNATIVEBYTES_DEFAULTS
+	);
+
+	static
+	ObjectImpl<LongBase>
+	fromUnsignedNativeBytes(
+		const void* p,
+		size_t size,
+		int flags = Py_ASNATIVEBYTES_DEFAULTS
+	);
 
 	long
 	getLong() const {
@@ -222,6 +297,142 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+inline
+ObjectImpl<LongBase>
+LongBase::fromLong(long value) {
+	ObjectImpl<LongBase> result;
+	result.createFromLong(value);
+	return result;
+}
+
+inline
+ObjectImpl<LongBase>
+LongBase::fromUnsignedLong(ulong_t value) {
+	ObjectImpl<LongBase> result;
+	result.createFromUnsignedLong(value);
+	return result;
+}
+
+inline
+ObjectImpl<LongBase>
+LongBase::fromSizeT(size_t value) {
+	ObjectImpl<LongBase> result;
+	result.createFromSizeT(value);
+	return result;
+}
+
+inline
+ObjectImpl<LongBase>
+LongBase::fromLongLong(long long value) {
+	ObjectImpl<LongBase> result;
+	result.createFromLongLong(value);
+	return result;
+}
+
+inline
+ObjectImpl<LongBase>
+LongBase::fromUnsignedLongLong(unsigned long long value) {
+	ObjectImpl<LongBase> result;
+	result.createFromUnsignedLongLong(value);
+	return result;
+}
+
+inline
+ObjectImpl<LongBase>
+LongBase::fromInt32(int32_t value) {
+	ObjectImpl<LongBase> result;
+	result.createFromInt32(value);
+	return result;
+}
+
+inline
+ObjectImpl<LongBase>
+LongBase::fromUInt32(uint32_t value) {
+	ObjectImpl<LongBase> result;
+	result.createFromUInt32(value);
+	return result;
+}
+
+inline
+ObjectImpl<LongBase>
+LongBase::fromInt64(int64_t value) {
+	ObjectImpl<LongBase> result;
+	result.createFromInt64(value);
+	return result;
+}
+
+inline
+ObjectImpl<LongBase>
+LongBase::fromUInt64(uint64_t value) {
+	ObjectImpl<LongBase> result;
+	result.createFromUInt64(value);
+	return result;
+}
+
+inline
+ObjectImpl<LongBase>
+LongBase::fromDouble(double value) {
+	ObjectImpl<LongBase> result;
+	result.createFromDouble(value);
+	return result;
+}
+
+inline
+ObjectImpl<LongBase>
+LongBase::fromString(
+	const char* string,
+	const char** end,
+	int base
+) {
+	ObjectImpl<LongBase> result;
+	result.createFromString(string, end, base);
+	return result;
+}
+
+inline
+ObjectImpl<LongBase>
+LongBase::fromUnicode(
+	PyObject* unicode,
+	int base
+) {
+	ObjectImpl<LongBase> result;
+	result.createFromUnicode(unicode, base);
+	return result;
+}
+
+inline
+ObjectImpl<LongBase>
+LongBase::fromVoidPtr(void* p) {
+	ObjectImpl<LongBase> result;
+	result.createFromVoidPtr(p);
+	return result;
+}
+
+inline
+ObjectImpl<LongBase>
+LongBase::fromNativeBytes(
+	const void* p,
+	size_t size,
+	int flags
+) {
+	ObjectImpl<LongBase> result;
+	result.createFromNativeBytes(p, size, flags);
+	return result;
+}
+
+inline
+ObjectImpl<LongBase>
+LongBase::fromUnsignedNativeBytes(
+	const void* p,
+	size_t size,
+	int flags
+) {
+	ObjectImpl<LongBase> result;
+	result.createFromUnsignedNativeBytes(p, size, flags);
+	return result;
+}
+
+inline
 bool
 LongBase::getInt32(int32_t* value) const {
 	ASSERT(m_p);
@@ -229,6 +440,7 @@ LongBase::getInt32(int32_t* value) const {
 	return completeWithLastPyErr(result != -1);
 }
 
+inline
 int32_t
 LongBase::getInt32() const {
 	int32_t value;
@@ -236,6 +448,7 @@ LongBase::getInt32() const {
 	return value;
 }
 
+inline
 bool
 LongBase::getUInt32(uint32_t* value) const {
 	ASSERT(m_p);
@@ -243,6 +456,7 @@ LongBase::getUInt32(uint32_t* value) const {
 	return completeWithLastPyErr(result != -1);
 }
 
+inline
 uint32_t
 LongBase::getUInt32() const {
 	uint32_t value;
@@ -250,6 +464,7 @@ LongBase::getUInt32() const {
 	return value;
 }
 
+inline
 bool
 LongBase::getInt64(int64_t* value) const {
 	ASSERT(m_p);
@@ -257,6 +472,7 @@ LongBase::getInt64(int64_t* value) const {
 	return completeWithLastPyErr(result != -1);
 }
 
+inline
 int64_t
 LongBase::getInt64() const {
 	int64_t value;
@@ -264,6 +480,7 @@ LongBase::getInt64() const {
 	return value;
 }
 
+inline
 bool
 LongBase::getUInt64(uint64_t* value) const {
 	ASSERT(m_p);
@@ -271,6 +488,7 @@ LongBase::getUInt64(uint64_t* value) const {
 	return completeWithLastPyErr(result != -1);
 }
 
+inline
 uint64_t
 LongBase::getUInt64() const {
 	uint64_t value;
@@ -278,6 +496,7 @@ LongBase::getUInt64() const {
 	return value;
 }
 
+inline
 size_t
 LongBase::getNativeBytes(
 	void* p,

@@ -18,34 +18,55 @@ namespace py {
 
 //..............................................................................
 
-class PyFinalizer {
-public:
+struct PyFinalizer {
+	PyThreadState* m_mainThreadState;
+
+	PyFinalizer() {
+		m_mainThreadState = NULL;
+	}
+
 	~PyFinalizer() {
+		if (m_mainThreadState)
+			::PyEval_RestoreThread(m_mainThreadState);
+
 		::Py_Finalize();
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+void
+setupFinalizer(uint_t flags) {
+	PyFinalizer* finalizer = sl::getSingleton<PyFinalizer>();
+	if (flags & InitializeFlag_ReleaseGil)
+		finalizer->m_mainThreadState = ::PyEval_SaveThread();
+}
+
 bool
-initialize(PyInitConfig* config) {
+initialize(
+	PyInitConfig* config,
+	uint_t flags
+) {
 	int result = ::Py_InitializeFromInitConfig(config);
 	if (result == -1) {
 		err::setError(InitConfig::getError(config));
 		return false;
 	}
 
-	sl::getSingleton<PyFinalizer>();
+	setupFinalizer(flags);
 	return true;
 }
 
 bool
-initialize(const PyConfig* config) {
+initialize(
+	const PyConfig* config,
+	uint_t flags
+) {
 	PyStatus status = ::Py_InitializeFromConfig(config);
 	if (PyStatus_Exception(status))
 		return failWithPyStatus(status);
 
-	sl::getSingleton<PyFinalizer>();
+	setupFinalizer(flags);
 	return true;
 }
 
@@ -55,13 +76,13 @@ bool
 compile(
 	int startSymbol,
 	PyObject** result_o,
-	const sl::StringRef& code,
+	const sl::StringRef& source,
 	const sl::StringRef& fileName,
 	PyCompilerFlags* flags,
 	int optimize
 ) {
 	PyObject* result = ::Py_CompileStringExFlags(
-		code.sz(),
+		source.sz(),
 		fileName.sz(),
 		startSymbol,
 		flags,
@@ -82,16 +103,38 @@ compile(
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 bool
+eval(
+	PyObject** result_o,
+	PyObject* code,
+	PyObject* globals,
+	PyObject* locals
+) {
+	PyObject* result = ::PyEval_EvalCode(code, globals, locals);
+
+	if (!result)
+		return failWithLastPyErr();
+
+	if (result_o)
+		*result_o = result;
+	else
+		Py_DECREF(result);
+
+	return true;
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+bool
 run(
 	int startSymbol,
 	PyObject** result_o,
-	const sl::StringRef& code,
+	const sl::StringRef& source,
 	PyObject* globals,
 	PyObject* locals,
 	PyCompilerFlags* flags
 ) {
 	PyObject* result = ::PyRun_StringFlags(
-		code.sz(),
+		source.sz(),
 		startSymbol,
 		globals,
 		locals,

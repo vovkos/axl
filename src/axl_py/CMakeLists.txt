@@ -18,10 +18,12 @@ set(
 	${AXL_INC_DIR}/axl_py/axl_py_Error.h
 	${AXL_INC_DIR}/axl_py/axl_py_Config.h
 	${AXL_INC_DIR}/axl_py/axl_py_Init.h
+	${AXL_INC_DIR}/axl_py/axl_py_Type.h
 	${AXL_INC_DIR}/axl_py/axl_py_Object.h
 	${AXL_INC_DIR}/axl_py/axl_py_Exception.h
 	${AXL_INC_DIR}/axl_py/axl_py_Long.h
 	${AXL_INC_DIR}/axl_py/axl_py_Tuple.h
+	${AXL_INC_DIR}/axl_py/axl_py_List.h
 	${AXL_INC_DIR}/axl_py/axl_py_Dict.h
 	${AXL_INC_DIR}/axl_py/axl_py_Bytes.h
 	${AXL_INC_DIR}/axl_py/axl_py_Unicode.h

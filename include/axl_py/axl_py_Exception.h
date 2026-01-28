@@ -20,6 +20,26 @@ namespace py {
 
 //..............................................................................
 
+class TracebackBase: public ObjectBase {
+public:
+	bool
+	check() const {
+		return m_p && PyTraceBack_Check(m_p);
+	}
+
+	bool
+	print(PyObject* file) const {
+		ASSERT(m_p);
+		return completeWithLastPyErr(::PyTraceBack_Print(m_p, file) != -1);
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+typedef ObjectImpl<TracebackBase> Traceback;
+
+//..............................................................................
+
 class ExceptionClassBase: public ObjectBase {
 public:
 	bool
@@ -46,31 +66,29 @@ public:
 	check() const {
 		return m_p && PyExceptionInstance_Check(m_p);
 	}
+
+	bool
+	getTraceback(PyObject** result) const {
+		ASSERT(m_p);
+		return completeWithLastPyErr((*result = ::PyException_GetTraceback(m_p)) != NULL);
+	}
+
+	Traceback
+	getTraceback() const;
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+Traceback
+ExceptionBase::getTraceback() const {
+	Traceback traceback;
+	getTraceback(&traceback);
+	return traceback;
+}
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef ObjectImpl<ExceptionBase> Exception;
-
-//..............................................................................
-
-class TraceBackBase: public ObjectBase {
-public:
-	bool
-	check() const {
-		return m_p && PyTraceBack_Check(m_p);
-	}
-
-	bool
-	print(PyObject* file) const {
-		ASSERT(m_p);
-		return completeWithLastPyErr(::PyTraceBack_Print(m_p, file) != -1);
-	}
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-typedef ObjectImpl<TraceBackBase> TraceBack;
 
 //..............................................................................
 

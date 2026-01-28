@@ -9831,8 +9831,9 @@ testRbTree() {
 
 //..............................................................................
 
-PyObject* py_hello(PyObject*, PyObject*)
-{
+#if (_AXL_PY)
+
+PyObject* py_hello(PyObject*, PyObject*) {
     printf("Hello from C++!\n");
     Py_RETURN_NONE;
 }
@@ -9860,6 +9861,64 @@ initMyModule() {
 	return ::PyModule_Create(&MyModule);
 }
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+struct HookDictObject: PyDictObject {
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class HookDictTypeObject: public py::TypeObject {
+protected:
+	static PyMappingMethods m_as_mapping;
+
+public:
+	HookDictTypeObject() {
+		tp_name = "nj.HookDict";
+		tp_basicsize = sizeof(HookDictObject);
+		tp_base = &PyDict_Type;
+		tp_as_mapping = &m_as_mapping;
+		tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE;
+
+		bool result = ready();
+		ASSERT(result);
+	}
+
+protected:
+	static
+	int
+	ass_subscript(
+		PyObject* self,
+		PyObject* key,
+		PyObject* value
+	);
+};
+
+PyMappingMethods HookDictTypeObject::m_as_mapping = {
+	NULL,          // mp_length
+	NULL,          // mp_subscript
+	ass_subscript, // mp_ass_subscript
+};
+
+int
+HookDictTypeObject::ass_subscript(
+	PyObject* self0,
+	PyObject* key0,
+	PyObject* value0
+) {
+    HookDictObject* dict = (HookDictObject*)self0;
+	py::Object key = key0;
+	py::Object value = value0;
+
+	printf(
+		"__setitem__: [%s] = %s\n",
+		key.getStr().getUtf8().sz(),
+		value.getStr().getUtf8().sz()
+	);
+
+    return PyDict_Type.tp_as_mapping->mp_ass_subscript(self0, key, value);
+}
+
 void
 testPython() {
 	wchar_t* paths[] = {
@@ -9880,23 +9939,58 @@ testPython() {
 	py::Dict myDict = mymod.getDict();
 	myDict.setItem("hello", py::CFunction::fromMethodDef(&MyModule_methods[0]));
 
-	py::Module main = py::addModule("__main__");
-	py::Dict mainDict = main.getDict();
-	mainDict.update(myDict);
+	static HookDictTypeObject hookDictType;
+ 	py::Object type = (PyObject*)&hookDictType;
+	py::Dict dict = type.call();
+	dict.setItem("__builtins__", PyEval_GetBuiltins());
+	dict.update(myDict);
 
-	result = py::run(
+	const sl::StringRef source =
+		"print('Foo!')\n"
+		"def foo():\n"
+		"  print('foo')\n"
+		"\n"
+		"g_a = 10\n"
 		"print('Hello world!')\n"
-		"printttt();"
-		"hello()\n",
-		mainDict,
-		NULL
-	);
+		"foo()\n"
+		"hello()\n";
 
+	PyCompilerFlags flags;
+	flags.cf_flags = PyCF_ONLY_AST;
+	flags.cf_feature_version = PY_MINOR_VERSION;
+
+	py::Object ast;
+	result = py::compile(&ast, source, "unnamed-source", &flags);
 	if (!result) {
-		printf("run failed: %s\n", err::getLastErrorDescription().sz());
+		printf("compile to AST failed: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	py::List list = ast.getAttr("body");
+	size_t count = list.getSize();
+	for (size_t i = 0; i < count; i++) {
+		py::Object node = list.getItem(i);
+		py::Unicode nodeName = node.getAttr("name");
+		py::Object cls = node.getAttr("__class__");
+		py::Unicode clsName = cls.getAttr("__name__");
+		printf("AST[%d]: %s: %s\n", i, clsName.getUtf8().sz(), nodeName ? nodeName.getUtf8().sz() : "<noname>");
+	}
+
+	py::Object code;
+	result = py::compile(&code, source, "unnamed-source");
+	if (!result) {
+		printf("compile to code failed: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	result = py::eval(code, dict);
+	if (!result) {
+		printf("eval failed: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 }
+
+#endif // _AXL_PY
 
 //..............................................................................
 
@@ -9926,7 +10020,9 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
+#if (_AXL_PY)
 	testPython();
+#endif
 	return 0;
 }
 

@@ -20,6 +20,10 @@ namespace py {
 
 //..............................................................................
 
+enum InitializeFlag {
+	InitializeFlag_ReleaseGil = 0x01,
+};
+
 inline
 bool
 preInitialize(const PyPreConfig* config) {
@@ -27,10 +31,16 @@ preInitialize(const PyPreConfig* config) {
 }
 
 bool
-initialize(PyInitConfig* config);
+initialize(
+	PyInitConfig* config,
+	uint_t flags = 0
+);
 
 bool
-initialize(const PyConfig* config);
+initialize(
+	const PyConfig* config,
+	uint_t flags = 0
+);
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -90,7 +100,7 @@ bool
 compile(
 	int startSymbol,
 	PyObject** result,
-	const sl::StringRef& code,
+	const sl::StringRef& source,
 	const sl::StringRef& fileName,
 	PyCompilerFlags* flags = NULL,
 	int optimize = -1
@@ -100,13 +110,13 @@ inline
 Object
 compile(
 	int startSymbol,
-	const sl::StringRef& code,
+	const sl::StringRef& source,
 	const sl::StringRef& fileName,
 	PyCompilerFlags* flags = NULL,
 	int optimize = -1
 ) {
 	Object result;
-	compile(startSymbol, &result, code, fileName, flags, optimize);
+	compile(startSymbol, &result, source, fileName, flags, optimize);
 	return result;
 }
 
@@ -114,24 +124,46 @@ inline
 bool
 compile(
 	PyObject** result,
-	const sl::StringRef& code,
+	const sl::StringRef& source,
 	const sl::StringRef& fileName,
 	PyCompilerFlags* flags = NULL,
 	int optimize = -1
 ) {
-	return compile(Py_file_input, result, code, fileName, flags, optimize);
+	return compile(Py_file_input, result, source, fileName, flags, optimize);
 }
 
 inline
 Object
 compile(
-	const sl::StringRef& code,
+	const sl::StringRef& source,
 	const sl::StringRef& fileName,
 	PyCompilerFlags* flags = NULL,
 	int optimize = -1
 ) {
 	Object result;
-	compile(&result, code, fileName, flags, optimize);
+	compile(&result, source, fileName, flags, optimize);
+	return result;
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+bool
+eval(
+	PyObject** result,
+	PyObject* code,
+	PyObject* globals,
+	PyObject* locals = NULL
+);
+
+inline
+Object
+eval(
+	PyObject* code,
+	PyObject* globals,
+	PyObject* locals = NULL
+) {
+	Object result;
+	eval(&result, code, globals, locals);
 	return result;
 }
 
@@ -141,7 +173,7 @@ bool
 run(
 	int startSymbol,
 	PyObject** result,
-	const sl::StringRef& code,
+	const sl::StringRef& source,
 	PyObject* globals,
 	PyObject* locals = NULL,
 	PyCompilerFlags* flags = NULL
@@ -151,13 +183,13 @@ inline
 Object
 run(
 	int startSymbol,
-	const sl::StringRef& code,
+	const sl::StringRef& source,
 	PyObject* globals,
 	PyObject* locals = NULL,
 	PyCompilerFlags* flags = NULL
 ) {
 	Object result;
-	run(startSymbol, &result, code, globals, locals, flags);
+	run(startSymbol, &result, source, globals, locals, flags);
 	return result;
 }
 
@@ -165,39 +197,128 @@ inline
 bool
 run(
 	PyObject** result,
-	const sl::StringRef& code,
+	const sl::StringRef& source,
 	PyObject* globals,
 	PyObject* locals = NULL,
 	PyCompilerFlags* flags = NULL
 ) {
-	return run(Py_file_input, result, code, globals, locals, flags);
+	return run(Py_file_input, result, source, globals, locals, flags);
 }
 
 inline
 Object
 run(
-	const sl::StringRef& code,
+	const sl::StringRef& source,
 	PyObject* globals,
 	PyObject* locals = NULL,
 	PyCompilerFlags* flags = NULL
 ) {
 	Object result;
-	run(&result, code, globals, locals, flags);
+	run(&result, source, globals, locals, flags);
 	return result;
 }
 
 inline
 bool
 run(
-	const sl::StringRef& code,
+	const sl::StringRef& source,
 	PyCompilerFlags* flags = NULL
 ) {
-	int result = ::PyRun_SimpleStringFlags(code.sz(), flags);
+	int result = ::PyRun_SimpleStringFlags(source.sz(), flags);
 	if (result == -1)
 		return failWithLastPyErr();
 
 	return true;
 }
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+int
+clearTypeCache() {
+	return ::PyType_ClearCache();
+}
+
+inline
+int
+addTypeWatcher(PyType_WatchCallback callback) {
+	return completeWithLastPyErr<int>(::PyType_AddWatcher(callback), -1);
+}
+
+inline
+bool
+clearTypeWatcher(int id) {
+	return completeWithLastPyErr(::PyType_ClearWatcher(id) != -1);
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class ThreadState {
+protected:
+	PyThreadState* m_state;
+
+public:
+	ThreadState() {
+		m_state = NULL;
+	}
+
+	operator bool () {
+		return m_state;
+	}
+
+	bool
+	isNull() const {
+		return m_state == NULL;
+	}
+
+	bool
+	detach() {
+		return completeWithLastPyErr((m_state = ::PyEval_SaveThread()) != NULL);
+	}
+
+	void
+	attach();
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+void
+ThreadState::attach() {
+	ASSERT(m_state);
+	::PyEval_RestoreThread(m_state);
+	m_state = NULL;
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class DetachedThreadRegion: public ThreadState {
+public:
+	DetachedThreadRegion() {
+		detach();
+		ASSERT(!isNull());
+	}
+
+	~DetachedThreadRegion() {
+		attach();
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class GilStateRegion {
+protected:
+	PyGILState_STATE m_state;
+
+public:
+	GilStateRegion() {
+		m_state = ::PyGILState_Ensure();
+	}
+
+	~GilStateRegion() {
+		::PyGILState_Release(m_state);
+	}
+};
 
 //..............................................................................
 
