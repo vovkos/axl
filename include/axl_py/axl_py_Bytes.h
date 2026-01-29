@@ -43,6 +43,14 @@ public:
 	}
 
 	bool
+	createFromString(
+		const void* p,
+		size_t size
+	) {
+		return finalizeCreate(::PyBytes_FromStringAndSize((char*)p, size));
+	}
+
+	bool
 	createFromFormat_va(
 		const char* format,
 		axl_va_list va
@@ -67,6 +75,13 @@ public:
 	static
 	ObjectImpl<BytesBase>
 	fromString(const sl::StringRef& string);
+
+	static
+	ObjectImpl<BytesBase>
+	fromString(
+		const void* p,
+		size_t size
+	);
 
 	static
 	ObjectImpl<BytesBase>
@@ -103,6 +118,17 @@ ObjectImpl<BytesBase>
 BytesBase::fromString(const sl::StringRef& string) {
 	ObjectImpl<BytesBase> result;
 	result.createFromString(string);
+	return result;
+}
+
+inline
+ObjectImpl<BytesBase>
+BytesBase::fromString(
+	const void* p,
+	size_t size
+) {
+	ObjectImpl<BytesBase> result;
+	result.createFromString(p, size);
 	return result;
 }
 
