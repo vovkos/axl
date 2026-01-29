@@ -19,6 +19,7 @@ set(
 	${AXL_INC_DIR}/axl_py/axl_py_Config.h
 	${AXL_INC_DIR}/axl_py/axl_py_Init.h
 	${AXL_INC_DIR}/axl_py/axl_py_Type.h
+	${AXL_INC_DIR}/axl_py/axl_py_Buffer.h
 	${AXL_INC_DIR}/axl_py/axl_py_Object.h
 	${AXL_INC_DIR}/axl_py/axl_py_Exception.h
 	${AXL_INC_DIR}/axl_py/axl_py_Long.h

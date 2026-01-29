@@ -159,6 +159,15 @@ public:
 	getBytes() const;
 
 	bool
+	getBuffer(
+		Py_buffer* buffer,
+		int flags
+	) const {
+		ASSERT(m_p);
+		return completeWithLastPyErr(::PyObject_GetBuffer(m_p, buffer, flags) != -1);
+	}
+
+	bool
 	getAttr(
 		PyObject** result,
 		const sl::StringRef& name
