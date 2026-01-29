@@ -102,6 +102,23 @@ public:
 		intptr_t from,
 		intptr_t to
 	) const;
+
+	bool
+	parseArgs_va(
+		const char* format,
+		axl_va_list va
+	) {
+		return completeWithLastPyErr(PyArg_VaParse(m_p, format, va) != 0); // (!) PyArg_VaParse returns 1 or 0
+	}
+
+	bool
+	parseArgs(
+		const char* format,
+		...
+	) {
+		AXL_VA_DECL(va, format);
+		return parseArgs_va(format, va);
+	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -165,6 +182,7 @@ TupleBase::getSlice(
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef ObjectImpl<TupleBase> Tuple;
+typedef ObjectBorrowedImpl<TupleBase> TupleBorrowed;
 
 //..............................................................................
 

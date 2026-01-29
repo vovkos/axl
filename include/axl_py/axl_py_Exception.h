@@ -37,6 +37,7 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef ObjectImpl<TracebackBase> Traceback;
+typedef ObjectBorrowedImpl<TracebackBase> TracebackBorrowed;
 
 //..............................................................................
 
@@ -57,6 +58,7 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef ObjectImpl<ExceptionClassBase> ExceptionClass;
+typedef ObjectBorrowedImpl<ExceptionClassBase> ExceptionBorrowedClass;
 
 //..............................................................................
 
@@ -89,6 +91,7 @@ ExceptionBase::getTraceback() const {
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef ObjectImpl<ExceptionBase> Exception;
+typedef ObjectBorrowedImpl<ExceptionBase> ExceptionBorrowed;
 
 //..............................................................................
 

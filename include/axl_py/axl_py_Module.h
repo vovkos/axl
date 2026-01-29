@@ -162,6 +162,7 @@ ModuleBase::fromModuleDef(
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef ObjectImpl<ModuleBase> Module;
+typedef ObjectBorrowedImpl<ModuleBase> ModuleBorrowed;
 
 //..............................................................................
 

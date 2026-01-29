@@ -128,6 +128,7 @@ BytesBase::fromObject(PyObject* object) {
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef ObjectImpl<BytesBase> Bytes;
+typedef ObjectBorrowedImpl<BytesBase> BytesBorrowed;
 
 //..............................................................................
 

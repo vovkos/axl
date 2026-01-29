@@ -34,11 +34,6 @@ public:
 		construct(src.m_p);
 	}
 
-	template <typename T2>
-	ObjectImpl(const ObjectImpl<T2>& src) {
-		construct(src.m_p);
-	}
-
 	ObjectImpl(ObjectImpl&& src) {
 		moveConstruct(std::move(src));
 	}
@@ -70,13 +65,6 @@ public:
 		return *this;
 	}
 
-	template <typename T2>
-	ObjectImpl&
-	operator = (const ObjectImpl<T2>& src) {
-		copy(src.m_p);
-		return *this;
-	}
-
 	ObjectImpl&
 	operator = (ObjectImpl&& src) {
 		move(std::move(src));
@@ -89,6 +77,31 @@ public:
 		move(std::move(src));
 		return *this;
 	}
+
+	PyObject**
+	p() {
+		return &m_p;
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <typename T>
+class ObjectBorrowedImpl: public T {
+public:
+	ObjectBorrowedImpl(PyObject* p = NULL) {
+		m_p = p;
+	}
+
+	ObjectBorrowedImpl&
+	operator = (PyObject* p) {
+		m_p = p;
+		return *this;
+	}
+
+private:
+	void
+	operator & () {}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -100,11 +113,6 @@ protected:
 public:
 	operator PyObject* () const {
 		return m_p;
-	}
-
-	PyObject**
-	p() {
-		return &m_p;
 	}
 
 	void
@@ -576,6 +584,7 @@ ObjectBase::callMethodObjArgs_va(
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef ObjectImpl<ObjectBase> Object;
+typedef ObjectBorrowedImpl<ObjectBase> ObjectBorrowed;
 
 //..............................................................................
 

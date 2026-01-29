@@ -85,6 +85,7 @@ CFunctionBase::fromMethodDef(
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef ObjectImpl<CFunctionBase> CFunction;
+typedef ObjectBorrowedImpl<CFunctionBase> CFunctionBorrowed;
 
 //..............................................................................
 

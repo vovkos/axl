@@ -29,6 +29,10 @@ public:
 		memcpy(this, &m_headInit, sizeof(PyTypeObject));
 	}
 
+	operator PyObject* () {
+		return (PyObject*)this;
+	}
+
 	ulong_t
 	getFlags() {
 		return PyType_GetFlags(this);

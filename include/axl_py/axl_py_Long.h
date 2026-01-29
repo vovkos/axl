@@ -511,6 +511,7 @@ LongBase::getNativeBytes(
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef ObjectImpl<LongBase> Long;
+typedef ObjectBorrowedImpl<LongBase> LongBorrowed;
 
 //..............................................................................
 

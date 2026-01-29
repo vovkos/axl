@@ -126,6 +126,7 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef ObjectImpl<DictBase> Dict;
+typedef ObjectBorrowedImpl<DictBase> DictBorrowed;
 
 //..............................................................................
 

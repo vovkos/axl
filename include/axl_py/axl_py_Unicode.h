@@ -429,6 +429,7 @@ UnicodeBase::getUtf32String() const {
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef ObjectImpl<UnicodeBase> Unicode;
+typedef ObjectBorrowedImpl<UnicodeBase> UnicodeBorrowed;
 
 //..............................................................................
 

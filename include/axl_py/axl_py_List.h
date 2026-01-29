@@ -213,6 +213,7 @@ ListBase::getTuple() const {
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef ObjectImpl<ListBase> List;
+typedef ObjectBorrowedImpl<ListBase> ListBorrowed;
 
 //..............................................................................
 
