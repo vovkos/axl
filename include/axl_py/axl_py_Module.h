@@ -109,6 +109,33 @@ public:
 		getFileNameObject(&name);
 		return name;
 	}
+
+	bool
+	add(
+		const sl::StringRef& name,
+		PyObject* item
+	) const {
+		ASSERT(m_p);
+		return completeWithLastPyErr(::PyModule_AddObjectRef(m_p, name.sz(), item) != -1);
+	}
+
+	bool
+	addIntConstant(
+		const sl::StringRef& name,
+		long value
+	) const {
+		ASSERT(m_p);
+		return completeWithLastPyErr(::PyModule_AddIntConstant(m_p, name.sz(), value) != -1);
+	}
+
+	bool
+	addStringConstant(
+		const sl::StringRef& name,
+		const sl::StringRef& value
+	) const {
+		ASSERT(m_p);
+		return completeWithLastPyErr(::PyModule_AddStringConstant(m_p, name.sz(), value.sz()) != -1);
+	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
