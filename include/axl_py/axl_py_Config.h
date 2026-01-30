@@ -237,26 +237,26 @@ public:
 	bool
 	setArgv(
 		int argc,
-		wchar_t* const* argv
+		const wchar_t* const* argv
 	) {
-		return completeWithPyStatus(::PyConfig_SetArgv(this, argc, argv));
+		return completeWithPyStatus(::PyConfig_SetArgv(this, argc, (wchar_t* const*)argv));
 	}
 
 	bool
 	setArgv(
 		int argc,
-		char* const* argv
+		const char* const* argv
 	) {
-		return completeWithPyStatus(::PyConfig_SetBytesArgv(this, argc, argv));
+		return completeWithPyStatus(::PyConfig_SetBytesArgv(this, argc, (char* const*)argv));
 	}
 
 	bool
 	setWideStringList(
 		PyWideStringList* field,
 		size_t count,
-		wchar_t** items
+		const wchar_t* const* items
 	) {
-		return completeWithPyStatus(::PyConfig_SetWideStringList(this, field, count, items));
+		return completeWithPyStatus(::PyConfig_SetWideStringList(this, field, count, (wchar_t**)items));
 	}
 
 	bool

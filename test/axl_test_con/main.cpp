@@ -9923,7 +9923,8 @@ HookDictTypeObject::ass_subscript(
 void
 testPython() {
 	wchar_t* paths[] = {
-		L"C:/Develop/python/python-3.14.2-embed/python314.zip",
+		L"C:/Develop/python/python-3.14.2/dlls",
+		L"C:/Develop/python/python-3.14.2/lib",
 	};
 
 	py::Object a;
