@@ -74,12 +74,12 @@ protected:
 
 	void
 	highlightLastToken(const QTextCharFormat& format) {
-		setFormat(ts - m_begin, te - ts, format);
+		this->setFormat(ts - m_begin, te - ts, format);
 	}
 
 	void
 	highlightLastToken(const QColor& color) {
-		setFormat(ts - m_begin, te - ts, color);
+		this->setFormat(ts - m_begin, te - ts, color);
 	}
 
 	void
