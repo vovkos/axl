@@ -32,6 +32,18 @@ public:
 		return m_p && PyLong_CheckExact(m_p);
 	}
 
+	static
+	bool
+	check(PyObject* p) {
+		return PyLong_Check(p);
+	}
+
+	static
+	bool
+	checkExact(PyObject* p) {
+		return PyLong_CheckExact(p);
+	}
+
 	bool
 	isZero() const {
 		ASSERT(m_p);

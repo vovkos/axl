@@ -32,6 +32,18 @@ public:
 		return m_p && PyTuple_CheckExact(m_p);
 	}
 
+	static
+	bool
+	check(PyObject* p) {
+		return PyTuple_Check(p);
+	}
+
+	static
+	bool
+	checkExact(PyObject* p) {
+		return PyTuple_CheckExact(p);
+	}
+
 	bool
 	createNew(size_t size) {
 		return finalizeCreate(::PyTuple_New(size));
@@ -169,6 +181,7 @@ TupleBase::setItem(
 	return true;
 }
 
+inline
 ObjectImpl<TupleBase>
 TupleBase::getSlice(
 	intptr_t from,
@@ -186,6 +199,7 @@ typedef ObjectBorrowedImpl<TupleBase> TupleBorrowed;
 
 //..............................................................................
 
+inline
 bool
 ObjectBase::callObjArgs_va(
 	PyObject** result,

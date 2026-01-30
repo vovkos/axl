@@ -133,10 +133,34 @@ public:
 	void
 	move(ObjectBase&& src);
 
+	bool
+	isImmortal() const {
+		ASSERT(m_p);
+		return ::PyUnstable_IsImmortal(m_p) != 0;
+	}
+
+	bool
+	isCallable() const {
+		ASSERT(m_p);
+		return ::PyCallable_Check(m_p) != 0;
+	}
+
 	PyTypeObject*
 	getType() const {
 		ASSERT(m_p);
 		return Py_TYPE(m_p);
+	}
+
+	bool
+	typeCheck(PyTypeObject* type) const {
+		ASSERT(m_p);
+		return ::PyObject_TypeCheck(m_p, type);
+	}
+
+	bool
+	typeCheck(PyObject* type) const {
+		ASSERT(m_p);
+		return ::PyType_Check(type) && ::PyObject_TypeCheck(m_p, (PyTypeObject*)type);
 	}
 
 	bool
@@ -173,6 +197,18 @@ public:
 	) const {
 		ASSERT(m_p);
 		return completeWithLastPyErr(::PyObject_GetBuffer(m_p, buffer, flags) != -1);
+	}
+
+	bool
+	hasAttr(const sl::StringRef& name) const {
+		ASSERT(m_p);
+		return ::PyObject_HasAttrString(m_p, name.sz()) != 0;
+	}
+
+	bool
+	hasAttr(PyObject* name) const {
+		ASSERT(m_p);
+		return ::PyObject_HasAttr(m_p, name) != 0;
 	}
 
 	bool

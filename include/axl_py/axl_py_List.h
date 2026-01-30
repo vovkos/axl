@@ -32,6 +32,18 @@ public:
 		return m_p && PyList_CheckExact(m_p);
 	}
 
+	static
+	bool
+	check(PyObject* p) {
+		return PyList_Check(p);
+	}
+
+	static
+	bool
+	checkExact(PyObject* p) {
+		return PyList_CheckExact(p);
+	}
+
 	bool
 	createNew(size_t size) {
 		return finalizeCreate(::PyList_New(size));

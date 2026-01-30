@@ -27,6 +27,12 @@ public:
 		return m_p && PyTraceBack_Check(m_p);
 	}
 
+	static
+	bool
+	check(PyObject* p) {
+		return PyTraceBack_Check(p);
+	}
+
 	bool
 	print(PyObject* file) const {
 		ASSERT(m_p);
@@ -48,6 +54,12 @@ public:
 		return m_p && PyExceptionClass_Check(m_p);
 	}
 
+	static
+	bool
+	check(PyObject* p) {
+		return PyExceptionClass_Check(p);
+	}
+
 	const char*
 	getName() const {
 		ASSERT(m_p);
@@ -67,6 +79,12 @@ public:
 	bool
 	check() const {
 		return m_p && PyExceptionInstance_Check(m_p);
+	}
+
+	static
+	bool
+	check(PyObject* p) {
+		return PyExceptionInstance_Check(p);
 	}
 
 	bool

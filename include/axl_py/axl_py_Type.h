@@ -29,18 +29,40 @@ public:
 		memcpy(this, &m_headInit, sizeof(PyTypeObject));
 	}
 
+	bool
+	check() {
+		return ::PyType_Check(this);
+	}
+
+	bool
+	checkExact() {
+		return ::PyType_CheckExact(this);
+	}
+
+	static
+	bool
+	check(PyObject* p) {
+		return ::PyType_Check(p);
+	}
+
+	static
+	bool
+	checkExact(PyObject* p) {
+		return ::PyType_CheckExact(p);
+	}
+
 	operator PyObject* () {
 		return (PyObject*)this;
 	}
 
 	ulong_t
 	getFlags() {
-		return PyType_GetFlags(this);
+		return ::PyType_GetFlags(this);
 	}
 
 	PyObject*
 	getDict() {
-		return PyType_GetDict(this);
+		return ::PyType_GetDict(this);
 	}
 
 	bool

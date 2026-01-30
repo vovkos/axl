@@ -32,6 +32,18 @@ public:
 		return m_p && ::PyCFunction_CheckExact(m_p);
 	}
 
+	static
+	bool
+	check(PyObject* p) {
+		return PyCFunction_Check(p);
+	}
+
+	static
+	bool
+	checkExact(PyObject* p) {
+		return PyCFunction_CheckExact(p);
+	}
+
 	int
 	getFlags() const {
 		ASSERT(m_p);

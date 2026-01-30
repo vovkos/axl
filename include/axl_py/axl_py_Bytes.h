@@ -32,6 +32,18 @@ public:
 		return m_p && PyBytes_CheckExact(m_p);
 	}
 
+	static
+	bool
+	check(PyObject* p) {
+		return PyBytes_Check(p);
+	}
+
+	static
+	bool
+	checkExact(PyObject* p) {
+		return PyBytes_CheckExact(p);
+	}
+
 	size_t
 	getSize() const {
 		return PyBytes_Size(m_p);

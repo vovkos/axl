@@ -32,6 +32,18 @@ public:
 		return m_p && ::PyUnicode_CheckExact(m_p);
 	}
 
+	static
+	bool
+	check(PyObject* p) {
+		return PyUnicode_Check(p);
+	}
+
+	static
+	bool
+	checkExact(PyObject* p) {
+		return PyUnicode_CheckExact(p);
+	}
+
 	size_t
 	getLength() const {
 		return ::PyUnicode_GetLength(m_p);

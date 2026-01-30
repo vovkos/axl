@@ -32,6 +32,18 @@ public:
 		return m_p && ::PyModule_CheckExact(m_p);
 	}
 
+	static
+	bool
+	check(PyObject* p) {
+		return PyModule_Check(p);
+	}
+
+	static
+	bool
+	checkExact(PyObject* p) {
+		return PyModule_CheckExact(p);
+	}
+
 	bool
 	create(sl::StringRef& name) {
 		return finalizeCreate(::PyModule_New(name.sz()));

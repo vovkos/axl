@@ -32,6 +32,18 @@ public:
 		return m_p && ::PyDict_CheckExact(m_p);
 	}
 
+	static
+	bool
+	check(PyObject* p) {
+		return PyDict_Check(p);
+	}
+
+	static
+	bool
+	checkExact(PyObject* p) {
+		return PyDict_Check(p);
+	}
+
 	bool
 	create() {
 		return finalizeCreate(::PyDict_New());

@@ -300,22 +300,23 @@ public:
 	}
 
 	~DetachedThreadRegion() {
-		attach();
+		if (m_state) // we could have reattached manually
+			attach();
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class GilStateRegion {
+class GilRegion {
 protected:
 	PyGILState_STATE m_state;
 
 public:
-	GilStateRegion() {
+	GilRegion() {
 		m_state = ::PyGILState_Ensure();
 	}
 
-	~GilStateRegion() {
+	~GilRegion() {
 		::PyGILState_Release(m_state);
 	}
 };

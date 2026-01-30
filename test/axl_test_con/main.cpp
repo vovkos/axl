@@ -9869,20 +9869,8 @@ struct HookDictObject: PyDictObject {
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class HookDictTypeObject: public py::TypeObject {
-protected:
-	static PyMappingMethods m_as_mapping;
-
 public:
-	HookDictTypeObject() {
-		tp_name = "nj.HookDict";
-		tp_basicsize = sizeof(HookDictObject);
-		tp_base = &PyDict_Type;
-		tp_as_mapping = &m_as_mapping;
-		tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE;
-
-		bool result = ready();
-		ASSERT(result);
-	}
+	HookDictTypeObject();
 
 protected:
 	static
@@ -9894,36 +9882,52 @@ protected:
 	);
 };
 
-PyMappingMethods HookDictTypeObject::m_as_mapping = {
-	NULL,          // mp_length
-	NULL,          // mp_subscript
-	ass_subscript, // mp_ass_subscript
-};
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+HookDictTypeObject::HookDictTypeObject() {
+	static PyMappingMethods mappingMethods = {
+		NULL,          // mp_length
+		NULL,          // mp_subscript
+		ass_subscript, // mp_ass_subscript
+	};
+
+	tp_name = "nj.PyHookDict";
+	tp_basicsize = sizeof(HookDictObject);
+	tp_base = &PyDict_Type;
+	tp_as_mapping = &mappingMethods;
+	tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE;
+
+	bool result = ready();
+	ASSERT(result);
+}
 
 int
 HookDictTypeObject::ass_subscript(
-	PyObject* self0,
-	PyObject* key0,
-	PyObject* value0
+	PyObject* self,
+	PyObject* key,
+	PyObject* value
 ) {
-    HookDictObject* dict = (HookDictObject*)self0;
-	py::Object key = key0;
-	py::Object value = value0;
+    HookDictObject* dict = (HookDictObject*)self;
 
 	printf(
-		"__setitem__: [%s] = %s\n",
-		key.getStr().getUtf8().sz(),
-		value.getStr().getUtf8().sz()
+	"__setitem__: [%s] = %s",
+		py::UnicodeBorrowed(key).getStr().getUtf8().sz(),
+		py::UnicodeBorrowed(value).getStr().getUtf8().sz()
 	);
 
-    return PyDict_Type.tp_as_mapping->mp_ass_subscript(self0, key, value);
+    return PyDict_Type.tp_as_mapping->mp_ass_subscript(self, key, value);
 }
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 void
 testPython() {
 	wchar_t* paths[] = {
 		L"C:/Develop/python/python-3.14.2-embed/python314.zip",
 	};
+
+	py::Object a;
+	py::ObjectBorrowed b = a;
 
 	py::IsolatedConfig config;
 	config.module_search_paths_set = 1;
