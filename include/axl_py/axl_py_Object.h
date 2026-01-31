@@ -21,94 +21,13 @@ namespace py {
 class UnicodeBase;
 class BytesBase;
 
+template <typename T>
+class ObjectImpl;
+
+template <typename T>
+class ObjectBorrowedImpl;
+
 //..............................................................................
-
-template <typename T>
-class ObjectImpl: public T {
-public:
-	ObjectImpl(PyObject* p = NULL) {
-		this->construct(p);
-	}
-
-	ObjectImpl(const ObjectImpl& src) {
-		this->construct(src.m_p);
-	}
-
-	ObjectImpl(ObjectImpl&& src) {
-		this->moveConstruct(std::move(src));
-	}
-
-	template <typename T2>
-	ObjectImpl(ObjectImpl<T2>&& src) {
-		this->moveConstruct(std::move(src));
-	}
-
-	~ObjectImpl() {
-		Py_XDECREF(this->m_p);
-	}
-
-	PyObject**
-	operator & () {
-		return &this->m_p;
-	}
-
-	ObjectImpl&
-	operator = (PyObject* p) {
-		this->copy(p);
-		return *this;
-	}
-
-	ObjectImpl&
-	operator = (const ObjectImpl& src) {
-		this->copy(src.m_p);
-		return *this;
-	}
-
-	ObjectImpl&
-	operator = (ObjectImpl&& src) {
-		this->move(std::move(src));
-		return *this;
-	}
-
-	template <typename T2>
-	ObjectImpl&
-	operator = (ObjectImpl<T2>&& src) {
-		this->move(std::move(src));
-		return *this;
-	}
-
-	PyObject*
-	p() const {
-		return this->m_p;
-	}
-
-	PyObject**
-	pp() {
-		return &this->m_p;
-	}
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-template <typename T>
-class ObjectBorrowedImpl: public T {
-public:
-	ObjectBorrowedImpl(PyObject* p = NULL) {
-		this->m_p = p;
-	}
-
-	ObjectBorrowedImpl&
-	operator = (PyObject* p) {
-		this->m_p = p;
-		return *this;
-	}
-
-private:
-	void
-	operator & () {}
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class ObjectBase {
 protected:
@@ -119,23 +38,10 @@ public:
 		return m_p;
 	}
 
-	void
-	attach(PyObject* p);
-
 	PyObject*
-	detach();
-
-	void
-	copy(PyObject* p);
-
-	void
-	release() {
-		Py_XDECREF(m_p);
-		m_p = NULL;
+	p() const {
+		return m_p;
 	}
-
-	void
-	move(ObjectBase&& src);
 
 	bool
 	isImmortal() const {
@@ -327,10 +233,7 @@ public:
 	callObjArgs(
 		PyObject* arg,
 		...
-	) const {
-		AXL_VA_DECL(va, arg);
-		return callObjArgs_va(arg, va);
-	}
+	) const;
 
 	bool
 	callMethod(
@@ -388,10 +291,7 @@ public:
 		PyObject* name,
 		PyObject* arg,
 		axl_va_list va
-	) const {
-		ObjectImpl<ObjectBase> method = getAttr(name);
-		return method ? method.callObjArgs_va(result, arg, va) : false;
-	}
+	) const;
 
 	bool
 	callMethodObjArgs(
@@ -435,10 +335,7 @@ public:
 		PyObject* name,
 		PyObject* arg,
 		...
-	) const {
-		AXL_VA_DECL(va, arg);
-		return callMethodObjArgs_va(name, arg, va);
-	}
+	) const;
 
 	ObjectImpl<ObjectBase>
 	callMethodObjArgs_va(
@@ -452,73 +349,210 @@ public:
 		const sl::StringRef& name,
 		PyObject* arg,
 		...
-	) const {
-		AXL_VA_DECL(va, arg);
-		return callMethodObjArgs_va(name, arg, va);
-	}
+	) const;
 
 protected:
-	void
-	construct(PyObject* p) {
-		Py_XINCREF(p);
-		m_p = p;
-	}
-
-	void
-	moveConstruct(ObjectBase&& src) {
-		m_p = src.m_p;
-		src.m_p = NULL;
-	}
+	// shouldn't be called from ObjectBorrowedImpl<T>
 
 	bool
 	finalizeCreate(PyObject* p) {
 		if (!p)
 			return failWithLastPyErr();
 
-		attach(p);
+		Py_XDECREF(this->m_p);
+		this->m_p = p;
 		return true;
 	}
 };
 
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//..............................................................................
 
-inline
-void
-ObjectBase::attach(PyObject* p) {
-	ASSERT(p != m_p);
-	Py_XDECREF(m_p);
-	m_p = p;
-}
+// owning reference
 
-inline
-PyObject*
-ObjectBase::detach() {
-	PyObject* p = m_p;
-	m_p = NULL;
-	return p;
-}
+template <typename T>
+class ObjectImpl: public T {
+	template <typename T2>
+	friend class ObjectImpl;
 
-inline
-void
-ObjectBase::copy(PyObject* p) {
-	if (p == m_p)
-		return;
+public:
+	ObjectImpl(PyObject* p = NULL) {
+		construct(p);
+	}
 
-	Py_XINCREF(p);
-	Py_XDECREF(m_p);
-	m_p = p;
-}
+	ObjectImpl(const ObjectImpl& src) {
+		construct(src.m_p);
+	}
 
-inline
-void
-ObjectBase::move(ObjectBase&& src) {
-	if (this == &src)
-		return;
+	template <typename T2>
+	ObjectImpl(const ObjectImpl<T2>& src) {
+		construct(src.p());
+	}
 
-	Py_XDECREF(m_p);
-	m_p = src.m_p;
-	src.m_p = NULL;
-}
+	template <typename T2>
+	ObjectImpl(const ObjectBorrowedImpl<T2>& src) {
+		construct(src.p());
+	}
+
+	ObjectImpl(ObjectImpl&& src) {
+		moveConstruct(std::move(src));
+	}
+
+	template <typename T2>
+	ObjectImpl(ObjectImpl<T2>&& src) {
+		moveConstruct(std::move(src));
+	}
+
+	~ObjectImpl() {
+		Py_XDECREF(this->m_p);
+	}
+
+	PyObject**
+	operator & () {
+		return &this->m_p;
+	}
+
+	ObjectImpl&
+	operator = (PyObject* p) {
+		copy(p);
+		return *this;
+	}
+
+	ObjectImpl&
+	operator = (const ObjectImpl& src) {
+		return operator = (src.p());
+	}
+
+	template <typename T2>
+	ObjectImpl&
+	operator = (const ObjectImpl<T2>& src) {
+		return operator = (src.p());
+	}
+
+	template <typename T2>
+	ObjectImpl&
+	operator = (const ObjectBorrowedImpl<T2>& src) {
+		return operator = (src.p());
+	}
+
+	ObjectImpl&
+	operator = (ObjectImpl&& src) {
+		move(std::move(src));
+		return *this;
+	}
+
+	template <typename T2>
+	ObjectImpl&
+	operator = (ObjectImpl<T2>&& src) {
+		move(std::move(src));
+		return *this;
+	}
+
+	PyObject**
+	pp() {
+		return &this->m_p;
+	}
+
+	void
+	attach(PyObject* p) {
+		ASSERT(p != this->m_p);
+		Py_XDECREF(this->m_p);
+		this->m_p = p;
+	}
+
+	PyObject*
+	detach() {
+		PyObject* p = this->m_p;
+		this->m_p = NULL;
+		return p;
+	}
+
+	void
+	copy(PyObject* p) {
+		if (p == this->m_p)
+			return;
+
+		Py_XINCREF(p);
+		Py_XDECREF(this->m_p);
+		this->m_p = p;
+	}
+
+	void
+	release() {
+		Py_XDECREF(this->m_p);
+		this->m_p = NULL;
+	}
+
+	template <typename T2>
+	void
+	move(ObjectImpl<T2>&& src) {
+		if (this == &src)
+			return;
+
+		Py_XDECREF(this->m_p);
+		this->m_p = src.m_p;
+		src.m_p = NULL;
+	}
+
+protected:
+	void
+	construct(PyObject* p) {
+		Py_XINCREF(p);
+		this->m_p = p;
+	}
+
+	template <typename T2>
+	void
+	moveConstruct(ObjectImpl<T2>&& src) {
+		this->m_p = src.m_p;
+		src.m_p = NULL;
+	}
+};
+
+//..............................................................................
+
+// borrowed reference
+
+template <typename T>
+class ObjectBorrowedImpl: public T {
+public:
+	ObjectBorrowedImpl(PyObject* p = NULL) {
+		this->m_p = p;
+	}
+
+	template <typename T2>
+	ObjectBorrowedImpl(const ObjectImpl<T2>& src) {
+		this->m_p = src.p();
+	}
+
+	template <typename T2>
+	ObjectBorrowedImpl(const ObjectBorrowedImpl<T2>& src) {
+		this->m_p = src.p();
+	}
+
+	ObjectBorrowedImpl&
+	operator = (PyObject* p) {
+		this->m_p = p;
+		return *this;
+	}
+
+	template <typename T2>
+	ObjectBorrowedImpl&
+	operator = (const ObjectImpl<T2>& src) {
+		return operator = (src.p());
+	}
+
+	template <typename T2>
+	ObjectBorrowedImpl&
+	operator = (const ObjectBorrowedImpl<T2>& src) {
+		return operator = (src.p());
+	}
+
+private:
+	void
+	operator & () {}
+};
+
+//..............................................................................
 
 inline
 ObjectImpl<ObjectBase>
@@ -581,6 +615,16 @@ ObjectBase::call(PyObject* arg) const {
 
 inline
 ObjectImpl<ObjectBase>
+ObjectBase::callObjArgs(
+	PyObject* arg,
+	...
+) const {
+	AXL_VA_DECL(va, arg);
+	return callObjArgs_va(arg, va);
+}
+
+inline
+ObjectImpl<ObjectBase>
 ObjectBase::callObjArgs_va(
 	PyObject* arg,
 	axl_va_list va
@@ -610,6 +654,18 @@ ObjectBase::callMethod(
 }
 
 inline
+bool
+ObjectBase::callMethodObjArgs_va(
+	PyObject** result,
+	PyObject* name,
+	PyObject* arg,
+	axl_va_list va
+) const {
+	ObjectImpl<ObjectBase> method = getAttr(name);
+	return method ? method.callObjArgs_va(result, arg, va) : false;
+}
+
+inline
 ObjectImpl<ObjectBase>
 ObjectBase::callMethodObjArgs_va(
 	PyObject* name,
@@ -619,6 +675,28 @@ ObjectBase::callMethodObjArgs_va(
 	ObjectImpl<ObjectBase> result;
 	callMethodObjArgs_va(&result, name, arg, va);
 	return result;
+}
+
+inline
+ObjectImpl<ObjectBase>
+ObjectBase::callMethodObjArgs(
+	PyObject* name,
+	PyObject* arg,
+	...
+) const {
+	AXL_VA_DECL(va, arg);
+	return callMethodObjArgs_va(name, arg, va);
+}
+
+inline
+ObjectImpl<ObjectBase>
+ObjectBase::callMethodObjArgs(
+	const sl::StringRef& name,
+	PyObject* arg,
+	...
+) const {
+	AXL_VA_DECL(va, arg);
+	return callMethodObjArgs_va(name, arg, va);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

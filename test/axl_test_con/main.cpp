@@ -9932,6 +9932,15 @@ testPython() {
 #endif
 	};
 
+	py::Object o;
+	py::ObjectBorrowed ob = o;
+	py::UnicodeBorrowed ub = o;
+	py::UnicodeBorrowed ub2 = ob;
+	py::Unicode u = o;
+	py::Unicode u2 = ob;
+	py::Unicode u3 = ub;
+
+
 	py::IsolatedConfig config;
 	config.module_search_paths_set = 1;
 	config.setWideStringList(&config.module_search_paths, countof(paths), paths);
