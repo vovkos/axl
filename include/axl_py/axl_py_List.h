@@ -206,6 +206,7 @@ ListBase::setItem(
 	return true;
 }
 
+inline
 ObjectImpl<ListBase>
 ListBase::getSlice(
 	intptr_t from,
@@ -216,6 +217,7 @@ ListBase::getSlice(
 	return result;
 }
 
+inline
 ObjectImpl<Tuple>
 ListBase::getTuple() const {
 	ObjectImpl<Tuple> result;

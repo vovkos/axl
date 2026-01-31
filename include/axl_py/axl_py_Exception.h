@@ -99,6 +99,7 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+inline
 Traceback
 ExceptionBase::getTraceback() const {
 	Traceback traceback;
