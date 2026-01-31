@@ -27,60 +27,64 @@ template <typename T>
 class ObjectImpl: public T {
 public:
 	ObjectImpl(PyObject* p = NULL) {
-		construct(p);
+		this->construct(p);
 	}
 
 	ObjectImpl(const ObjectImpl& src) {
-		construct(src.m_p);
+		this->construct(src.m_p);
 	}
 
 	ObjectImpl(ObjectImpl&& src) {
-		moveConstruct(std::move(src));
+		this->moveConstruct(std::move(src));
 	}
 
 	template <typename T2>
 	ObjectImpl(ObjectImpl<T2>&& src) {
-		moveConstruct(std::move(src));
+		this->moveConstruct(std::move(src));
 	}
 
 	~ObjectImpl() {
-		Py_XDECREF(m_p);
+		Py_XDECREF(this->m_p);
 	}
 
 	PyObject**
 	operator & () {
-		ASSERT(!m_p);
-		return &m_p;
+		return &this->m_p;
 	}
 
 	ObjectImpl&
 	operator = (PyObject* p) {
-		copy(p);
+		this->copy(p);
 		return *this;
 	}
 
 	ObjectImpl&
 	operator = (const ObjectImpl& src) {
-		copy(src.m_p);
+		this->copy(src.m_p);
 		return *this;
 	}
 
 	ObjectImpl&
 	operator = (ObjectImpl&& src) {
-		move(std::move(src));
+		this->move(std::move(src));
 		return *this;
 	}
 
 	template <typename T2>
 	ObjectImpl&
 	operator = (ObjectImpl<T2>&& src) {
-		move(std::move(src));
+		this->move(std::move(src));
 		return *this;
 	}
 
+	PyObject*
+	p() const {
+		return this->m_p;
+	}
+
 	PyObject**
-	p() {
-		return &m_p;
+	pp() {
+		return &this->m_p;
 	}
 };
 
@@ -90,12 +94,12 @@ template <typename T>
 class ObjectBorrowedImpl: public T {
 public:
 	ObjectBorrowedImpl(PyObject* p = NULL) {
-		m_p = p;
+		this->m_p = p;
 	}
 
 	ObjectBorrowedImpl&
 	operator = (PyObject* p) {
-		m_p = p;
+		this->m_p = p;
 		return *this;
 	}
 

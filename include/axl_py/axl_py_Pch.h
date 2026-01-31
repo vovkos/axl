@@ -17,6 +17,6 @@
 
 extern "C" {
 
-#include <python.h>
+#include <Python.h>
 
 } // extern "C" {

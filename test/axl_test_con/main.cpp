@@ -9910,7 +9910,7 @@ HookDictTypeObject::ass_subscript(
     HookDictObject* dict = (HookDictObject*)self;
 
 	printf(
-	"__setitem__: [%s] = %s",
+	"__setitem__: [%s] = %s\n",
 		py::UnicodeBorrowed(key).getStr().getUtf8().sz(),
 		py::UnicodeBorrowed(value).getStr().getUtf8().sz()
 	);
@@ -9922,13 +9922,15 @@ HookDictTypeObject::ass_subscript(
 
 void
 testPython() {
-	wchar_t* paths[] = {
+	const wchar_t* paths[] = {
+#if (_AXL_OS_WIN)
 		L"C:/Develop/python/python-3.14.2/dlls",
 		L"C:/Develop/python/python-3.14.2/lib",
+#elif (_AXL_OS_LINUX)
+		L"/home/vladimir/Develop/python/python-3.14.2/build/install-amd64/lib/python3.14/lib-dynload",
+		L"/home/vladimir/Develop/python/python-3.14.2/build/install-amd64/lib/python314.zip",
+#endif
 	};
-
-	py::Object a;
-	py::ObjectBorrowed b = a;
 
 	py::IsolatedConfig config;
 	config.module_search_paths_set = 1;

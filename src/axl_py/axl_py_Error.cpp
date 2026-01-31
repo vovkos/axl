@@ -74,7 +74,7 @@ setLastPyErr() {
 	Object traceback;
 
     ::PyErr_Fetch(&type, &value, &traceback);
-    ::PyErr_NormalizeException(type.p(), value.p(), traceback.p());
+    ::PyErr_NormalizeException(&type, &value, &traceback);
 	err::Error error = createPyErrError(type, value, traceback);
 	return err::setError(error);
 }

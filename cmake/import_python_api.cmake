@@ -44,7 +44,7 @@ elseif(NOT PYTHON_LIB_NAME)
 	)
 endif()
 
-if(EXISTS ${PYTHON_INC_DIR}/python.h AND PYTHON_LIB_DIR AND PYTHON_LIB_NAME)
+if(EXISTS ${PYTHON_INC_DIR}/Python.h AND PYTHON_LIB_DIR AND PYTHON_LIB_NAME)
 	axl_message("Python API paths:")
 	axl_message("    Includes:"  "${PYTHON_INC_DIR}")
 	axl_message("    Libraries:" "${PYTHON_LIB_DIR}")

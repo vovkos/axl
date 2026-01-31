@@ -69,7 +69,7 @@ if(BUILD_AXL_PY)
 	include_directories(${PYTHON_INC_DIR})
 	link_directories(${PYTHON_LIB_DIR})
 	add_definitions(-D_AXL_PY=1)
-	list(APPEND OPT_LIB_LIST axl_py)
+	list(APPEND OPT_LIB_LIST axl_py ${PYTHON_LIB_NAME})
 endif()
 
 if(BUILD_AXL_IO_SHMT)
