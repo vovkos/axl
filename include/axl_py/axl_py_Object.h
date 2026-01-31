@@ -385,7 +385,7 @@ public:
 
 	template <typename T2>
 	ObjectImpl(const ObjectImpl<T2>& src) {
-		construct(src.p());
+		construct(src.m_p);
 	}
 
 	template <typename T2>
@@ -419,13 +419,13 @@ public:
 
 	ObjectImpl&
 	operator = (const ObjectImpl& src) {
-		return operator = (src.p());
+		return operator = (src.m_p);
 	}
 
 	template <typename T2>
 	ObjectImpl&
 	operator = (const ObjectImpl<T2>& src) {
-		return operator = (src.p());
+		return operator = (src.m_p);
 	}
 
 	template <typename T2>
@@ -485,7 +485,7 @@ public:
 	template <typename T2>
 	void
 	move(ObjectImpl<T2>&& src) {
-		if (this == &src)
+		if (&this->m_p == &src.m_p) // operator & is overloaded
 			return;
 
 		Py_XDECREF(this->m_p);
