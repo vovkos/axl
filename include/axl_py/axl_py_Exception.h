@@ -63,7 +63,7 @@ public:
 	const char*
 	getName() const {
 		ASSERT(m_p);
-		return ::PyExceptionClass_Name(m_p);
+		return PyExceptionClass_Name(m_p);
 	}
 };
 

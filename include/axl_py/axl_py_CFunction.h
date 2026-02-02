@@ -24,7 +24,7 @@ class CFunctionBase: public ObjectBase {
 public:
 	bool
 	check() const {
-		return m_p && ::PyCFunction_Check(m_p);
+		return m_p && PyCFunction_Check(m_p);
 	}
 
 	bool

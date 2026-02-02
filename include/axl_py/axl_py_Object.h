@@ -66,13 +66,13 @@ public:
 	bool
 	typeCheck(PyTypeObject* type) const {
 		ASSERT(m_p);
-		return ::PyObject_TypeCheck(m_p, type);
+		return PyObject_TypeCheck(m_p, type);
 	}
 
 	bool
 	typeCheck(PyObject* type) const {
 		ASSERT(m_p);
-		return ::PyType_Check(type) && ::PyObject_TypeCheck(m_p, (PyTypeObject*)type);
+		return ::PyType_Check(type) && PyObject_TypeCheck(m_p, (PyTypeObject*)type);
 	}
 
 	bool

@@ -71,7 +71,7 @@ public:
 
 	void*
 	getData() const {
-		return ::PyUnicode_DATA(m_p);
+		return PyUnicode_DATA(m_p);
 	}
 
 	bool
@@ -81,7 +81,7 @@ public:
 
 	bool
 	isAscii() const {
-		return ::PyUnicode_IS_ASCII(m_p);
+		return PyUnicode_IS_ASCII(m_p);
 	}
 
 	bool

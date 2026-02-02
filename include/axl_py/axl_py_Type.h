@@ -60,11 +60,14 @@ public:
 		return ::PyType_GetFlags(this);
 	}
 
+#if (PY_VERSION_HEX >= 0x030c0000)
 	PyObject*
 	getDict() {
 		return ::PyType_GetDict(this);
 	}
+#endif
 
+#if (PY_VERSION_HEX >= 0x030b0000)
 	bool
 	getName(PyObject** name) {
 		return completeWithLastPyErr((*name = ::PyType_GetName(this)) != NULL);
@@ -80,6 +83,7 @@ public:
 
 	Unicode
 	getQualName();
+#endif
 
 #if (PY_VERSION_HEX >= 0x030d0000)
 	bool
@@ -118,6 +122,8 @@ AXL_SELECT_ANY const PyTypeObject TypeObject::m_headInit = {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+#if (PY_VERSION_HEX >= 0x030b0000)
+
 inline
 Unicode
 TypeObject::getName() {
@@ -133,6 +139,8 @@ TypeObject::getQualName() {
 	getQualName(&name);
 	return name;
 }
+
+#endif
 
 #if (PY_VERSION_HEX >= 0x030d0000)
 

@@ -24,7 +24,7 @@ class ModuleBase: public ObjectBase {
 public:
 	bool
 	check() const {
-		return m_p && ::PyModule_Check(m_p);
+		return m_p && PyModule_Check(m_p);
 	}
 
 	bool
@@ -97,11 +97,7 @@ public:
 	}
 
 	ObjectImpl<UnicodeBase>
-	getNameObject() const {
-		ObjectImpl<UnicodeBase> name;
-		getNameObject(&name);
-		return name;
-	}
+	getNameObject() const;
 
 	sl::StringRef
 	getFileName() const {
@@ -116,20 +112,13 @@ public:
 	}
 
 	ObjectImpl<UnicodeBase>
-	getFileNameObject() const {
-		ObjectImpl<UnicodeBase> name;
-		getFileNameObject(&name);
-		return name;
-	}
+	getFileNameObject() const;
 
 	bool
 	add(
 		const sl::StringRef& name,
 		PyObject* item
-	) const {
-		ASSERT(m_p);
-		return completeWithLastPyErr(::PyModule_AddObjectRef(m_p, name.sz(), item) != -1);
-	}
+	) const;
 
 	bool
 	addIntConstant(
@@ -169,6 +158,41 @@ ModuleBase::fromModuleDef(
 	ObjectImpl<ModuleBase> result;
 	result.create(moduleDef, apiVersion);
 	return result;
+}
+
+inline
+ObjectImpl<UnicodeBase>
+ModuleBase::getNameObject() const {
+	ObjectImpl<UnicodeBase> name;
+	getNameObject(&name);
+	return name;
+}
+
+inline
+ObjectImpl<UnicodeBase>
+ModuleBase::getFileNameObject() const {
+	ObjectImpl<UnicodeBase> name;
+	getFileNameObject(&name);
+	return name;
+}
+
+inline
+bool
+ModuleBase::add(
+	const sl::StringRef& name,
+	PyObject* item
+) const {
+	ASSERT(m_p);
+#if (PY_VERSION_HEX >= 0x030a0000)
+	return completeWithLastPyErr(::PyModule_AddObjectRef(m_p, name.sz(), item) != -1);
+#else
+	int result = ::PyModule_AddObject(m_p, name.sz(), item);
+	if (result == -1)
+		return failWithLastPyErr();
+
+	Py_INCREF(item); // compensate for the reference stolen by PyModule_AddObject
+	return true;
+#endif
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

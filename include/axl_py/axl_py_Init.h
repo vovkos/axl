@@ -241,6 +241,8 @@ clearTypeCache() {
 	return ::PyType_ClearCache();
 }
 
+#if (PY_VERSION_HEX >= 0x030c0000)
+
 inline
 int
 addTypeWatcher(PyType_WatchCallback callback) {
@@ -252,6 +254,8 @@ bool
 clearTypeWatcher(int id) {
 	return completeWithLastPyErr(::PyType_ClearWatcher(id) != -1);
 }
+
+#endif
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
