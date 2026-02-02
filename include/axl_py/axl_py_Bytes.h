@@ -180,5 +180,5 @@ ObjectBase::getBytes() const {
 
 //..............................................................................
 
-} // namespace lua
+} // namespace py
 } // namespace axl

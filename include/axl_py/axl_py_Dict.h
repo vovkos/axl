@@ -144,5 +144,5 @@ typedef ObjectBorrowedImpl<DictBase> DictBorrowed;
 
 //..............................................................................
 
-} // namespace lua
+} // namespace py
 } // namespace axl

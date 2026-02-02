@@ -714,5 +714,5 @@ typedef ObjectBorrowedImpl<ObjectBase> ObjectBorrowed;
 
 //..............................................................................
 
-} // namespace lua
+} // namespace py
 } // namespace axl

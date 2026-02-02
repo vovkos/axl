@@ -101,5 +101,5 @@ typedef ObjectBorrowedImpl<CFunctionBase> CFunctionBorrowed;
 
 //..............................................................................
 
-} // namespace lua
+} // namespace py
 } // namespace axl

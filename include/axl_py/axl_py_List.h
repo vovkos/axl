@@ -233,5 +233,5 @@ typedef ObjectBorrowedImpl<ListBase> ListBorrowed;
 
 //..............................................................................
 
-} // namespace lua
+} // namespace py
 } // namespace axl

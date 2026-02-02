@@ -202,5 +202,5 @@ typedef ObjectBorrowedImpl<ModuleBase> ModuleBorrowed;
 
 //..............................................................................
 
-} // namespace lua
+} // namespace py
 } // namespace axl

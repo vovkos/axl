@@ -164,5 +164,5 @@ TypeObject::getModuleName() {
 
 //..............................................................................
 
-} // namespace lua
+} // namespace py
 } // namespace axl

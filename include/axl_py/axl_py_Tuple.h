@@ -212,5 +212,5 @@ ObjectBase::callObjArgs_va(
 
 //..............................................................................
 
-} // namespace lua
+} // namespace py
 } // namespace axl
