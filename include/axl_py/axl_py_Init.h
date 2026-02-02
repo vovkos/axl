@@ -30,11 +30,13 @@ preInitialize(const PyPreConfig* config) {
 	return completeWithPyStatus(::Py_PreInitialize(config));
 }
 
+#if (PY_VERSION_HEX >= 0x030e0000)
 bool
 initialize(
 	PyInitConfig* config,
 	uint_t flags = 0
 );
+#endif
 
 bool
 initialize(

@@ -42,6 +42,8 @@ setupFinalizer(uint_t flags) {
 		finalizer->m_mainThreadState = ::PyEval_SaveThread();
 }
 
+#if (PY_VERSION_HEX >= 0x030e0000)
+
 bool
 initialize(
 	PyInitConfig* config,
@@ -56,6 +58,8 @@ initialize(
 	setupFinalizer(flags);
 	return true;
 }
+
+#endif
 
 bool
 initialize(

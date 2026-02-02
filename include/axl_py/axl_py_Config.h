@@ -36,6 +36,8 @@ public:
 	}
 };
 
+#if (PY_VERSION_HEX >= 0x030e0000)
+
 //..............................................................................
 
 class FreePyInitConfig {
@@ -211,6 +213,8 @@ InitConfig::getStr(const sl::StringRef& name) const {
 }
 
 //..............................................................................
+
+#endif
 
 class ConfigBase: public PyConfig {
 public:

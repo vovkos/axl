@@ -43,11 +43,13 @@ public:
 		return m_p;
 	}
 
+#if (PY_VERSION_HEX >= 0x030e0000)
 	bool
 	isImmortal() const {
 		ASSERT(m_p);
 		return ::PyUnstable_IsImmortal(m_p) != 0;
 	}
+#endif
 
 	bool
 	isCallable() const {
@@ -145,6 +147,7 @@ public:
 	ObjectImpl<ObjectBase>
 	getAttr(PyObject* name) const;
 
+#if (PY_VERSION_HEX >= 0x030d0000)
 	bool
 	getOptionalAttr(
 		PyObject** result,
@@ -168,6 +171,7 @@ public:
 
 	ObjectImpl<ObjectBase>
 	getOptionalAttr(PyObject* name) const;
+#endif
 
 	bool
 	callEx(
@@ -570,6 +574,8 @@ ObjectBase::getAttr(PyObject* name) const {
 	return value;
 }
 
+#if (PY_VERSION_HEX >= 0x030d0000)
+
 inline
 ObjectImpl<ObjectBase>
 ObjectBase::getOptionalAttr(const sl::StringRef& name) const {
@@ -585,6 +591,8 @@ ObjectBase::getOptionalAttr(PyObject* name) const {
 	getOptionalAttr(&value, name);
 	return value;
 }
+
+#endif
 
 inline
 ObjectImpl<ObjectBase>

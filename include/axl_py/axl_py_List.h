@@ -24,24 +24,24 @@ class ListBase: public ObjectBase {
 public:
 	bool
 	check() const {
-		return m_p && PyList_Check(m_p);
+		return m_p && ::PyList_Check(m_p);
 	}
 
 	bool
 	checkExact() const {
-		return m_p && PyList_CheckExact(m_p);
+		return m_p && ::PyList_CheckExact(m_p);
 	}
 
 	static
 	bool
 	check(PyObject* p) {
-		return PyList_Check(p);
+		return ::PyList_Check(p);
 	}
 
 	static
 	bool
 	checkExact(PyObject* p) {
-		return PyList_CheckExact(p);
+		return ::PyList_CheckExact(p);
 	}
 
 	bool
@@ -84,13 +84,13 @@ public:
 	size_t
 	getSize() const {
 		ASSERT(m_p);
-		return PyList_Size(m_p);
+		return ::PyList_Size(m_p);
 	}
 
 	PyObject*
 	getItem(size_t index) const {
 		ASSERT(m_p);
-		return PyList_GetItem(m_p, index); // borrowed reference
+		return ::PyList_GetItem(m_p, index); // borrowed reference
 	}
 
 	bool
@@ -105,13 +105,13 @@ public:
 		PyObject* item
 	) const {
 		ASSERT(m_p);
-		return completeWithLastPyErr(PyList_Insert(m_p, index, item) != -1);
+		return completeWithLastPyErr(::PyList_Insert(m_p, index, item) != -1);
 	}
 
 	bool
 	append(PyObject* item) const {
 		ASSERT(m_p);
-		return completeWithLastPyErr(PyList_Append(m_p, item) != -1);
+		return completeWithLastPyErr(::PyList_Append(m_p, item) != -1);
 	}
 
 	bool
@@ -121,7 +121,7 @@ public:
 		intptr_t to
 	) const {
 		ASSERT(m_p);
-		return completeWithLastPyErr((*result = PyList_GetSlice(m_p, from, to)) != NULL);
+		return completeWithLastPyErr((*result = ::PyList_GetSlice(m_p, from, to)) != NULL);
 	}
 
 	ObjectImpl<ListBase>
@@ -133,28 +133,30 @@ public:
 	bool
 	getTuple(PyObject** result) const {
 		ASSERT(m_p);
-		return completeWithLastPyErr((*result = PyList_AsTuple(m_p)) != NULL);
+		return completeWithLastPyErr((*result = ::PyList_AsTuple(m_p)) != NULL);
 	}
 
 	ObjectImpl<Tuple>
 	getTuple() const;
 
+#if (PY_VERSION_HEX >= 0x030d0000)
 	bool
 	clear() const {
 		ASSERT(m_p);
-		return completeWithLastPyErr(PyList_Clear(m_p) != -1);
+		return completeWithLastPyErr(::PyList_Clear(m_p) != -1);
 	}
+#endif
 
 	bool
 	sort() const {
 		ASSERT(m_p);
-		return completeWithLastPyErr(PyList_Sort(m_p) != -1);
+		return completeWithLastPyErr(::PyList_Sort(m_p) != -1);
 	}
 
 	bool
 	reverse() const {
 		ASSERT(m_p);
-		return completeWithLastPyErr(PyList_Reverse(m_p) != -1);
+		return completeWithLastPyErr(::PyList_Reverse(m_p) != -1);
 	}
 };
 
@@ -198,7 +200,7 @@ ListBase::setItem(
 	size_t index,
 	PyObject* item
 ) const {
-	int result = PyList_SetItem(m_p, index, item);
+	int result = ::PyList_SetItem(m_p, index, item);
 	if (result == -1)
 		return failWithLastPyErr();
 

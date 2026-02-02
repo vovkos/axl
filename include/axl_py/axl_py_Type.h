@@ -81,6 +81,7 @@ public:
 	Unicode
 	getQualName();
 
+#if (PY_VERSION_HEX >= 0x030d0000)
 	bool
 	getFullyQualifiedName(PyObject** name) {
 		return completeWithLastPyErr((*name = ::PyType_GetFullyQualifiedName(this)) != NULL);
@@ -96,6 +97,7 @@ public:
 
 	Unicode
 	getModuleName();
+#endif
 
 	void
 	setModified() {
@@ -132,6 +134,8 @@ TypeObject::getQualName() {
 	return name;
 }
 
+#if (PY_VERSION_HEX >= 0x030d0000)
+
 inline
 Unicode
 TypeObject::getFullyQualifiedName() {
@@ -147,6 +151,8 @@ TypeObject::getModuleName() {
 	getModuleName(&name);
 	return name;
 }
+
+#endif
 
 //..............................................................................
 

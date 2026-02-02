@@ -71,11 +71,13 @@ public:
 		return ::PyDict_Contains(m_p, key) == 1;
 	}
 
+#if (PY_VERSION_HEX >= 0x030d0000)
 	bool
 	contains(const sl::StringRef& key) {
 		ASSERT(m_p);
 		return ::PyDict_ContainsString(m_p, key.sz()) == 1;
 	}
+#endif
 
 	PyObject*
 	getItem(PyObject* key) {

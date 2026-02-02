@@ -44,6 +44,7 @@ public:
 		return PyLong_CheckExact(p);
 	}
 
+#if (PY_VERSION_HEX >= 0x030e0000)
 	bool
 	isZero() const {
 		ASSERT(m_p);
@@ -61,6 +62,7 @@ public:
 		ASSERT(m_p);
 		return ::PyLong_IsNegative(m_p);
 	}
+#endif
 
 	bool
 	createFromLong(long value) {
@@ -87,6 +89,7 @@ public:
 		return finalizeCreate(::PyLong_FromUnsignedLongLong(value));
 	}
 
+#if (PY_VERSION_HEX >= 0x030e0000)
 	bool
 	createFromInt32(int32_t value) {
 		return finalizeCreate(::PyLong_FromInt32(value));
@@ -106,6 +109,7 @@ public:
 	createFromUInt64(uint64_t value) {
 		return finalizeCreate(::PyLong_FromUInt64(value));
 	}
+#endif
 
 	bool
 	createFromDouble(double value) {
@@ -134,6 +138,7 @@ public:
 		return finalizeCreate(::PyLong_FromVoidPtr(p));
 	}
 
+#if (PY_VERSION_HEX >= 0x030e0000)
 	bool
 	createFromNativeBytes(
 		const void* p,
@@ -151,6 +156,7 @@ public:
 	) {
 		return finalizeCreate(::PyLong_FromUnsignedNativeBytes(p, size, flags));
 	}
+#endif
 
 	static
 	ObjectImpl<LongBase>
@@ -172,6 +178,7 @@ public:
 	ObjectImpl<LongBase>
 	fromUnsignedLongLong(unsigned long long value);
 
+#if (PY_VERSION_HEX >= 0x030e0000)
 	static
 	ObjectImpl<LongBase>
 	fromInt32(int32_t value);
@@ -187,6 +194,7 @@ public:
 	static
 	ObjectImpl<LongBase>
 	fromUInt64(uint64_t value);
+#endif
 
 	static
 	ObjectImpl<LongBase>
@@ -211,6 +219,7 @@ public:
 	ObjectImpl<LongBase>
 	fromVoidPtr(void* p);
 
+#if (PY_VERSION_HEX >= 0x030e0000)
 	static
 	ObjectImpl<LongBase>
 	fromNativeBytes(
@@ -226,6 +235,7 @@ public:
 		size_t size,
 		int flags = Py_ASNATIVEBYTES_DEFAULTS
 	);
+#endif
 
 	long
 	getLong() const {
@@ -239,11 +249,13 @@ public:
 		return ::PyLong_AsUnsignedLong(m_p);
 	}
 
+#if (PY_VERSION_HEX >= 0x030d0000)
 	int
 	getInt() const {
 		ASSERT(m_p);
 		return ::PyLong_AsInt(m_p);
 	}
+#endif
 
 	long long
 	getLongLong() const {
@@ -275,6 +287,7 @@ public:
 		return ::PyLong_AsVoidPtr(m_p);
 	}
 
+#if (PY_VERSION_HEX >= 0x030e0000)
 	bool
 	getInt32(int32_t* value) const;
 
@@ -305,6 +318,7 @@ public:
 		size_t size,
 		int flags = Py_ASNATIVEBYTES_DEFAULTS
 	);
+#endif
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -349,6 +363,8 @@ LongBase::fromUnsignedLongLong(unsigned long long value) {
 	return result;
 }
 
+#if (PY_VERSION_HEX >= 0x030e0000)
+
 inline
 ObjectImpl<LongBase>
 LongBase::fromInt32(int32_t value) {
@@ -380,6 +396,8 @@ LongBase::fromUInt64(uint64_t value) {
 	result.createFromUInt64(value);
 	return result;
 }
+
+#endif
 
 inline
 ObjectImpl<LongBase>
@@ -419,6 +437,8 @@ LongBase::fromVoidPtr(void* p) {
 	result.createFromVoidPtr(p);
 	return result;
 }
+
+#if (PY_VERSION_HEX >= 0x030e0000)
 
 inline
 ObjectImpl<LongBase>
@@ -519,6 +539,8 @@ LongBase::getNativeBytes(
 	Py_ssize_t result = ::PyLong_AsNativeBytes(m_p, p, size, flags);
 	return completeWithLastPyErr<size_t>(result, (Py_ssize_t)-1);
 }
+
+#endif
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
