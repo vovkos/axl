@@ -45,14 +45,23 @@ elseif(NOT PYTHON_LIB_NAME)
 endif()
 
 if(EXISTS ${PYTHON_INC_DIR}/Python.h AND PYTHON_LIB_DIR AND PYTHON_LIB_NAME)
-	axl_message("Python API paths:")
-	axl_message("    Includes:"  "${PYTHON_INC_DIR}")
-	axl_message("    Libraries:" "${PYTHON_LIB_DIR}")
-
-	if(PYTHON_DLL_DIR)
-		axl_message("    DLLs:" "${PYTHON_DLL_DIR}")
+	if(WIN32)
+		set(PYTHON_LIB_NAME ${PYTHON_LIB_NAME}$<$<CONFIG:Debug>:_d>)
 	endif()
 
+	axl_message("Python API paths:")
+	axl_message("    Includes:"     "${PYTHON_INC_DIR}")
+	axl_message("    Libraries:"    "${PYTHON_LIB_DIR}")
+
+	if(PYTHON_DLL_DIR)
+		axl_message("    DLLs:"     "${PYTHON_DLL_DIR}")
+	endif()
+
+	if(PYTHON_PYD_DIR)
+		axl_message("    PYDs:"     "${PYTHON_PYD_DIR}")
+	endif()
+
+	axl_message("    Stdlib:"       "${PYTHON_ZIP}")
 	axl_message("    Library name:" "${PYTHON_LIB_NAME}")
 
 	set(PYTHON_API_FOUND TRUE)
