@@ -9920,16 +9920,13 @@ HookDictTypeObject::ass_subscript(
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+#include "pythonPaths.h"
+
 void
 testPython() {
 	const wchar_t* paths[] = {
-#if (_AXL_OS_WIN)
-		L"C:/Develop/python/python-3.14.2/dlls",
-		L"C:/Develop/python/python-3.14.2/lib",
-#elif (_AXL_OS_LINUX)
-		L"/home/vladimir/Develop/python/python-3.14.2/build/install-amd64/lib/python3.14/lib-dynload",
-		L"/home/vladimir/Develop/python/python-3.14.2/build/install-amd64/lib/python314.zip",
-#endif
+		PYTHON_PYD_DIRW,
+		PYTHON_ZIPW
 	};
 
 	py::Object o;

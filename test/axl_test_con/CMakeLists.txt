@@ -70,6 +70,8 @@ if(BUILD_AXL_PY)
 	link_directories(${PYTHON_LIB_DIR})
 	add_definitions(-D_AXL_PY=1)
 	list(APPEND OPT_LIB_LIST axl_py ${PYTHON_LIB_NAME})
+	configure_file(pythonPaths.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/pythonPaths.h)
+	include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
 endif()
 
 if(BUILD_AXL_IO_SHMT)
@@ -292,11 +294,7 @@ if(WIN32)
 	endif()
 
 	if(BUILD_AXL_PY AND PYTHON_DLL_DIR)
-		list(
-			APPEND _DLL_LIST
-			${PYTHON_DLL_DIR}/${PYTHON_LIB_NAME}.dll
-			${PYTHON_DLL_DIR}/${PYTHON_LIB_NAME}_d.dll
-		)
+		list(APPEND _DLL_LIST ${PYTHON_DLL_DIR}/${PYTHON_LIB_NAME}.dll)
 	endif()
 
 	if(BUILD_AXL_IO_USB AND LIBUSB_DLL_DIR)
