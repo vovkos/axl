@@ -10,7 +10,6 @@
 #...............................................................................
 
 brew install lua
-brew install libusb
 brew install hidapi
 brew install ragel
 
