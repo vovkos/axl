@@ -844,12 +844,13 @@ axl_find_lib_dir_ex
 
 	set(_RESULT_LIB_DIR)
 	set(_RESULT_LIB_NAME)
+	set(_RESULT_FRAMEWORK_VERSION)
 	set(_LIB_DIR_LIST)
 	set(_LIB_NAME_LIST)
 	set(_STATE)
 
 	foreach(_ARG ${_ARG_LIST})
-		string(REGEX MATCH "^(RESULT_LIB_DIR|RESULT_LIB_NAME|LIB_DIR|LIB_NAME)$" _MATCH ${_ARG})
+		string(REGEX MATCH "^(RESULT_LIB_DIR|RESULT_LIB_NAME|RESULT_FRAMEWORK_VERSION|LIB_DIR|LIB_NAME)$" _MATCH ${_ARG})
 
 		if(NOT "${_MATCH}" STREQUAL "")
 			set(_STATE ${_MATCH})
@@ -858,6 +859,9 @@ axl_find_lib_dir_ex
 			set(_STATE)
 		elseif("${_STATE}" STREQUAL "RESULT_LIB_NAME")
 			set(_RESULT_LIB_NAME ${_ARG})
+			set(_STATE)
+		elseif("${_STATE}" STREQUAL "RESULT_FRAMEWORK_VERSION")
+			set(_RESULT_FRAMEWORK_VERSION ${_ARG})
 			set(_STATE)
 		elseif("${_STATE}" STREQUAL "LIB_DIR")
 			list(APPEND _LIB_DIR_LIST ${_ARG})
@@ -882,6 +886,10 @@ axl_find_lib_dir_ex
 
 			if(_RESULT_LIB_NAME)
 				set(${_RESULT_LIB_NAME} ${_ACTUAL_LIB_NAME})
+			endif()
+
+			if(${_ACTUAL_LIB_NAME} MATCHES "\\.framework$" AND _RESULT_FRAMEWORK_VERSION)
+				file(READ_SYMLINK "${_LIB_DIR}/${_ACTUAL_LIB_NAME}/Versions/Current" ${_RESULT_FRAMEWORK_VERSION})
 			endif()
 
 			break()
