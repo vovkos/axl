@@ -9925,8 +9925,8 @@ HookDictTypeObject::ass_subscript(
 void
 testPython() {
 	const wchar_t* paths[] = {
-		PYTHON_PYD_DIRW,
-		PYTHON_ZIPW
+		PYTHON_EXT_DIR_W,
+		PYTHON_STDLIB_W
 	};
 
 	py::Object o;
@@ -9936,7 +9936,6 @@ testPython() {
 	py::Unicode u = o;
 	py::Unicode u2 = ob;
 	py::Unicode u3 = ub;
-
 
 	py::IsolatedConfig config;
 	config.module_search_paths_set = 1;

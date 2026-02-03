@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#define PYTHON_PYD_DIRA "${PYTHON_PYD_DIR}"
-#define PYTHON_PYD_DIRW L"${PYTHON_PYD_DIR}"
-#define PYTHON_ZIPA     "${PYTHON_ZIP}"
-#define PYTHON_ZIPW     L"${PYTHON_ZIP}"
+#define PYTHON_EXT_DIR   "${PYTHON_EXT_DIR}"
+#define PYTHON_EXT_DIR_W L"${PYTHON_EXT_DIR}"
+#define PYTHON_STDLIB    "${PYTHON_STDLIB}"
+#define PYTHON_STDLIB_W  L"${PYTHON_STDLIB}"
