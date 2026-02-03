@@ -24,7 +24,12 @@ if(NOT PYTHON_INC_DIR)
 endif()
 
 if(NOT PYTHON_LIB_DIR)
-	if(NOT PYTHON_LIB_NAME)
+	if(PYTHON_LIB_NAME)
+		axl_find_lib_dir_ex(
+			RESULT_LIB_DIR PYTHON_LIB_DIR
+			LIB_NAME ${PYTHON_LIB_NAME}
+		)
+	elseif (NOT APPLE)
 		axl_find_lib_dir_ex(
 			RESULT_LIB_DIR PYTHON_LIB_DIR
 			RESULT_LIB_NAME PYTHON_LIB_NAME
@@ -33,8 +38,17 @@ if(NOT PYTHON_LIB_DIR)
 	else()
 		axl_find_lib_dir_ex(
 			RESULT_LIB_DIR PYTHON_LIB_DIR
-			LIB_NAME ${PYTHON_LIB_NAME}
+			RESULT_LIB_NAME PYTHON_LIB_NAME
+			RESULT_FRAMEWORK_VERSION PYTHON_FRAMEWORK_VERSION
+			LIB_NAME ${_PYTHON_LIB_NAME_LIST}
 		)
+
+		if(PYTHON_FRAMEWORK_VERSION)
+			set(PYTHON_LIB_NAME "${PYTHON_LIB_DIR}/${PYTHON_LIB_NAME}")
+			set(PYTHON_STDLIB "${PYTHON_LIB_NAME}/Versions/Current/lib/python${PYTHON_FRAMEWORK_VERSION}")
+			set(PYTHON_EXT_DIR "${PYTHON_STDLIB}/lib-dynload")
+			unset(PYTHON_LIB_DIR)
+		endif()
 	endif()
 elseif(NOT PYTHON_LIB_NAME)
 	axl_find_lib_dir_ex(
@@ -44,25 +58,28 @@ elseif(NOT PYTHON_LIB_NAME)
 	)
 endif()
 
-if(EXISTS ${PYTHON_INC_DIR}/Python.h AND PYTHON_LIB_DIR AND PYTHON_LIB_NAME)
+if(EXISTS ${PYTHON_INC_DIR}/Python.h AND PYTHON_LIB_NAME)
 	if(WIN32)
 		set(PYTHON_LIB_NAME ${PYTHON_LIB_NAME}$<$<CONFIG:Debug>:_d>)
 	endif()
 
 	axl_message("Python API paths:")
-	axl_message("    Includes:"     "${PYTHON_INC_DIR}")
-	axl_message("    Libraries:"    "${PYTHON_LIB_DIR}")
+	axl_message("    Includes:"       "${PYTHON_INC_DIR}")
+
+	if(PYTHON_LIB_DIR)
+		axl_message("    Libraries:"  "${PYTHON_LIB_DIR}")
+	endif()
 
 	if(PYTHON_DLL_DIR)
-		axl_message("    DLLs:"     "${PYTHON_DLL_DIR}")
+		axl_message("    DLLs:"       "${PYTHON_DLL_DIR}")
 	endif()
 
-	if(PYTHON_PYD_DIR)
-		axl_message("    PYDs:"     "${PYTHON_PYD_DIR}")
+	if(PYTHON_EXT_DIR)
+		axl_message("    Extensions:" "${PYTHON_EXT_DIR}")
 	endif()
 
-	axl_message("    Stdlib:"       "${PYTHON_ZIP}")
-	axl_message("    Library name:" "${PYTHON_LIB_NAME}")
+	axl_message("    Stdlib:"         "${PYTHON_STDLIB}")
+	axl_message("    Library name:"   "${PYTHON_LIB_NAME}")
 
 	set(PYTHON_API_FOUND TRUE)
 else()
