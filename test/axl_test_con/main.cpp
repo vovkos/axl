@@ -9924,6 +9924,8 @@ HookDictTypeObject::ass_subscript(
 
 void
 testPython() {
+	lex::registerParseErrorProvider();
+
 	const wchar_t* paths[] = {
 		PYTHON_EXT_DIR_W,
 		PYTHON_STDLIB_W
@@ -9957,8 +9959,10 @@ testPython() {
 	dict.setItem("__builtins__", PyEval_GetBuiltins());
 	dict.update(myDict);
 
+	const sl::StringRef sourceName = "axl-test-python-src";
 	const sl::StringRef source =
 		"print('Foo!')\n"
+		"a()\n"
 		"def foo():\n"
 		"  print('foo')\n"
 		"\n"
@@ -9972,7 +9976,7 @@ testPython() {
 	flags.cf_feature_version = PY_MINOR_VERSION;
 
 	py::Object ast;
-	result = py::compile(&ast, source, "unnamed-source", &flags);
+	result = py::compile(&ast, source, sourceName, &flags);
 	if (!result) {
 		printf("compile to AST failed: %s\n", err::getLastErrorDescription().sz());
 		return;
@@ -9989,7 +9993,7 @@ testPython() {
 	}
 
 	py::Object code;
-	result = py::compile(&code, source, "unnamed-source");
+	result = py::compile(&code, source, sourceName);
 	if (!result) {
 		printf("compile to code failed: %s\n", err::getLastErrorDescription().sz());
 		return;

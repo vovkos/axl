@@ -13,7 +13,7 @@
 
 #define _AXL_PY_EXCEPTION_H
 
-#include "axl_py_Object.h"
+#include "axl_py_Unicode.h"
 
 namespace axl {
 namespace py {
@@ -70,7 +70,7 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 typedef ObjectImpl<ExceptionClassBase> ExceptionClass;
-typedef ObjectBorrowedImpl<ExceptionClassBase> ExceptionBorrowedClass;
+typedef ObjectBorrowedImpl<ExceptionClassBase> ExceptionClassBorrowed;
 
 //..............................................................................
 
@@ -111,6 +111,84 @@ ExceptionBase::getTraceback() const {
 
 typedef ObjectImpl<ExceptionBase> Exception;
 typedef ObjectBorrowedImpl<ExceptionBase> ExceptionBorrowed;
+
+//..............................................................................
+
+class CodeBase: public ObjectBase {
+public:
+	bool
+	check() const {
+		return m_p && PyCode_Check(m_p);
+	}
+
+	static
+	bool
+	check(PyObject* p) {
+		return PyCode_Check(p);
+	}
+
+	UnicodeBorrowed
+	getFileName() const {
+		ASSERT(check());
+		return ((PyCodeObject*)m_p)->co_filename;
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+typedef ObjectImpl<CodeBase> Code;
+typedef ObjectBorrowedImpl<CodeBase> CodeBorrowed;
+
+//..............................................................................
+
+class FrameBase: public ObjectBase {
+public:
+	bool
+	check() const {
+		return m_p && PyFrame_Check(m_p);
+	}
+
+	static
+	bool
+	check(PyObject* p) {
+		return PyFrame_Check(p);
+	}
+
+	int
+	getLineNumber() const {
+		ASSERT(check());
+		return ::PyFrame_GetLineNumber((PyFrameObject*)m_p);
+	}
+
+	bool
+	getCode(PyObject** result) const;
+
+	Code
+	getCode() const;
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+bool
+FrameBase::getCode(PyObject** result) const {
+	ASSERT(check());
+	*result = (PyObject*)::PyFrame_GetCode((PyFrameObject*)m_p);
+	return true;
+}
+
+inline
+Code
+FrameBase::getCode() const {
+	Code result;
+	getCode(&result);
+	return result;
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+typedef ObjectImpl<FrameBase> Frame;
+typedef ObjectBorrowedImpl<FrameBase> FrameBorrowed;
 
 //..............................................................................
 
