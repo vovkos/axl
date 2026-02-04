@@ -56,6 +56,41 @@ registerParseErrorProvider() {
 	);
 }
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+err::Error
+createSrcPosError(
+	const sl::StringRef& filePath,
+	int line,
+	int col = 0
+) {
+	err::Error error;
+	error.pack<sl::PackSeq_3<const char*, int, int> >(
+		g_parseErrorGuid,
+		ParseErrorCode_SrcPos,
+		filePath.sz(),
+		line,
+		col
+	);
+	return error;
+}
+
+inline
+err::Error
+createSrcPosError(
+	const sl::StringRef& filePath,
+	const LineCol& lineCol
+) {
+	return createSrcPosError(filePath, lineCol.m_line, lineCol.m_col);
+}
+
+inline
+err::Error
+createSrcPosError(const SrcPos& srcPos) {
+	return createSrcPosError(srcPos.m_filePath, srcPos.m_line, srcPos.m_col);
+}
+
 inline
 size_t
 pushSrcPosError(
@@ -63,13 +98,7 @@ pushSrcPosError(
 	int line,
 	int col = 0
 ) {
-	return err::pushPackError<sl::PackSeq_3<const char*, int, int> >(
-		g_parseErrorGuid,
-		ParseErrorCode_SrcPos,
-		filePath.sz(),
-		line,
-		col
-	);
+	return err::pushError(createSrcPosError(filePath.sz(), line, col));
 }
 
 inline
@@ -89,7 +118,7 @@ pushSrcPosError(const SrcPos& srcPos) {
 
 inline
 bool
-isSrcPosError(const err::ErrorHdr* error) {
+isSrcPosError(const err::ErrorRef& error) {
 	return
 		error->m_size >= sizeof(err::ErrorHdr)* 2 + sizeof(char) + sizeof(int)* 2 &&
 		error->isStackTopKindOf(g_parseErrorGuid, ParseErrorCode_SrcPos);
@@ -99,14 +128,14 @@ void
 decodeSrcPosError(
 	sl::StringRef* filePath,
 	LineCol* lineCol,
-	const err::ErrorHdr* error
+	const err::ErrorRef& error
 );
 
 inline
 void
 decodeSrcPosError(
 	LineCol* lineCol,
-	const err::ErrorHdr* error
+	const err::ErrorRef& error
 ) {
 	decodeSrcPosError(NULL, lineCol, error);
 }
@@ -115,7 +144,7 @@ inline
 void
 decodeSrcPosError(
 	SrcPos* srcPos,
-	const err::ErrorHdr* error
+	const err::ErrorRef& error
 ) {
 	decodeSrcPosError(&srcPos->m_filePath, srcPos, error);
 }

@@ -22,7 +22,7 @@ void
 decodeSrcPosError(
 	sl::StringRef* filePath_o,
 	LineCol* lineCol,
-	const err::ErrorHdr* error
+	const err::ErrorRef& error
 ) {
 	ASSERT(isSrcPosError(error));
 
