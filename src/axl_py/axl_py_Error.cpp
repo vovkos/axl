@@ -76,7 +76,7 @@ createPyErrError(
 	ASSERT(exception.check());
 
 	Unicode msg = exception.hasAttr("msg") ?
-		exception.getAttr("msg") :
+		Unicode(exception.getAttr("msg")) :
 		exception.getStr();
 
 	if (msg.check()) {

@@ -9962,7 +9962,6 @@ testPython() {
 	const sl::StringRef sourceName = "axl-test-python-src";
 	const sl::StringRef source =
 		"print('Foo!')\n"
-		"a()\n"
 		"def foo():\n"
 		"  print('foo')\n"
 		"\n"
