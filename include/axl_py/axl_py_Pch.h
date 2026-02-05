@@ -20,4 +20,8 @@ extern "C" {
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 
+#if (PY_VERSION_HEX < 0x030b0000)
+#	include <frameobject.h>
+#endif
+
 } // extern "C" {
