@@ -59,8 +59,9 @@ elseif(NOT PYTHON_LIB_NAME)
 endif()
 
 if(EXISTS ${PYTHON_INC_DIR}/Python.h AND PYTHON_LIB_NAME)
+	set(PYTHON_LIB_NAME_NGE ${PYTHON_LIB_NAME}) # no generator expressions
+
 	if(WIN32)
-		set(PYTHON_LIB_NAME_NGE ${PYTHON_LIB_NAME}) # no generator expressions
 		set(PYTHON_LIB_NAME ${PYTHON_LIB_NAME}$<$<CONFIG:Debug>:_d>)
 	endif()
 
