@@ -208,10 +208,12 @@ ShmtBase::ensureMappingSize(size_t size) {
 	}
 #endif
 
-	void* p = m_mapping.open(&m_file, 0, size);
+	Mapping mapping;
+	void* p = mapping.open(&m_file, 0, size);
 	if (!p)
 		return false;
 
+	sl::takeOver(&m_mapping, &mapping);
 	m_hdr = (ShmtFileHdr*)p;
 	m_data = (char*)(m_hdr + 1);
 	return true;
