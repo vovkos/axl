@@ -435,6 +435,13 @@ axl_create_gcc_settings)
 			DEFAULT "-Wno-incompatible-ms-struct"
 			"-Wincompatible-ms-struct" "-Wno-incompatible-ms-struct"
 		)
+
+		axl_create_compiler_flag_setting(
+			GCC_FLAG_WARNING_DYNAMIC_CLASS_MEMACCESS
+			DESCRIPTION "Warn about direct memory access to classes with vtables"
+			DEFAULT "-Wno-dynamic-class-memaccess"
+			"-Wdynamic-class-memaccess" "-Wno-dynamic-class-memaccess"
+		)
 	else() # GCC-specific warnings
 		axl_create_compiler_flag_setting(
 			GCC_FLAG_WARNING_UNKNOWN_WARNING
