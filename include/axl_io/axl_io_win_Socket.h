@@ -181,7 +181,7 @@ public:
 		dword_t size,
 		dword_t* actualSize,
 		dword_t flags,
-		WSAOVERLAPPED* overlapped,
+		WSAOVERLAPPED* overlapped = NULL,
 		LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc = NULL
 	);
 
@@ -191,7 +191,7 @@ public:
 		dword_t size,
 		dword_t* actualSize,
 		dword_t* flags,
-		WSAOVERLAPPED* overlapped,
+		WSAOVERLAPPED* overlapped = NULL,
 		LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc = NULL
 	);
 
@@ -202,7 +202,7 @@ public:
 		dword_t* actualSize,
 		dword_t flags,
 		const sockaddr* addr,
-		WSAOVERLAPPED* overlapped,
+		WSAOVERLAPPED* overlapped = NULL,
 		LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc = NULL
 	);
 
@@ -214,7 +214,7 @@ public:
 		dword_t* flags,
 		SockAddr* addr,
 		socklen_t* addrSize,
-		WSAOVERLAPPED* overlapped,
+		WSAOVERLAPPED* overlapped = NULL,
 		LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc = NULL
 	);
 
@@ -226,7 +226,7 @@ public:
 		void* outBuffer,
 		dword_t outBufferSize,
 		dword_t* actualSize,
-		WSAOVERLAPPED* overlapped,
+		WSAOVERLAPPED* overlapped = NULL,
 		LPWSAOVERLAPPED_COMPLETION_ROUTINE completionFunc = NULL
 	);
 
