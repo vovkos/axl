@@ -52,6 +52,12 @@ public:
 #endif
 
 	bool
+	isNone() const {
+		ASSERT(m_p);
+		return Py_IsNone(m_p) != 0;
+	}
+
+	bool
 	isCallable() const {
 		ASSERT(m_p);
 		return ::PyCallable_Check(m_p) != 0;
