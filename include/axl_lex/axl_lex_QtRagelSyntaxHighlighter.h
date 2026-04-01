@@ -11,7 +11,7 @@
 
 #pragma once
 
-#define _AXL_LEX_RAGELQTSYNTAXHIGHLIGHTER_H
+#define _AXL_LEX_QTRAGELSYNTAXHIGHLIGHTER_H
 
 #include "axl_lex_Ragel.h"
 
