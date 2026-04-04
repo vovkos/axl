@@ -43,18 +43,9 @@ public:
 		return m_p;
 	}
 
-#if (PY_VERSION_HEX >= 0x030e0000)
-	bool
-	isImmortal() const {
-		ASSERT(m_p);
-		return ::PyUnstable_IsImmortal(m_p) != 0;
-	}
-#endif
-
 	bool
 	isNone() const {
-		ASSERT(m_p);
-		return Py_IsNone(m_p) != 0;
+		return m_p == Py_None;
 	}
 
 	bool
