@@ -273,7 +273,7 @@ public:
 		PyObject* arg
 	) const {
 		ASSERT(m_p);
-		return completeWithLastPyErr((*result = ::PyObject_CallMethodOneArg(m_p, arg, name)) != NULL);
+		return completeWithLastPyErr((*result = ::PyObject_CallMethodOneArg(m_p, name, arg)) != NULL);
 	}
 
 	bool
