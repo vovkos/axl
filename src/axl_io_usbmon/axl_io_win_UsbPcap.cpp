@@ -25,10 +25,10 @@ UsbPcap::open(
 	const sl::String_w& name,
 	Mode mode
 ) {
-	static sl::StringRef_w symlinkPrefix = L"\\\\.\\";
+	AXL_STR_W_DECL(SymlinkPrefix, L"\\\\.\\");
 
 	return m_device.create(
-		name.isPrefix(symlinkPrefix) ? name : symlinkPrefix + name,
+		name.isPrefix(SymlinkPrefix) ? name : SymlinkPrefix + name,
 		mode == Mode_Enumerate ? 0 : GENERIC_READ | GENERIC_WRITE,
 		mode == Mode_Enumerate ? FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE : 0,
 		NULL,

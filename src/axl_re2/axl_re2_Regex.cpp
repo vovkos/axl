@@ -121,20 +121,21 @@ adjustRegexPattern(
 	const sl::StringRef& source,
 	uint_t flags
 ) {
+	AXL_STR_DECL(Anchor, "\\b");
+
 	if (!(flags & RegexFlag_WholeWord))
 		return source;
 
-	static sl::StringRef anchor = "\\b";
-	bool hasPrefix = source.isPrefix(anchor);
-	bool hasSuffix = source.isSuffix(anchor);
+	bool hasPrefix = source.isPrefix(Anchor);
+	bool hasSuffix = source.isSuffix(Anchor);
 
 	if (hasPrefix)
-		return hasSuffix ? source : sl::String(source) + anchor;
+		return hasSuffix ? source : sl::String(source) + Anchor;
 
-	sl::String string = anchor;
+	sl::String string = Anchor;
 	string += source;
 	if (!hasSuffix)
-		string += anchor;
+		string += Anchor;
 
 	return string;
 }

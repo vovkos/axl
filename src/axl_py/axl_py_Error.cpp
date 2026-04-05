@@ -37,21 +37,24 @@ createPyStatusError(const PyStatus& status) {
 
 err::ErrorRef
 extractSrcPosError(PyObject* exception0) {
-	static const sl::StringRef DefaultFileName = "untitled-script";
+	AXL_STR_DECL(LineNo, "lineno");
+	AXL_STR_DECL(Offset, "offset");
+	AXL_STR_DECL(FileName, "filename");
+	AXL_STR_DECL(Untitled, "untitled-script");
 
 	ObjectBorrowed exception = exception0;
-	if (!exception.hasAttr("lineno"))
+	if (!exception.hasAttr(LineNo))
 		return err::ErrorRef();
 
-	Long lineAttr = exception.getAttr("lineno");
+	Long lineAttr = exception.getAttr(LineNo);
 	if (!lineAttr.check())
 		return err::ErrorRef();
 
 	int line = lineAttr.getLong() - 1; // python lines are one-based
-	Long offsetAttr = exception.getAttr("offset");
+	Long offsetAttr = exception.getAttr(Offset);
 	int col = offsetAttr.check() ? offsetAttr.getLong() - 1 : 0; // python cols are one-based
-	Unicode fileNameAttr = exception.getAttr("filename");
-	sl::StringRef fileName = fileNameAttr.check() ? fileNameAttr.getUtf8() : DefaultFileName;
+	Unicode fileNameAttr = exception.getAttr(FileName);
+	sl::StringRef fileName = fileNameAttr.check() ? fileNameAttr.getUtf8() : Untitled;
 	return lex::createSrcPosError(fileName, line, col);
 }
 
@@ -61,6 +64,9 @@ createPyErrError(
 	PyObject* value,
 	PyObject* traceback
 ) {
+	AXL_STR_DECL(Msg, "msg");
+	AXL_STR_DECL(MsgDelim, ": ");
+
 	if (!type)
 		return &err::g_noError;
 
@@ -75,12 +81,12 @@ createPyErrError(
 	ExceptionBorrowed exception = value;
 	ASSERT(exception.check());
 
-	Unicode msg = exception.hasAttr("msg") ?
-		Unicode(exception.getAttr("msg")) :
+	Unicode msg = exception.hasAttr(Msg) ?
+		Unicode(exception.getAttr(Msg)) :
 		exception.getStr();
 
 	if (msg.check()) {
-		string += ": ";
+		string += MsgDelim;
 		string += msg.getUtf8();
 	}
 

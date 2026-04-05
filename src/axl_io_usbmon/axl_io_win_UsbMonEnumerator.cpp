@@ -27,15 +27,15 @@ normalizeDeviceName(
 	sl::StringRef_w* deviceName,
 	const sl::StringRef_w& name
 ) {
-	static sl::StringRef_w symlinkPrefix = L"\\\\.\\";
-	static sl::StringRef_w ntSymlinkPrefix = L"\\??\\";
+	AXL_STR_W_DECL(SymlinkPrefix, L"\\\\.\\");
+	AXL_STR_W_DECL(NtSymlinkPrefix, L"\\??\\");
 
-	if (name.isPrefix(ntSymlinkPrefix))
-		*deviceName = symlinkPrefix + name.getSubString(ntSymlinkPrefix.getLength());
+	if (name.isPrefix(NtSymlinkPrefix))
+		*deviceName = SymlinkPrefix + name.getSubString(NtSymlinkPrefix.getLength());
 	else if (name.isPrefix('\\'))
 		*deviceName = name;
 	else
-		*deviceName = symlinkPrefix + name;
+		*deviceName = SymlinkPrefix + name;
 
 	return deviceName->getLength();
 }
@@ -115,6 +115,11 @@ UsbPcapDeviceEnumerator::enumerate(
 	sl::List<UsbMonDeviceDesc>* deviceList,
 	uint_t flags
 ) {
+	AXL_STR_W_DECL(DeviceDirName, L"\\device");
+	AXL_STR_W_DECL(DeviceTypeName, L"device");
+	AXL_STR_W_DECL(UsbPcapPrefix, L"usbpcap");
+	AXL_STR_W_DECL(SymlinkPrefix, L"\\\\.\\");
+
 	deviceList->clear();
 
 	bool result = m_deviceInfoSet.create(DIGCF_DEVICEINTERFACE | DIGCF_PRESENT);
@@ -130,15 +135,9 @@ UsbPcapDeviceEnumerator::enumerate(
 		DirBufferSize = 4 * 1024
 	};
 
-	long status;
-	static sl::StringRef_w deviceDirName = L"\\device";
-	static sl::StringRef_w deviceTypeName = L"device";
-	static sl::StringRef_w usbPcapPrefix = L"usbpcap";
-	static sl::StringRef_w symlinkPrefix = L"\\\\.\\";
-
 	UNICODE_STRING uniName;
-	uniName.Buffer = (PWSTR)deviceDirName.cp();
-	uniName.Length = deviceDirName.getLength() * sizeof(wchar_t);
+	uniName.Buffer = (PWSTR)DeviceDirName.cp();
+	uniName.Length = DeviceDirName.getLength() * sizeof(wchar_t);
 	uniName.MaximumLength = uniName.Length + sizeof(wchar_t);
 
 	OBJECT_ATTRIBUTES oa = { 0 };
@@ -146,7 +145,7 @@ UsbPcapDeviceEnumerator::enumerate(
 	oa.ObjectName = &uniName;
 
 	NtHandle deviceDir;
-	status = ntOpenDirectoryObject(deviceDir.p(), DIRECTORY_QUERY | DIRECTORY_TRAVERSE, &oa);
+	long status = ntOpenDirectoryObject(deviceDir.p(), DIRECTORY_QUERY | DIRECTORY_TRAVERSE, &oa);
 	if (status < 0) {
 		err::setError(NtStatus(status));
 		return -1;
@@ -188,12 +187,12 @@ UsbPcapDeviceEnumerator::enumerate(
 			sl::StringRef_w name(dirInfo->Name.Buffer, dirInfo->Name.Length / sizeof(wchar_t), true);
 			sl::StringRef_w typeName(dirInfo->TypeName.Buffer, dirInfo->TypeName.Length / sizeof(wchar_t), true);
 
-			if (!typeName.isEqualIgnoreCase(deviceTypeName) ||
-				!name.isPrefixIgnoreCase(usbPcapPrefix)
+			if (!typeName.isEqualIgnoreCase(DeviceTypeName) ||
+				!name.isPrefixIgnoreCase(UsbPcapPrefix)
 			)
 				continue;
 
-			sl::String_w pcapDeviceName = symlinkPrefix + name;
+			sl::String_w pcapDeviceName = SymlinkPrefix + name;
 			win::UsbPcap pcap;
 
 			bool result =
