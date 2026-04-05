@@ -2084,5 +2084,20 @@ formatString_w(
 
 //..............................................................................
 
+#define AXL_STR_DECL(name, s) static const sl::StringRef name((s), lengthof(s), true);
+#define AXL_STR_W_DECL(name, s) static const sl::StringRef_w name((s), lengthof(s), true);
+
+#define AXL_STR(s) ([]() -> const sl::StringRef& { \
+	AXL_STR_DECL(string, s);\
+	return string; \
+}())
+
+#define AXL_STR_W(s) ([]() -> const sl::StringRef& { \
+	AXL_STR_W_DECL(string, s);\
+	return string; \
+}())
+
+//..............................................................................
+
 } // namespace sl
 } // namespace axl
