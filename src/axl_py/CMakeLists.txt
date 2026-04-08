@@ -30,12 +30,14 @@ set(
 	${AXL_INC_DIR}/axl_py/axl_py_Unicode.h
 	${AXL_INC_DIR}/axl_py/axl_py_Module.h
 	${AXL_INC_DIR}/axl_py/axl_py_CFunction.h
+	${AXL_INC_DIR}/axl_py/axl_py_Stdio.h
 )
 
 set(
 	LIB_CPP_LIST
 	axl_py_Init.cpp
 	axl_py_Error.cpp
+	axl_py_Stdio.cpp
 )
 
 source_group(
