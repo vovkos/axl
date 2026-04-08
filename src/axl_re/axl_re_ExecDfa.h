@@ -40,7 +40,8 @@ protected:
 public:
 	ExecDfaBase(StateImpl* parent);
 
-	virtual ~ExecDfaBase() {
+	virtual
+	~ExecDfaBase() {
 		if (m_prevEngine)
 			delete m_prevEngine;
 	}

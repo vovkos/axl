@@ -32,7 +32,8 @@ protected:
 	sl::String m_fileName;
 
 public:
-	virtual ~HidDbLoader() {}
+	virtual
+	~HidDbLoader() {}
 
 	const sl::String&
 	getPath() const {
