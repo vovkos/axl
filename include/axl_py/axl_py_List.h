@@ -45,7 +45,7 @@ public:
 	}
 
 	bool
-	createNew(size_t size) {
+	createNew(size_t size = 0) {
 		return finalizeCreate(::PyList_New(size));
 	}
 
@@ -129,6 +129,16 @@ public:
 		intptr_t from,
 		intptr_t to
 	) const;
+
+	bool
+	setSlice(
+		intptr_t from,
+		intptr_t to,
+		PyObject* items
+	) const {
+		ASSERT(m_p);
+		return completeWithLastPyErr(::PyList_SetSlice(m_p, from, to, items) != -1);
+	}
 
 	bool
 	getTuple(PyObject** result) const {
