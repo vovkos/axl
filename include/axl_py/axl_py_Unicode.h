@@ -107,8 +107,29 @@ public:
 	}
 
 	bool
+	createFromString(
+		const char* string,
+		size_t length
+	) {
+		return finalizeCreate(::PyUnicode_FromStringAndSize(string, length));
+	}
+
+	bool
 	createFromString(const sl::StringRef& string) {
-		return finalizeCreate(::PyUnicode_FromStringAndSize(string.cp(), string.getLength()));
+		return createFromString(string.cp(), string.getLength());
+	}
+
+	bool
+	createFromString(
+		const wchar_t* string,
+		size_t length = -1
+	) {
+		return finalizeCreate(::PyUnicode_FromWideChar(string, length));
+	}
+
+	bool
+	createFromString(const sl::StringRef_w& string) {
+		return createFromString(string.cp(), string.getLength());
 	}
 
 	bool
@@ -168,7 +189,25 @@ public:
 
 	static
 	ObjectImpl<UnicodeBase>
+	fromString(
+		const char* string,
+		size_t length
+	);
+
+	static
+	ObjectImpl<UnicodeBase>
 	fromString(const sl::StringRef& string);
+
+	static
+	ObjectImpl<UnicodeBase>
+	fromString(
+		const wchar_t* string,
+		size_t length = -1
+	);
+
+	static
+	ObjectImpl<UnicodeBase>
+	fromString(const sl::StringRef_w& string);
 
 	static
 	ObjectImpl<UnicodeBase>
@@ -281,7 +320,37 @@ UnicodeBase::fromString(const char* string) {
 
 inline
 ObjectImpl<UnicodeBase>
+UnicodeBase::fromString(
+	const char* string,
+	size_t length
+) {
+	ObjectImpl<UnicodeBase> result;
+	result.createFromString(string, length);
+	return result;
+}
+
+inline
+ObjectImpl<UnicodeBase>
 UnicodeBase::fromString(const sl::StringRef& string) {
+	ObjectImpl<UnicodeBase> result;
+	result.createFromString(string);
+	return result;
+}
+
+inline
+ObjectImpl<UnicodeBase>
+UnicodeBase::fromString(
+	const wchar_t* string,
+	size_t length
+) {
+	ObjectImpl<UnicodeBase> result;
+	result.createFromString(string, length);
+	return result;
+}
+
+inline
+ObjectImpl<UnicodeBase>
+UnicodeBase::fromString(const sl::StringRef_w& string) {
 	ObjectImpl<UnicodeBase> result;
 	result.createFromString(string);
 	return result;
