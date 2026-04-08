@@ -46,58 +46,6 @@ initialize(
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-inline
-PyObject*
-addModule(const sl::StringRef& name) {
-	PyObject* module = ::PyImport_AddModule(name.sz()); // borrowed reference
-	return completeWithLastPyErr<PyObject*>(module, NULL);
-}
-
-inline
-PyObject*
-addModule(PyObject* name) {
-	PyObject* module = ::PyImport_AddModuleObject(name); // borrowed reference
-	return completeWithLastPyErr<PyObject*>(module, NULL);
-}
-
-inline
-bool
-importModule(
-	PyObject** result,
-	const sl::StringRef& name
-) {
-	*result = ::PyImport_ImportModule(name.sz()); // new reference
-	return completeWithLastPyErr(*result != NULL);
-}
-
-inline
-Module
-importModule(const sl::StringRef& name) {
-	Module module;
-	importModule(&module, name);
-	return module;
-}
-
-inline
-bool
-importModule(
-	PyObject** result,
-	PyObject* name
-) {
-	*result = ::PyImport_Import(name); // new reference
-	return completeWithLastPyErr(*result != NULL);
-}
-
-inline
-Module
-importModule(PyObject* name) {
-	Module module;
-	importModule(&module, name);
-	return module;
-}
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 bool
 compile(
 	int startSymbol,
