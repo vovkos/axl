@@ -144,6 +144,24 @@ public:
 	ObjectImpl<ObjectBase>
 	getAttr(PyObject* name) const;
 
+	bool
+	setAttr(
+		PyObject* name,
+		PyObject* value
+	) const {
+		ASSERT(m_p);
+		return completeWithLastPyErr(::PyObject_SetAttr(m_p, name, value) != -1);
+	}
+
+	bool
+	setAttr(
+		const sl::StringRef& name,
+		PyObject* value
+	) const {
+		ASSERT(m_p);
+		return completeWithLastPyErr(::PyObject_SetAttrString(m_p, name.sz(), value) != -1);
+	}
+
 #if (PY_VERSION_HEX >= 0x030d0000)
 	bool
 	getOptionalAttr(
