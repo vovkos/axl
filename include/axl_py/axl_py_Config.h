@@ -227,7 +227,7 @@ public:
 		wchar_t** field,
 		const sl::StringRef_w& value
 	) {
-		return completeWithPyStatus(::PyConfig_SetString(this, field, value.cp()));
+		return completeWithPyStatus(::PyConfig_SetString(this, field, value.sz()));
 	}
 
 	bool
@@ -235,7 +235,7 @@ public:
 		wchar_t** field,
 		const sl::StringRef& value
 	) {
-		return completeWithPyStatus(::PyConfig_SetBytesString(this, field, value.cp()));
+		return completeWithPyStatus(::PyConfig_SetBytesString(this, field, value.sz()));
 	}
 
 	bool
