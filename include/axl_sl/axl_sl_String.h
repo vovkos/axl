@@ -2092,7 +2092,7 @@ formatString_w(
 	return string; \
 }())
 
-#define AXL_STR_W(s) ([]() -> const sl::StringRef& { \
+#define AXL_STR_W(s) ([]() -> const sl::StringRef_w& { \
 	AXL_STR_W_DECL(string, s);\
 	return string; \
 }())
