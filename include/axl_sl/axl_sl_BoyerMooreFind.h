@@ -195,19 +195,19 @@ typedef BoyerMooreBinFindBase<BoyerMooreReverseBinDetails>         BoyerMooreRev
 //..............................................................................
 
 struct BoyerMooreTextFindResult {
-	uint64_t m_charOffset;
-	uint64_t m_binOffset;
-	uint64_t m_binEndOffset;
+	uint64_t m_cpOffset;
+	uint64_t m_cuOffset;
+	uint64_t m_cuEndOffset;
 
 	BoyerMooreTextFindResult() {
-		m_charOffset = -1;
-		m_binOffset = -1;
-		m_binEndOffset = -1;
+		m_cpOffset = -1;
+		m_cuOffset = -1;
+		m_cuOffset = -1;
 	}
 
 	bool
 	isValid() const {
-		return m_charOffset != -1;
+		return m_cpOffset != -1;
 	}
 };
 
@@ -219,6 +219,10 @@ public:
 	typedef typename Details::Encoding Encoding;
 	typedef typename Details::Decoder Decoder;
 	typedef typename Details::CaseOp CaseOp;
+
+	typedef typename Encoding::C CU;
+	typedef typename BoyerMooreTextStateBase<CU> State;
+	typedef typename BoyerMooreTextAccessorBase<CU> Accessor;
 
 	typedef enc::Convert<
 		enc::Utf32,
@@ -266,7 +270,7 @@ public:
 			return false;
 
 		if (IsCaseFolded) {
-			typename Array<typename Details::C>::Rwi rwi = this->m_pattern;
+			typename Array<utf32_t>::Rwi rwi = this->m_pattern;
 			for (size_t i = 0; i < length; i++)
 				rwi[i] = CaseOp()(rwi[i]);
 		}
@@ -277,12 +281,12 @@ public:
 
 	BoyerMooreTextFindResult
 	find(
-		const void* p,
-		size_t size,
+		const CU* p,
+		size_t length,
 		utf32_t replacementChar = enc::StdChar_Replacement
 	) const {
-		BoyerMooreTextState state(sl::StringRef_utf32(this->m_pattern, this->m_pattern.getCount()));
-		BoyerMooreTextFindResult result = find(&state, p, size, replacementChar);
+		State state(sl::StringRef_utf32(this->m_pattern, this->m_pattern.getCount()));
+		BoyerMooreTextFindResult result = find(&state, p, length, replacementChar);
 		if (IsWholeWord && !result.isValid())
 			result = eof(&state);
 		return result;
@@ -290,15 +294,15 @@ public:
 
 	BoyerMooreTextFindResult
 	find(
-		BoyerMooreTextState* state,
-		const void* p0,
-		size_t size,
+		State* state,
+		const CU* p0,
+		size_t length,
 		utf32_t replacementChar = enc::StdChar_Replacement
 	) const {
 		ASSERT(state->getPatternLength() == this->m_pattern.getCount());
 
-		sl::PtrIterator<const char, IsReverse> p(IsReverse ? (char*)p0 + size - 1 : (char*)p0);
-		const char* end = p + size;
+		sl::PtrIterator<const CU, IsReverse> p(IsReverse ? p0 + length - 1 : p0);
+		const CU* end = p + length;
 
 		enc::DecoderState decoderState = state->getDecoderState();
 
@@ -314,13 +318,13 @@ public:
 				replacementChar
 			);
 
-			const char* p2 = convertResult.m_src; // just a short alias
+			const CU* p2 = convertResult.m_src; // just a short alias
 			size_t srcLength = -(p - p2); // respect IsReverse
 			size_t dstLength = convertResult.m_dst - buffer;
 			size_t fullLength = state->getTailLength() + dstLength;
 			size_t i;
 
-			BoyerMooreTextAccessor accessor(state, buffer);
+			Accessor accessor(state, buffer);
 
 			if (IsWholeWord) {
 				i = findWholeWordImpl(state, accessor, fullLength);
@@ -333,20 +337,20 @@ public:
 					return createFindResult(state, i, p, p2);
 			}
 
-			// locate bin-offset of the prospective start of match
-			size_t binOffset = locateBinOffset(state, i, p, p2);
+			// locate cu-offset of the prospective start of match
+			size_t cuOffset = locateCuOffset(state, i, p, p2);
 
 			state->advance<IsReverse>(
 				i,
 				buffer,
 				dstLength,
-				binOffset,
-				IsReverse ? p2 + 1 : (const char*)p,
+				cuOffset,
+				IsReverse ? p2 + 1 : (const CU*)p,
 				srcLength,
 				decoderState
 			);
 
-			ASSERT(state->getBinTailSize() >= state->getTailLength());
+			ASSERT(state->getCuTailLength() >= state->getTailLength());
 			p = p2;
 		}
 
@@ -354,11 +358,11 @@ public:
 	}
 
 	BoyerMooreTextFindResult
-	eof(BoyerMooreTextState* state) const {
+	eof(State* state) const {
 		ASSERT(IsWholeWord);
 
 		static utf32_t suffix = ' ';
-		BoyerMooreTextAccessor accessor(state, &suffix);
+		Accessor accessor(state, &suffix);
 		size_t fullLength = state->getTailLength() + 1;
 		size_t i = findWholeWordImpl(state, accessor, fullLength);
 		return i + this->m_pattern.getCount() < fullLength ? // account for suffix
@@ -369,8 +373,8 @@ public:
 protected:
 	size_t
 	findWholeWordImpl(
-		BoyerMooreTextState* state,
-		const BoyerMooreTextAccessor& accessor,
+		State* state,
+		const Accessor& accessor,
 		size_t length
 	) const {
 		if (!length)
@@ -404,50 +408,50 @@ protected:
 
 	BoyerMooreTextFindResult
 	createFindResult(
-		BoyerMooreTextState* state,
+		State* state,
 		size_t i,
-		const char* p,
-		const char* end
+		const CU* p,
+		const CU* end
 	) const {
 		BoyerMooreTextFindResult result;
-		result.m_charOffset = state->getOffset() + i;
-		result.m_binOffset = state->getBinOffset() + locateBinOffset(state, i, p, end);
-		result.m_binEndOffset = state->getBinOffset() + locateBinOffset(state, i + this->m_pattern.getCount(), p, end);
-		state->reset(result.m_charOffset, result.m_binOffset);
+		result.m_cpOffset = state->getOffset() + i;
+		result.m_cuOffset = state->getCuOffset() + locateCuOffset(state, i, p, end);
+		result.m_cuEndOffset = state->getCuOffset() + locateCuOffset(state, i + this->m_pattern.getCount(), p, end);
+		state->reset(result.m_cpOffset, result.m_cuOffset);
 		return result;
 	}
 
 	static
 	size_t
-	locateBinOffset(
-		const BoyerMooreTextState* state,
+	locateCuOffset(
+		const State* state,
 		size_t i,
-		const char* p,
-		const char* end
+		const CU* p,
+		const CU* end
 	) {
 		enc::ConvertLengthResult result;
 		size_t tailLength = state->getTailLength();
-		size_t binTailSize = state->getBinTailSize();
+		size_t cuTailLength = state->getCuTailLength();
 
 		if (i >= tailLength) { // beyond tail
 			enc::DecoderState decoderState = state->getDecoderState();
 			result = Locate::locate(&decoderState, i - tailLength, p, end);
 
-			ASSERT((intptr_t)(binTailSize + result.m_srcLength) >= 0);
-			return binTailSize + result.m_srcLength;
+			ASSERT((intptr_t)(cuTailLength + result.m_srcLength) >= 0);
+			return cuTailLength + result.m_srcLength;
 		}
 
 		enc::DecoderState decoderState = 0;
-		const char* front = state->getBinTailFront();
-		const char* back = state->getBinTailBack();
+		const CU* front = state->getCuTailFront();
+		const CU* back = state->getCuTailBack();
 
 		if (front < back) // one continous chunk
 			result = IsReverse ?
 				Locate::locate(&decoderState, i, back - 1, front - 1) :
 				Locate::locate(&decoderState, i, front, back);
 		else { // two disjoint chunks
-			const char* buffer = state->getBinTailBuffer();
-			const char* bufferEnd = state->getBinTailBufferEnd();
+			const CU* buffer = state->getCuTailBuffer();
+			const CU* bufferEnd = state->getCuTailBufferEnd();
 
 			if (IsReverse) {
 				result = Locate::locate(&decoderState, i, back - 1, buffer - 1); // back first
@@ -472,41 +476,61 @@ protected:
 		}
 
 		// not yet, search the latest data
-		ASSERT(result.m_srcLength == binTailSize);
+		ASSERT(result.m_srcLength == cuTailLength);
 		result = Locate::locate(&decoderState, i - tailLength, p, end);
 
-		ASSERT((intptr_t)(binTailSize + result.m_srcLength) >= 0);
-		return binTailSize + result.m_srcLength;
+		ASSERT((intptr_t)(cuTailLength + result.m_srcLength) >= 0);
+		return cuTailLength + result.m_srcLength;
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::Details>                    BoyerMooreTextFind_utf8;
-typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::ReverseDetails>             BoyerMooreReverseTextFind_utf8;
-typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::WholeWordDetails>           BoyerMooreWholeWordTextFind_utf8;
-typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::WholeWordReverseDetails>    BoyerMooreWholeWordReverseTextFind_utf8;
-typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::CaseFoldedDetails>          BoyerMooreCaseFoldedTextFind_utf8;
-typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::CaseFoldedReverseDetails>   BoyerMooreCaseFoldedReverseTextFind_utf8;
-typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::CaseFoldedWholeWordDetails> BoyerMooreCaseFoldedWholeWordTextFind_utf8;
-typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::CaseFoldedWholeWordReverseDetails> BoyerMooreCaseFoldedWholeWordReverseTextFind_utf8;
-
-typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_latin1::Details>                    BoyerMooreTextFind_latin1;
-typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_latin1::ReverseDetails>             BoyerMooreReverseTextFind_latin1;
-typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_latin1::WholeWordDetails>           BoyerMooreWholeWordTextFind_latin1;
-typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_latin1::WholeWordReverseDetails>    BoyerMooreWholeWordReverseTextFind_latin1;
-typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_latin1::CaseFoldedDetails>          BoyerMooreCaseFoldedTextFind_latin1;
-typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_latin1::CaseFoldedReverseDetails>   BoyerMooreCaseFoldedReverseTextFind_latin1;
-typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_latin1::CaseFoldedWholeWordDetails> BoyerMooreCaseFoldedWholeWordTextFind_latin1;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_latin1::Details>                           BoyerMooreTextFind_latin1;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_latin1::ReverseDetails>                    BoyerMooreReverseTextFind_latin1;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_latin1::WholeWordDetails>                  BoyerMooreWholeWordTextFind_latin1;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_latin1::WholeWordReverseDetails>           BoyerMooreWholeWordReverseTextFind_latin1;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_latin1::CaseFoldedDetails>                 BoyerMooreCaseFoldedTextFind_latin1;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_latin1::CaseFoldedReverseDetails>          BoyerMooreCaseFoldedReverseTextFind_latin1;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_latin1::CaseFoldedWholeWordDetails>        BoyerMooreCaseFoldedWholeWordTextFind_latin1;
 typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_latin1::CaseFoldedWholeWordReverseDetails> BoyerMooreCaseFoldedWholeWordReverseTextFind_latin1;
 
-typedef BoyerMooreTextFind_utf8                    BoyerMooreTextFind;
-typedef BoyerMooreReverseTextFind_utf8             BoyerMooreReverseTextFind;
-typedef BoyerMooreWholeWordTextFind_utf8           BoyerMooreWholeWordTextFind;
-typedef BoyerMooreWholeWordReverseTextFind_utf8    BoyerMooreWholeWordReverseTextFind;
-typedef BoyerMooreCaseFoldedTextFind_utf8          BoyerMooreCaseFoldedTextFind;
-typedef BoyerMooreCaseFoldedReverseTextFind_utf8   BoyerMooreCaseFoldedReverseTextFind;
-typedef BoyerMooreCaseFoldedWholeWordTextFind_utf8 BoyerMooreCaseFoldedWholeWordTextFind;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::Details>                           BoyerMooreTextFind_utf8;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::ReverseDetails>                    BoyerMooreReverseTextFind_utf8;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::WholeWordDetails>                  BoyerMooreWholeWordTextFind_utf8;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::WholeWordReverseDetails>           BoyerMooreWholeWordReverseTextFind_utf8;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::CaseFoldedDetails>                 BoyerMooreCaseFoldedTextFind_utf8;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::CaseFoldedReverseDetails>          BoyerMooreCaseFoldedReverseTextFind_utf8;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::CaseFoldedWholeWordDetails>        BoyerMooreCaseFoldedWholeWordTextFind_utf8;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf8::CaseFoldedWholeWordReverseDetails> BoyerMooreCaseFoldedWholeWordReverseTextFind_utf8;
+
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf16::Details>                           BoyerMooreTextFind_utf16;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf16::ReverseDetails>                    BoyerMooreReverseTextFind_utf16;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf16::WholeWordDetails>                  BoyerMooreWholeWordTextFind_utf16;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf16::WholeWordReverseDetails>           BoyerMooreWholeWordReverseTextFind_utf16;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf16::CaseFoldedDetails>                 BoyerMooreCaseFoldedTextFind_utf16;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf16::CaseFoldedReverseDetails>          BoyerMooreCaseFoldedReverseTextFind_utf16;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf16::CaseFoldedWholeWordDetails>        BoyerMooreCaseFoldedWholeWordTextFind_utf16;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf16::CaseFoldedWholeWordReverseDetails> BoyerMooreCaseFoldedWholeWordReverseTextFind_utf16;
+
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf32::Details>                           BoyerMooreTextFind_utf32;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf32::ReverseDetails>                    BoyerMooreReverseTextFind_utf32;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf32::WholeWordDetails>                  BoyerMooreWholeWordTextFind_utf32;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf32::WholeWordReverseDetails>           BoyerMooreWholeWordReverseTextFind_utf32;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf32::CaseFoldedDetails>                 BoyerMooreCaseFoldedTextFind_utf32;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf32::CaseFoldedReverseDetails>          BoyerMooreCaseFoldedReverseTextFind_utf32;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf32::CaseFoldedWholeWordDetails>        BoyerMooreCaseFoldedWholeWordTextFind_utf32;
+typedef BoyerMooreTextFindBase<BoyerMooreTextDetails_utf32::CaseFoldedWholeWordReverseDetails> BoyerMooreCaseFoldedWholeWordReverseTextFind_utf32;
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+typedef BoyerMooreTextFind_utf8                           BoyerMooreTextFind;
+typedef BoyerMooreReverseTextFind_utf8                    BoyerMooreReverseTextFind;
+typedef BoyerMooreWholeWordTextFind_utf8                  BoyerMooreWholeWordTextFind;
+typedef BoyerMooreWholeWordReverseTextFind_utf8           BoyerMooreWholeWordReverseTextFind;
+typedef BoyerMooreCaseFoldedTextFind_utf8                 BoyerMooreCaseFoldedTextFind;
+typedef BoyerMooreCaseFoldedReverseTextFind_utf8          BoyerMooreCaseFoldedReverseTextFind;
+typedef BoyerMooreCaseFoldedWholeWordTextFind_utf8        BoyerMooreCaseFoldedWholeWordTextFind;
 typedef BoyerMooreCaseFoldedWholeWordReverseTextFind_utf8 BoyerMooreCaseFoldedWholeWordReverseTextFind;
 
 //..............................................................................
