@@ -221,8 +221,8 @@ public:
 	typedef typename Details::CaseOp CaseOp;
 
 	typedef typename Encoding::C CU;
-	typedef typename BoyerMooreTextStateBase<CU> State;
-	typedef typename BoyerMooreTextAccessorBase<CU> Accessor;
+	typedef BoyerMooreTextStateBase<CU> State;
+	typedef BoyerMooreTextAccessorBase<CU> Accessor;
 
 	typedef enc::Convert<
 		enc::Utf32,
@@ -340,7 +340,7 @@ public:
 			// locate cu-offset of the prospective start of match
 			size_t cuOffset = locateCuOffset(state, i, p, p2);
 
-			state->advance<IsReverse>(
+			state->template advance<IsReverse>(
 				i,
 				buffer,
 				dstLength,
