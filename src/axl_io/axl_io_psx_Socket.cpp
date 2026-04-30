@@ -31,9 +31,8 @@ Socket::open(
 
 int
 Socket::getError() {
-	int error = 0;
-	getOption(SOL_SOCKET, SO_ERROR, &error, sizeof(int));
-	return error;
+	int error;
+	return getOption(SOL_SOCKET, SO_ERROR, &error, sizeof(int)) ? error : errno;
 }
 
 bool

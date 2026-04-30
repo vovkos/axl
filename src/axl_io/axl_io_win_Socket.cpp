@@ -32,8 +32,7 @@ Socket::open(
 int
 Socket::getError() {
 	int error;
-	getOption(SOL_SOCKET, SO_ERROR, &error, sizeof(int));
-	return error;
+	return getOption(SOL_SOCKET, SO_ERROR, &error, sizeof(int)) ? error : ::WSAGetLastError();
 }
 
 bool
