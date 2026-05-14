@@ -44,6 +44,16 @@ public:
 	}
 };
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+bool
+Library::loadLibrary(const sl::StringRef_w& fileName) {
+	close();
+	m_h = ::LoadLibraryW(fileName.sz());
+	return err::complete(m_h != NULL);
+}
+
 //..............................................................................
 
 } // namespace win

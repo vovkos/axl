@@ -10034,6 +10034,58 @@ testPython() {
 //..............................................................................
 
 #if (_AXL_OS_WIN)
+
+size_t
+enumCertStore(const sys::win::CertStore& store) {
+	sys::win::Certificate cert;
+	sl::String_w subject;
+	sl::String_w issuer;
+	sl::String_w friendlyName;
+	sl::Array<char> thumbprint;
+
+	for (size_t i = 0;; i++) {
+		bool result = store.getNextCertificate(&cert, cert);
+		if (!result)
+			return -1;
+
+		if (!cert)
+			return i;
+
+		cert.getSubjectName(&subject);
+		cert.getIssuerName(&issuer);
+		cert.getFriendlyName(&friendlyName);
+		cert.getThumbprint(&thumbprint);
+
+		uint64_t notBefore = cert.getNotBefore();
+		uint64_t notAfter = cert.getNotAfter();
+
+		printf("\n#%-3zd subject:    %S\n", i, subject.sz());
+		printf("     issuer:     %S\n", issuer.sz());
+
+		if (!friendlyName.isEmpty())
+			printf("     friendly:   %S\n", friendlyName.sz());
+
+		printf("     thumbprint: %s\n", enc::HexEncoding::encode(thumbprint, thumbprint.getCount()).sz());
+		printf("     not before: %s\n", sys::Time(notBefore).format("%Y-%M-%d %h:%m:%s").sz());
+		printf("     not after:  %s\n", sys::Time(notAfter).format("%Y-%M-%d %h:%m:%s").sz());
+	}
+}
+
+void
+testSystemCertStore() {
+	sys::win::CertStore store;
+	store.openSystemStore(CERT_SYSTEM_STORE_LOCAL_MACHINE, L"Root");
+	enumCertStore(store);
+
+	store.openSystemStore(CERT_SYSTEM_STORE_CURRENT_USER, L"My");
+	enumCertStore(store);
+}
+
+#endif // _AXL_OS_WIN
+
+//..............................................................................
+
+#if (_AXL_OS_WIN)
 int
 wmain(
 	int argc,
@@ -10059,7 +10111,11 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
+#if (_AXL_OS_WIN)
+	testSystemCertStore();
+#else
 	testBoyerMoore();
+#endif
 
 #if (_AXL_PY)
 	testPython();

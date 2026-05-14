@@ -157,6 +157,9 @@
 #	include "axl_sys_win_Authenticode.h"
 #	include "axl_sys_win_DeviceInfo.h"
 #	include <axl_sys_win_CfgMgr.h>
+
+#	include <wincrypt.h>
+#	include "axl_sys_win_Certificate.h"
 #elif (_AXL_OS_POSIX)
 #	include "axl_io_psx_Mapping.h"
 #	include "axl_io_psx_Pty.h"
