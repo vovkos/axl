@@ -66,7 +66,7 @@ public:
 		size_t length,
 		dword_t* requiredLength
 	) const {
-		bool_t result = ::SetupDiGetDeviceInstanceId(m_devInfoSet, &m_devInfoData, buffer, (dword_t)length, requiredLength);
+		bool_t result = ::SetupDiGetDeviceInstanceIdW(m_devInfoSet, &m_devInfoData, buffer, (dword_t)length, requiredLength);
 		return err::complete(result != 0);
 	}
 

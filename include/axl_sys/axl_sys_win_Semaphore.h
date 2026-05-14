@@ -32,7 +32,7 @@ public:
 	) {
 		close();
 
-		m_h = ::CreateSemaphore(secAttr, initialCount, maxCount, name.sz());
+		m_h = ::CreateSemaphoreW(secAttr, initialCount, maxCount, name.sz());
 		return err::complete(m_h != NULL);
 	}
 
@@ -44,7 +44,7 @@ public:
 	) {
 		close();
 
-		m_h = ::OpenSemaphore(access, doInheritHandle, name.sz());
+		m_h = ::OpenSemaphoreW(access, doInheritHandle, name.sz());
 		return err::complete(m_h != NULL);
 	}
 
