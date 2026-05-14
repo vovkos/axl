@@ -14,6 +14,10 @@
 #include "axl_cry_Bio.h"
 #include "axl_cry_CryptoError.h"
 
+#if (_AXL_OS_WIN)
+#	include "axl_sys_win_Certificate.h"
+#endif
+
 namespace axl {
 namespace cry {
 
@@ -104,6 +108,42 @@ X509Store::addCert(X509* cert) {
 	int result = X509_STORE_add_cert(m_h, cert);
 	return completeWithLastCryptoError(result);
 }
+
+#if (_AXL_OS_WIN)
+
+size_t
+X509Store::addWinCertStore(const sys::win::CertStore& store) {
+	ASSERT(m_h);
+
+	size_t count = 0;
+	sys::win::Certificate cert;
+	for (;;) {
+		bool result = store.getNextCertificate(&cert, cert);
+		if (!result)
+			return -1;
+
+		if (!cert)
+			break;
+
+		sl::ArrayRef<char> der = cert.getDer();
+		const uchar_t* p = (const uchar_t*)der.cp();
+
+		X509Cert x509;
+		::d2i_X509(x509.p(), &p, (long)der.getCount());
+		if (!x509)
+			return -1;
+
+		result = addCert(x509);
+		if (!result)
+			return -1;
+
+		count++;
+	}
+
+	return count;
+}
+
+#endif // _AXL_OS_WIN
 
 //..............................................................................
 

@@ -12,3 +12,7 @@
 #pragma once
 
 #include "axl_cry_Pch.h"
+
+#if (_AXL_OS_WIN)
+#	include <wincrypt.h>
+#endif

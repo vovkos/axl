@@ -16,6 +16,17 @@
 #include "axl_cry_Pch.h"
 
 namespace axl {
+
+#ifdef _AXL_OS_WIN
+namespace sys {
+namespace win {
+
+class CertStore;
+
+} // namespace win
+} // namespace sys
+#endif
+
 namespace cry {
 
 //..............................................................................
@@ -107,6 +118,11 @@ public:
 
 	bool
 	addCert(X509* cert);
+
+#ifdef _AXL_OS_WIN
+	size_t
+	addWinCertStore(const sys::win::CertStore& store);
+#endif
 };
 
 //..............................................................................
