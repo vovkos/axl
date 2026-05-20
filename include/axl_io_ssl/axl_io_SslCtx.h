@@ -131,6 +131,12 @@ public:
 		::SSL_CTX_set_verify(m_h, mode, callbackFunc);
 	}
 
+	X509_STORE*
+	getCertStore() {
+		ASSERT(m_h);
+		return ::SSL_CTX_get_cert_store(m_h);
+	}
+
 	bool
 	loadVerifyLocations(
 		const sl::StringRef& caFileName,
