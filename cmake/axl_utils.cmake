@@ -1094,6 +1094,29 @@ axl_touch_if_changed
 	)
 endmacro()
 
+function(
+axl_enum_targets
+	_RESULT
+	# _DIR
+)
+	list(LENGTH ARGN _ARGC)
+	if(_ARGC GREATER 0)
+		list(GET ARGN 0 _DIR)
+	else()
+		set(_DIR ${CMAKE_CURRENT_LIST_DIR})
+	endif()
+
+	get_property(_TARGETS DIRECTORY ${_DIR} PROPERTY BUILDSYSTEM_TARGETS)
+	get_property(_SUBDIRS DIRECTORY ${_DIR} PROPERTY SUBDIRECTORIES)
+
+	foreach(_SUBDIR IN LISTS _SUBDIRS)
+		axl_enum_targets(_SUBTARGETS ${_SUBDIR})
+		list(APPEND _TARGETS ${_SUBTARGETS})
+	endforeach()
+
+	set(${_RESULT} ${_TARGETS} PARENT_SCOPE)
+endfunction()
+
 #...............................................................................
 
 # imports -- CMake' find_package replacement with support for manual override
