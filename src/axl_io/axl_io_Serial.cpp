@@ -13,8 +13,6 @@
 #include "axl_io_Serial.h"
 #include "axl_sys_Event.h"
 
-#include "axl_enc_HexEncoding.h"
-
 namespace axl {
 namespace io {
 
