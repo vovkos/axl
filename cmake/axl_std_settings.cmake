@@ -537,6 +537,13 @@ axl_create_gcc_settings)
 	)
 
 	axl_create_compiler_flag_setting(
+		GCC_FLAG_CPP_WARNING_DEPRECATED_ENUM_ENUM_CONVERSION
+		DESCRIPTION "Warn about uses of functions/variables/types marked as deprecated"
+		DEFAULT "-Wno-deprecated-enum-enum-conversion"
+		"-Wdeprecated-enum-enum-conversion" "-Wno-deprecated-enum-enum-conversion"
+	)
+
+	axl_create_compiler_flag_setting(
 		GCC_FLAG_WARNING_UNUSED_VALUE
 		DESCRIPTION "Warn about unused expressions"
 		DEFAULT "-Wno-unused-value"
