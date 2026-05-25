@@ -476,14 +476,18 @@ MainWindow::MainWindow(QWidget* parent) :
 	f.setFixedPitch(true);
 	f.setStyleHint(
 		QFont::Monospace,
+#if (QT_VERSION_MAJOR >= 6) // no ForceIntegerMetrics in qt6
+		QFont::NoFontMerging
+#else
 		(QFont::StyleStrategy)(QFont::NoFontMerging | QFont::ForceIntegerMetrics)
+#endif
 	);
 
 	QWidget* client = new QWidget(this);
 	setCentralWidget(client);
 
 	QVBoxLayout* vlayout = new QVBoxLayout;
-	vlayout->setMargin(0);
+	vlayout->setContentsMargins(0, 0, 0, 0);
 	client->setLayout(vlayout);
 
 #if (_TEST_PAINT)

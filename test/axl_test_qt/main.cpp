@@ -712,8 +712,15 @@ addRootCaCertificates() {
 	QByteArray pem = QByteArray::fromRawData(data, lengthof(data));
 	QList<QSslCertificate> list = QSslCertificate::fromData(pem, QSsl::Pem);
 	QList<QSslCertificate>::ConstIterator it = list.begin();
+
+	QSslConfiguration config = QSslConfiguration::defaultConfiguration();
+	QList<QSslCertificate> certs = config.caCertificates();
+
 	for (; it != list.end(); it++)
-		QSslSocket::addDefaultCaCertificate(*it);
+		certs.append(*it);
+
+	config.setCaCertificates(certs);
+	QSslConfiguration::setDefaultConfiguration(config);
 }
 
 void
@@ -748,15 +755,19 @@ benchCodecs() {
 	do {
 		uint64_t t0 = sys::getTimestamp();
 
-		const QTextCodec* codec = QTextCodec::codecForName("utf8");
-
-		QString s;
-		QVector<uint> ucs;
+#if (QT_VERSION_MAJOR >= 6)
+		QStringDecoder decoder(QStringDecoder::Utf8);
 		for (int i = 0; i < n; i++) {
-			s = codec->toUnicode((char*)data_utf, length_utf * sizeof(data_utf[0]));
-			// ucs = s.toUcs4();
+			QString s = decoder(QByteArrayView((const char*)data_utf, length_utf * sizeof(data_utf[0])));
+			// QVector<uint> ucs = s.toUcs4();
 		}
-
+#else
+		const QTextCodec* codec = QTextCodec::codecForName("utf8");
+		for (int i = 0; i < n; i++) {
+			QString s = codec->toUnicode((char*)data_utf, length_utf * sizeof(data_utf[0]));
+			// QVector<uint> ucs = s.toUcs4();
+		}
+#endif
 		uint64_t t1 = sys::getTimestamp();
 		printf("QT iterations: %d, msec: %lld\n", n, (t1 - t0) / 10000);
 	} while (0);

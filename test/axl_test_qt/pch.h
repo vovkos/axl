@@ -51,6 +51,7 @@
 #include <QLineEdit>
 #include <QSslSocket>
 #include <QSslCertificate>
+#include <QSslConfiguration>
 
 #if (_AXL_OS_LINUX)
 #	include <QtDBus>

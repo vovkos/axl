@@ -207,6 +207,16 @@ endmacro()
 
 # versionless shims
 
+if(NOT COMMAND qt_wrap_cpp)
+	macro(qt_wrap_ui)
+		if(QT_VERSION_MAJOR EQUAL 6)
+			qt6_wrap_cpp(${ARGN})
+		else()
+			qt5_wrap_cpp(${ARGN})
+		endif()
+	endmacro()
+endif()
+
 if(NOT COMMAND qt_wrap_ui)
 	macro(qt_wrap_ui)
 		if(QT_VERSION_MAJOR EQUAL 6)
