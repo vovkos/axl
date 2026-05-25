@@ -15,6 +15,12 @@ unset(Qt5Widgets_DIR CACHE)
 unset(Qt5Network_DIR CACHE)
 unset(Qt5DBus_DIR    CACHE)
 
+unset(Qt6Core_DIR    CACHE)
+unset(Qt6Gui_DIR     CACHE)
+unset(Qt6Widgets_DIR CACHE)
+unset(Qt6Network_DIR CACHE)
+unset(Qt6DBus_DIR    CACHE)
+
 set(QT_FOUND FALSE)
 set(QTCORE_FOUND FALSE)
 set(QTGUI_FOUND FALSE)
@@ -31,41 +37,63 @@ if(QT_CMAKE_DIR)
 	)
 endif()
 
-find_package(Qt5Core QUIET ${_FIND_PACKAGE_FLAGS})
-if(Qt5Core_FOUND)
-	set(QT_FOUND TRUE)
-	set(QTCORE_FOUND TRUE)
-	set(QTCORE_CMAKE_DIR ${Qt5Core_DIR})
-endif()
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-find_package(Qt5Gui QUIET ${_FIND_PACKAGE_FLAGS})
-if(Qt5Gui_FOUND)
-	set(QTGUI_FOUND TRUE)
-	set(QTGUI_CMAKE_DIR ${Qt5Gui_DIR})
-endif()
+macro(
+	find_qt_paths
+	_PREFIX
+)
+	find_package(${_PREFIX}Core QUIET ${_FIND_PACKAGE_FLAGS})
+	if(${_PREFIX}Core_FOUND)
+		set(QT_FOUND TRUE)
+		set(QTCORE_FOUND TRUE)
+		set(QTCORE_CMAKE_DIR ${${_PREFIX}Core_DIR})
 
-find_package(Qt5Widgets QUIET ${_FIND_PACKAGE_FLAGS})
-if(Qt5Widgets_FOUND)
-	set(QTWIDGETS_FOUND TRUE)
-	set(QTWIDGETS_CMAKE_DIR ${Qt5Widgets_DIR})
-endif()
+		set(QT_VERSION_MAJOR ${${_PREFIX}Core_VERSION_MAJOR})
+		set(QT_VERSION_MINOR ${${_PREFIX}Core_VERSION_MINOR})
+		set(QT_VERSION_PATCH ${${_PREFIX}Core_VERSION_PATCH})
+	endif()
 
-find_package(Qt5Network QUIET ${_FIND_PACKAGE_FLAGS})
-if(Qt5Network_FOUND)
-	set(QTNETWORK_FOUND TRUE)
-	set(QTNETWORK_CMAKE_DIR ${Qt5Network_DIR})
-endif()
+	find_package(${_PREFIX}Gui QUIET ${_FIND_PACKAGE_FLAGS})
+	if(${_PREFIX}Gui_FOUND)
+		set(QTGUI_FOUND TRUE)
+		set(QTGUI_CMAKE_DIR ${${_PREFIX}Gui_DIR})
+	endif()
 
-if(UNIX AND NOT APPLE)
-	find_package(Qt5DBus QUIET ${_FIND_PACKAGE_FLAGS})
-	if(Qt5DBus_FOUND)
-		set(QTDBUS_FOUND TRUE)
-		set(QTDBUS_CMAKE_DIR ${Qt5DBus_DIR})
+	find_package(${_PREFIX}Widgets QUIET ${_FIND_PACKAGE_FLAGS})
+	if(${_PREFIX}Widgets_FOUND)
+		set(QTWIDGETS_FOUND TRUE)
+		set(QTWIDGETS_CMAKE_DIR ${${_PREFIX}Widgets_DIR})
+	endif()
+
+	find_package(${_PREFIX}Network QUIET ${_FIND_PACKAGE_FLAGS})
+	if(${_PREFIX}Network_FOUND)
+		set(QTNETWORK_FOUND TRUE)
+		set(QTNETWORK_CMAKE_DIR ${${_PREFIX}Network_DIR})
+	endif()
+
+	if(UNIX AND NOT APPLE)
+		find_package(${_PREFIX}DBus QUIET ${_FIND_PACKAGE_FLAGS})
+		if(${_PREFIX}DBus_FOUND)
+			set(QTDBUS_FOUND TRUE)
+			set(QTDBUS_CMAKE_DIR ${${_PREFIX}DBus_DIR})
+		endif()
+	endif()
+endmacro()
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+if(QT_VERSION_MAJOR)
+	find_qt_paths(Qt${QT_VERSION_MAJOR})
+else()
+	find_qt_paths(Qt6)
+	if(NOT QT_FOUND)
+		find_qt_paths(Qt5)
 	endif()
 endif()
 
 if(QT_FOUND)
-	axl_message("QT ${Qt5Core_VERSION_STRING} paths:")
+	axl_message("QT ${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH} paths:")
 	axl_message("    Core CMake files:" "${QTCORE_CMAKE_DIR}")
 
 	if(QTGUI_FOUND)
@@ -98,10 +126,14 @@ endif()
 
 #...............................................................................
 
-# this macro is similar to qt5_wrap_cpp but does not generate those ridiculous output paths
+# this macro is similar to qt5_wrap_cpp but guarantees to output directly to
+# ${CMAKE_CURRENT_BINARY_DIR} without creating any subdirs
+#
+# crucial if you include generated moc_xxx.cpp files manually and thus need to
+# add know exact include path
 
 macro(
-qt5_wrap_cpp_alt
+qt_wrap_cpp_alt
 	_MOC_CPP_LIST
 	# ...
 )
@@ -121,12 +153,15 @@ qt5_wrap_cpp_alt
 			set(_MOC_CPP_PATH ${CMAKE_CURRENT_BINARY_DIR}/moc_${_H_NAME}.cpp)
 		endif()
 
-		qt5_generate_moc(${_H_PATH} ${_MOC_CPP_PATH})
+		if(QT_VERSION_MAJOR EQUAL 6)
+			qt6_generate_moc(${_H_PATH} ${_MOC_CPP_PATH})
+		else()
+			qt5_generate_moc(${_H_PATH} ${_MOC_CPP_PATH})
+		endif()
+
 		list(APPEND ${_MOC_CPP_LIST} ${_MOC_CPP_PATH})
 	endforeach()
 endmacro()
-
-#...............................................................................
 
 # this macro is similar to qt5_use_modules but doesn't touch the target's
 # POSITION_INDEPENDENT_CODE property which MAY cause some QT statics to be
@@ -137,12 +172,12 @@ endmacro()
 # crucial for qt-5.0.x through 5.3.x; starting with 5.4.x QT macros are fixed
 
 macro(
-qt5_use_modules_alt
+qt_use_modules_alt
 	_TARGET
 	# ...
 )
 
-	if(Qt5Core_VERSION_STRING VERSION_LESS 5.4.0)
+	if(QT_VERSION_MAJOR EQUAL 5 AND Qt5Core_VERSION_STRING VERSION_LESS 5.4.0)
 		get_target_property(_PREV_PIC ${_TARGET} POSITION_INDEPENDENT_CODE)
 		qt5_use_modules(${_TARGET} ${ARGN})
 		set_target_properties(${_TARGET} PROPERTIES POSITION_INDEPENDENT_CODE ${_PREV_PIC})
@@ -150,14 +185,14 @@ qt5_use_modules_alt
 		set(_MODULES ${ARGN})
 		set(_IMPORTS)
 		foreach(_MODULE ${_MODULES})
-			list(APPEND _IMPORTS "Qt5::${_MODULE}")
+			list(APPEND _IMPORTS "Qt${QT_VERSION_MAJOR}::${_MODULE}")
 		endforeach()
 		target_link_libraries(${_TARGET} ${_IMPORTS})
 	endif()
 endmacro()
 
 macro(
-qt5_create_qt_conf
+qt_create_qt_conf
 	_DIR
 )
 
@@ -167,5 +202,29 @@ qt5_create_qt_conf
 		"Plugins = ${QT_PLUGIN_DIR}\n"
 	)
 endmacro()
+
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+# versionless shims
+
+if(NOT COMMAND qt_wrap_ui)
+	macro(qt_wrap_ui)
+		if(QT_VERSION_MAJOR EQUAL 6)
+			qt6_wrap_ui(${ARGN})
+		else()
+			qt5_wrap_ui(${ARGN})
+		endif()
+	endmacro()
+endif()
+
+if(NOT COMMAND qt_add_resources)
+	macro(qt_add_resources)
+		if(QT_VERSION_MAJOR EQUAL 6)
+			qt6_add_resources(${ARGN})
+		else()
+			qt5_add_resources(${ARGN})
+		endif()
+	endmacro()
+endif()
 
 #...............................................................................

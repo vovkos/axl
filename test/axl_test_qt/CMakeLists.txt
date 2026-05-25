@@ -47,7 +47,7 @@ set(
 	mainwindow.h
 )
 
-qt5_wrap_cpp_alt(
+qt_wrap_cpp_alt(
 	GEN_MOC_CPP_LIST
 	${MOC_H_LIST}
 )
@@ -105,14 +105,14 @@ add_executable(
 	${GEN_MOC_CPP_LIST}
 )
 
-qt5_use_modules_alt(
+qt_use_modules_alt(
 	axl_test_qt
 	Widgets
 	Network
 )
 
 if(UNIX AND NOT APPLE)
-	qt5_use_modules_alt(
+	qt_use_modules_alt(
 		axl_test_qt
 		DBus
 	)
@@ -157,8 +157,8 @@ if(WIN32 AND QT_DLL_DIR)
 		${QT_DLL_DIR}/Qt5Network${_DEBUG_SUFFIX}.dll
 	)
 
-	qt5_create_qt_conf(${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
-	qt5_create_qt_conf(${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release)
+	qt_create_qt_conf(${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
+	qt_create_qt_conf(${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release)
 endif()
 
 #...............................................................................
