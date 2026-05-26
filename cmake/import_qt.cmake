@@ -9,17 +9,18 @@
 #
 #...............................................................................
 
-unset(Qt5Core_DIR    CACHE)
-unset(Qt5Gui_DIR     CACHE)
-unset(Qt5Widgets_DIR CACHE)
-unset(Qt5Network_DIR CACHE)
-unset(Qt5DBus_DIR    CACHE)
+unset(Qt5Core_DIR        CACHE)
+unset(Qt5Gui_DIR         CACHE)
+unset(Qt5Widgets_DIR     CACHE)
+unset(Qt5Network_DIR     CACHE)
+unset(Qt5DBus_DIR        CACHE)
 
-unset(Qt6Core_DIR    CACHE)
-unset(Qt6Gui_DIR     CACHE)
-unset(Qt6Widgets_DIR CACHE)
-unset(Qt6Network_DIR CACHE)
-unset(Qt6DBus_DIR    CACHE)
+unset(Qt6Core_DIR        CACHE)
+unset(Qt6Gui_DIR         CACHE)
+unset(Qt6Widgets_DIR     CACHE)
+unset(Qt6Network_DIR     CACHE)
+unset(Qt6DBus_DIR        CACHE)
+unset(Qt6Core5Compat_DIR CACHE)
 
 set(QT_FOUND FALSE)
 set(QTCORE_FOUND FALSE)
@@ -79,6 +80,14 @@ macro(
 			set(QTDBUS_CMAKE_DIR ${${_PREFIX}DBus_DIR})
 		endif()
 	endif()
+
+	if(QT_VERSION_MAJOR EQUAL 6)
+		find_package(Qt6Core5Compat QUIET ${_FIND_PACKAGE_FLAGS})
+		if(Qt6Core5Compat_FOUND)
+			set(QTCORE5COMPAT_FOUND TRUE)
+			set(QTCORE5COMPAT_CMAKE_DIR ${Qt6Core5Compat_DIR})
+		endif()
+	endif()
 endmacro()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -94,22 +103,26 @@ endif()
 
 if(QT_FOUND)
 	axl_message("QT ${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH} paths:")
-	axl_message("    Core CMake files:" "${QTCORE_CMAKE_DIR}")
+	axl_message("    Core:" "${QTCORE_CMAKE_DIR}")
 
 	if(QTGUI_FOUND)
-		axl_message("    Gui CMake files:" "${QTGUI_CMAKE_DIR}")
+		axl_message("    Gui:" "${QTGUI_CMAKE_DIR}")
 	endif()
 
 	if(QTWIDGETS_FOUND)
-		axl_message("    Widgets CMake files:" "${QTWIDGETS_CMAKE_DIR}")
+		axl_message("    Widgets:" "${QTWIDGETS_CMAKE_DIR}")
 	endif()
 
 	if(QTNETWORK_FOUND)
-		axl_message("    Network CMake files:" "${QTNETWORK_CMAKE_DIR}")
+		axl_message("    Network:" "${QTNETWORK_CMAKE_DIR}")
 	endif()
 
 	if(QTDBUS_FOUND)
-		axl_message("    DBus CMake files:" "${QTDBUS_CMAKE_DIR}")
+		axl_message("    DBus:" "${QTDBUS_CMAKE_DIR}")
+	endif()
+
+	if(QTCORE5COMPAT_FOUND)
+		axl_message("    Core5Compat:" "${QTCORE5COMPAT_CMAKE_DIR}")
 	endif()
 
 	if(QT_DLL_DIR)
