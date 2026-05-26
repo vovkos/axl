@@ -218,36 +218,20 @@ endmacro()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-# versionless shims
+# versionless shims for QT 5 — QT 6 defines these natively
 
-if(NOT COMMAND qt_wrap_cpp)
-	macro(qt_wrap_ui)
-		if(QT_VERSION_MAJOR EQUAL 6)
-			qt6_wrap_cpp(${ARGN})
-		else()
-			qt5_wrap_cpp(${ARGN})
-		endif()
-	endmacro()
-endif()
+if(QT_VERSION_MAJOR EQUAL 5)
+    macro(qt_wrap_cpp)
+        qt5_wrap_cpp(${ARGN})
+    endmacro()
 
-if(NOT COMMAND qt_wrap_ui)
-	macro(qt_wrap_ui)
-		if(QT_VERSION_MAJOR EQUAL 6)
-			qt6_wrap_ui(${ARGN})
-		else()
-			qt5_wrap_ui(${ARGN})
-		endif()
-	endmacro()
-endif()
+    macro(qt_wrap_ui)
+        qt5_wrap_ui(${ARGN})
+    endmacro()
 
-if(NOT COMMAND qt_add_resources)
-	macro(qt_add_resources)
-		if(QT_VERSION_MAJOR EQUAL 6)
-			qt6_add_resources(${ARGN})
-		else()
-			qt5_add_resources(${ARGN})
-		endif()
-	endmacro()
+    macro(qt_add_resources)
+        qt5_add_resources(${ARGN})
+    endmacro()
 endif()
 
 #...............................................................................
