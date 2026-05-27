@@ -189,13 +189,22 @@ qt_use_modules_alt
 	_TARGET
 	# ...
 )
+	set(_MODULES ${ARGN})
 
 	if(QT_VERSION_MAJOR EQUAL 5 AND Qt5Core_VERSION_STRING VERSION_LESS 5.4.0)
+		if(TARGET Qt5::Core)
+			set_property(TARGET Qt5::Core PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE)
+		endif()
+
 		get_target_property(_PREV_PIC ${_TARGET} POSITION_INDEPENDENT_CODE)
-		qt5_use_modules(${_TARGET} ${ARGN})
-		set_target_properties(${_TARGET} PROPERTIES POSITION_INDEPENDENT_CODE ${_PREV_PIC})
+		qt5_use_modules(${_TARGET} ${_MODULES})
+
+		if("${_PREV_PIC}" MATCHES "-NOTFOUND")
+			unset(_PREV_PIC)
+		endif()
+
+		set_property(TARGET ${_TARGET} PROPERTY POSITION_INDEPENDENT_CODE ${_PREV_PIC})
 	else() # on newer QTs, use imported targets
-		set(_MODULES ${ARGN})
 		set(_IMPORTS)
 		foreach(_MODULE ${_MODULES})
 			list(APPEND _IMPORTS "Qt${QT_VERSION_MAJOR}::${_MODULE}")
