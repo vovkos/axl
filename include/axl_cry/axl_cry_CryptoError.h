@@ -114,7 +114,7 @@ clearCryptoError() {
 inline
 size_t
 setLastCryptoError() {
-	return setError(CryptoError(::ERR_peek_last_error()));
+	return setCryptoError(::ERR_peek_last_error());
 }
 
 template <typename T>
