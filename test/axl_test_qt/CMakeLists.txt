@@ -151,10 +151,10 @@ if(WIN32 AND QT_DLL_DIR)
 
 	axl_copy_dlls_for_target(
 		axl_test_qt
-		${QT_DLL_DIR}/Qt5Core${_DEBUG_SUFFIX}.dll
-		${QT_DLL_DIR}/Qt5Gui${_DEBUG_SUFFIX}.dll
-		${QT_DLL_DIR}/Qt5Widgets${_DEBUG_SUFFIX}.dll
-		${QT_DLL_DIR}/Qt5Network${_DEBUG_SUFFIX}.dll
+		${QT_DLL_DIR}/Qt${QT_VERSION_MAJOR}Core${_DEBUG_SUFFIX}.dll
+		${QT_DLL_DIR}/Qt${QT_VERSION_MAJOR}Gui${_DEBUG_SUFFIX}.dll
+		${QT_DLL_DIR}/Qt${QT_VERSION_MAJOR}Widgets${_DEBUG_SUFFIX}.dll
+		${QT_DLL_DIR}/Qt${QT_VERSION_MAJOR}Network${_DEBUG_SUFFIX}.dll
 	)
 
 	qt_create_qt_conf(${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug)
