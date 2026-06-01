@@ -117,8 +117,8 @@ X509Store::addWinCertStore(const sys::win::CertStore& store) {
 
 	size_t count = 0;
 	sys::win::Certificate cert;
-	for (;;) {
-		bool result = store.getNextCertificate(&cert, cert);
+	for (size_t i = 0;; i++) {
+		bool result = store.getNextCertificate(&cert);
 		if (!result)
 			return -1;
 

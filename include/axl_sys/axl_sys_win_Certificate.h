@@ -250,21 +250,17 @@ public:
 	);
 
 	bool
-	getNextCertificate(
-		Certificate* certificate,
-		const CERT_CONTEXT* prev = NULL
-	) const;
+	getNextCertificate(Certificate* certificate) const;
 
 	Certificate
-	getNextCertificate(const CERT_CONTEXT* prev = NULL) const;
+	getFirstCertificate() const;
 
 	Certificate
 	findCertificate(
 		dword_t encodingType,
 		dword_t findFlags,
 		dword_t findType,
-		const void* findParam,
-		const CERT_CONTEXT* prev = NULL
+		const void* findParam
 	);
 
 	bool
@@ -273,8 +269,7 @@ public:
 		dword_t encodingType,
 		dword_t findFlags,
 		dword_t findType,
-		const void* findParam,
-		const CERT_CONTEXT* prev = NULL
+		const void* findParam
 	);
 };
 
@@ -299,12 +294,10 @@ CertStore::openSystemStore(
 
 inline
 bool
-CertStore::getNextCertificate(
-	Certificate* certificate,
-	const CERT_CONTEXT* prev
-) const {
+CertStore::getNextCertificate(Certificate* certificate) const {
 	ASSERT(m_h);
 
+	const CERT_CONTEXT* prev = certificate->detach();
 	const CERT_CONTEXT* next = ::CertEnumCertificatesInStore(m_h, prev);
 	if (!next) {
 		dword_t error = ::GetLastError();
@@ -318,9 +311,9 @@ CertStore::getNextCertificate(
 
 inline
 Certificate
-CertStore::getNextCertificate(const CERT_CONTEXT* prev) const {
+CertStore::getFirstCertificate() const {
 	Certificate certificate;
-	getNextCertificate(&certificate, prev);
+	getNextCertificate(&certificate);
 	return certificate;
 }
 
@@ -331,11 +324,11 @@ CertStore::findCertificate(
 	dword_t encodingType,
 	dword_t findFlags,
 	dword_t findType,
-	const void* findParam,
-	const CERT_CONTEXT* prev
+	const void* findParam
 ) {
 	ASSERT(m_h);
 
+	const CERT_CONTEXT* prev = certificate->detach();
 	const CERT_CONTEXT* next = ::CertFindCertificateInStore(
 		m_h,
 		encodingType,
@@ -361,11 +354,10 @@ CertStore::findCertificate(
 	dword_t encodingType,
 	dword_t findFlags,
 	dword_t findType,
-	const void* findParam,
-	const CERT_CONTEXT* prev
+	const void* findParam
 ) {
 	Certificate certificate;
-	findCertificate(&certificate, encodingType, findFlags, findType, findParam,	prev);
+	findCertificate(&certificate, encodingType, findFlags, findType, findParam);
 	return certificate;
 }
 

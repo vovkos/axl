@@ -10044,7 +10044,7 @@ enumCertStore(const sys::win::CertStore& store) {
 	sl::Array<char> thumbprint;
 
 	for (size_t i = 0;; i++) {
-		bool result = store.getNextCertificate(&cert, cert);
+		bool result = store.getNextCertificate(&cert);
 		if (!result)
 			return -1;
 
