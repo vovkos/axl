@@ -118,6 +118,13 @@ isPunctuation(utf32_t c) {
 }
 
 bool
+isSymbol(utf32_t c) {
+	uint32_t props;
+	GET_PROPS(c, props);
+	return (UBool)((CAT_MASK(props)&U_GC_S_MASK)!=0);
+}
+
+bool
 isLetter(utf32_t c) {
 	uint32_t props;
 	GET_PROPS(c, props);

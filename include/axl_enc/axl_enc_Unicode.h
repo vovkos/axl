@@ -44,6 +44,9 @@ bool
 isPunctuation(utf32_t c);
 
 bool
+isSymbol(utf32_t c);
+
+bool
 isLetter(utf32_t c);
 
 bool
