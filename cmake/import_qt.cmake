@@ -22,6 +22,12 @@ unset(Qt6Network_DIR     CACHE)
 unset(Qt6DBus_DIR        CACHE)
 unset(Qt6Core5Compat_DIR CACHE)
 
+unset(Qt6CoreTools_DIR    CACHE)
+unset(Qt6GuiTools_DIR     CACHE)
+unset(Qt6WidgetsTools_DIR CACHE)
+unset(Qt6NetworkTools_DIR CACHE)
+unset(Qt6DBusTools_DIR    CACHE)
+
 set(QT_FOUND FALSE)
 set(QTCORE_FOUND FALSE)
 set(QTGUI_FOUND FALSE)
@@ -92,6 +98,16 @@ endmacro()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+if(QT_CMAKE_DIR)
+	# QT6's _qt_internal_find_tool_dependencies calls find_package() prepending
+	# QT_HOST_PATH and QT_HOST_PATH_CMAKE_DIR to CMake find roots -- that's the 
+	# only way to reliably beat system-installed QT6 tools, which could be 
+	# incompatible  with the exact version of QT6 QT_CMAKE_DIR points to
+
+	set(QT_HOST_PATH "${QT_CMAKE_DIR}/../.." CACHE PATH "" FORCE)
+	set(QT_HOST_PATH_CMAKE_DIR "${QT_CMAKE_DIR}" CACHE PATH "" FORCE)
+endif()
+
 if(QT_VERSION_MAJOR)
 	find_qt_paths(Qt${QT_VERSION_MAJOR})
 else()
@@ -99,6 +115,11 @@ else()
 	if(NOT QT_FOUND)
 		find_qt_paths(Qt5)
 	endif()
+endif()
+
+if(QT_CMAKE_DIR)
+	unset(QT_HOST_PATH CACHE)
+	unset(QT_HOST_PATH_CMAKE_DIR CACHE)
 endif()
 
 if(QT_FOUND)
