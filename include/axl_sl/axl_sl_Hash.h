@@ -217,6 +217,93 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+// bit-mixing helpers for integer hashing with power-of-2 bucket dispatch
+
+inline
+size_t
+hashInt32(uint32_t x) {
+	x ^= x >> 16;
+	x *= 0x45d9f3b;
+	x ^= x >> 16;
+	return (size_t)x;
+}
+
+inline
+size_t
+hashInt64(uint64_t x) {
+	x ^= x >> 33;
+	x *= 0xff51afd7ed558ccdULL;
+	x ^= x >> 33;
+	return (size_t)x;
+}
+
+// HashInt -- identity for small types, bit-mixing for 16/32/64-bit types
+
+template <typename T>
+class HashInt {
+public:
+	size_t
+	operator () (T key) const {
+		return (size_t)key;
+	}
+};
+
+template <>
+class HashInt<int16_t> {
+public:
+	size_t
+	operator () (int16_t key) const {
+		return hashInt32((uint32_t)(uint16_t)key);
+	}
+};
+
+template <>
+class HashInt<uint16_t> {
+public:
+	size_t
+	operator () (uint16_t key) const {
+		return hashInt32((uint32_t)key);
+	}
+};
+
+template <>
+class HashInt<int32_t> {
+public:
+	size_t
+	operator () (int32_t key) const {
+		return hashInt32((uint32_t)key);
+	}
+};
+
+template <>
+class HashInt<uint32_t> {
+public:
+	size_t
+	operator () (uint32_t key) const {
+		return hashInt32(key);
+	}
+};
+
+template <>
+class HashInt<int64_t> {
+public:
+	size_t
+	operator () (int64_t key) const {
+		return hashInt64((uint64_t)key);
+	}
+};
+
+template <>
+class HashInt<uint64_t> {
+public:
+	size_t
+	operator () (uint64_t key) const {
+		return hashInt64(key);
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 template <
 	typename T,
 	typename H

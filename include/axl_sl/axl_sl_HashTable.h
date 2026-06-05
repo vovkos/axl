@@ -118,7 +118,7 @@ public:
 protected:
 	List<Entry> m_list;
 	Array<Bucket> m_table;
-	size_t m_resizeThreshold;
+	uint_t m_resizeThreshold;
 	Hash m_hash;
 	Eq m_eq;
 
@@ -185,6 +185,7 @@ public:
 
 	bool
 	setBucketCount(size_t bucketCount) {
+		ASSERT(isPowerOf2(bucketCount));
 		Array<Bucket> newTable;
 		bool result = newTable.setCount(bucketCount);
 		if (!result)
@@ -197,9 +198,7 @@ public:
 			Bucket* oldBucket = &oldRwi[i];
 			while (!oldBucket->isEmpty()) {
 				Entry* entry = oldBucket->removeHead();
-				size_t hash = m_hash(entry->m_key);
-
-				Bucket* newBucket = &newRwi[hash % bucketCount];
+				Bucket* newBucket = &newRwi[m_hash(entry->m_key) & (bucketCount - 1)];
 				entry->m_bucket = newBucket;
 				newBucket->insertTail(entry);
 			}
@@ -209,13 +208,13 @@ public:
 		return true;
 	}
 
-	size_t
+	uint_t
 	getResizeThreshold() const {
 		return m_resizeThreshold;
 	}
 
 	void
-	setResizeThreshold(size_t resizeThreshold) {
+	setResizeThreshold(uint_t resizeThreshold) {
 		m_resizeThreshold = resizeThreshold;
 	}
 
@@ -225,22 +224,18 @@ public:
 		if (!bucketCount)
 			return NULL;
 
-		size_t hash = m_hash(key);
-		typename Bucket::ConstIterator it = m_table[hash % bucketCount].getHead();
-		for (; it; it++) {
-			bool isEqual = m_eq(key, it->m_key);
-			if (isEqual)
+		ASSERT(isPowerOf2(bucketCount));
+		typename Bucket::ConstIterator it = m_table[m_hash(key) & (bucketCount - 1)].getHead();
+		for (; it; it++)
+			if (m_eq(key, it->m_key))
 				return it;
-		}
 
 		return NULL;
 	}
 
 	Iterator
 	find(KeyArg key) {
-		return m_table.ensureExclusive() ?
-			(Entry*)((const HashTable*)this)->find(key).getEntry() : // a simple const-cast
-			NULL;
+		return (Entry*)((const HashTable*)this)->find(key).getEntry(); // a simple const-cast
 	}
 
 	Value
@@ -257,20 +252,17 @@ public:
 		size_t bucketCount = m_table.getCount();
 		if (!bucketCount) {
 			bucketCount = Def_InitialBucketCount;
-
 			bool result = m_table.setCount(bucketCount);
 			if (!result)
 				return NULL;
 		}
 
-		size_t hash = m_hash(key);
-		Bucket* bucket = &m_table.rwi()[hash % bucketCount];
+		ASSERT(isPowerOf2(bucketCount));
+		Bucket* bucket = &m_table.rwi()[m_hash(key) & (bucketCount - 1)];
 		typename Bucket::Iterator it = bucket->getHead();
-		for (; it; it++) {
-			bool isEqual = m_eq(key, it->m_key);
-			if (isEqual)
+		for (; it; it++)
+			if (m_eq(key, it->m_key))
 				return it;
-		}
 
 		Entry* entry = new (mem::ZeroInit) Entry;
 		entry->m_key = key;
@@ -279,9 +271,9 @@ public:
 		bucket->insertTail(entry);
 
 	#if (AXL_PTR_BITS == 64)
-		size_t loadFactor = getCount() * 100 / bucketCount;
+		uint_t loadFactor = (uint_t)(getCount() * 100 / bucketCount);
 	#else
-		size_t loadFactor = (size_t)((uint64_t)getCount() * 100 / bucketCount);
+		uint_t loadFactor = (uint_t)((uint64_t)getCount() * 100 / bucketCount);
 	#endif
 
 		if (loadFactor > m_resizeThreshold)
@@ -385,7 +377,7 @@ template <
 class SimpleHashTable: public HashTable<
 	Key,
 	Value,
-	sl::HashId<Key>,
+	sl::HashInt<Key>,
 	sl::Eq<Key>,
 	KeyArg,
 	ValueArg
@@ -482,7 +474,7 @@ protected: \
 		Class, \
 		Key, \
 		Value, \
-		axl::sl::HashId<Key> \
+		axl::sl::HashInt<Key> \
 	)
 
 #define AXL_SL_END_SIMPLE_HASH_TABLE() \

@@ -14,7 +14,6 @@
 
 #define __STDC_LIMIT_MACROS
 #define __STDC_CONSTANT_MACROS
-#define _ITERATOR_DEBUG_LEVEL 0
 
 #include "axl_g_Pch.h"
 

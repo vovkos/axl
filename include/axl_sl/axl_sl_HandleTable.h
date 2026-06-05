@@ -70,7 +70,7 @@ template <
 class HandleTableBase: public HashTable<
 	Key,
 	Value,
-	HashId<Key>,
+	HashInt<Key>,
 	Eq<Key>,
 	Key,
 	ValueArg

@@ -950,7 +950,7 @@ void testArrayPerf(const char* typeName) {
 void
 benchHashTable() {
 	// benchmark: QHash vs sl::SimpleHashTable for uint64 keys
-	const size_t KeyCount  = 1024 * 1024;
+	const size_t KeyCount  = 8 * 1024;
 	const size_t LookupCount = 500ULL * 1000000;
 
 	QVector<uint64_t> keys(KeyCount);
@@ -1002,7 +1002,7 @@ benchHashTable() {
 		}
 	};
 
-	typedef MurMurHash MyHash;
+	typedef ClaudeHash MyHash;
 
 	// ...
 
@@ -1197,7 +1197,7 @@ main(
 #endif
 
 #if (1)
-	// benchHashTable();
+	benchHashTable();
 	printf("\n");
 	benchRbTree();
 	return 0;
