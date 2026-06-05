@@ -142,7 +142,7 @@ public:
 template <
 	typename Key,
 	typename Value,
-	typename Cmp = Cmp<Key>,
+	typename Cmp = Lt<Key>,
 	typename KeyArg = typename ArgType<Key>::Type,
 	typename ValueArg = typename ArgType<Value>::Type
 >

@@ -40,9 +40,19 @@ protected:
 	ListLink* m_prev;
 
 public:
+	const ListLink*
+	getNext() const {
+		return m_next;
+	}
+
 	ListLink*
 	getNext() {
 		return m_next;
+	}
+
+	const ListLink*
+	getPrev() const {
+		return m_prev;
 	}
 
 	ListLink*

@@ -121,7 +121,6 @@ set(
 	${AXL_INC_DIR}/axl_sl/axl_sl_UnsignedType.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_Operator.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_Construct.h
-	${AXL_INC_DIR}/axl_sl/axl_sl_Cmp.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_Hash.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_Swap.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_Closure.h

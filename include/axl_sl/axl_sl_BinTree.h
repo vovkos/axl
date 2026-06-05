@@ -15,7 +15,6 @@
 
 #include "axl_sl_List.h"
 #include "axl_sl_MapEntry.h"
-#include "axl_sl_Cmp.h"
 
 namespace axl {
 namespace sl {
@@ -113,17 +112,8 @@ public:
 
 	Iterator
 	find(KeyArg key) {
-		Node* node = m_root;
-
-		while (node) {
-			int cmp = m_cmp(key, node->m_key);
-			if (cmp == 0)
-				return node;
-
-			node = cmp < 0 ? node->m_left : node->m_right;
-		}
-
-		return NULL;
+		Node* leNode = findLeNode(key);
+		return leNode && !m_cmp(leNode->m_key, key) ? leNode : NULL;
 	}
 
 	ConstIterator
@@ -134,40 +124,26 @@ public:
 	template <RelOpKind opKind>
 	Iterator
 	find(KeyArg key) {
-		Node* node = m_root;
-		Node* prevNode;
-		int prevCmp;
-
-		if (isEmpty())
-			return NULL;
-
-		while (node) {
-			int cmp = m_cmp(key, node->m_key);
-			if (cmp == 0)
-				break; // exact match
-
-			prevNode = node;
-			prevCmp = cmp;
-			node = cmp < 0 ? node->m_left : node->m_right;
-		}
-
-		ASSERT(node || prevNode);
+		Node* leNode = findLeNode(key);
 		switch (opKind) {
 		case RelOpKind_Lt:
-			return node ? node->m_left : prevCmp > 0 ? prevNode : Iterator(prevNode).getPrev();
+			return leNode ?
+				m_cmp(leNode->m_key, key) ? leNode : Iterator(leNode).getPrev() :
+				NULL;
 
 		case RelOpKind_Le:
-			return node ? node : prevCmp > 0 ? prevNode : Iterator(prevNode).getPrev();
+			return leNode;
 
 		case RelOpKind_Gt:
-			return node ? node->m_right : prevCmp < 0 ? prevNode : Iterator(prevNode).getNext();
+			return leNode ? Iterator(leNode).getNext() : getHead();
 
 		case RelOpKind_Ge:
-			return node ? node : prevCmp < 0 ? prevNode : Iterator(prevNode).getNext();
+			return leNode ?
+				!m_cmp(leNode->m_key, key) ? leNode : Iterator(leNode).getNext() :
+				getHead();
 
 		default:
-			ASSERT(opKind == RelOpKind_Eq);
-			return node;
+			return leNode && !m_cmp(leNode->m_key, key) ? leNode : NULL;
 		}
 	}
 
@@ -198,41 +174,38 @@ public:
 
 	Iterator
 	visit(KeyArg key) {
-		Node* parent = NULL;
 		Node* node = m_root;
+		if (!node) {
+			node = createNode(NULL, key);
+			m_root = node;
+			return m_nodeList.insertTail(node);
+		}
 
-		// find the place to insert
-
-		int cmp;
-
-		while (node) {
-			cmp = m_cmp(key, node->m_key);
-			if (cmp == 0)
+		Node* child;
+		for (;;)
+			if (m_cmp(key, node->m_key)) {
+				if (node->m_left)
+					node = node->m_left;
+				else {
+					child = createNode(node, key);
+					node->m_left = child;
+					m_nodeList.insertBefore(child, node);
+					break;
+				}
+			} else if (m_cmp(node->m_key, key)) {
+				if (node->m_right)
+					node = node->m_right;
+				else {
+					child = createNode(node, key);
+					node->m_right = child;
+					m_nodeList.insertAfter(child, node);
+					break;
+				}
+			} else
 				return node;
 
-			parent = node;
-			node = cmp < 0 ? node->m_left : node->m_right;
-		}
-
-		// create and insert new node
-
-		node = new (mem::ZeroInit) Node;
-		node->m_key = key;
-		node->m_parent = parent;
-
-		if (!parent) {
-			m_root = node;
-			m_nodeList.insertTail(node);
-		} else if (cmp < 0) {
-			parent->m_left = node;
-			m_nodeList.insertBefore(node, parent);
-		} else {
-			parent->m_right = node;
-			m_nodeList.insertAfter(node, parent);
-		}
-
-		static_cast<T*>(this)->onInsert(node);
-		return node;
+		static_cast<T*>(this)->onInsert(child);
+		return child;
 	}
 
 	Iterator
@@ -316,6 +289,32 @@ public:
 	}
 
 protected:
+	Node*
+	findLeNode(KeyArg key) {
+		Node* leNode = NULL;
+		Node* node = m_root;
+		while (node)
+			if (m_cmp(key, node->m_key))
+				node = node->m_left;
+			else {
+				leNode = node;
+				node = node->m_right;
+			}
+
+		return leNode;
+	}
+
+	Node*
+	createNode(
+		Node* parent,
+		KeyArg key
+	) {
+		Node* node = new (mem::ZeroInit) Node;
+		node->m_parent = parent;
+		node->m_key = key;
+		return node;
+	}
+
 	Node*
 	getLeftmostChild(Node* node) {
 		while (node->m_left)
@@ -480,8 +479,10 @@ protected:
 		Node* x,
 		KeyArg key
 	) {
-		ASSERT(!x->m_prev || m_cmp(((Node*)x->m_prev)->m_key, key) < 0);
-		ASSERT(!x->m_next || m_cmp(((Node*)x->m_next)->m_key, key) > 0);
+		// assert the tree order stays intact
+
+		ASSERT(!x->m_prev || m_cmp(((Node*)x->m_prev)->m_key, key));
+		ASSERT(!x->m_next || m_cmp(key, ((Node*)x->m_next)->m_key));
 		x->m_key = key;
 	}
 

@@ -14,6 +14,7 @@
 
 #define __STDC_LIMIT_MACROS
 #define __STDC_CONSTANT_MACROS
+#define _ITERATOR_DEBUG_LEVEL 0
 
 #include "axl_g_Pch.h"
 
@@ -72,3 +73,6 @@ using namespace axl;
 //..............................................................................
 
 #include <openssl/x509.h>
+#include <unordered_map>
+#include <map>
+#include "axl_sl_RbTree.h"

@@ -947,6 +947,204 @@ void testArrayPerf(const char* typeName) {
 	printf("sl::Array<%s> time: %s\n", typeName, sys::Time(time, 0).format("%m:%s:%l").sz());
 }
 
+void
+benchHashTable() {
+	// benchmark: QHash vs sl::SimpleHashTable for uint64 keys
+	const size_t KeyCount  = 1024 * 1024;
+	const size_t LookupCount = 500ULL * 1000000;
+
+	QVector<uint64_t> keys(KeyCount);
+	for (int i = 0; i < KeyCount; i++)
+		keys[i] =
+			(uint64_t)(33 + rand() % 94)         // printable ASCII cp
+			| ((uint64_t)(rand() % 4) << 21)     // fontFlags
+			| ((uint64_t)(rand() % 16) << 25);   // colorRgb index
+
+	class StdHash {
+	public:
+		size_t operator () (uint64_t key) const {
+			return std::hash<uint64_t>()(key);
+		}
+	};
+
+	class IdHash {
+	public:
+		size_t operator () (uint64_t key) const {
+			return (size_t)key;
+		}
+	};
+
+	class QtHash {
+	public:
+		size_t operator () (uint64_t key) const {
+			return (size_t)qHash(key);
+		}
+	};
+
+	struct MurMurHash {
+		size_t operator()(uint64_t k) const {
+			k ^= k >> 33;
+			k *= 0xff51afd7ed558ccdULL;
+			k ^= k >> 33;
+			k *= 0xc4ceb9fe1a85ec53ULL;
+			k ^= k >> 33;
+			return (size_t)k;
+		}
+	};
+
+	class ClaudeHash {
+	public:
+		size_t operator () (uint64_t key) const {
+			key ^= key >> 33;
+			key *= 0xff51afd7ed558ccdULL;
+			key ^= key >> 33;
+			return (size_t)key;
+		}
+	};
+
+	typedef MurMurHash MyHash;
+
+	// ...
+
+	// std::unordered_map
+	{
+
+
+		QElapsedTimer timer0;
+		std::unordered_map<uint64_t, void*, MyHash> map;
+		timer0.start();
+		map.reserve(KeyCount);
+		for (size_t i = 0; i < KeyCount; i++)
+			map[keys[i]] = (void*)(intptr_t)i;
+		printf("unordered_map.insert: %lld ms\n", timer0.elapsed());
+
+		QElapsedTimer timer;
+		timer.start();
+		volatile intptr_t sum = 0;
+		for (size_t i = 0; i < LookupCount; i++) {
+			auto it = map.find(keys[i % KeyCount]);
+			if (it != map.end())
+				sum += (intptr_t)it->second;
+		}
+		printf("unordered_map.find:   %lld ms (sum=%lld)\n", timer.elapsed(), (long long)sum);
+	}
+
+	// QHash
+	{
+		QElapsedTimer timer0;
+		QHash<uint64_t, void*> map;
+		timer0.start();
+		for (size_t i = 0; i < KeyCount; i++)
+			map[keys[i]] = (void*)(intptr_t)i;
+		printf("QHash.insert:         %lld ms\n", timer0.elapsed());
+
+		const QHash<uint64_t, void*>& map2 = map;
+
+		QElapsedTimer timer;
+		timer.start();
+		volatile intptr_t sum = 0;
+		for (size_t i = 0; i < LookupCount; i++) {
+			auto it = map2.find(keys[i % KeyCount]);
+			if (it != map2.end())
+				sum += (intptr_t)it.value();
+		}
+		printf("QHash.find:           %lld ms (sum=%lld)\n", timer.elapsed(), (long long)sum);
+	}
+
+	// sl::SimpleHashTable
+	{
+		QElapsedTimer timer0;
+		timer0.start();
+		sl::HashTable<uint64_t, void*, MyHash> map;
+		for (size_t i = 0; i < KeyCount; i++)
+			map.visit(keys[i])->m_value = (void*)(intptr_t)i;
+		printf("sl::HashTable.visit: %lld ms\n", timer0.elapsed());
+
+		QElapsedTimer timer;
+		timer.start();
+		volatile intptr_t sum = 0;
+		for (size_t i = 0; i < LookupCount; i++) {
+			sl::ConstHashTableIterator<uint64_t, void*> it = map.find(keys[i % KeyCount]);
+			if (it)
+				sum += (intptr_t)it->m_value;
+		}
+		printf("sl::HashTable.find:  %lld ms (sum=%lld)\n", timer.elapsed(), (long long)sum);
+	}
+}
+
+void
+benchRbTree() {
+	const size_t KeyCount    = 8 * 1024;
+	const size_t LookupCount = 40ULL * 1000000;
+
+	QVector<uint64_t> keys(KeyCount);
+	for (int i = 0; i < KeyCount; i++)
+		keys[i] =
+			(uint64_t)(33 + rand() % 94)
+			| ((uint64_t)(rand() % 4) << 21)
+			| ((uint64_t)(rand() % 16) << 25);
+
+	// std::map
+	{
+		QElapsedTimer timer0;
+		std::map<uint64_t, void*> map;
+		timer0.start();
+		for (size_t i = 0; i < KeyCount; i++)
+			map[keys[i]] = (void*)(intptr_t)i;
+		printf("std::map.insert:     %lld ms\n", timer0.elapsed());
+
+		QElapsedTimer timer;
+		timer.start();
+		volatile intptr_t sum = 0;
+		for (size_t i = 0; i < LookupCount; i++) {
+			auto it = map.find(keys[i % KeyCount]);
+			if (it != map.end())
+				sum += (intptr_t)it->second;
+		}
+		printf("std::map.find:       %lld ms (sum=%lld)\n", timer.elapsed(), (long long)sum);
+	}
+
+	// QMap
+	{
+		QElapsedTimer timer0;
+		QMap<uint64_t, void*> map;
+		timer0.start();
+		for (size_t i = 0; i < KeyCount; i++)
+			map[keys[i]] = (void*)(intptr_t)i;
+		printf("QMap.insert:         %lld ms\n", timer0.elapsed());
+
+		QElapsedTimer timer;
+		timer.start();
+		volatile intptr_t sum = 0;
+		for (size_t i = 0; i < LookupCount; i++) {
+			auto it = map.find(keys[i % KeyCount]);
+			if (it != map.end())
+				sum += (intptr_t)it.value();
+		}
+		printf("QMap.find:           %lld ms (sum=%lld)\n", timer.elapsed(), (long long)sum);
+	}
+
+	// sl::RbTree
+	{
+		QElapsedTimer timer0;
+		sl::RbTree<uint64_t, void*> map;
+		timer0.start();
+		for (size_t i = 0; i < KeyCount; i++)
+			map.visit(keys[i])->m_value = (void*)(intptr_t)i;
+		printf("sl::RbTree.visit:    %lld ms\n", timer0.elapsed());
+
+		QElapsedTimer timer;
+		timer.start();
+		volatile intptr_t sum = 0;
+		for (size_t i = 0; i < LookupCount; i++) {
+			sl::ConstRbTreeIterator<uint64_t, void*> it = map.find(keys[i % KeyCount]);
+			if (it)
+				sum += (intptr_t)it->m_value;
+		}
+		printf("sl::RbTree.find:     %lld ms (sum=%lld)\n", timer.elapsed(), (long long)sum);
+	}
+}
+
 int
 main(
 	int argc,
@@ -996,6 +1194,13 @@ main(
 
 #if (_AXL_OS_POSIX)
 	setvbuf(stdout, NULL, _IOLBF, 1024);
+#endif
+
+#if (1)
+	// benchHashTable();
+	printf("\n");
+	benchRbTree();
+	return 0;
 #endif
 
 #if (0)
@@ -1159,3 +1364,5 @@ main(
 }
 
 //..............................................................................
+
+
