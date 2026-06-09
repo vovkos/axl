@@ -24,15 +24,26 @@ namespace sl {
 template <
 	typename T,
 	typename Key,
-	typename Value
+	typename Value,
+	typename KeyValueArgs = ArgTypes<Key, Value>
 >
-struct BinTreeNodeBase: MapEntry<Key, Value> {
+struct BinTreeNodeBase: MapEntry<Key, Value, KeyValueArgs> {
 protected:
 	T* m_parent;
 	T* m_left;
 	T* m_right;
 
 protected:
+	BinTreeNodeBase(
+		typename BinTreeNodeBase::KeyArg key,
+		T* parent
+	):
+		MapEntry<Key, Value, KeyValueArgs>(key) {
+		m_parent = parent;
+		m_left = NULL;
+		m_right = NULL;
+	}
+
 	// overridable
 
 	static
@@ -47,15 +58,16 @@ protected:
 
 template <
 	typename T,
-	typename Node,
-	typename Key,
-	typename Value,
-	typename Cmp,
-	typename KeyArg,
-	typename ValueArg
+	typename Node0,
+	typename Cmp
 >
 class BinTreeBase {
 public:
+	typedef Node0 Node;
+	typedef typename Node::Key Key;
+	typedef typename Node::Value Value;
+	typedef typename Node::KeyArg KeyArg;
+	typedef typename Node::ValueArg ValueArg;
 	typedef sl::Iterator<Node> Iterator;
 	typedef sl::ConstIterator<Node> ConstIterator;
 
@@ -176,7 +188,7 @@ public:
 	visit(KeyArg key) {
 		Node* node = m_root;
 		if (!node) {
-			node = createNode(NULL, key);
+			node = new Node(key, NULL);
 			m_root = node;
 			return m_nodeList.insertTail(node);
 		}
@@ -187,7 +199,7 @@ public:
 				if (node->m_left)
 					node = node->m_left;
 				else {
-					child = createNode(node, key);
+					child = new Node(key, node);
 					node->m_left = child;
 					m_nodeList.insertBefore(child, node);
 					break;
@@ -196,7 +208,7 @@ public:
 				if (node->m_right)
 					node = node->m_right;
 				else {
-					child = createNode(node, key);
+					child = new Node(key, node);
 					node->m_right = child;
 					m_nodeList.insertAfter(child, node);
 					break;
@@ -302,17 +314,6 @@ protected:
 			}
 
 		return leNode;
-	}
-
-	Node*
-	createNode(
-		Node* parent,
-		KeyArg key
-	) {
-		Node* node = new (mem::ZeroInit) Node;
-		node->m_parent = parent;
-		node->m_key = key;
-		return node;
 	}
 
 	Node*

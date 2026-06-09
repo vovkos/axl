@@ -29,21 +29,19 @@ enum RbColor {
 
 template <
 	typename Key,
-	typename Value
+	typename Value,
+	typename KeyValueArgs = ArgTypes<Key, Value>
 >
 class RbTreeNode: public BinTreeNodeBase<
-	RbTreeNode<Key, Value>,
+	RbTreeNode<Key, Value, KeyValueArgs>,
 	Key,
-	Value
+	Value,
+	KeyValueArgs
 > {
 	template <
 		typename T,
 		typename Node,
-		typename Key2,
-		typename Value2,
-		typename Cmp,
-		typename KeyArg,
-		typename ValueArg
+		typename Cmp
 	>
 	friend class BinTreeBase;
 
@@ -51,8 +49,7 @@ class RbTreeNode: public BinTreeNodeBase<
 		typename Key2,
 		typename Value2,
 		typename Cmp,
-		typename KeyArg,
-		typename ValueArg
+		typename KeyValueArgs
 	>
 	friend class RbTree;
 
@@ -60,6 +57,14 @@ protected:
 	RbColor m_color;
 
 protected:
+	RbTreeNode(
+		typename RbTreeNode::KeyArg key,
+		RbTreeNode* parent
+	):
+		BinTreeNodeBase<RbTreeNode, Key, Value, KeyValueArgs>(key, parent) {
+		m_color = RbColor_Black; // root doesn't go through onInsert and must be black
+	}
+
 	static
 	void
 	onXcg(
@@ -103,84 +108,42 @@ protected:
 #endif
 };
 
-//..............................................................................
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename Key,
-	typename Value
+	typename Value,
+	typename KeyValueArgs = ArgTypes<Key, Value>
 >
-class RbTreeIterator: public Iterator<RbTreeNode<Key, Value> > {
-public:
-	RbTreeIterator() {}
+using RbTreeIterator = Iterator<RbTreeNode<Key, Value, KeyValueArgs> >;
 
-	RbTreeIterator(const Iterator<RbTreeNode<Key, Value> >& src) {
-		this->m_p = src.getEntry();
-	}
-};
+template <
+	typename Key,
+	typename Value,
+	typename KeyValueArgs = ArgTypes<Key, Value>
+>
+using ConstRbTreeIterator = ConstIterator<RbTreeNode<Key, Value, KeyValueArgs> >;
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename Key,
-	typename Value
->
-class ConstRbTreeIterator: public ConstIterator<RbTreeNode<Key, Value> > {
-public:
-	ConstRbTreeIterator() {}
-
-	ConstRbTreeIterator(const Iterator<RbTreeNode<Key, Value> >& src) {
-		this->m_p = src.getEntry();
-	}
-
-	ConstRbTreeIterator(const ConstIterator<RbTreeNode<Key, Value> >& src) {
-		this->m_p = src.getEntry();
-	}
-};
-
-//..............................................................................
-
-template <
-	typename Key,
 	typename Value,
 	typename Cmp = Lt<Key>,
-	typename KeyArg = typename ArgType<Key>::Type,
-	typename ValueArg = typename ArgType<Value>::Type
+	typename KeyValueArgs = typename ArgTypes<Key, Value>
 >
 class RbTree: public BinTreeBase<
-	RbTree<Key, Value, Cmp, KeyArg, ValueArg>,
-	RbTreeNode<Key, Value>,
-	Key,
-	Value,
-	Cmp,
-	KeyArg,
-	ValueArg
+	RbTree<Key, Value, Cmp, KeyValueArgs>,
+	RbTreeNode<Key, Value, KeyValueArgs>,
+	Cmp
 > {
 public:
-	friend class BinTreeBase<
-		RbTree<Key, Value, Cmp, KeyArg, ValueArg>,
-		RbTreeNode<Key, Value>,
-		Key,
-		Value,
-		Cmp,
-		KeyArg,
-		ValueArg
-	>;
-
-	typedef BinTreeBase<
-		RbTree<Key, Value, Cmp, KeyArg, ValueArg>,
-		RbTreeNode<Key, Value>,
-		Key,
-		Value,
-		Cmp,
-		KeyArg,
-		ValueArg
-	> BaseType;
-
-	typedef RbTreeNode<Key, Value> Node;
+	typedef RbTreeNode<Key, Value, KeyValueArgs> Node;
+	friend class BinTreeBase<RbTree, Node, Cmp>;
 
 public:
 	RbTree(const Cmp& cmp = Cmp()):
-		BaseType(cmp) {}
+		BinTreeBase<RbTree, Node, Cmp>(cmp) {}
 
 protected:
 	void
