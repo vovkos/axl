@@ -35,9 +35,10 @@ ReadWriteLock::create() {
 
 	m_data = new Data();
 	m_data->m_signature = Signature;
-	m_readEvent.create();
-	m_writeEvent.create();
-	return true;
+
+	return
+		m_readEvent.create() &&
+		m_writeEvent.create();
 }
 
 bool
@@ -217,76 +218,6 @@ ReadWriteLock::writeUnlock() {
 	sys::atomicUnlock(&m_data->m_lock);
 }
 
-void
-ReadWriteLock::upgradeReadLockToWriteLock() {
-	bool result;
-
-	sys::atomicLock(&m_data->m_lock);
-	ASSERT(m_data->m_activeReadCount >= 1);
-
-	if (m_data->m_activeReadCount == 1 && !m_data->m_activeWriteCount && !m_data->m_queuedReadCount) {
-		m_readEvent.reset();
-		m_data->m_activeWriteCount = 1;
-		m_data->m_activeReadCount = 0;
-
-#if (_AXL_SYS_READWRITELOCK_DEBUG_THREADS)
-		onRemoveReadThread();
-		onAddWriteThread();
-#endif
-		sys::atomicUnlock(&m_data->m_lock);
-		return;
-	}
-
-	m_data->m_queuedWriteCount++;
-
-	do {
-		sys::atomicUnlock(&m_data->m_lock);
-
-		// another writer might squeeze in here, finish and wake up readers
-		// one reader might start, finish and wake up this writer
-
-		result = m_writeEvent.wait();
-		ASSERT(result);
-
-		if (!result) // in release, fall back to spin-locking
-			sys::yieldProcessor();
-
-		// another reader woken up by the first writer might have read-locked
-
-		sys::atomicLock(&m_data->m_lock);
-	} while (m_data->m_activeReadCount != 1 || m_data->m_activeWriteCount);
-
-	m_readEvent.reset();
-	m_data->m_queuedWriteCount--;
-	m_data->m_activeWriteCount = 1;
-	m_data->m_activeReadCount = 0;
-
-#if (_AXL_SYS_READWRITELOCK_DEBUG_THREADS)
-	onRemoveReadThread();
-	onAddWriteThread();
-#endif
-	sys::atomicUnlock(&m_data->m_lock);
-}
-
-void
-ReadWriteLock::downgradeWriteLockToReadLock() {
-	sys::atomicLock(&m_data->m_lock);
-	ASSERT(m_data->m_activeReadCount == 0 && m_data->m_activeWriteCount == 1);
-	m_data->m_activeWriteCount = 0;
-	m_data->m_activeReadCount = 1;
-
-	if (m_data->m_queuedReadCount) { // wake queued readers
-		bool result = m_readEvent.signal();
-		ASSERT(result);
-	}
-
-#if (_AXL_SYS_READWRITELOCK_DEBUG_THREADS)
-	onRemoveWriteThread();
-	onAddReadThread();
-#endif
-	sys::atomicUnlock(&m_data->m_lock);
-}
-
 #if (_AXL_SYS_READWRITELOCK_DEBUG_THREADS)
 
 void
@@ -299,8 +230,11 @@ ReadWriteLock::onAddReadThread() {
 
 void
 ReadWriteLock::onRemoveReadThread() {
-	if (!m_data->m_activeReadCount)
+	if (!m_data->m_activeReadCount) {
+		ASSERT(m_data->m_threadIdTable[0] == sys::getCurrentThreadId());
+		m_data->m_threadIdTable[0] = 0;
 		return;
+	}
 
 	size_t count = m_data->m_activeReadCount + 1;
 	if (count > countof(m_data->m_threadIdTable))

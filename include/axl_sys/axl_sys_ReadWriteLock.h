@@ -94,12 +94,6 @@ public:
 	void
 	writeUnlock();
 
-	void
-	upgradeReadLockToWriteLock();
-
-	void
-	downgradeWriteLockToReadLock();
-
 protected:
 #if (_AXL_SYS_READWRITELOCK_DEBUG_THREADS)
 	void
