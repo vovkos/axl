@@ -147,6 +147,8 @@ set(
 	${AXL_INC_DIR}/axl_sl/axl_sl_Guid.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_Handle.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_HandleTable.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_RobinHashTable.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_QuadraticHashTable.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_HashTable.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_Iterator.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_PtrIterator.h

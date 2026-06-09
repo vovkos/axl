@@ -36,6 +36,8 @@ set(
 	test_Packetizer.cpp
 	test_RbTree.cpp
 	test_Ref.cpp
+	test_QuadraticHashTable.cpp
+	test_RobinHashTable.cpp
 	test_StringTemplate.cpp
 	test_Usb.cpp
 	test_Bstr.cpp
