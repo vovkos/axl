@@ -29,8 +29,8 @@ template <
 struct MapEntry: ListLink {
 	typedef Key0 Key;
 	typedef Value0 Value;
-	typedef typename KeyValueArgs::template Type<0> KeyArg;
-	typedef typename KeyValueArgs::template Type<1> ValueArg;
+	typedef typename std::tuple_element<0, KeyValueArgs>::type KeyArg;
+	typedef typename std::tuple_element<1, KeyValueArgs>::type ValueArg;
 
 protected:
 	Key m_key;

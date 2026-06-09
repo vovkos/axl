@@ -130,7 +130,7 @@ template <
 	typename Key,
 	typename Value,
 	typename Cmp = Lt<Key>,
-	typename KeyValueArgs = typename ArgTypes<Key, Value>
+	typename KeyValueArgs = ArgTypes<Key, Value>
 >
 class RbTree: public BinTreeBase<
 	RbTree<Key, Value, Cmp, KeyValueArgs>,

@@ -98,13 +98,10 @@ template <typename T>
 class ArgType<T*>: public SimpleArgType<T*> {
 };
 
-//..............................................................................
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename... Ts>
-struct ArgTypes {
-	template <size_t i>
-	using Type = typename std::tuple_element<i, std::tuple<typename ArgType<Ts>::Type...> >::type;
-};
+using ArgTypes = std::tuple<typename ArgType<Ts>::Type...>;
 
 //..............................................................................
 
