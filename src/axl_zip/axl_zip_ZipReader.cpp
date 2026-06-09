@@ -71,7 +71,7 @@ bool
 ZipReader::openFile(const sl::StringRef& fileName) {
 	close();
 
-	m_zip = new (mem::ZeroInit) mz_zip_archive;
+	m_zip = new mz_zip_archive();
 	mz_bool result = mz_zip_reader_init_file(m_zip, fileName.sz(), MZ_ZIP_FLAG_DO_NOT_SORT_CENTRAL_DIRECTORY);
 	return result ? true : err::fail(err::SystemErrorCode_Unsuccessful);
 }
@@ -83,7 +83,7 @@ ZipReader::openMem(
 ) {
 	close();
 
-	m_zip = new (mem::ZeroInit) mz_zip_archive;
+	m_zip = new mz_zip_archive();
 	mz_bool result = mz_zip_reader_init_mem(m_zip, p, size, MZ_ZIP_FLAG_DO_NOT_SORT_CENTRAL_DIRECTORY);
 	return result ? true : err::fail(err::SystemErrorCode_Unsuccessful);
 }

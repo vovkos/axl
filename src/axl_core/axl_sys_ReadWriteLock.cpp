@@ -24,7 +24,6 @@ ReadWriteLock::close() {
 		delete m_data;
 
 	m_data = NULL;
-
 	m_readEvent.close();
 	m_writeEvent.close();
 	m_mapping.close();
@@ -34,12 +33,10 @@ bool
 ReadWriteLock::create() {
 	close();
 
-	m_data = new (mem::ZeroInit) Data;
+	m_data = new Data();
+	m_data->m_signature = Signature;
 	m_readEvent.create();
 	m_writeEvent.create();
-
-	m_data->m_signature = Signature;
-
 	return true;
 }
 

@@ -536,8 +536,7 @@ class NfaStateSetMap: public sl::HashTable<
 	NfaStateSet,
 	T,
 	sl::HashDuckType<NfaStateSet>,
-	sl::EqDuckType<NfaStateSet>,
-	const NfaStateSet&
+	sl::EqDuckType<NfaStateSet>
 > {
 };
 
