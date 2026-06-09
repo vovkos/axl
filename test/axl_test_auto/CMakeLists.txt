@@ -34,6 +34,7 @@ set(
 	test_List.cpp
 	test_Packer.cpp
 	test_Packetizer.cpp
+	test_RangeTree.cpp
 	test_RbTree.cpp
 	test_Ref.cpp
 	test_QuadraticHashTable.cpp

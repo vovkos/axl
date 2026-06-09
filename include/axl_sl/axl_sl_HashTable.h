@@ -31,8 +31,6 @@ template <
 	typename KeyValueArgs = ArgTypes<Key, Value>
 >
 struct HashTableEntry: MapEntry<Key, Value, KeyValueArgs> {
-	using typename MapEntry<Key, Value, KeyValueArgs>::KeyArg;
-
 	template <
 		typename Key2,
 		typename Value2,

@@ -18,30 +18,38 @@
 namespace axl {
 namespace sl {
 
-template <
-	typename Offset,
-	typename Value,
-	typename ValueArg,
-	typename ValueEq
->
-class RangeTree;
-
 //..............................................................................
 
 template <
-	typename Offset,
-	typename Value,
-	typename ValueArg,
-	typename ValueEq
+	typename Offset0,
+	typename Value0,
+	typename ValueArg0 = typename ArgType<Value0>::Type
 >
 class RangeTreeValue {
-	friend class RangeTree<Offset, Value, ValueArg, ValueEq>;
+	template <
+		typename Offset2,
+		typename Value2,
+		typename Eq,
+		typename ValueArgs2
+	>
+	friend class RangeTree;
+
+public:
+	typedef Offset0 Offset;
+	typedef Value0 Value;
+	typedef ValueArg0 ValueArg;
 
 protected:
 	Offset m_endOffset;
+
+public:
 	Value m_value;
 
 public:
+	RangeTreeValue():
+		m_endOffset(),
+		m_value() {}
+
 	Value& operator * () {
 		return m_value;
 	}
@@ -63,8 +71,13 @@ public:
 		return m_endOffset;
 	}
 
-	Value&
+	const Value&
 	getValue() const {
+		return m_value;
+	}
+
+	Value&
+	getValue() {
 		return m_value;
 	}
 };
@@ -73,13 +86,27 @@ public:
 
 template <
 	typename Offset, // integer type (size_t, uint64_t, intptr_t, etc)
-	typename Value,
-	typename ValueArg = typename sl::ArgType<Value>::Type,
-	typename ValueEq = typename sl::Eq<Value, ValueArg>
+	typename Value0,
+	typename ValueEq = Eq<Value0>,
+	typename ValueArg0 = typename ArgType<Value0>::Type
 >
-class RangeTree: public sl::RbTree<Offset, RangeTreeValue<Offset, Value, ValueArg, ValueEq> > {
+class RangeTree: public RbTree<
+	Offset,
+	RangeTreeValue<Offset, Value0, ValueArg0>,
+	Lt<Offset>,
+	std::tuple<Offset, ValueArg0>
+> {
 public:
-	typedef sl::RbTree<Offset, RangeTreeValue<Offset, Value, ValueArg, ValueEq> > Tree;
+	typedef Value0 Value;
+	typedef ValueArg0 ValueArg;
+
+	typedef RbTree<
+		Offset,
+		RangeTreeValue<Offset, Value, ValueArg>,
+		Lt<Offset>,
+		std::tuple<Offset, ValueArg>
+	> Tree;
+
 	typedef typename Tree::Iterator Iterator;
 	typedef typename Tree::ConstIterator ConstIterator;
 
@@ -87,7 +114,7 @@ public:
 	ConstIterator
 	addRange(
 		Offset offset,
-		size_t length,
+		Offset length,
 		ValueArg value
 	) {
 		ASSERT(length);
@@ -104,7 +131,12 @@ public:
 			it->m_value.m_endOffset = endOffset; // need to extend the old one
 			normalize(it);
 		} else if (it->getKey() == offset) { // intersection with a different value (same offset)
-			if (it->m_value.m_endOffset <= endOffset) { // the whole old range is completely covered by the new one
+			Iterator prevIt = it.getPrev();
+			if (prevIt && prevIt->m_value.m_endOffset == offset && ValueEq()(prevIt->m_value.m_value, value)) { // merge with the preceding range
+				it = prevIt;
+				it->m_value.m_endOffset = endOffset;
+				normalize(it);
+			} else if (it->m_value.m_endOffset <= endOffset) { // the whole old range is completely covered by the new one
 				it->m_value.m_endOffset = endOffset;
 				it->m_value.m_value = value;
 				normalize(it);
