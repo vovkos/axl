@@ -7368,7 +7368,7 @@ protected:
 public:
 	bool
 	onSection(const char* name) {
-		SectionNameMap::Iterator it = SectionNameMap::find(name);
+		SectionNameMap::ConstIterator it = SectionNameMap::find(name);
 		SectionKind section = it ? it->m_value : SectionKind_Undefined;
 		printf("OnSection '%s'\n", name);
 		return true;
@@ -7379,7 +7379,7 @@ public:
 		const char* name,
 		const char* value
 	) {
-		KeyNameMap::Iterator it = KeyNameMap::find(name);
+		KeyNameMap::ConstIterator it = KeyNameMap::find(name);
 		KeyKind key = it ? it->m_value : KeyKind_Undefined;
 		printf("OnKeyValue '%s' = '%s'\n", name, value);
 		return true;

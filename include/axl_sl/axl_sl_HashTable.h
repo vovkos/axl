@@ -27,16 +27,18 @@ namespace sl {
 
 template <
 	typename Key,
-	typename Value
+	typename Value,
+	typename KeyValueArgs = ArgTypes<Key, Value>
 >
-struct HashTableEntry: MapEntry<Key, Value> {
+struct HashTableEntry: MapEntry<Key, Value, KeyValueArgs> {
+	using typename MapEntry<Key, Value, KeyValueArgs>::KeyArg;
+
 	template <
 		typename Key2,
 		typename Value2,
 		typename Hash,
 		typename Eq,
-		typename KeyArg,
-		typename ValueArg
+		typename KeyValueArgs2
 	>
 	friend class HashTable;
 
@@ -59,39 +61,32 @@ protected:
 protected:
 	ListLink m_bucketLink;
 	Bucket* m_bucket;
+
+public:
+	HashTableEntry(
+		typename HashTableEntry::KeyArg key,
+		Bucket* bucket
+	):
+		MapEntry<Key, Value, KeyValueArgs>(key) {
+		m_bucket = bucket;
+	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
 	typename Key,
-	typename Value
+	typename Value,
+	typename KeyValueArgs = ArgTypes<Key, Value>
 >
-class HashTableIterator: public Iterator<HashTableEntry<Key, Value> > {
-public:
-	HashTableIterator() {}
-
-	HashTableIterator(const Iterator<HashTableEntry<Key, Value> >& src) {
-		this->m_p = src.getEntry();
-	}
-};
+using HashTableIterator = Iterator<HashTableEntry<Key, Value, KeyValueArgs> >;
 
 template <
 	typename Key,
-	typename Value
+	typename Value,
+	typename KeyValueArgs = ArgTypes<Key, Value>
 >
-class ConstHashTableIterator: public ConstIterator<HashTableEntry<Key, Value> > {
-public:
-	ConstHashTableIterator() {}
-
-	ConstHashTableIterator(const Iterator<HashTableEntry<Key, Value> >& src) {
-		this->m_p = src.getEntry();
-	}
-
-	ConstHashTableIterator(const ConstIterator<HashTableEntry<Key, Value> >& src) {
-		this->m_p = src.getEntry();
-	}
-};
+using ConstHashTableIterator = ConstIterator<HashTableEntry<Key, Value, KeyValueArgs> >;
 
 //..............................................................................
 
@@ -100,8 +95,7 @@ template <
 	typename Value,
 	typename Hash,
 	typename Eq = Eq<Key>,
-	typename KeyArg = typename ArgType<Key>::Type,
-	typename ValueArg = typename ArgType<Value>::Type
+	typename KeyValueArgs = ArgTypes<Key, Value>
 >
 class HashTable {
 public:
@@ -110,10 +104,12 @@ public:
 		Def_ResizeThreshold    = 75,
 	};
 
-	typedef HashTableEntry<Key, Value> Entry;
+	typedef HashTableEntry<Key, Value, KeyValueArgs> Entry;
+	typedef typename Entry::KeyArg KeyArg;
+	typedef typename Entry::ValueArg ValueArg;
+	typedef typename Entry::Bucket Bucket;
 	typedef sl::Iterator<Entry> Iterator;
 	typedef sl::ConstIterator<Entry> ConstIterator;
-	typedef typename Entry::Bucket Bucket;
 
 protected:
 	List<Entry> m_list;
@@ -204,7 +200,7 @@ public:
 			}
 		}
 
-		m_table = newTable;
+		sl::takeOver(&m_table, &newTable);
 		return true;
 	}
 
@@ -235,7 +231,7 @@ public:
 
 	Iterator
 	find(KeyArg key) {
-		return (Entry*)((const HashTable*)this)->find(key).getEntry(); // a simple const-cast
+		return (Entry*)((const HashTable*)this)->find(key).p();
 	}
 
 	Value
@@ -255,6 +251,11 @@ public:
 			bool result = m_table.setCount(bucketCount);
 			if (!result)
 				return NULL;
+		} else if ((uint64_t)(getCount() + 1) * 100 > (uint64_t)bucketCount * m_resizeThreshold) {
+			bucketCount *= 2;
+			bool result = setBucketCount(bucketCount);
+			if (!result)
+				return NULL;
 		}
 
 		ASSERT(isPowerOf2(bucketCount));
@@ -264,21 +265,9 @@ public:
 			if (m_eq(key, it->m_key))
 				return it;
 
-		Entry* entry = new (mem::ZeroInit) Entry;
-		entry->m_key = key;
-		entry->m_bucket = bucket;
+		Entry* entry = new Entry(key, bucket);
 		m_list.insertTail(entry);
 		bucket->insertTail(entry);
-
-	#if (AXL_PTR_BITS == 64)
-		uint_t loadFactor = (uint_t)(getCount() * 100 / bucketCount);
-	#else
-		uint_t loadFactor = (uint_t)((uint64_t)getCount() * 100 / bucketCount);
-	#endif
-
-		if (loadFactor > m_resizeThreshold)
-			setBucketCount(bucketCount * 2);
-
 		return entry;
 	}
 
@@ -299,7 +288,6 @@ public:
 		bool* isNew
 	) {
 		size_t prevCount = this->getCount();
-
 		Iterator it = this->visit(key);
 		it->m_value = value;
 
@@ -315,9 +303,7 @@ public:
 		ValueArg value
 	) {
 		size_t prevCount = this->getCount();
-
 		Iterator it = this->visit(key);
-
 		if (this->getCount() == prevCount)
 			return NULL;
 
@@ -371,16 +357,14 @@ public:
 template <
 	typename Key,
 	typename Value,
-	typename KeyArg = typename ArgType<Key>::Type,
-	typename ValueArg = typename ArgType<Value>::Type
+	typename KeyValueArgs = ArgTypes<Key, Value>
 >
 class SimpleHashTable: public HashTable<
 	Key,
 	Value,
 	sl::HashInt<Key>,
 	sl::Eq<Key>,
-	KeyArg,
-	ValueArg
+	KeyValueArgs
 > {
 };
 
@@ -391,16 +375,14 @@ class SimpleHashTable: public HashTable<
 template <
 	typename Key,
 	typename Value,
-	typename KeyArg = typename ArgType<Key>::Type,
-	typename ValueArg = typename ArgType<Value>::Type
+	typename KeyValueArgs = ArgTypes<Key, Value>
 >
 class DuckTypeHashTable: public HashTable<
 	Key,
 	Value,
 	sl::HashDuckType<Key>,
 	sl::EqDuckType<Key>,
-	KeyArg,
-	ValueArg
+	KeyValueArgs
 > {
 };
 
@@ -411,35 +393,34 @@ class DuckTypeHashTable: public HashTable<
 template <
 	typename Key,
 	typename Value,
-	typename ValueArg = typename ArgType<Value>::Type
+	typename KeyValueArgs = ArgTypes<Key*, Value>
 >
 class DuckTypePtrHashTable: public HashTable<
 	Key*,
 	Value,
 	sl::HashDuckType<Key>,
 	sl::EqDuckType<Key>,
-	Key*,
-	ValueArg
+	KeyValueArgs
 > {
 };
 
 //..............................................................................
 
-#define AXL_SL_BEGIN_HASH_TABLE_EX(Class, Key, Value, Hash, Eq, KeyArg, ValueArg) \
+#define AXL_SL_BEGIN_HASH_TABLE(Class, Key, Value, Hash, Eq) \
 class Class { \
 public: \
-	typedef axl::sl::HashTable<Key, Value, Hash, Eq, KeyArg, ValueArg> MapBase; \
-	typedef MapBase::Iterator Iterator; \
-	static \
-	Iterator \
-	find(KeyArg key) { \
+	typedef axl::sl::HashTable<Key, Value, Hash, Eq> MapBase; \
+	typedef MapBase::ConstIterator ConstIterator; \
+static \
+	ConstIterator \
+	find(MapBase::KeyArg key) { \
 		return axl::sl::getSingleton<Map>()->find(key); \
 	} \
 	static \
 	Value \
 	findValue ( \
-		KeyArg key, \
-		ValueArg undefinedValue \
+		MapBase::KeyArg key, \
+		MapBase::ValueArg undefinedValue \
 	) { \
 		return axl::sl::getSingleton<Map>()->findValue(key, undefinedValue); \
 	} \
@@ -449,23 +430,12 @@ protected: \
 		Map() {
 
 #define AXL_SL_HASH_TABLE_ENTRY(key, value) \
-			visit(key)->m_value = value;
+			add(key, value);
 
 #define AXL_SL_END_HASH_TABLE() \
 		} \
 	}; \
 };
-
-#define AXL_SL_BEGIN_HASH_TABLE(Class, Key, Value, Hash) \
-	AXL_SL_BEGIN_HASH_TABLE_EX( \
-		Class, \
-		Key, \
-		Value, \
-		Hash, \
-		axl::sl::Eq<Key>, \
-		axl::sl::ArgType<Key>::Type, \
-		axl::sl::ArgType<Value>::Type \
-	)
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
@@ -474,7 +444,8 @@ protected: \
 		Class, \
 		Key, \
 		Value, \
-		axl::sl::HashInt<Key> \
+		axl::sl::HashInt<Key>, \
+		axl::sl::Eq<Key> \
 	)
 
 #define AXL_SL_END_SIMPLE_HASH_TABLE() \
@@ -483,14 +454,12 @@ protected: \
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_SL_BEGIN_DUCK_TYPE_HASH_TABLE(Class, Key, Value) \
-	AXL_SL_BEGIN_HASH_TABLE_EX( \
+	AXL_SL_BEGIN_HASH_TABLE( \
 		Class, \
 		Key, \
 		Value, \
 		axl::sl::HashDuckType<Key>, \
-		axl::sl::EqDuckType<Key>, \
-		axl::sl::ArgType<Key>::Type, \
-		axl::sl::ArgType<Value>::Type \
+		axl::sl::EqDuckType<Key> \
 	)
 
 #define AXL_SL_END_DUCK_TYPE_HASH_TABLE() \
