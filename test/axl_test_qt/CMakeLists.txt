@@ -84,6 +84,7 @@ source_group(
 include_directories(
 	${AXL_INC_DIR}
 	${OPENSSL_INC_DIR}
+	${BOOST_INC_DIR}
 	${GEN_DIR}
 )
 

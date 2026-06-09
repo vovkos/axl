@@ -14,6 +14,7 @@
 #include "axl_sys_Thread.h"
 #include "axl_re_Regex.h"
 #include "axl_io_MappedFile.h"
+#include "LlvmDenseMap.h"
 
 #include <QCheckBox>
 #include <QDialogButtonBox>
@@ -23,7 +24,7 @@
 #include <string>
 #include <locale>
 #include <codecvt>
-
+#include <boost/unordered/unordered_flat_map.hpp>
 
 //..............................................................................
 
@@ -847,6 +848,8 @@ benchCodecs() {
 
 
 #include <vector>
+#include <random>
+#include <algorithm>
 #include <QVector>
 
 volatile size_t g_n = 0;
@@ -950,15 +953,20 @@ void testArrayPerf(const char* typeName) {
 void
 benchHashTable() {
 	// benchmark: QHash vs sl::SimpleHashTable for uint64 keys
-	const size_t KeyCount  = 8 * 1024;
-	const size_t LookupCount = 500ULL * 1000000;
+	const size_t KeyCount  = 64 * 1024;
+	const size_t LookupCount = 150ULL * 1000000;
 
 	QVector<uint64_t> keys(KeyCount);
 	for (int i = 0; i < KeyCount; i++)
 		keys[i] =
-			(uint64_t)(33 + rand() % 94)         // printable ASCII cp
-			| ((uint64_t)(rand() % 4) << 21)     // fontFlags
-			| ((uint64_t)(rand() % 16) << 25);   // colorRgb index
+			(uint64_t)(33 + rand() % 94)                                             // printable ASCII cp
+			| ((uint64_t)(rand() % 4) << 21)                                         // fontFlags
+			| ((uint64_t)(rand() % 256 | (rand() % 256) << 8 | (rand() % 256) << 16) << 25); // true RGB
+
+	// only even-indexed keys are inserted (~50% miss rate); look up from a shuffled
+	// copy so the hit/miss sequence is unpredictable and doesn't flatter branch prediction
+	QVector<uint64_t> lookupKeys = keys;
+	std::shuffle(lookupKeys.begin(), lookupKeys.end(), std::mt19937(0x1234abcd));
 
 	class StdHash {
 	public:
@@ -994,6 +1002,8 @@ benchHashTable() {
 
 	class ClaudeHash {
 	public:
+		using is_avalanching = std::true_type; // tell boost::unordered to skip its post-mixing
+
 		size_t operator () (uint64_t key) const {
 			key ^= key >> 33;
 			key *= 0xff51afd7ed558ccdULL;
@@ -1013,8 +1023,7 @@ benchHashTable() {
 		QElapsedTimer timer0;
 		std::unordered_map<uint64_t, void*, MyHash> map;
 		timer0.start();
-		map.reserve(KeyCount);
-		for (size_t i = 0; i < KeyCount; i++)
+		for (size_t i = 0; i < KeyCount; i += 2)
 			map[keys[i]] = (void*)(intptr_t)i;
 		printf("unordered_map.insert: %lld ms\n", timer0.elapsed());
 
@@ -1022,9 +1031,9 @@ benchHashTable() {
 		timer.start();
 		volatile intptr_t sum = 0;
 		for (size_t i = 0; i < LookupCount; i++) {
-			auto it = map.find(keys[i % KeyCount]);
+			auto it = map.find(lookupKeys[i % KeyCount]);
 			if (it != map.end())
-				sum += (intptr_t)it->second;
+				sum += 1; //(intptr_t)it->second;
 		}
 		printf("unordered_map.find:   %lld ms (sum=%lld)\n", timer.elapsed(), (long long)sum);
 	}
@@ -1034,7 +1043,7 @@ benchHashTable() {
 		QElapsedTimer timer0;
 		QHash<uint64_t, void*> map;
 		timer0.start();
-		for (size_t i = 0; i < KeyCount; i++)
+		for (size_t i = 0; i < KeyCount; i += 2)
 			map[keys[i]] = (void*)(intptr_t)i;
 		printf("QHash.insert:         %lld ms\n", timer0.elapsed());
 
@@ -1044,19 +1053,19 @@ benchHashTable() {
 		timer.start();
 		volatile intptr_t sum = 0;
 		for (size_t i = 0; i < LookupCount; i++) {
-			auto it = map2.find(keys[i % KeyCount]);
+			auto it = map2.find(lookupKeys[i % KeyCount]);
 			if (it != map2.end())
-				sum += (intptr_t)it.value();
+				sum += 1; // (intptr_t)it.value();
 		}
 		printf("QHash.find:           %lld ms (sum=%lld)\n", timer.elapsed(), (long long)sum);
 	}
 
-	// sl::SimpleHashTable
+	// sl::HashTable
 	{
 		QElapsedTimer timer0;
 		timer0.start();
 		sl::HashTable<uint64_t, void*, MyHash> map;
-		for (size_t i = 0; i < KeyCount; i++)
+		for (size_t i = 0; i < KeyCount; i += 2)
 			map.visit(keys[i])->m_value = (void*)(intptr_t)i;
 		printf("sl::HashTable.visit: %lld ms\n", timer0.elapsed());
 
@@ -1064,25 +1073,115 @@ benchHashTable() {
 		timer.start();
 		volatile intptr_t sum = 0;
 		for (size_t i = 0; i < LookupCount; i++) {
-			sl::ConstHashTableIterator<uint64_t, void*> it = map.find(keys[i % KeyCount]);
+			sl::ConstHashTableIterator<uint64_t, void*> it = map.find(lookupKeys[i % KeyCount]);
 			if (it)
-				sum += (intptr_t)it->m_value;
+				sum += 1; // (intptr_t)it->m_value;
 		}
 		printf("sl::HashTable.find:  %lld ms (sum=%lld)\n", timer.elapsed(), (long long)sum);
+	}
+
+	// sl::RobinHashTable (Robin Hood open addressing)
+	{
+		QElapsedTimer timer0;
+		timer0.start();
+		sl::RobinHashTable<uint64_t, void*, MyHash> map;
+		for (size_t i = 0; i < KeyCount; i += 2)
+			map.visit(keys[i])->m_value = (void*)(intptr_t)i;
+		printf("sl::RobinHashTable.visit: %lld ms\n", timer0.elapsed());
+
+		QElapsedTimer timer;
+		timer.start();
+		volatile intptr_t sum = 0;
+		for (size_t i = 0; i < LookupCount; i++) {
+			sl::RobinHashTable<uint64_t, void*, MyHash>::ConstIterator it = map.find(lookupKeys[i % KeyCount]);
+			if (it)
+				sum += 1; // (intptr_t)it->m_value;
+		}
+		printf("sl::RobinHashTable.find:  %lld ms (sum=%lld)\n", timer.elapsed(), (long long)sum);
+	}
+
+	// sl::LlvmDenseMap (linear probing, packed occupancy bit array, tombstone-free deletion)
+	{
+		struct MyDenseMapInfo {
+			static unsigned getHashValue(uint64_t key) {
+				key ^= key >> 33;
+				key *= 0xff51afd7ed558ccdULL;
+				key ^= key >> 33;
+				return (unsigned)key;
+			}
+			static bool isEqual(uint64_t a, uint64_t b) { return a == b; }
+		};
+
+		QElapsedTimer timer0;
+		timer0.start();
+		sl::LlvmDenseMap<uint64_t, void*, MyDenseMapInfo> map;
+		for (size_t i = 0; i < KeyCount; i += 2)
+			map[keys[i]] = (void*)(intptr_t)i;
+		printf("sl::LlvmDenseMap.insert: %lld ms\n", timer0.elapsed());
+
+		QElapsedTimer timer;
+		timer.start();
+		volatile intptr_t sum = 0;
+		for (size_t i = 0; i < LookupCount; i++) {
+			auto it = map.find(lookupKeys[i % KeyCount]);
+			if (it != map.end())
+				sum += 1; //(intptr_t)it->second;
+		}
+		printf("sl::LlvmDenseMap.find:   %lld ms (sum=%lld)\n", timer.elapsed(), (long long)sum);
+	}
+
+	// sl::QuadraticHashTable (quadratic probing via triangular numbers, Empty/Tombstone keys)
+	{
+		QElapsedTimer timer0;
+		timer0.start();
+		sl::QuadraticHashTable<uint64_t, -1, -2, void*, MyHash> map;
+		for (size_t i = 0; i < KeyCount; i += 2)
+			map.visit(keys[i])->m_value = (void*)(intptr_t)i;
+		printf("sl::QuadraticHashTable.visit: %lld ms\n", timer0.elapsed());
+
+		QElapsedTimer timer;
+		timer.start();
+		volatile intptr_t sum = 0;
+		for (size_t i = 0; i < LookupCount; i++) {
+			sl::QuadraticHashTable<uint64_t, -1, -2, void*, MyHash>::ConstIterator it = map.find(lookupKeys[i % KeyCount]);
+			if (it)
+				sum += 1; // (intptr_t)it->m_value;
+		}
+		printf("sl::QuadraticHashTable.find:  %lld ms (sum=%lld)\n", timer.elapsed(), (long long)sum);
+	}
+
+	// boost::unordered_flat_map (SwissTable-style FoA: SIMD fingerprint groups, non-relocating)
+	{
+		QElapsedTimer timer0;
+		timer0.start();
+		boost::unordered_flat_map<uint64_t, void*, MyHash> map;
+		for (size_t i = 0; i < KeyCount; i += 2)
+			map[keys[i]] = (void*)(intptr_t)i;
+		printf("boost::flat_map.insert:  %lld ms\n", timer0.elapsed());
+
+		QElapsedTimer timer;
+		timer.start();
+		volatile intptr_t sum = 0;
+		for (size_t i = 0; i < LookupCount; i++) {
+			auto it = map.find(lookupKeys[i % KeyCount]);
+			if (it != map.end())
+				sum += 1; // (intptr_t)it->second;
+		}
+		printf("boost::flat_map.find:    %lld ms (sum=%lld)\n", timer.elapsed(), (long long)sum);
 	}
 }
 
 void
 benchRbTree() {
-	const size_t KeyCount    = 8 * 1024;
-	const size_t LookupCount = 40ULL * 1000000;
+	const size_t KeyCount  = 128 * 1024;
+	const size_t LookupCount = 20ULL * 1000000;
 
 	QVector<uint64_t> keys(KeyCount);
 	for (int i = 0; i < KeyCount; i++)
 		keys[i] =
-			(uint64_t)(33 + rand() % 94)
-			| ((uint64_t)(rand() % 4) << 21)
-			| ((uint64_t)(rand() % 16) << 25);
+			(uint64_t)(33 + rand() % 94)                                             // printable ASCII cp
+			| ((uint64_t)(rand() % 4) << 21)                                         // fontFlags
+			| ((uint64_t)(rand() % 256 | (rand() % 256) << 8 | (rand() % 256) << 16) << 25); // true RGB
 
 	// std::map
 	{
@@ -1214,7 +1313,6 @@ main(
 #endif
 
 #if (0)
-
 //	char const* src = "abc";
 //	char const* src = "a*(b|cd?)+";
 	char const* src = "[ABCDefghijkl](b|c)*";

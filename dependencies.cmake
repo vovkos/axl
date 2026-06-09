@@ -53,6 +53,7 @@ set(
 	AXL_IMPORT_LIST
 
 	OPTIONAL
+		boost
 		lua
 		python_api
 		pcap

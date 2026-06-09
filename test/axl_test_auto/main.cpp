@@ -18,7 +18,7 @@ bool
 runTest(
 	size_t index,
 	size_t total,
-	const char* name,
+	const sl::StringRef& name,
 	TestFunc* func
 ) {
 	printf(
@@ -26,7 +26,7 @@ runTest(
 		"...................................................................\n",
 		index,
 		total,
-		name
+		name.sz()
 	);
 
 	bool result = true;

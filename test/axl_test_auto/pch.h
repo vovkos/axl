@@ -17,6 +17,8 @@
 
 #include "axl_sl_Array.h"
 #include "axl_sl_HashTable.h"
+#include "axl_sl_RobinHashTable.h"
+#include "axl_sl_QuadraticHashTable.h"
 #include "axl_sl_BoxList.h"
 #include "axl_sl_BitMap.h"
 #include "axl_sl_Packer.h"

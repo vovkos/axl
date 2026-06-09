@@ -75,3 +75,5 @@ using namespace axl;
 #include <unordered_map>
 #include <map>
 #include "axl_sl_RbTree.h"
+#include "axl_sl_RobinHashTable.h"
+#include "axl_sl_QuadraticHashTable.h"
