@@ -334,7 +334,7 @@ public:
 //..............................................................................
 
 #define AXL_SL_BEGIN_STRING_HASH_TABLE(Class, Value) \
-	AXL_SL_BEGIN_DUCK_TYPE_HASH_TABLE(Class, axl::sl::String, Value)
+	AXL_SL_BEGIN_DUCK_TYPE_HASH_TABLE(Class, axl::sl::StringRef, Value)
 
 #define AXL_SL_END_STRING_HASH_TABLE() \
 	AXL_SL_END_DUCK_TYPE_HASH_TABLE()
@@ -342,14 +342,12 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #define AXL_SL_BEGIN_STRING_HASH_TABLE_IGNORE_CASE_PCU(Class, Value) \
-	AXL_SL_BEGIN_HASH_TABLE_EX( \
+	AXL_SL_BEGIN_HASH_TABLE( \
 		Class, \
-		axl::sl::String, \
+		axl::sl::StringRef, \
 		Value, \
 		axl::sl::HashStringIgnoreCase_pcu, \
-		axl::sl::EqStringIgnoreCase_pcu, \
-		axl::sl::StringRef, \
-		axl::sl::ArgType<Value>::Type \
+		axl::sl::EqStringIgnoreCase_pcu \
 	)
 
 #define AXL_SL_END_STRING_HASH_TABLE_IGNORE_CASE_PCU() \
@@ -360,12 +358,10 @@ public:
 #define AXL_SL_BEGIN_STRING_HASH_TABLE_IGNORE_CASE_PCP(Class, Value) \
 	AXL_SL_BEGIN_HASH_TABLE_EX( \
 		Class, \
-		axl::sl::String, \
+		axl::sl::StringRef, \
 		Value, \
 		axl::sl::HashStringIgnoreCase_pcp, \
-		axl::sl::EqStringIgnoreCase_pcp, \
-		axl::sl::StringRef, \
-		axl::sl::ArgType<Value>::Type \
+		axl::sl::EqStringIgnoreCase_pcp \
 	)
 
 #define AXL_SL_END_STRING_HASH_TABLE_IGNORE_CASE_PCP() \
