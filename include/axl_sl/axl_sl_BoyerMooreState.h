@@ -211,7 +211,7 @@ public:
 		uint64_t cuOffset
 	) {
 		size_t patternLength = enc::Convert<enc::Utf32, enc::Utf8>::calcRequiredLength(pattern.cp(), pattern.getEnd());
-		return create(pattern.getLength(), cpOffset, cuOffset);
+		return create(patternLength, cpOffset, cuOffset);
 	}
 
 	bool

@@ -27,6 +27,7 @@ namespace sl {
 template <
 	typename C0,
 	typename SkipTables0,
+	bool IsHorspool0,
 	bool IsReverse0,
 	size_t BadSkipTableSize0 = 256
 >
@@ -35,6 +36,7 @@ struct BoyerMooreDetailsBase {
 	typedef SkipTables0 SkipTables;
 
 	enum {
+		IsHorspool       = IsHorspool0,
 		IsReverse        = IsReverse0,
 		BadSkipTableSize = BadSkipTableSize0,
 	};
@@ -45,24 +47,28 @@ struct BoyerMooreDetailsBase {
 typedef BoyerMooreDetailsBase<
 	char,
 	BoyerMooreBadSkipTableBase<char>,
+	true,
 	false
 > BoyerMooreHorspoolBinDetails;
 
 typedef BoyerMooreDetailsBase<
 	char,
 	BoyerMooreBadSkipTableBase<char>,
+	true,
 	true
 > BoyerMooreHorspoolReverseBinDetails;
 
 typedef BoyerMooreDetailsBase<
 	char,
 	BoyerMooreSkipTablesBase<char>,
+	false,
 	false
 > BoyerMooreBinDetails;
 
 typedef BoyerMooreDetailsBase<
 	char,
 	BoyerMooreSkipTablesBase<char>,
+	false,
 	true
 > BoyerMooreReverseBinDetails;
 
@@ -72,6 +78,7 @@ template <
 	typename SkipTables0,
 	typename Encoding0,
 	typename Decoder0,
+	bool IsHorspool0,
 	bool IsReverse0,
 	typename CaseOp0,
 	bool IsCaseFolded0,
@@ -82,6 +89,7 @@ template <
 struct BoyerMooreTextDetailsBase: BoyerMooreDetailsBase<
 	utf32_t,
 	SkipTables0,
+	IsHorspool0,
 	IsReverse0,
 	BadSkipTableSize0
 > {
@@ -100,13 +108,15 @@ struct BoyerMooreTextDetailsBase: BoyerMooreDetailsBase<
 
 template <
 	typename SkipTables,
-	typename Encoding
+	typename Encoding,
+	bool IsHorspool
 >
 struct BoyerMooreTextDetailsImpl {
 	typedef BoyerMooreTextDetailsBase<
 		SkipTables,
 		Encoding,
 		typename Encoding::Decoder,
+		IsHorspool,
 		false,
 		sl::Nop<utf32_t>,
 		false,
@@ -117,6 +127,7 @@ struct BoyerMooreTextDetailsImpl {
 		SkipTables,
 		Encoding,
 		typename Encoding::ReverseDecoder,
+		IsHorspool,
 		true,
 		sl::Nop<utf32_t>,
 		false,
@@ -127,6 +138,7 @@ struct BoyerMooreTextDetailsImpl {
 		SkipTables,
 		Encoding,
 		typename Encoding::Decoder,
+		IsHorspool,
 		false,
 		sl::Nop<utf32_t>,
 		false,
@@ -137,6 +149,7 @@ struct BoyerMooreTextDetailsImpl {
 		SkipTables,
 		Encoding,
 		typename Encoding::ReverseDecoder,
+		IsHorspool,
 		true,
 		sl::Nop<utf32_t>,
 		false,
@@ -147,6 +160,7 @@ struct BoyerMooreTextDetailsImpl {
 		SkipTables,
 		Encoding,
 		typename Encoding::Decoder,
+		IsHorspool,
 		false,
 		enc::ToCaseFolded,
 		true,
@@ -157,6 +171,7 @@ struct BoyerMooreTextDetailsImpl {
 		SkipTables,
 		Encoding,
 		typename Encoding::ReverseDecoder,
+		IsHorspool,
 		true,
 		enc::ToCaseFolded,
 		true,
@@ -167,6 +182,7 @@ struct BoyerMooreTextDetailsImpl {
 		SkipTables,
 		Encoding,
 		typename Encoding::Decoder,
+		IsHorspool,
 		false,
 		enc::ToCaseFolded,
 		true,
@@ -177,6 +193,7 @@ struct BoyerMooreTextDetailsImpl {
 		SkipTables,
 		Encoding,
 		typename Encoding::ReverseDecoder,
+		IsHorspool,
 		true,
 		enc::ToCaseFolded,
 		true,
@@ -186,14 +203,15 @@ struct BoyerMooreTextDetailsImpl {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-typedef BoyerMooreTextDetailsImpl<BoyerMooreBadSkipTableBase<utf32_t>, enc::Latin1> BoyerMooreHorspoolTextDetails_latin1;
-typedef BoyerMooreTextDetailsImpl<BoyerMooreBadSkipTableBase<utf32_t>, enc::Utf8>   BoyerMooreHorspoolTextDetails_utf8;
-typedef BoyerMooreTextDetailsImpl<BoyerMooreBadSkipTableBase<utf32_t>, enc::Utf16>  BoyerMooreHorspoolTextDetails_utf16;
-typedef BoyerMooreTextDetailsImpl<BoyerMooreBadSkipTableBase<utf32_t>, enc::Utf32>  BoyerMooreHorspoolTextDetails_utf32;
-typedef BoyerMooreTextDetailsImpl<BoyerMooreSkipTablesBase<utf32_t>, enc::Latin1>   BoyerMooreTextDetails_latin1;
-typedef BoyerMooreTextDetailsImpl<BoyerMooreSkipTablesBase<utf32_t>, enc::Utf8>     BoyerMooreTextDetails_utf8;
-typedef BoyerMooreTextDetailsImpl<BoyerMooreSkipTablesBase<utf32_t>, enc::Utf16>    BoyerMooreTextDetails_utf16;
-typedef BoyerMooreTextDetailsImpl<BoyerMooreSkipTablesBase<utf32_t>, enc::Utf32>    BoyerMooreTextDetails_utf32;
+typedef BoyerMooreTextDetailsImpl<BoyerMooreBadSkipTableBase<utf32_t>, enc::Latin1, true> BoyerMooreHorspoolTextDetails_latin1;
+typedef BoyerMooreTextDetailsImpl<BoyerMooreBadSkipTableBase<utf32_t>, enc::Utf8, true>   BoyerMooreHorspoolTextDetails_utf8;
+typedef BoyerMooreTextDetailsImpl<BoyerMooreBadSkipTableBase<utf32_t>, enc::Utf16, true>  BoyerMooreHorspoolTextDetails_utf16;
+typedef BoyerMooreTextDetailsImpl<BoyerMooreBadSkipTableBase<utf32_t>, enc::Utf32, true>  BoyerMooreHorspoolTextDetails_utf32;
+
+typedef BoyerMooreTextDetailsImpl<BoyerMooreSkipTablesBase<utf32_t>, enc::Latin1, false>  BoyerMooreTextDetails_latin1;
+typedef BoyerMooreTextDetailsImpl<BoyerMooreSkipTablesBase<utf32_t>, enc::Utf8, false>    BoyerMooreTextDetails_utf8;
+typedef BoyerMooreTextDetailsImpl<BoyerMooreSkipTablesBase<utf32_t>, enc::Utf16, false>   BoyerMooreTextDetails_utf16;
+typedef BoyerMooreTextDetailsImpl<BoyerMooreSkipTablesBase<utf32_t>, enc::Utf32, false>   BoyerMooreTextDetails_utf32;
 
 //..............................................................................
 

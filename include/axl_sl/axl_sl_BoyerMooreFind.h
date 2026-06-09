@@ -40,7 +40,8 @@ public:
 	typedef typename Details::SkipTables SkipTables;
 
 	enum {
-		IsReverse = Details::IsReverse
+		IsHorspool = Details::IsHorspool,
+		IsReverse  = Details::IsReverse
 	};
 
 protected:
@@ -126,21 +127,25 @@ protected:
 		size_t last = m_pattern.getCount() - 1;
 		size_t i = i0 + last;
 		while (i < length) {
+			size_t k = i;
 			intptr_t j = last;
 			C c;
 			for (;;) {
-				c = accessor[i];
+				c = accessor[k];
 				if (c != m_pattern[j])
 					break;
 
 				if (j == 0)
-					return i;
+					return k;
 
-				i--;
+				k--;
 				j--;
 			}
 
-			i += m_skipTables.getSkip(c, j);
+			if (IsHorspool) {
+				i += m_skipTables.getBadSkip(accessor[i]);
+			} else
+				i = k + m_skipTables.getSkip(c, j);
 		}
 
 		return i - last; // prospective start of match

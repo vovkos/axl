@@ -60,16 +60,17 @@ public:
 	}
 
 	size_t
-	getSkip(C c) const {
+	getBadSkip(C c) const {
 		return m_table[(size_t)c % m_table.getCount()];
 	}
 
 	size_t
 	getSkip(
 		C c,
-		size_t patternPos // unused
+		size_t patternPos
 	) const {
-		return getSkip(c);
+		ASSERT(false); // should not be called directly
+		return getBadSkip(c);
 	}
 };
 
@@ -106,7 +107,7 @@ public:
 	}
 
 	size_t
-	getSkip(size_t patternPos) const {
+	getGoodSkip(size_t patternPos) const {
 		return m_table[patternPos];
 	}
 
@@ -174,12 +175,17 @@ public:
 	}
 
 	size_t
+	getBadSkip(C c) const {
+		return m_badSkipTable.getBadSkip(c);
+	}
+
+	size_t
 	getSkip(
 		C c,
 		size_t patternPos
 	) const {
-		size_t badSkip = m_badSkipTable.getSkip(c);
-		size_t goodSkip = m_goodSkipTable.getSkip(patternPos);
+		size_t badSkip = m_badSkipTable.getBadSkip(c);
+		size_t goodSkip = m_goodSkipTable.getGoodSkip(patternPos);
 		return AXL_MAX(badSkip, goodSkip);
 	}
 };
