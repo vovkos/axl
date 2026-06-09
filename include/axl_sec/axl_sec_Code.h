@@ -28,10 +28,8 @@ public:
 	Code(const Code& src):
 		cf::TypeBase<SecCodeRef>(src) {}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	Code(Code&& src):
 		cf::TypeBase<SecCodeRef>(std::move(src)) {}
-#endif
 
 	Code(
 		SecCodeRef p,

@@ -99,10 +99,8 @@ public:
 public:
 	ErrorRef() {}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	ErrorRef(ErrorRef&& src):
 		BaseType(std::move(src)) {}
-#endif
 
 	ErrorRef(const ErrorRef& src):
 		BaseType(src) {}
@@ -119,13 +117,11 @@ public:
 		uint_t code
 	);
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	ErrorRef&
 	operator = (ErrorRef&& src) {
 		move(std::move(src));
 		return *this;
 	}
-#endif
 
 	ErrorRef&
 	operator = (const ErrorRef& src) {
@@ -156,7 +152,6 @@ class Error: public rc::Buf<ErrorHdr, SizeOfError, ErrorRef> {
 public:
 	Error() {}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	Error(Error&& src) {
 		move(std::move(src));
 	}
@@ -164,7 +159,6 @@ public:
 	Error(ErrorRef&& src) {
 		move(std::move(src));
 	}
-#endif
 
 	Error(const Error& src) {
 		copy(src);
@@ -205,7 +199,6 @@ public:
 		setBuffer(kind, p, size);
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	Error&
 	operator = (Error&& src) {
 		move(std::move(src));
@@ -217,7 +210,6 @@ public:
 		move(std::move(src));
 		return *this;
 	}
-#endif
 
 	Error&
 	operator = (const Error& src) {

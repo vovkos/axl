@@ -53,13 +53,11 @@ public:
 		return *this;
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	SecScopedBookmark&
 	operator = (SecScopedBookmark&& src) {
 		move(std::move(src));
 		return *this;
 	}
-#endif
 
 	bool
 	isEmpty() const {
@@ -88,10 +86,8 @@ public:
 	void
 	copy(const SecScopedBookmark& src);
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	void
 	move(SecScopedBookmark&& src);
-#endif
 
 	bool
 	load(

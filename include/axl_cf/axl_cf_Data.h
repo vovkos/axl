@@ -28,10 +28,8 @@ public:
 	Data(const Data& src):
 		TypeBase<CFDataRef>(src) {}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	Data(Data&& src):
 		TypeBase<CFDataRef>(std::move(src)) {}
-#endif
 
 	Data(
 		CFDataRef p,
@@ -52,13 +50,11 @@ public:
 		return *this;
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	Data&
 	operator = (Data&& src) {
 		move(std::move(src));
 		return *this;
 	}
-#endif
 
 	Data&
 	operator = (CFDataRef p) {

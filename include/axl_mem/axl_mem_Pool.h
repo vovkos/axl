@@ -37,14 +37,12 @@ public:
 		return !m_freeList.isEmpty() ? m_freeList.removeHead() : new T;
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	T*
 	get(T&& src) {
 		T* p = get();
 		*p = std::move(src);
 		return p;
 	}
-#endif
 
 	T*
 	get(const T& src) {

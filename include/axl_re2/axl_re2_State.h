@@ -66,11 +66,9 @@ public:
 		copy(src);
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	Capture(Capture&& src) {
 		move(std::move(src));
 	}
-#endif
 
 	Capture&
 	operator = (const Capture& src) {
@@ -78,13 +76,11 @@ public:
 		return *this;
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	Capture&
 	operator = (Capture&& src) {
 		move(std::move(src));
 		return *this;
 	}
-#endif
 
 	operator bool () const {
 		return m_endOffset != -1; // pre-match is still OK
@@ -126,10 +122,8 @@ public:
 	copy(const Capture& src);
 
 protected:
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	void
 	move(Capture&& src);
-#endif
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -150,7 +144,6 @@ Capture::copy(const Capture& src) {
 	m_text = src.m_text;
 }
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 inline
 void
 Capture::move(Capture&& src) {
@@ -158,7 +151,6 @@ Capture::move(Capture&& src) {
 	m_endOffset = src.m_endOffset;
 	m_text = std::move(src.m_text);
 }
-#endif
 
 //..............................................................................
 
@@ -192,13 +184,11 @@ public:
 	}
 
 protected:
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	void
 	move(Match&& src) {
 		Capture::move(std::move(src));
 		m_id = src.m_id;
 	}
-#endif
 };
 
 //..............................................................................
@@ -230,12 +220,10 @@ public:
 
 	State(const State& src);
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	State(State&& src) {
 		m_impl = NULL;
 		move(std::move(src));
 	}
-#endif
 
 	~State();
 
@@ -249,13 +237,11 @@ public:
 		return *this;
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	State&
 	operator = (State&& src) {
 		move(std::move(src));
 		return *this;
 	}
-#endif
 
 	bool
 	isMatch() const;
@@ -329,10 +315,8 @@ protected:
 	void
 	copy(const State& src);
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	void
 	move(State&& src);
-#endif
 
 	void
 	prepareMatch() const;

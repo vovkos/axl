@@ -31,8 +31,8 @@
 #	define AXL_CPP_MSC_VERSION_MINOR (_MSC_VER % 100)
 #	define AXL_CPP_MSC_VERSION (((_MSC_VER / 100) << 8) | (_MSC_VER % 100))
 #	define AXL_CPP_STRING "Microsoft Visual C++"
-#	if (AXL_CPP_MSC_VERSION >= 0x1000)
-#		define _AXL_CPP_HAS_RVALUE_REF 1
+#	if (AXL_CPP_MSC_VERSION < 0x1000)
+#		error support for C++11 is required
 #	endif
 #elif (defined __GNUC__)
 #	define _AXL_CPP_GCC 1
@@ -54,8 +54,8 @@
 #	else
 #		define AXL_CPP_STRING "GNU C++"
 #	endif
-#	if (__cplusplus >= 201103L)
-#		define _AXL_CPP_HAS_RVALUE_REF 1
+#	if (__cplusplus < 201103L)
+#		error support for C++11 is required
 #	endif
 #else
 #	error unsupported C++ compiler

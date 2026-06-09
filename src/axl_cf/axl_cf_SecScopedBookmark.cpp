@@ -60,8 +60,6 @@ SecScopedBookmark::copy(const SecScopedBookmark& src) {
 		AXL_TRACE("WARNING: can't access an already-accessible resource: %s", err::getLastErrorDescription().sz());
 }
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
-
 void
 SecScopedBookmark::move(SecScopedBookmark&& src) {
 	stopAccess();
@@ -71,8 +69,6 @@ SecScopedBookmark::move(SecScopedBookmark&& src) {
 	m_dataCache = std::move(src.m_dataCache);
 	m_isDirectory = std::move(src.m_isDirectory);
 }
-
-#endif
 
 bool
 SecScopedBookmark::load(

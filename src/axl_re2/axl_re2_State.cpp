@@ -61,7 +61,6 @@ State::copy(const State& src) {
 	m_match = src.m_match;
 }
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 void
 State::move(State&& src) {
 	delete m_impl;
@@ -69,7 +68,6 @@ State::move(State&& src) {
 	m_match = std::move(src.m_match);
 	src.m_impl = NULL;
 }
-#endif
 
 bool
 State::isMatch() const {

@@ -463,12 +463,10 @@ public:
 		return isReverse() ? m_map.hash() : sl::djb2(m_array, m_array.getCount() * sizeof(NfaState*));
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	void
 	move(NfaStateSet&& src) {
 		sl::takeOver(this, &src);
 	}
-#endif
 
 	void
 	copy(const NfaStateSet& src) {

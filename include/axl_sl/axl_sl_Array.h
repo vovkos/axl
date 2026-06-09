@@ -41,12 +41,10 @@ public:
 		initialize();
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	ArrayRef(ArrayRef&& src) {
 		initialize();
 		move(std::move(src));
 	}
-#endif
 
 	ArrayRef(const ArrayRef& src) {
 		initialize();
@@ -95,13 +93,11 @@ public:
 		return m_p;
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	ArrayRef&
 	operator = (ArrayRef&& src) {
 		move(std::move(src));
 		return *this;
 	}
-#endif
 
 	ArrayRef&
 	operator = (const ArrayRef& src) {
@@ -186,7 +182,6 @@ protected:
 		m_count = 0;
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	void
 	move(ArrayRef&& src) {
 		if (m_hdr)
@@ -197,7 +192,6 @@ protected:
 		m_count = src.m_count;
 		src.initialize();
 	}
-#endif
 
 	void
 	attach(const ArrayRef& src) {
@@ -274,7 +268,6 @@ public:
 public:
 	Array() {}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	Array(Array&& src) {
 		move(std::move(src));
 	}
@@ -282,7 +275,6 @@ public:
 	Array(ArrayRef&& src) {
 		move(std::move(src));
 	}
-#endif
 
 	Array(const Array& src) {
 		copy(src);
@@ -329,7 +321,6 @@ public:
 		return this->m_p;
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	Array&
 	operator = (Array&& src) {
 		move(std::move(src));
@@ -341,7 +332,6 @@ public:
 		move(std::move(src));
 		return *this;
 	}
-#endif
 
 	Array&
 	operator = (const Array& src) {
@@ -417,7 +407,6 @@ public:
 		ZeroConstruct() (this->m_p, this->m_count);
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	size_t
 	move(ArrayRef&& src) {
 		if (src.isEmpty()) {
@@ -436,7 +425,6 @@ public:
 		this->ArrayRef::move(std::move(src));
 		return this->m_count;
 	}
-#endif
 
 	size_t
 	forceCopy(const ArrayRef& src) {

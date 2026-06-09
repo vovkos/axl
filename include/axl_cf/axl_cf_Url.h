@@ -29,10 +29,8 @@ public:
 	Url(const Url& src):
 		TypeBase<CFURLRef>(src) {}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	Url(Url&& src):
 		TypeBase<CFURLRef>(std::move(src)) {}
-#endif
 
 	Url(
 		CFURLRef p,
@@ -46,13 +44,11 @@ public:
 		return *this;
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	Url&
 	operator = (Url&& src) {
 		move(std::move(src));
 		return *this;
 	}
-#endif
 
 	Url&
 	operator = (CFURLRef p) {

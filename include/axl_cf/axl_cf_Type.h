@@ -72,12 +72,10 @@ public:
 		m_p = src.m_p;
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	TypeBase(TypeBase&& src) {
 		m_p = src.m_p;
 		src.m_p = NULL;
 	}
-#endif
 
 	TypeBase(
 		T p,
@@ -103,13 +101,11 @@ public:
 		return *this;
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	TypeBase&
 	operator = (TypeBase&& src) {
 		move(std::move(src));
 		return *this;
 	}
-#endif
 
 	TypeBase&
 	operator = (T p) {
@@ -163,7 +159,6 @@ public:
 		m_p = p;
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	void
 	move(TypeBase&& src) {
 		if (m_p)
@@ -172,7 +167,6 @@ public:
 		m_p = src.m_p;
 		src.m_p = NULL;
 	}
-#endif
 
 	intptr_t
 	getRetainCount() const {

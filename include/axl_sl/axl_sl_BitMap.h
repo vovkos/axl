@@ -418,12 +418,10 @@ public:
 		memset(m_map.p(), 0, m_map.getCount() * sizeof(size_t));
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	void
 	move(BitMap&& src) {
 		m_map.move(std::move(src.m_map));
 	}
-#endif
 
 	bool
 	forceCopy(const BitMap& src) {

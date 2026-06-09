@@ -88,11 +88,9 @@ protected:
 public:
 	State() {}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	State(State&& src) {
 		m_p.move(std::move(src.m_p));
 	}
-#endif
 
 	State(const State& src) {
 		m_p.copy(src.m_p);
@@ -106,13 +104,11 @@ public:
 		return m_p != NULL;
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	State&
 	operator = (State&& src) {
 		m_p.move(std::move(src.m_p));
 		return *this;
 	}
-#endif
 
 	State&
 	operator = (const State& src) {

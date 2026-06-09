@@ -29,10 +29,8 @@ public:
 	DictionaryBase(const DictionaryBase& src):
 		TypeBase<T>(src) {}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	DictionaryBase(DictionaryBase&& src):
 		TypeBase<T>(std::move(src)) {}
-#endif
 
 	DictionaryBase(
 		T p,
@@ -47,13 +45,11 @@ public:
 		return *this;
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	DictionaryBase&
 	operator = (DictionaryBase&& src) {
 		move(std::move(src));
 		return *this;
 	}
-#endif
 
 	DictionaryBase&
 	operator = (T p) {
@@ -170,13 +166,11 @@ public:
 		return *this;
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	MutableDictionary&
 	operator = (MutableDictionary&& src) {
 		move(std::move(src));
 		return *this;
 	}
-#endif
 
 	MutableDictionary&
 	operator = (CFMutableDictionaryRef p) {

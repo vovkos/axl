@@ -27,10 +27,8 @@ public:
 	Number(const Number& src):
 		TypeBase<CFNumberRef>(src) {}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	Number(Number&& src):
 		TypeBase<CFNumberRef>(std::move(src)) {}
-#endif
 
 	Number(
 		CFNumberType type,
@@ -79,13 +77,11 @@ public:
 		return *this;
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	Number&
 	operator = (Number&& src) {
 		move(std::move(src));
 		return *this;
 	}
-#endif
 
 	Number&
 	operator = (CFNumberRef p) {

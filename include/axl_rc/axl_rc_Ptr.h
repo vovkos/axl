@@ -41,12 +41,10 @@ public:
 		initialize();
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	Ptr(Ptr&& src) {
 		initialize();
 		move(std::move(src));
 	}
-#endif
 
 	Ptr(const Ptr& src) {
 		initialize();
@@ -100,13 +98,11 @@ public:
 		return *this;
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	Ptr&
 	operator = (Ptr&& src) {
 		copy(src);
 		return *this;
 	}
-#endif
 
 	Ptr&
 	operator = (const Ptr& src) {
@@ -130,14 +126,12 @@ public:
 		return m_refCount;
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	void
 	move(Ptr&& src) {
 		m_p = src.m_p;
 		m_refCount = src.m_refCount;
 		src.initialize();
 	}
-#endif
 
 	void
 	copy(const Ptr& src) {

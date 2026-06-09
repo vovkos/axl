@@ -28,12 +28,10 @@ public:
 	String(const String& src):
 		TypeBase<CFStringRef>(src) {}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	String(String&& src) {
 		m_p = src.m_p;
 		src.m_p = NULL;
 	}
-#endif
 
 	String(
 		CFStringRef p,
@@ -58,13 +56,11 @@ public:
 		return *this;
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	String&
 	operator = (String&& src) {
 		move(std::move(src));
 		return *this;
 	}
-#endif
 
 	String&
 	operator = (CFStringRef p) {

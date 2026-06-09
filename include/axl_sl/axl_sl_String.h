@@ -69,12 +69,10 @@ public:
 		initialize();
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	StringRefBase(StringRef&& src) {
 		initialize();
 		move(std::move(src));
 	}
-#endif
 
 	StringRefBase(const StringRef& src) {
 		initialize();
@@ -136,13 +134,11 @@ public:
 		release();
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	StringRefBase&
 	operator = (StringRef&& src) {
 		move(std::move(src));
 		return *this;
 	}
-#endif
 
 	StringRefBase&
 	operator = (const StringRef& src) {
@@ -706,7 +702,6 @@ protected:
 		m_isNullTerminated = false;
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	void
 	move(StringRefBase&& src) {
 		if (m_hdr)
@@ -718,7 +713,6 @@ protected:
 		m_isNullTerminated = src.m_isNullTerminated;
 		src.initialize();
 	}
-#endif
 
 	void
 	attachBufHdr(rc::BufHdr* hdr) const {
@@ -908,7 +902,6 @@ public:
 public:
 	StringBase() {}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	StringBase(StringBase&& src) {
 		move(std::move(src));
 	}
@@ -916,7 +909,6 @@ public:
 	StringBase(StringRef&& src) {
 		move(std::move(src));
 	}
-#endif
 
 	StringBase(const StringBase& src) {
 		copy(src);
@@ -999,7 +991,6 @@ public:
 		return sz();
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	StringBase&
 	operator = (StringBase&& src) {
 		move(std::move(src));
@@ -1011,7 +1002,6 @@ public:
 		move(std::move(src));
 		return *this;
 	}
-#endif
 
 	StringBase&
 	operator = (const StringBase& src) {
@@ -1142,7 +1132,6 @@ public:
 		this->m_length = 0;
 	}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	size_t
 	move(StringRef&& src) {
 		if (src.isEmpty()) {
@@ -1161,7 +1150,6 @@ public:
 		this->StringRef::move(std::move(src));
 		return this->m_length;
 	}
-#endif
 
 	size_t
 	forceCopy(const StringRef& src) {

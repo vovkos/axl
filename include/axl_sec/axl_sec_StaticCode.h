@@ -28,10 +28,8 @@ public:
 	StaticCode(const StaticCode& src):
 		cf::TypeBase<SecStaticCodeRef>(src) {}
 
-#if (_AXL_CPP_HAS_RVALUE_REF)
 	StaticCode(StaticCode&& src):
 		cf::TypeBase<SecStaticCodeRef>(std::move(src)) {}
-#endif
 
 	StaticCode(
 		SecStaticCodeRef p,
