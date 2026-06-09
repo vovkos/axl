@@ -38,7 +38,7 @@ public:
 	typedef T Type;
 };
 
-//..............................................................................
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // specialization for primitive types
 
@@ -96,6 +96,14 @@ class ArgType<uint64_t>: public SimpleArgType<uint64_t> {
 
 template <typename T>
 class ArgType<T*>: public SimpleArgType<T*> {
+};
+
+//..............................................................................
+
+template <typename... Ts>
+struct ArgTypes {
+	template <size_t i>
+	using Type = typename std::tuple_element<i, std::tuple<typename ArgType<Ts>::Type...> >::type;
 };
 
 //..............................................................................
