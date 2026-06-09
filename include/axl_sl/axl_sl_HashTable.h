@@ -406,10 +406,10 @@ class DuckTypePtrHashTable: public HashTable<
 
 //..............................................................................
 
-#define AXL_SL_BEGIN_HASH_TABLE(Class, Key, Value, Hash, Eq) \
+#define AXL_SL_BEGIN_HASH_TABLE(Class, Key, Value, Hash, Eq, ...) \
 class Class { \
 public: \
-	typedef axl::sl::HashTable<Key, Value, Hash, Eq> MapBase; \
+	typedef axl::sl::HashTable<Key, Value, Hash, Eq, ##__VA_ARGS__> MapBase; \
 	typedef MapBase::ConstIterator ConstIterator; \
 static \
 	ConstIterator \
@@ -439,13 +439,14 @@ protected: \
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-#define AXL_SL_BEGIN_SIMPLE_HASH_TABLE(Class, Key, Value) \
+#define AXL_SL_BEGIN_SIMPLE_HASH_TABLE(Class, Key, Value, ...) \
 	AXL_SL_BEGIN_HASH_TABLE( \
 		Class, \
 		Key, \
 		Value, \
 		axl::sl::HashInt<Key>, \
-		axl::sl::Eq<Key> \
+		axl::sl::Eq<Key>, \
+		##__VA_ARGS__ \
 	)
 
 #define AXL_SL_END_SIMPLE_HASH_TABLE() \
@@ -453,13 +454,14 @@ protected: \
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-#define AXL_SL_BEGIN_DUCK_TYPE_HASH_TABLE(Class, Key, Value) \
+#define AXL_SL_BEGIN_DUCK_TYPE_HASH_TABLE(Class, Key, Value, ...) \
 	AXL_SL_BEGIN_HASH_TABLE( \
 		Class, \
 		Key, \
 		Value, \
 		axl::sl::HashDuckType<Key>, \
-		axl::sl::EqDuckType<Key> \
+		axl::sl::EqDuckType<Key>, \
+		##__VA_ARGS__ \
 	)
 
 #define AXL_SL_END_DUCK_TYPE_HASH_TABLE() \
