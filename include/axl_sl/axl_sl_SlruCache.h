@@ -149,12 +149,12 @@ protected:
 	size_t m_protectedCapacity;
 
 public:
-	explicit SlruCache() {
+	SlruCache() {
 		m_probationCapacity = Def_ProbationCapacity;
 		m_protectedCapacity = Def_ProtectedCapacity;
 	}
 
-	explicit SlruCache(
+	SlruCache(
 		size_t probationCapacity,
 		size_t protectedCapacity
 	) {
@@ -265,7 +265,7 @@ public:
 		ValueArg undefinedValue
 	) const {
 		ConstIterator it = this->find(key);
-		return it ? it->m_value.m_value : undefinedValue;
+		return it ? it->m_value : undefinedValue;
 	}
 
 	Iterator
@@ -275,11 +275,13 @@ public:
 
 		switch (entry->m_tier) {
 		case Entry::Tier_Undefined:
+			entry->m_tier = Entry::Tier_Probation;
 			m_probationList.insertHead(entry);
 			evict();
 			break;
 
 		case Entry::Tier_Probation:
+			entry->m_tier = Entry::Tier_Protected;
 			m_probationList.remove(entry);
 			m_protectedList.insertHead(entry);
 			demote();
