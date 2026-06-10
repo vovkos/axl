@@ -48,11 +48,11 @@ using RobinHashTableIterator = MapIterator<Key, Value, KeyValueArgs>;
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename Key,
-	typename Value,
-	typename Hash,
-	typename Eq = Eq<Key>,
-	typename KeyValueArgs = ArgTypes<Key, Value>
+	typename Key0,
+	typename Value0,
+	typename Hash0,
+	typename Eq0 = Eq<Key0>,
+	typename KeyValueArgs = ArgTypes<Key0, Value0>
 >
 class RobinHashTable {
 public:
@@ -61,6 +61,10 @@ public:
 		Def_ResizeThreshold = 75, // percent
 	};
 
+	typedef Key0 Key;
+	typedef Value0 Value;
+	typedef Hash0 Hash;
+	typedef Eq0 Eq;
 	typedef MapEntry<Key, Value, KeyValueArgs> Entry;
 	typedef typename Entry::KeyArg KeyArg;
 	typedef typename Entry::ValueArg ValueArg;

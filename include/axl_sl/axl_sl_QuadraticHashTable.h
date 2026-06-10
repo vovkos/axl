@@ -50,13 +50,13 @@ using QuadraticHashTableIterator = MapIterator<Key, Value, KeyValueArgs>;
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename Key,
-	Key EmptyKey,
-	Key TombstoneKey,
-	typename Value,
-	typename Hash,
-	typename Eq = Eq<Key>,
-	typename KeyValueArgs = ArgTypes<Key, Value>
+	typename Key0,
+	Key0 EmptyKey,
+	Key0 TombstoneKey,
+	typename Value0,
+	typename Hash0,
+	typename Eq0 = Eq<Key0>,
+	typename KeyValueArgs = ArgTypes<Key0, Value0>
 >
 class QuadraticHashTable {
 public:
@@ -65,6 +65,10 @@ public:
 		Def_ResizeThreshold = 75,
 	};
 
+	typedef Key0 Key;
+	typedef Value0 Value;
+	typedef Hash0 Hash;
+	typedef Eq0 Eq;
 	typedef MapEntry<Key, Value, KeyValueArgs> Entry;
 	typedef typename Entry::KeyArg KeyArg;
 	typedef typename Entry::ValueArg ValueArg;
