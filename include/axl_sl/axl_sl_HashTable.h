@@ -163,12 +163,12 @@ public:
 
 	Iterator
 	getTail() {
-		return m_list.getHead();
+		return m_list.getTail();
 	}
 
 	ConstIterator
 	getTail() const {
-		return m_list.getHead();
+		return m_list.getTail();
 	}
 
 	size_t
