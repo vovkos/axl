@@ -154,7 +154,7 @@ public:
 
 	void
 	clear() {
-		sl::Array<Slot>::Rwi rwi = m_slotArray;
+		typename sl::Array<Slot>::Rwi rwi = m_slotArray;
 		size_t capacity = m_slotArray.getCount();
 		for (size_t i = 0; i < capacity; i++)
 			rwi[i].m_key = EmptyKey;
@@ -188,7 +188,7 @@ public:
 				return NULL;
 		}
 
-		sl::Array<Slot>::Rwi rwi = m_slotArray;
+		typename sl::Array<Slot>::Rwi rwi = m_slotArray;
 		size_t mask = capacity - 1;
 		size_t i = m_hash(key) & mask;
 		size_t step = 1;
@@ -255,7 +255,7 @@ public:
 		if (!result)
 			return false;
 
-		sl::Array<Slot>::Rwi rwi = m_slotArray;
+		typename sl::Array<Slot>::Rwi rwi = m_slotArray;
 		for (size_t i = 0; i < capacity; i++)
 			rwi[i].m_key = EmptyKey;
 
@@ -291,7 +291,7 @@ protected:
 
 	void
 	eraseSlot(size_t i) {
-		sl::Array<Slot>::Rwi rwi = m_slotArray;
+		typename sl::Array<Slot>::Rwi rwi = m_slotArray;
 		rwi[i].m_key = TombstoneKey;
 		rwi[i].m_entry = NULL;
 		m_tombstoneCount++;
@@ -300,7 +300,7 @@ protected:
 	void
 	addEntry(Entry* entry) {
 		ASSERT(!m_slotArray.isEmpty());
-		sl::Array<Slot>::Rwi rwi = m_slotArray;
+		typename sl::Array<Slot>::Rwi rwi = m_slotArray;
 		size_t mask = m_slotArray.getCount() - 1;
 		size_t i = m_hash(entry->getKey()) & mask;
 		size_t step = 1;

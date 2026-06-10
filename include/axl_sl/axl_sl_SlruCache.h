@@ -187,22 +187,26 @@ public:
 
 	Iterator
 	getHead() {
-		return &m_map.getHead()->m_value;
+		typename Map::Iterator it = m_map.getHead();
+		return it ? &it->m_value : NULL;
 	}
 
 	ConstIterator
 	getHead() const {
-		return &m_map.getHead()->m_value;
+		typename Map::ConstIterator it = m_map.getHead();
+		return it ? &it->m_value : NULL;
 	}
 
 	Iterator
 	getTail() {
-		return &m_map.getTail()->m_value;
+		typename Map::Iterator it = m_map.getTail();
+		return it ? &it->m_value : NULL;
 	}
 
 	ConstIterator
 	getTail() const {
-		return &m_map.getTail()->m_value;
+		typename Map::ConstIterator it = m_map.getTail();
+		return it ? &it->m_value : NULL;
 	}
 
 	size_t

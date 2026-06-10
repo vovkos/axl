@@ -49,7 +49,7 @@ class RbTreeNode: public BinTreeNodeBase<
 		typename Key2,
 		typename Value2,
 		typename Cmp,
-		typename KeyValueArgs
+		typename KeyValueArgs2
 	>
 	friend class RbTree;
 

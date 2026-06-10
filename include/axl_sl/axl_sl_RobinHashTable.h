@@ -202,8 +202,8 @@ public:
 		}
 
 		ASSERT(!m_ctrlArray.isEmpty());
-		sl::Array<Slot>::Rwi slotRwi = m_slotArray;
-		sl::Array<uint8_t>::Rwi ctrlRwi = m_ctrlArray;
+		typename sl::Array<Slot>::Rwi slotRwi = m_slotArray;
+		typename sl::Array<uint8_t>::Rwi ctrlRwi = m_ctrlArray;
 		size_t mask = capacity - 1;
 		size_t i = m_hash(key) & mask;
 		uint_t psl = 1;
@@ -307,8 +307,8 @@ protected:
 	void
 	addEntry(Entry* entry) {
 		ASSERT(!m_ctrlArray.isEmpty());
-		sl::Array<Slot>::Rwi slotRwi = m_slotArray;
-		sl::Array<uint8_t>::Rwi ctrlRwi = m_ctrlArray;
+		typename sl::Array<Slot>::Rwi slotRwi = m_slotArray;
+		typename sl::Array<uint8_t>::Rwi ctrlRwi = m_ctrlArray;
 		size_t mask = m_ctrlArray.getCount() - 1;
 		size_t i = m_hash(entry->getKey()) & mask;
 		uint_t psl = 1;
@@ -337,8 +337,8 @@ protected:
 
 	void
 	eraseSlot(size_t i) {
-		sl::Array<Slot>::Rwi slotRwi = m_slotArray;
-		sl::Array<uint8_t>::Rwi ctrlRwi = m_ctrlArray;
+		typename sl::Array<Slot>::Rwi slotRwi = m_slotArray;
+		typename sl::Array<uint8_t>::Rwi ctrlRwi = m_ctrlArray;
 		size_t mask = m_ctrlArray.getCount() - 1;
 
 		for (;;) {

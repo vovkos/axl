@@ -44,25 +44,25 @@ protected:
 	Key m_seed;
 
 public:
-	HandleTableBase(KeyArg seed = 1) {
+	HandleTableBase(typename HandleTableBase::KeyArg seed = 1) {
 		m_seed = seed;
 	}
 
 	void
-	reset(KeyArg seed = 1) {
+	reset(typename HandleTableBase::KeyArg seed = 1) {
 		this->clear();
 		m_seed = seed;
 	}
 
-	KeyArg
-	add(ValueArg value) {
+	typename HandleTableBase::KeyArg
+	add(typename HandleTableBase::ValueArg value) {
 		return add(m_seed, value);
 	}
 
-	KeyArg
+	typename HandleTableBase::KeyArg
 	add(
-		KeyArg key,
-		ValueArg value
+		typename HandleTableBase::KeyArg key,
+		typename HandleTableBase::ValueArg value
 	) {
 		for (;;) {
 			if (!key)

@@ -53,7 +53,7 @@
 #  include <intrin.h>
 #else
 #  define LLVM_ATTRIBUTE_NOINLINE   __attribute__((noinline))
-#  define LLVM_ATTRIBUTE_ALWAYS_INLINE __attribute__((always_inline))
+#  define LLVM_ATTRIBUTE_ALWAYS_INLINE __attribute__((always_inline)) inline
 #endif
 
 #if defined(__GNUC__) || defined(__clang__)
