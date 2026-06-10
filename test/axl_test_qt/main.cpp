@@ -1012,7 +1012,7 @@ benchHashTable() {
 		}
 	};
 
-	typedef ClaudeHash MyHash;
+	typedef sl::HashInt<uint64_t> MyHash;
 
 	// ...
 

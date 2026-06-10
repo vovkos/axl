@@ -19,6 +19,7 @@
 #include "axl_sl_HashTable.h"
 #include "axl_sl_RobinHashTable.h"
 #include "axl_sl_QuadraticHashTable.h"
+#include "axl_sl_SlruCache.h"
 #include "axl_sl_RangeTree.h"
 #include "axl_sl_BoxList.h"
 #include "axl_sl_BitMap.h"
@@ -65,3 +66,5 @@ using namespace axl;
 #endif
 
 //..............................................................................
+
+#define _AXL_TEST 1

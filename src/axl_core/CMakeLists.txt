@@ -150,6 +150,7 @@ set(
 	${AXL_INC_DIR}/axl_sl/axl_sl_RobinHashTable.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_QuadraticHashTable.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_HashTable.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_SlruCache.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_Iterator.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_PtrIterator.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_List.h

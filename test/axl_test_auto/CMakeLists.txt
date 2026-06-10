@@ -39,6 +39,7 @@ set(
 	test_Ref.cpp
 	test_QuadraticHashTable.cpp
 	test_RobinHashTable.cpp
+	test_SlruCache.cpp
 	test_StringTemplate.cpp
 	test_Usb.cpp
 	test_Bstr.cpp
