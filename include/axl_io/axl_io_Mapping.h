@@ -46,22 +46,22 @@ public:
 		m_size = 0;
 	}
 
-	operator void* () {
+	operator void* () const {
 		return m_p;
 	}
 
 	bool
-	isOpen() {
+	isOpen() const {
 		return m_p != NULL;
 	}
 
 	void*
-	p() {
+	p() const {
 		return m_p;
 	}
 
 	size_t
-	getSize() {
+	getSize() const {
 		return m_size;
 	}
 

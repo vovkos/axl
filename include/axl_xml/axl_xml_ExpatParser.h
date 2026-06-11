@@ -79,7 +79,7 @@ public:
 	// handlers
 
 	void*
-	getUserData() {
+	getUserData() const {
 		return XML_GetUserData(m_h);
 	}
 

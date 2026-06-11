@@ -46,7 +46,7 @@ public:
 	}
 
 	size_t
-	getSize() {
+	getSize() const {
 		return m_size;
 	}
 

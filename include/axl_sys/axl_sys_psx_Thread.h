@@ -96,12 +96,12 @@ public:
 		ASSERT(result);
 	}
 
-	operator pthread_t() {
+	operator pthread_t () {
 		return m_threadId;
 	}
 
 	bool
-	isOpen() {
+	isOpen() const {
 		return m_isOpen;
 	}
 

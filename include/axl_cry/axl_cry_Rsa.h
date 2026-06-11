@@ -36,7 +36,7 @@ public:
 	Rsa() {}
 
 	size_t
-	getSize() {
+	getSize() const {
 		return RSA_size(m_h);
 	}
 

@@ -52,7 +52,7 @@ public:
 
 public:
 	bool
-	isOpen() {
+	isOpen() const {
 		return m_socket.isOpen();
 	}
 

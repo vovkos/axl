@@ -28,7 +28,7 @@ struct AutoBaudRateResult {
 	uint_t m_baudRate;
 	uint_t m_frameBits; // data bits + parity
 
-	explicit operator bool() const {
+	explicit operator bool () const {
 		return m_frameBits != 0;
 	}
 };

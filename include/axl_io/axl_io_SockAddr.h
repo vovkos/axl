@@ -289,7 +289,7 @@ struct SockAddr {
 	}
 
 	uint_t
-	getPort() {
+	getPort() const {
 		return sl::swapByteOrder16(m_addr_ip4.sin_port);
 	}
 
@@ -340,17 +340,17 @@ struct SockAddr {
 	}
 
 	size_t
-	getNetMaskBitCount() {
+	getNetMaskBitCount() const {
 		return getSockAddrNetMaskBitCount(&m_addr);
 	}
 
 	size_t
-	getNetMaskBitCount_ip4() {
+	getNetMaskBitCount_ip4() const {
 		return getSockAddrNetMaskBitCount_ip4(&m_addr_ip4);
 	}
 
 	size_t
-	getNetMaskBitCount_ip6() {
+	getNetMaskBitCount_ip6() const {
 		return getSockAddrNetMaskBitCount_ip6(&m_addr_ip6);
 	}
 

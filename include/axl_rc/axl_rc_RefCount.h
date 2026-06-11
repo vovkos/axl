@@ -57,12 +57,12 @@ public:
 	}
 
 	size_t
-	getRefCount() {
+	getRefCount() const {
 		return m_refCount;
 	}
 
 	size_t
-	getWeakRefCount() {
+	getWeakRefCount() const {
 		return m_weakRefCount;
 	}
 

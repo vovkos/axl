@@ -37,7 +37,7 @@ public:
 
 public:
 	bool
-	isOpen() {
+	isOpen() const {
 		return m_serial.isOpen();
 	}
 

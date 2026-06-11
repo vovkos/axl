@@ -100,7 +100,7 @@ protected:
 public:
 	ModuleIterator(size_t count = 0);
 
-	explicit operator bool () {
+	explicit operator bool () const {
 		return m_index < m_count;
 	}
 

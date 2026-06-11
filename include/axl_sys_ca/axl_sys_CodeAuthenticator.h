@@ -135,7 +135,7 @@ public:
 	);
 
 	size_t
-	getSignatureSize() {
+	getSignatureSize() const {
 		return m_privateKey.getSize();
 	}
 

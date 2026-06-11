@@ -216,7 +216,7 @@ public:
 		m_state = NULL;
 	}
 
-	explicit operator bool () {
+	explicit operator bool () const {
 		return m_state != NULL;
 	}
 

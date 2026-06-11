@@ -67,7 +67,7 @@ public:
 		m_slot = NULL;
 	}
 
-	explicit operator bool () {
+	explicit operator bool () const {
 		return m_slot != NULL;
 	}
 

@@ -36,7 +36,7 @@ public:
 	}
 
 	bool
-	isValid() {
+	isValid() const {
 		return ::IOIteratorIsValid(m_p);
 	}
 

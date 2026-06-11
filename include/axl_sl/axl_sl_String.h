@@ -1720,7 +1720,7 @@ public:
 	}
 
 	bool
-	isExclusive() {
+	isExclusive() const {
 		return !this->m_length || this->m_hdr && this->m_hdr->getRefCount() == 1;
 	}
 

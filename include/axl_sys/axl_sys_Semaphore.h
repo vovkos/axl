@@ -32,7 +32,7 @@ public:
 
 public:
 	bool
-	isOpen() {
+	isOpen() const {
 		return m_semaphore.isOpen();
 	}
 
@@ -70,7 +70,7 @@ public:
 
 public:
 	bool
-	isOpen() {
+	isOpen() const {
 		return m_sem.isOpen();
 	}
 

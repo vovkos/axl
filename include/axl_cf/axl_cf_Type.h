@@ -91,7 +91,7 @@ public:
 		clear();
 	}
 
-	operator T() const {
+	operator T () const {
 		return m_p;
 	}
 

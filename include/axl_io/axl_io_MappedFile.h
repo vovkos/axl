@@ -57,12 +57,12 @@ protected:
 
 public:
 	MappedFile*
-	getMappedFile() {
+	getMappedFile() const {
 		return (MappedFile*)((char*)this - m_parentOffset);
 	}
 
 	bool
-	isEmpty() {
+	isEmpty() const {
 		return m_viewList.isEmpty();
 	}
 
@@ -249,26 +249,26 @@ public:
 	}
 
 	bool
-	isOpen() {
+	isOpen() const {
 		return m_mapping.isOpen();
 	}
 
 	void*
-	p() {
+	p() const {
 		return m_mapping.p();
 	}
 
-	operator void* () {
+	operator void* () const {
 		return m_mapping;
 	}
 
 	size_t
-	getMappingSize() {
+	getMappingSize() const {
 		return m_mapping.getSize();
 	}
 
 	uint64_t
-	getFileSize() {
+	getFileSize() const {
 		return m_file.getSize();
 	}
 

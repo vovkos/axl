@@ -40,7 +40,7 @@ public:
 	}
 
 	bool
-	isOpen() {
+	isOpen() const {
 		return m_thread.isOpen();
 	}
 
@@ -103,7 +103,7 @@ public:
 
 public:
 	bool
-	isOpen() {
+	isOpen() const {
 		return m_thread.isOpen();
 	}
 

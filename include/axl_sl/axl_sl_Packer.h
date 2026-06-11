@@ -193,12 +193,12 @@ public:
 	}
 
 	const uchar_t*
-	getBuffer() {
+	getBuffer() const {
 		return m_buffer;
 	}
 
 	size_t
-	getSize() {
+	getSize() const {
 		return m_buffer.getCount();
 	}
 

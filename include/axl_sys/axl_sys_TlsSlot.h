@@ -30,11 +30,11 @@ public:
 	}
 
 	size_t
-	getSlot() {
+	getSlot() const {
 		return m_slot;
 	}
 
-	operator size_t() {
+	operator size_t () const {
 		return m_slot;
 	}
 };

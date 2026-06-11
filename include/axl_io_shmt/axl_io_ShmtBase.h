@@ -51,7 +51,7 @@ public:
 	}
 
 	bool
-	isOpen() {
+	isOpen() const {
 		return m_hdr != NULL;
 	}
 
