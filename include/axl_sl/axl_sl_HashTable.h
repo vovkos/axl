@@ -97,11 +97,6 @@ template <
 >
 class HashTable {
 public:
-	enum Def {
-		Def_InitialBucketCount = 32,
-		Def_ResizeThreshold    = 75,
-	};
-
 	typedef Key0 Key;
 	typedef Value0 Value;
 	typedef Hash0 Hash;
@@ -112,6 +107,11 @@ public:
 	typedef typename Entry::Bucket Bucket;
 	typedef sl::Iterator<Entry> Iterator;
 	typedef sl::ConstIterator<Entry> ConstIterator;
+
+	enum Def {
+		Def_InitialBucketCount = 32,
+		Def_ResizeThreshold    = 75,
+	};
 
 protected:
 	List<Entry> m_list;

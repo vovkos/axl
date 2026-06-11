@@ -40,29 +40,34 @@ class HandleTableBase: public HashTable<
 	Eq<Key>,
 	KeyValueArgs
 > {
+public:
+	using KeyArg = typename HandleTableBase::KeyArg;
+	using ValueArg = typename HandleTableBase::ValueArg;
+	using Iterator = typename HandleTableBase::Iterator;
+
 protected:
 	Key m_seed;
 
 public:
-	HandleTableBase(typename HandleTableBase::KeyArg seed = 1) {
+	HandleTableBase(KeyArg seed = 1) {
 		m_seed = seed;
 	}
 
 	void
-	reset(typename HandleTableBase::KeyArg seed = 1) {
+	reset(KeyArg seed = 1) {
 		this->clear();
 		m_seed = seed;
 	}
 
-	typename HandleTableBase::KeyArg
-	add(typename HandleTableBase::ValueArg value) {
+	KeyArg
+	add(ValueArg value) {
 		return add(m_seed, value);
 	}
 
-	typename HandleTableBase::KeyArg
+	KeyArg
 	add(
-		typename HandleTableBase::KeyArg key,
-		typename HandleTableBase::ValueArg value
+		KeyArg key,
+		ValueArg value
 	) {
 		for (;;) {
 			if (!key)
@@ -75,7 +80,7 @@ public:
 		}
 
 		ASSERT(key);
-		typename HandleTableBase::Iterator it = this->visit(key);
+		Iterator it = this->visit(key);
 		it->m_value = value;
 		m_seed = key + 1;
 		return key;
