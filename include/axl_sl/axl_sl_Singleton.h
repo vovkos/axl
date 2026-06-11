@@ -51,7 +51,7 @@ public:
 public:
 	void
 	operator () (void* p) {
-		new(p)T;
+		new (p) T;
 		g::getModule()->addFinalizer(AXL_RC_NEW_ARGS(Destruct, ((T*)p)));
 	}
 };

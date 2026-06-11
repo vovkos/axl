@@ -120,7 +120,7 @@ public:
 		) const {
 			T* end = p + count;
 			for (; p < end; p++)
-				new(p)T;
+				new (p) T;
 		}
 	};
 
@@ -155,7 +155,7 @@ public:
 	) {
 		T* end = dst + count;
 		for (; dst < end; dst++, src++)
-			new(dst)T(*src);
+			new (dst) T(*src);
 	}
 
 	static

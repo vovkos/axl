@@ -27,7 +27,7 @@ class ConstructSimpleSingleton {
 public:
 	void
 	operator () (void* p) {
-		new(p)T;
+		new (p) T;
 	}
 };
 

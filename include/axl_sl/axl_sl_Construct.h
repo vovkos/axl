@@ -105,7 +105,7 @@ takeOver(
 
 	dst->~T();
 	memcpy(dst, src, SizeOfNoReusableTailPadding<T>()());
-	new(src)T;
+	new (src) T;
 }
 
 //..............................................................................

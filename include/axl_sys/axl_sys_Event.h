@@ -428,7 +428,7 @@ public:
 	create() {
 		close();
 
-		new(m_eventBuffer) UnnamedEventImpl;
+		new (m_eventBuffer) UnnamedEventImpl;
 		m_eventKind = EventKind_Unnamed;
 		return true;
 	}
@@ -437,7 +437,7 @@ public:
 	create(const sl::StringRef& name) {
 		close();
 
-		new(m_eventBuffer) NamedEventImpl;
+		new (m_eventBuffer) NamedEventImpl;
 		m_eventKind = EventKind_Named;
 
 		bool result = getNamedEvent()->create(name);
@@ -453,7 +453,7 @@ public:
 	open(const sl::StringRef& name) {
 		close();
 
-		new(m_eventBuffer) NamedEventImpl;
+		new (m_eventBuffer) NamedEventImpl;
 		m_eventKind = EventKind_Named;
 
 		bool result = getNamedEvent()->open(name);
@@ -556,7 +556,7 @@ public:
 		close();
 
 		m_event = (EventImpl*)m_unnamedEventBuffer;
-		new(m_event) EventImpl;
+		new (m_event) EventImpl;
 		return true;
 	}
 
