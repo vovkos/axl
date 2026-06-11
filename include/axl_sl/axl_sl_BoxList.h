@@ -45,8 +45,9 @@ protected:
 	Compare m_compare;
 
 public:
-	CompareBoxListEntry(Compare compare):
-		m_compare(compare) {}
+	CompareBoxListEntry(const Compare& compare) {
+		m_compare = compare;
+	}
 
 	bool
 	operator () (
@@ -131,12 +132,18 @@ class ConstBoxIterator: public BoxIteratorImpl<
 public:
 	ConstBoxIterator() {}
 
+	ConstBoxIterator(const BoxIterator<T>& it) {
+		this->m_p = it.getEntry();
+	}
+
 	ConstBoxIterator(const BoxListEntry<T>* p) {
 		this->m_p = p;
 	}
 
-	ConstBoxIterator(const BoxIterator<T>& it) {
-		this->m_p = it.getEntry();
+	ConstBoxIterator&
+	operator = (const BoxListEntry<T>* p) {
+		this->m_p = p;
+		return *this;
 	}
 };
 

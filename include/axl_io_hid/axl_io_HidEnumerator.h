@@ -39,8 +39,8 @@ public:
 		m_p = p;
 	}
 
-	operator const void* () const {
-		return m_p;
+	explicit operator bool () const {
+		return m_p != NULL;
 	}
 
 	const hid_device_info*

@@ -41,10 +41,34 @@ public:
 		m_p = NULL;
 	}
 
-	// operator bool () might seem more logical, but then '+' and '-' will not work
+	explicit operator bool () const {
+		return m_p != NULL;
+	}
 
-	operator const void* () const {
-		return m_p;
+	bool
+	operator == (const IteratorBase& src) const {
+		return m_p == src.m_p;
+	}
+
+	bool
+	operator != (const IteratorBase& src) const {
+		return m_p != src.m_p;
+	}
+
+	bool
+	operator == (const Entry* p) const {
+		return this->m_p == p;
+	}
+
+	bool
+	operator != (const Entry* p) const {
+		return this->m_p != p;
+	}
+
+	T&
+	operator = (Entry* p) {
+		this->m_p = p;
+		return *this;
 	}
 
 	T&
@@ -194,22 +218,6 @@ public:
 		return this->m_p;
 	}
 
-	T&
-	operator = (Entry* p) {
-		this->m_p = p;
-		return *this;
-	}
-
-	bool
-	operator == (Entry* p) const {
-		return this->m_p == p;
-	}
-
-	bool
-	operator != (Entry* p) const {
-		return !operator == (p);
-	}
-
 	Entry* p() const {
 		return this->m_p;
 	}
@@ -276,6 +284,12 @@ public:
 
 	ConstIterator(const T* p) {
 		this->m_p = p;
+	}
+
+	ConstIterator&
+	operator = (const T* p) {
+		this->m_p = p;
+		return *this;
 	}
 };
 

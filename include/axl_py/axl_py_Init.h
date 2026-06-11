@@ -216,8 +216,8 @@ public:
 		m_state = NULL;
 	}
 
-	operator bool () {
-		return m_state;
+	explicit operator bool () {
+		return m_state != NULL;
 	}
 
 	bool

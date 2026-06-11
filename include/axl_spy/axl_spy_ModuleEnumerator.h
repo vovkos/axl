@@ -22,7 +22,7 @@ public:
 
 	ModuleIterator(const sl::ArrayRef<HMODULE>& moduleArray);
 
-	operator bool () const {
+	explicit operator bool () const {
 		return m_index < m_moduleArray.getCount();
 	}
 
@@ -63,7 +63,7 @@ public:
 		m_linkMap = linkMap;
 	}
 
-	operator bool () const {
+	explicit operator bool () const {
 		return m_linkMap != NULL;
 	}
 
@@ -100,7 +100,7 @@ protected:
 public:
 	ModuleIterator(size_t count = 0);
 
-	operator bool () {
+	explicit operator bool () {
 		return m_index < m_count;
 	}
 

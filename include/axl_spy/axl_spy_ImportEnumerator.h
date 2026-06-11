@@ -67,7 +67,7 @@ public:
 		m_slot = NULL;
 	}
 
-	operator bool () {
+	explicit operator bool () {
 		return m_slot != NULL;
 	}
 

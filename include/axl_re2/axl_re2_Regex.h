@@ -63,7 +63,7 @@ public:
 
 	~Regex();
 
-	operator bool () const {
+	explicit operator bool () const {
 		return getRegexKind() != RegexKind_Undefined;
 	}
 

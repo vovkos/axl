@@ -82,7 +82,7 @@ public:
 		return *this;
 	}
 
-	operator bool () const {
+	explicit operator bool () const {
 		return m_endOffset != -1; // pre-match is still OK
 	}
 
@@ -227,7 +227,7 @@ public:
 
 	~State();
 
-	operator bool () const {
+	explicit operator bool () const {
 		return isMatch();
 	}
 

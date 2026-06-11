@@ -92,7 +92,7 @@ public:
 
 	bool
 	contains(uint_t key) const {
-		return this->m_map.find(key);
+		return (bool)this->m_map.find(key);
 	}
 
 	void
