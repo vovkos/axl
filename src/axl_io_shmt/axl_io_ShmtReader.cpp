@@ -96,7 +96,7 @@ ShmtReader::read(sl::Array<char>* buffer) {
 				memcpy(p, m_data + readOffset, size1);
 
 			if (size2)
-				memcpy(p + size1, m_data + 1, size2);
+				memcpy(p + size1, m_data, size2);
 		}
 
 		sys::atomicLock(&m_hdr->m_lock);
