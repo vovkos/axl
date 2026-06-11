@@ -452,7 +452,7 @@ axl_create_gcc_settings)
 
 		axl_create_compiler_flag_setting(
 			GCC_FLAG_WARNING_STRINGOP_OVERFLOW
-			DESCRIPTION "Warn for calls to memcpy/strcpy which (GCC thinks) might overflow the buffer"
+			DESCRIPTION "Warn about calls to memcpy/strcpy which (GCC thinks) might overflow the buffer"
 			DEFAULT "-Wno-stringop-overflow"
 			"-Wstringop-overflow"
 			"-Wstringop-overflow=1"
@@ -464,11 +464,20 @@ axl_create_gcc_settings)
 
 		axl_create_compiler_flag_setting(
 			GCC_FLAG_WARNING_STRINGOP_OVERREAD
-			DESCRIPTION "Warn for calls to memcpy/strcpy which (GCC thinks) might overread from the buffer"
+			DESCRIPTION "Warn about calls to memcpy/strcpy which (GCC thinks) might overread from the buffer"
 			DEFAULT "-Wno-stringop-overread"
 			"-Wstringop-overread"
 			"-Wno-stringop-overread"
 		)
+
+		axl_create_compiler_flag_setting(
+			GCC_FLAG_WARNING_FREE_NONHEAP_OBJECT
+			DESCRIPTION "Warn about attempting to deallocate a non-heap objects"
+			DEFAULT "-Wno-free-nonheap-object"
+			"-Wfree-nonheap-object"
+			"-Wno-free-nonheap-object"
+		)
+
 	endif()
 
 	axl_create_compiler_flag_setting(
