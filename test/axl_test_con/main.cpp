@@ -3412,16 +3412,22 @@ protected:
 	Transport* m_transport;
 
 public:
+	size_t m_msgCount;    // total messages received (filled on completion)
+	size_t m_payloadSize; // total payload bytes received (excludes ReqHdr)
+
+public:
 	ClientReaderThread(Transport* transport) {
 		m_transport = transport;
+		m_msgCount = 0;
+		m_payloadSize = 0;
 	}
 
 	uint_t
 	threadFunc() {
 		ASSERT(m_transport);
 
-		int percentage = 0;
 		size_t totalSize = 0;
+		size_t msgCount = 0;
 
 		sl::Array<char> buffer;
 
@@ -3444,15 +3450,11 @@ public:
 			}
 
 			totalSize += reply->m_size;
-
-			int newPercentage = (uint64_t)totalSize * 100 / TotalSize;
-			if (newPercentage != percentage) {
-				percentage = newPercentage;
-				printf("\b\b\b\b%d%%", percentage);
-			}
+			msgCount++;
 		}
 
-		printf("\nReading 100%% (done), %zd bytes\n", totalSize);
+		m_msgCount = msgCount;
+		m_payloadSize = totalSize;
 		return 0;
 	}
 };
@@ -3590,14 +3592,48 @@ public:
 	}
 };
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+struct BenchResult {
+	uint64_t m_time;      // elapsed, in 100ns units (sys::getTimestamp)
+	size_t m_msgCount;
+	size_t m_payloadSize; // payload bytes only (excludes per-message ReqHdr)
+
+	BenchResult() {
+		m_time = 0;
+		m_msgCount = 0;
+		m_payloadSize = 0;
+	}
+};
+
+inline
+void
+printBenchResult(
+	const char* name,
+	const BenchResult& res
+) {
+	double seconds = res.m_time / 1e7; // 100ns units -> seconds
+	double wireSize = (double)res.m_payloadSize + (double)res.m_msgCount * sizeof(ReqHdr);
+
+	printf("%-6s: %8.3f s  %10zu msgs  %7.2f M msg/s  payload %6.1f MB/s  wire %6.1f MB/s\n",
+		name,
+		seconds,
+		res.m_msgCount,
+		seconds ? res.m_msgCount / seconds / 1e6 : 0,
+		seconds ? res.m_payloadSize / seconds / (1024 * 1024) : 0,
+		seconds ? wireSize / seconds / (1024 * 1024) : 0
+	);
+}
+
 } // namespace shm_test
 
 //..............................................................................
 
-void
+shm_test::BenchResult
 testSharedMemoryTransport() {
 	using namespace shm_test;
 
+	BenchResult res;
 	bool result;
 
 	ShmTransport serverTransport;
@@ -3653,7 +3689,7 @@ testSharedMemoryTransport() {
 
 	if (!result) {
 		printf("can't initialize: %s\n", err::getLastErrorDescription().sz());
-		return;
+		return res;
 	}
 
 	ServerThread serverThread(&serverTransport);
@@ -3676,15 +3712,19 @@ testSharedMemoryTransport() {
 
 	uint64_t time2 = sys::getTimestamp();
 
-	printf("shm test completed: %s\n", sys::Time(time2 - time0, 0).format("%m:%s.%l").sz());
+	res.m_time = time2 - time0;
+	res.m_msgCount = clientReaderThread.m_msgCount;
+	res.m_payloadSize = clientReaderThread.m_payloadSize;
+	return res;
 }
 
 //..............................................................................
 
-void
+shm_test::BenchResult
 testPipeTransport() {
 	using namespace shm_test;
 
+	BenchResult res;
 	bool result;
 
 	PipeTransport serverTransport;
@@ -3712,7 +3752,7 @@ testPipeTransport() {
 	if (!result) {
 		err::setLastSystemError();
 		printf("can't initialize: %s\n", err::getLastErrorDescription().sz());
-		return;
+		return res;
 	}
 
 	serverTransport.m_readPipe = pipeA[0];
@@ -3751,7 +3791,33 @@ testPipeTransport() {
 
 	uint64_t time2 = sys::getTimestamp();
 
-	printf("pipe test completed: %s\n", sys::Time(time2 - time0, 0).format("%m:%s.%l").sz());
+	res.m_time = time2 - time0;
+	res.m_msgCount = clientReaderThread.m_msgCount;
+	res.m_payloadSize = clientReaderThread.m_payloadSize;
+	return res;
+}
+
+//..............................................................................
+
+void
+benchShmtTransport() {
+	using namespace shm_test;
+
+	printf(
+		"transport round-trip benchmark: %zu MB payload, blocks 0..%zu bytes, ReqHdr %zu bytes\n",
+		(size_t)(TotalSize / (1024 * 1024)),
+		(size_t)MaxBlockSize,
+		sizeof(ReqHdr)
+	);
+
+	BenchResult shmt = testSharedMemoryTransport();
+	BenchResult pipe = testPipeTransport();
+
+	printBenchResult("shmt", shmt);
+	printBenchResult("pipe", pipe);
+
+	if (shmt.m_time && pipe.m_time)
+		printf("speedup (pipe/shmt): %.2fx\n", (double)pipe.m_time / shmt.m_time);
 }
 
 //..............................................................................
@@ -10111,14 +10177,8 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-#if (_AXL_OS_WIN)
-	testSystemCertStore();
-#else
-	testBoyerMoore();
-#endif
-
-#if (_AXL_PY)
-	testPython();
+#if (_AXL_IO_SHMT)
+	benchShmtTransport();
 #endif
 	return 0;
 }
