@@ -25,7 +25,7 @@ template <typename T>
 class ReverseArray {
 public:
 	typedef T Value;
-	typedef typename ArgType<T>::Type ValueArg;
+	typedef ArgType<T> ValueArg;
 
 public:
 	static
@@ -91,7 +91,7 @@ protected:
 // general case: full cycle of construction, copy, destruction
 
 template <typename T>
-class ArrayDetails: public ReverseArray<T> {
+class FullArrayDetails: public ReverseArray<T> {
 public:
 	class Hdr: public rc::BufHdr {
 	public:
@@ -264,65 +264,12 @@ public:
 	}
 };
 
-//..............................................................................
-
-// specialization for primitive types
-
-template <>
-class ArrayDetails<char>: public SimpleArrayDetails<char> {
-};
-
-template <>
-class ArrayDetails<wchar_t>: public SimpleArrayDetails<wchar_t> {
-};
-
-template <>
-class ArrayDetails<float>: public SimpleArrayDetails<float> {
-};
-
-template <>
-class ArrayDetails<double>: public SimpleArrayDetails<double> {
-};
-
-template <>
-class ArrayDetails<int8_t>: public SimpleArrayDetails<int8_t> {
-};
-
-template <>
-class ArrayDetails<uint8_t>: public SimpleArrayDetails<uint8_t> {
-};
-
-template <>
-class ArrayDetails<int16_t>: public SimpleArrayDetails<int16_t> {
-};
-
-template <>
-class ArrayDetails<uint16_t>: public SimpleArrayDetails<uint16_t> {
-};
-
-template <>
-class ArrayDetails<int32_t>: public SimpleArrayDetails<int32_t> {
-};
-
-template <>
-class ArrayDetails<uint32_t>: public SimpleArrayDetails<uint32_t> {
-};
-
-template <>
-class ArrayDetails<int64_t>: public SimpleArrayDetails<int64_t> {
-};
-
-template <>
-class ArrayDetails<uint64_t>: public SimpleArrayDetails<uint64_t> {
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-// specialization for pointers
-
 template <typename T>
-class ArrayDetails<T*>: public SimpleArrayDetails<T*> {
-};
+using ArrayDetails = typename std::conditional<
+	std::is_scalar<T>::value,
+	SimpleArrayDetails<T>,
+	FullArrayDetails<T>
+>::type;
 
 //..............................................................................
 
