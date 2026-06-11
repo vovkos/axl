@@ -216,7 +216,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class Nop {
 public:
@@ -232,7 +232,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class Minus {
 public:
@@ -244,7 +244,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class Not {
 public:
@@ -256,7 +256,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class Add {
 public:
@@ -271,7 +271,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class Sub {
 public:
@@ -286,7 +286,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class Mul {
 public:
@@ -301,7 +301,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class Div {
 public:
@@ -316,7 +316,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class Mod {
 public:
@@ -331,7 +331,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class Shl {
 public:
@@ -346,7 +346,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class Shr {
 public:
@@ -361,7 +361,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class And {
 public:
@@ -376,7 +376,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class AndNot {
 public:
@@ -391,7 +391,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class Xor {
 public:
@@ -406,7 +406,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class Or {
 public:
@@ -421,7 +421,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class Min {
 public:
@@ -436,7 +436,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class Max {
 public:
@@ -466,7 +466,7 @@ enum RelOpKind {
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class Eq {
 public:
@@ -483,7 +483,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class EqBin {
 public:
@@ -500,7 +500,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class EqDuckType {
 public:
@@ -547,7 +547,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class Ne {
 public:
@@ -564,7 +564,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class Lt {
 public:
@@ -581,7 +581,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class Gt {
 public:
@@ -598,7 +598,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class Le {
 public:
@@ -615,7 +615,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class Ge {
 public:
@@ -634,7 +634,7 @@ public:
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class Assign {
 public:
@@ -652,7 +652,7 @@ public:
 template <
 	typename Func,
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class OpAssign {
 public:

@@ -144,7 +144,7 @@ public:
 
 template <
 	typename T,
-	typename ValueArg = typename ArgType<T>::Type
+	typename ValueArg = ArgType<T>
 >
 class BoxList: public OwningListBase<
 	BoxListEntry<T>,

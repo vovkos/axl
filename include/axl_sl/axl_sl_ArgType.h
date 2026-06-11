@@ -21,15 +21,15 @@ namespace sl {
 //..............................................................................
 
 template <typename T>
-class ArgType {
-public:
+struct ArgTypeSelector {
 	typedef typename std::conditional<std::is_scalar<T>::value, T, const T&>::type Type;
 };
 
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+template <typename T>
+using ArgType = typename ArgTypeSelector<T>::Type;
 
 template <typename... Ts>
-using ArgTypes = std::tuple<typename ArgType<Ts>::Type...>;
+using ArgTypes = std::tuple<ArgType<Ts>...>;
 
 //..............................................................................
 

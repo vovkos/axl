@@ -395,7 +395,7 @@ typedef HashSzBase_i<utf32_t> HashSz_i_utf32;
 
 template <
 	typename T,
-	typename Arg = typename ArgType<T>::Type
+	typename Arg = ArgType<T>
 >
 class HashDuckType {
 public:

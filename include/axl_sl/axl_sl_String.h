@@ -1961,20 +1961,17 @@ typedef StringBase<utf32_t> String_utf32;
 // specializations for ArgType
 
 template <>
-class ArgType<String_utf8> {
-public:
+struct ArgTypeSelector<String_utf8> {
 	typedef const StringRef_utf8& Type;
 };
 
 template <>
-class ArgType<String_utf16> {
-public:
+struct ArgTypeSelector<String_utf16> {
 	typedef const StringRef_utf16& Type;
 };
 
 template <>
-class ArgType<String_utf32> {
-public:
+struct ArgTypeSelector<String_utf32> {
 	typedef const StringRef_utf32& Type;
 };
 

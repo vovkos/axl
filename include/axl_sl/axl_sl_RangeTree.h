@@ -23,7 +23,7 @@ namespace sl {
 template <
 	typename Offset0,
 	typename Value0,
-	typename ValueArg0 = typename ArgType<Value0>::Type
+	typename ValueArg0 = ArgType<Value0>
 >
 class RangeTreeValue {
 	template <
@@ -88,7 +88,7 @@ template <
 	typename Offset, // integer type (size_t, uint64_t, intptr_t, etc)
 	typename Value0,
 	typename ValueEq = Eq<Value0>,
-	typename ValueArg0 = typename ArgType<Value0>::Type
+	typename ValueArg0 = ArgType<Value0>
 >
 class RangeTree: public RbTree<
 	Offset,
