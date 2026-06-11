@@ -31,7 +31,7 @@ endif()
 
 #. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-if(${QT_FOUND})
+if(QT_FOUND)
 	option(
 		BUILD_AXL_TEST_QT
 		"Build axl_test_qt (QT GUI general-purpose testig app)"

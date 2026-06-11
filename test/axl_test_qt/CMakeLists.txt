@@ -84,9 +84,13 @@ source_group(
 include_directories(
 	${AXL_INC_DIR}
 	${OPENSSL_INC_DIR}
-	${BOOST_INC_DIR}
 	${GEN_DIR}
 )
+
+if(BOOST_FOUND)
+	include_directories(${BOOST_INC_DIR})
+	add_definitions(-D_BOOST=1)
+endif()
 
 link_directories(
 	${AXL_LIB_DIR}

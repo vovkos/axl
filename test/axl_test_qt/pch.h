@@ -72,8 +72,19 @@ using namespace axl;
 //..............................................................................
 
 #include <openssl/x509.h>
-#include <unordered_map>
+
 #include <map>
+#include <unordered_map>
+#include <iostream>
+#include <string>
+#include <locale>
+#include <codecvt>
+
+#if(_BOOST)
+#   include <boost/unordered/unordered_flat_map.hpp>
+#endif
+
 #include "axl_sl_RbTree.h"
 #include "axl_sl_RobinHashTable.h"
 #include "axl_sl_QuadraticHashTable.h"
+#include "axl_sys_DynamicLib.h"

@@ -16,16 +16,6 @@
 #include "axl_io_MappedFile.h"
 #include "LlvmDenseMap.h"
 
-#include <QCheckBox>
-#include <QDialogButtonBox>
-#include "axl_sys_DynamicLib.h"
-
-#include <iostream>
-#include <string>
-#include <locale>
-#include <codecvt>
-#include <boost/unordered/unordered_flat_map.hpp>
-
 //..............................................................................
 
 #if 0
@@ -1150,6 +1140,7 @@ benchHashTable() {
 		printf("sl::QuadraticHashTable.find:  %lld ms (sum=%lld)\n", timer.elapsed(), (long long)sum);
 	}
 
+#if (_BOOST)
 	// boost::unordered_flat_map (SwissTable-style FoA: SIMD fingerprint groups, non-relocating)
 	{
 		QElapsedTimer timer0;
@@ -1169,6 +1160,7 @@ benchHashTable() {
 		}
 		printf("boost::flat_map.find:    %lld ms (sum=%lld)\n", timer.elapsed(), (long long)sum);
 	}
+#endif
 }
 
 void
