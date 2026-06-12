@@ -70,6 +70,17 @@ isLowerCase(utf32_t c);
 bool
 isUpperCase(utf32_t c);
 
+// CJK occupy two columns in a monospace grid
+
+bool
+isDoubleWidth(utf32_t c);
+
+inline
+uint_t
+getColWidth(utf32_t c) {
+	return isDoubleWidth(c) ? 2 : 1;
+}
+
 //..............................................................................
 
 // case ops
@@ -309,13 +320,13 @@ public:
 	typedef typename DstEncoding::Encoder Encoder;
 	typedef ConvertResult<DstUnit, SrcUnit> Result;
 
-	class CountingEmitter {
+	class LengthCountingEmitter {
 	protected:
 		size_t m_length;
 		utf32_t m_replacement;
 
 	public:
-		CountingEmitter(utf32_t replacement) {
+		LengthCountingEmitter(utf32_t replacement) {
 			m_length = 0;
 			m_replacement = replacement;
 		}
@@ -336,6 +347,52 @@ public:
 			utf32_t cp
 		) {
 			m_length += Encoder::getEncodeLength(Op()(cp), m_replacement);
+		}
+
+		void
+		emitCu(
+			const SrcUnit* p,
+			utf32_t cu
+		) {
+			emitCp(p, cu);
+		}
+
+		void
+		emitCpAfterCu(
+			const SrcUnit* p,
+			utf32_t cp
+		) {
+			emitCp(p, cp);
+		}
+	};
+
+	class ColCountingEmitter {
+	protected:
+		size_t m_col;
+		utf32_t m_replacement;
+
+	public:
+		ColCountingEmitter(utf32_t replacement) {
+			m_col = 0;
+			m_replacement = replacement;
+		}
+
+		size_t
+		getCol() const {
+			return m_col;
+		}
+
+		bool
+		canEmit() const {
+			return true;
+		}
+
+		void
+		emitCp(
+			const SrcUnit* p,
+			utf32_t cp
+		) {
+			m_col += getColWidth(cp);
 		}
 
 		void
@@ -433,7 +490,7 @@ public:
 		const SrcUnit* end,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		CountingEmitter emitter(replacement);
+		LengthCountingEmitter emitter(replacement);
 		Decoder::decode(state, emitter, p, end);
 		return emitter.getLength();
 	}
@@ -445,9 +502,34 @@ public:
 		const SrcUnit* end,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		CountingEmitter emitter(replacement);
+		LengthCountingEmitter emitter(replacement);
 		Decoder::decode(emitter, p, end);
 		return emitter.getLength();
+	}
+
+	static
+	size_t
+	calcRequiredColCount(
+		DecoderState* state,
+		const SrcUnit* p,
+		const SrcUnit* end,
+		utf32_t replacement = StdChar_Replacement
+	) {
+		ColCountingEmitter emitter(replacement);
+		Decoder::decode(state, emitter, p, end);
+		return emitter.getCol();
+	}
+
+	static
+	size_t
+	calcRequiredColCount(
+		const SrcUnit* p,
+		const SrcUnit* end,
+		utf32_t replacement = StdChar_Replacement
+	) {
+		ColCountingEmitter emitter(replacement);
+		Decoder::decode(emitter, p, end);
+		return emitter.getCol();
 	}
 
 	static

@@ -31,6 +31,28 @@ namespace enc {
 /* getting a uint32_t properties word from the data */
 #define GET_PROPS(c, result) ((result)=UTRIE2_GET16(&propsTrie, c));
 
+/* UEastAsianWidth is stored in properties-vector word 0 (uprops.h) */
+#define UPROPS_EA_MASK  0x000e0000
+#define UPROPS_EA_SHIFT 17
+
+/* UEastAsianWidth values we care about (uchar.h) */
+#define U_EA_FULLWIDTH 3
+#define U_EA_WIDE      5
+
+/* equivalent of ICU's u_getUnicodeProperties(c, column) */
+inline
+uint32_t
+getUnicodeProperties(
+	utf32_t c,
+	int32_t column
+) {
+	if (column >= propsVectorsColumns)
+		return 0;
+
+	uint16_t vecIndex = UTRIE2_GET16(&propsVectorsTrie, c);
+	return propsVectors[vecIndex + column];
+}
+
 #define GET_CASE_PROPS() &ucase_props_singleton
 
 #define GET_EXCEPTIONS(csp, props) ((csp)->exceptions+((props)>>UCASE_EXC_SHIFT))
@@ -178,6 +200,12 @@ isUpperCase(utf32_t c) {
 	uint32_t props;
 	GET_PROPS(c, props);
 	return (UBool)(GET_CATEGORY(props)==U_UPPERCASE_LETTER);
+}
+
+bool
+isDoubleWidth(utf32_t c) {
+	uint32_t ea = (getUnicodeProperties(c, 0) & UPROPS_EA_MASK) >> UPROPS_EA_SHIFT;
+	return ea == U_EA_WIDE || ea == U_EA_FULLWIDTH;
 }
 
 utf32_t
