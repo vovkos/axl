@@ -46,6 +46,12 @@ public:
 		m_size = 0;
 	}
 
+#if (_AXL_OS_POSIX) // must unlink shm
+	~Mapping() {
+		close();
+	}
+#endif
+
 	operator void* () const {
 		return m_p;
 	}

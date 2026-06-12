@@ -232,6 +232,10 @@ public:
 		 m_data = NULL;
 	}
 
+	~NamedSemEventBase() {
+		close();
+	}
+
 	void
 	close() {
 		if (!m_data)
