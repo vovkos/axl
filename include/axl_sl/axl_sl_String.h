@@ -301,7 +301,6 @@ public:
 		return m_p + m_length;
 	}
 
-
 	bool
 	isEmpty() const {
 		return m_length == 0;

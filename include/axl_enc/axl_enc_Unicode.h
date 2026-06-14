@@ -320,13 +320,13 @@ public:
 	typedef typename DstEncoding::Encoder Encoder;
 	typedef ConvertResult<DstUnit, SrcUnit> Result;
 
-	class LengthCountingEmitter {
+	class CountingEmitter {
 	protected:
 		size_t m_length;
 		utf32_t m_replacement;
 
 	public:
-		LengthCountingEmitter(utf32_t replacement) {
+		CountingEmitter(utf32_t replacement) {
 			m_length = 0;
 			m_replacement = replacement;
 		}
@@ -347,52 +347,6 @@ public:
 			utf32_t cp
 		) {
 			m_length += Encoder::getEncodeLength(Op()(cp), m_replacement);
-		}
-
-		void
-		emitCu(
-			const SrcUnit* p,
-			utf32_t cu
-		) {
-			emitCp(p, cu);
-		}
-
-		void
-		emitCpAfterCu(
-			const SrcUnit* p,
-			utf32_t cp
-		) {
-			emitCp(p, cp);
-		}
-	};
-
-	class ColCountingEmitter {
-	protected:
-		size_t m_col;
-		utf32_t m_replacement;
-
-	public:
-		ColCountingEmitter(utf32_t replacement) {
-			m_col = 0;
-			m_replacement = replacement;
-		}
-
-		size_t
-		getCol() const {
-			return m_col;
-		}
-
-		bool
-		canEmit() const {
-			return true;
-		}
-
-		void
-		emitCp(
-			const SrcUnit* p,
-			utf32_t cp
-		) {
-			m_col += getColWidth(cp);
 		}
 
 		void
@@ -490,7 +444,7 @@ public:
 		const SrcUnit* end,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		LengthCountingEmitter emitter(replacement);
+		CountingEmitter emitter(replacement);
 		Decoder::decode(state, emitter, p, end);
 		return emitter.getLength();
 	}
@@ -502,34 +456,9 @@ public:
 		const SrcUnit* end,
 		utf32_t replacement = StdChar_Replacement
 	) {
-		LengthCountingEmitter emitter(replacement);
+		CountingEmitter emitter(replacement);
 		Decoder::decode(emitter, p, end);
 		return emitter.getLength();
-	}
-
-	static
-	size_t
-	calcRequiredColCount(
-		DecoderState* state,
-		const SrcUnit* p,
-		const SrcUnit* end,
-		utf32_t replacement = StdChar_Replacement
-	) {
-		ColCountingEmitter emitter(replacement);
-		Decoder::decode(state, emitter, p, end);
-		return emitter.getCol();
-	}
-
-	static
-	size_t
-	calcRequiredColCount(
-		const SrcUnit* p,
-		const SrcUnit* end,
-		utf32_t replacement = StdChar_Replacement
-	) {
-		ColCountingEmitter emitter(replacement);
-		Decoder::decode(emitter, p, end);
-		return emitter.getCol();
 	}
 
 	static
@@ -591,7 +520,7 @@ public:
 
 //..............................................................................
 
-// locates offsets of code-units that decode into a given character position
+// locates offsets of code-units that decode into a given codepoint position
 
 template <
 	typename Encoding0,
@@ -756,6 +685,158 @@ public:
 	) {
 		Emitter emitter;
 		Decoder::decode(state, emitter, src, srcEnd);
+	}
+};
+
+//..............................................................................
+
+// maps code units to columns and back with respect to double-width codepoints
+
+template <typename Decoder>
+class ColLayout {
+public:
+	typedef typename Decoder::C C;
+
+protected:
+	class CountingEmitter {
+	protected:
+		size_t m_col;
+
+	public:
+		CountingEmitter() {
+			m_col = 0;
+		}
+
+		size_t
+		getCol() const {
+			return m_col;
+		}
+
+		bool
+		canEmit() const {
+			return true;
+		}
+
+		void
+		emitCp(
+			const C* p,
+			utf32_t cp
+		) {
+			m_col += getColWidth(cp);
+		}
+
+		void
+		emitCu(
+			const C* p,
+			utf32_t cu
+		) {
+			m_col++;
+		}
+
+		void
+		emitCpAfterCu(
+			const C* p,
+			utf32_t cp
+		) {
+			m_col++;
+		}
+	};
+
+	class LocatingEmitter {
+	protected:
+		size_t m_col;
+		size_t m_targetCol;
+		const C* m_p;
+
+	public:
+		LocatingEmitter(
+			size_t col,
+			const C* src
+		) {
+			m_col = 0;
+			m_targetCol = col;
+			m_p = src;
+		}
+
+		size_t
+		getCol() const {
+			return m_col;
+		}
+
+		const C*
+		getSrc() const {
+			return m_p;
+		}
+
+		bool
+		canEmit() const {
+			return m_col < m_targetCol;
+		}
+
+		void
+		emitCp(
+			const C* p,
+			utf32_t cp
+		) {
+			if (!isDoubleWidth(cp)) {
+				m_p = p;
+				m_col++;
+			} else { // handle potential overshoot
+				m_col += 2;
+				if (m_col <= m_targetCol) // on overshoot, keep previous m_p
+					m_p = p;
+			}
+		}
+
+		void
+		emitCu(
+			const C* p,
+			utf32_t cu
+		) {
+			emitChecked(p);
+		}
+
+		void
+		emitCpAfterCu(
+			const C* p,
+			utf32_t cp
+		) {
+			emitChecked(p);
+		}
+
+	protected:
+		void
+		emitChecked(const C* p) {
+			if (canEmit()) {
+				m_p = p;
+				m_col++;
+			}
+		}
+	};
+
+public:
+	static
+	size_t
+	calcCol(
+		const C* p,
+		const C* end
+	) {
+		CountingEmitter emitter;
+		Decoder::decode(emitter, p, end);
+		return emitter.getCol();
+	}
+
+	static
+	ConvertLengthResult
+	locateCol(
+		size_t col,
+		const C* src,
+		const C* srcEnd
+	) {
+		LocatingEmitter emitter(col, src);
+		Decoder::decode(emitter, src, srcEnd);
+		size_t actualCol = emitter.getCol();
+		return ConvertLengthResult(actualCol > col ? actualCol - 2 : actualCol, emitter.getSrc() - src);
 	}
 };
 
