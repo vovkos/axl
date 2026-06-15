@@ -743,6 +743,49 @@ public:
 	}
 
 	size_t
+	removeAll(ValueArg e) {
+		return removeAll(0, e);
+	}
+
+	size_t
+	removeAll(
+		size_t startFrom,
+		ValueArg e
+	) {
+		T* dst = this->m_p + startFrom;
+		T* end = this->m_p + this->m_count;
+		for (; dst < end; dst++)
+			if (*dst == e)
+				break;
+
+		if (dst >= end)
+			return 0;
+
+		const T* src = dst + 1;
+		for (;;) {
+			for (;;) { // skip e
+				if (src >= end) {
+					overrideLength(dst - this->m_p);
+					return end - dst;
+				}
+
+				if (*src != e)
+					break;
+
+				src++;
+			}
+
+			const T* src0 = src++;
+			while (src < end && *src != e) // accumulate non-e
+				src++;
+
+			size_t count = src - src0;
+			Details::copy(dst, src0, count);
+			dst += count;
+		}
+	}
+
+	size_t
 	pop(size_t count = 1) {
 		if (count >= this->m_count)
 			count = this->m_count;

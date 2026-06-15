@@ -1532,6 +1532,50 @@ public:
 	}
 
 	size_t
+	removeAll(C c) {
+		return removeAll(0, c);
+	}
+
+	size_t
+	removeAll(
+		size_t startFrom,
+		C c
+	) {
+		T* dst = this->m_p + startFrom;
+		T* end = this->m_p + this->m_length;
+		for (; dst < end; dst++)
+			if (*dst == c)
+				break;
+
+		if (dst >= end)
+			return 0;
+
+		const T* src = dst + 1;
+		for (;;) {
+			for (;;) { // skip c
+				if (src >= end) {
+					overrideLength(dst - this->m_p);
+					return end - dst;
+				}
+
+				if (*src != c)
+					break;
+
+				src++;
+			}
+
+			const T* src0 = src++;
+			while (src < end && *src != c) // accumulate non-c
+				src++;
+
+			size_t count = src - src0;
+			Details::copy(dst, src0, count);
+			dst += count;
+
+		}
+	}
+
+	size_t
 	trimLeft(const StringRef& charSet) {
 		size_t i = this->findNotOneOf(charSet);
 		if (i == -1) {
