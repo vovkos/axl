@@ -73,7 +73,13 @@ isUpperCase(utf32_t c);
 // CJK occupy two columns in a monospace grid
 
 bool
-isDoubleWidth(utf32_t c);
+isDoubleWidthImpl(utf32_t c);
+
+inline
+bool
+isDoubleWidth(utf32_t c) {
+	return c >= 0x1100 && isDoubleWidthImpl(c);
+}
 
 inline
 uint_t

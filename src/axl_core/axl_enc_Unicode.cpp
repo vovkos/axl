@@ -203,7 +203,7 @@ isUpperCase(utf32_t c) {
 }
 
 bool
-isDoubleWidth(utf32_t c) {
+isDoubleWidthImpl(utf32_t c) {
 	uint32_t ea = (getUnicodeProperties(c, 0) & UPROPS_EA_MASK) >> UPROPS_EA_SHIFT;
 	return ea == U_EA_WIDE || ea == U_EA_FULLWIDTH;
 }
