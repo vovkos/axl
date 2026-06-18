@@ -18,17 +18,26 @@ namespace {
 
 void
 test_Basic() {
-	sl::HandleTable<int> table(0xffffffff);
+	// pick a seed just below a byte boundary so add() crosses it by incrementing;
+	// the boundary must fit in uintptr_t, so it depends on the pointer width
+
+#if (AXL_PTR_BITS >= 64)
+	uintptr_t seed = 0xffffffff;
+#else
+	uintptr_t seed = 0xffff;
+#endif
+
+	sl::HandleTable<int> table(seed);
 
 	uintptr_t h1 = table.add(100);
 	uintptr_t h2 = table.add(200);
 	uintptr_t h3 = table.add(300);
 	uintptr_t h4 = table.add(400);
 
-	TEST_ASSERT(h1 == 0xffffffff);
-	TEST_ASSERT(h2 == 0x100000000);
-	TEST_ASSERT(h3 == 0x100000001);
-	TEST_ASSERT(h4 == 0x100000002);
+	TEST_ASSERT(h1 == seed);
+	TEST_ASSERT(h2 == seed + 1);
+	TEST_ASSERT(h3 == seed + 2);
+	TEST_ASSERT(h4 == seed + 3);
 	TEST_ASSERT(table.getCount() == 4);
 
 	TEST_ASSERT(table.find(h1)->m_value == 100);
