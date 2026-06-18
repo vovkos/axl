@@ -41,6 +41,7 @@ set(
 	test_RobinHashTable.cpp
 	test_SlruCache.cpp
 	test_StringTemplate.cpp
+	test_Unicode.cpp
 	test_Usb.cpp
 	test_Bstr.cpp
 )
