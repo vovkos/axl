@@ -6813,7 +6813,7 @@ spyModule(const spy::ModuleIterator& moduleIt) {
 		}
 
 		size_t slotVmAddr = it.getSlotVmAddr();
-		bool isUnique = hookSet.addIfNotExists(slotVmAddr, true);
+		bool isUnique = (bool)hookSet.addIfNotExists(slotVmAddr, true);
 		if (!isUnique) {
 #	if (_SPY_TEST_TRACE_HOOKING_FUNCTION)
 			printf("  already hooked [%08llx] %s\n", slotVmAddr, functionName.sz());
