@@ -429,6 +429,28 @@ typedef enum UCharDirection {
 	U_CHAR_DIRECTION_COUNT
 } UCharDirection;
 
+/**
+ * East Asian Width constants.
+ *
+ * @see UCHAR_EAST_ASIAN_WIDTH
+ * @see u_getIntPropertyValue
+ * @stable ICU 2.2
+ */
+typedef enum UEastAsianWidth {
+    /*
+     * Note: UEastAsianWidth constants are parsed by preparseucd.py.
+     * It matches lines like
+     *     U_EA_<Unicode East_Asian_Width value name>
+     */
+
+    U_EA_NEUTRAL,   /*[N]*/
+    U_EA_AMBIGUOUS, /*[A]*/
+    U_EA_HALFWIDTH, /*[H]*/
+    U_EA_FULLWIDTH, /*[F]*/
+    U_EA_NARROW,    /*[Na]*/
+    U_EA_WIDE,      /*[W]*/
+} UEastAsianWidth;
+
 /** Option value for case folding: use default mappings defined in CaseFolding.txt. @stable ICU 2.0 */
 #define U_FOLD_CASE_DEFAULT 0
 
@@ -535,6 +557,14 @@ enum {
 	U_FW_z  =0xff5a,
 	ZWNBSP  =0xfeff
 };
+
+//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+//
+// from uprops.h
+//
+
+#define UPROPS_EA_MASK          0x000e0000
+#define UPROPS_EA_SHIFT         17
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 //
@@ -787,10 +817,16 @@ enum {
 /**
  * Bit mask for getting just the options from a string compare options word
  * that are relevant for case folding (of a single string or code point).
- * See uchar.h.
+ *
+ * Currently only bit 0 for U_FOLD_CASE_EXCLUDE_SPECIAL_I.
+ * It is conceivable that at some point we might use one more bit for using uppercase sharp s.
+ * It is conceivable that at some point we might want the option to use only simple case foldings
+ * when operating on strings.
+ *
+ * See stringoptions.h.
  * @internal
  */
-#define _FOLD_CASE_OPTIONS_MASK 0xff
+#define _FOLD_CASE_OPTIONS_MASK 7
 
 /* indexes into indexes[] */
 enum {

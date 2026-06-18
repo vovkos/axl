@@ -31,14 +31,6 @@ namespace enc {
 /* getting a uint32_t properties word from the data */
 #define GET_PROPS(c, result) ((result)=UTRIE2_GET16(&propsTrie, c));
 
-/* UEastAsianWidth is stored in properties-vector word 0 (uprops.h) */
-#define UPROPS_EA_MASK  0x000e0000
-#define UPROPS_EA_SHIFT 17
-
-/* UEastAsianWidth values we care about (uchar.h) */
-#define U_EA_FULLWIDTH 3
-#define U_EA_WIDE      5
-
 /* equivalent of ICU's u_getUnicodeProperties(c, column) */
 inline
 uint32_t
