@@ -223,7 +223,9 @@ inline
 size_t
 hashInt32(uint32_t x) {
 	x ^= x >> 16;
-	x *= 0x45d9f3b;
+	x *= 0x7feb352d;
+	x ^= x >> 15;
+	x *= 0x846ca68b;
 	x ^= x >> 16;
 	return (size_t)x;
 }
@@ -234,7 +236,18 @@ hashInt64(uint64_t x) {
 	x ^= x >> 33;
 	x *= 0xff51afd7ed558ccdULL;
 	x ^= x >> 33;
+	x *= 0xc4ceb9fe1a85ec53ULL;
+	x ^= x >> 33;
 	return (size_t)x;
+}
+
+inline
+size_t
+hashInt128(
+	uint64_t lo,
+	uint64_t hi
+) {
+	return hashInt64(hashInt64(lo) * 0x9e3779b97f4a7c15ULL + hi);
 }
 
 // HashInt -- identity for small types, bit-mixing for 16/32/64-bit types
