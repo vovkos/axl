@@ -305,14 +305,12 @@ public:
 	}
 };
 
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
 template <typename T>
-class HashPtr {
+class HashInt<T*> {
 public:
 	size_t
-	operator () (const T* p) const {
-		return HashInt<size_t>()((size_t)p);
+	operator () (T* key) const {
+		return HashIntImpl<sizeof(T*)>()((size_t)key);
 	}
 };
 
