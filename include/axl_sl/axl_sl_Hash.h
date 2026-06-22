@@ -250,46 +250,34 @@ hashInt128(
 	return hashInt64(hashInt64(lo) * 0x9e3779b97f4a7c15ULL + hi);
 }
 
-// HashInt -- identity for small types, bit-mixing for 16/32/64-bit types
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-template <typename T>
-class HashInt {
+// HashIntImpl<size_t> is to make sure every integer type of a given size
+// is covered regardless of specific typedefs on a given platform
+
+template <size_t size>
+class HashIntImpl;
+
+template <>
+class HashIntImpl<1> {
 public:
 	size_t
-	operator () (T key) const {
-		return (size_t)key;
+	operator () (uint8_t key) const {
+		return key; // identity for 8-bit
 	}
 };
 
 template <>
-class HashInt<int16_t> {
-public:
-	size_t
-	operator () (int16_t key) const {
-		return hashInt32((uint32_t)(uint16_t)key);
-	}
-};
-
-template <>
-class HashInt<uint16_t> {
+class HashIntImpl<2> {
 public:
 	size_t
 	operator () (uint16_t key) const {
-		return hashInt32((uint32_t)key);
+		return hashInt32(key);
 	}
 };
 
 template <>
-class HashInt<int32_t> {
-public:
-	size_t
-	operator () (int32_t key) const {
-		return hashInt32((uint32_t)key);
-	}
-};
-
-template <>
-class HashInt<uint32_t> {
+class HashIntImpl<4> {
 public:
 	size_t
 	operator () (uint32_t key) const {
@@ -298,16 +286,7 @@ public:
 };
 
 template <>
-class HashInt<int64_t> {
-public:
-	size_t
-	operator () (int64_t key) const {
-		return hashInt64((uint64_t)key);
-	}
-};
-
-template <>
-class HashInt<uint64_t> {
+class HashIntImpl<8> {
 public:
 	size_t
 	operator () (uint64_t key) const {
@@ -317,18 +296,23 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-template <
-	typename T,
-	typename H
->
+template <typename T>
+class HashInt {
+public:
+	size_t
+	operator () (T key) const {
+		return HashIntImpl<sizeof(T)>()(key);
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <typename T>
 class HashPtr {
 public:
 	size_t
-	operator () (
-		const T* a,
-		const T* b
-	) const {
-		return H() (*a, *b);
+	operator () (const T* p) const {
+		return HashInt<size_t>()((size_t)p);
 	}
 };
 

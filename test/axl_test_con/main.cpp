@@ -2896,7 +2896,7 @@ protected:
 	io::psx::Mapping m_guardPage;
 
 	sl::Array<uint64_t> m_threadArray;
-	sl::HashTable<uint64_t, bool, sl::HashId<uint64_t> > m_threadMap;
+	sl::HashTable<uint64_t, bool, sl::HashInt<uint64_t> > m_threadMap;
 
 	volatile HandshakeKind m_handshakeKind;
 	volatile int32_t m_handshakeCounter;
@@ -3032,7 +3032,7 @@ protected:
 protected:
 	sys::win::VirtualMemory m_guardPage;
 
-	sl::HashTable<uint64_t, bool, sl::HashId<uint64_t> > m_threadMap;
+	sl::HashTable<uint64_t, bool, sl::HashInt<uint64_t> > m_threadMap;
 
 	volatile HandshakeKind m_handshakeKind;
 	volatile int32_t m_handshakeCounter;
