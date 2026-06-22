@@ -65,10 +65,10 @@ djb2(
 	size_t hash,
 	utf32_t c
 ) {
-	hash = ((hash << 5) + hash) + c & 0xff;
-	hash = ((hash << 5) + hash) + (c >> 8) & 0xff;
-	hash = ((hash << 5) + hash) + (c >> 16) & 0xff;
-	hash = ((hash << 5) + hash) + (c >> 24) & 0xff;
+	hash = ((hash << 5) + hash) + (c & 0xff);
+	hash = ((hash << 5) + hash) + ((c >> 8) & 0xff);
+	hash = ((hash << 5) + hash) + ((c >> 16) & 0xff);
+	hash = ((hash << 5) + hash) + ((c >> 24) & 0xff);
 	return hash;
 }
 
@@ -104,8 +104,8 @@ djb2_op(
 	const utf16_t* end = p + length;
 	for (; p < end; p++) {
 		utf16_t c = op(*p);
-		hash = ((hash << 5) + hash) + c & 0xff;
-		hash = ((hash << 5) + hash) + (c >> 8) & 0xff;
+		hash = ((hash << 5) + hash) + (c & 0xff);
+		hash = ((hash << 5) + hash) + ((c >> 8) & 0xff);
 	}
 
 	return hash;
@@ -122,10 +122,10 @@ djb2_op(
 	const utf32_t* end = p + length;
 	for (; p < end; p++) {
 		utf32_t c = op(*p);
-		hash = ((hash << 5) + hash) + c & 0xff;
-		hash = ((hash << 5) + hash) + (c >> 8) & 0xff;
-		hash = ((hash << 5) + hash) + (c >> 16) & 0xff;
-		hash = ((hash << 5) + hash) + (c >> 24) & 0xff;
+		hash = ((hash << 5) + hash) + (c & 0xff);
+		hash = ((hash << 5) + hash) + ((c >> 8) & 0xff);
+		hash = ((hash << 5) + hash) + ((c >> 16) & 0xff);
+		hash = ((hash << 5) + hash) + ((c >> 24) & 0xff);
 	}
 
 	return hash;
