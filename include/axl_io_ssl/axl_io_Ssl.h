@@ -64,6 +64,18 @@ public:
 	}
 
 	long
+	getMode() {
+		ASSERT(m_h);
+		return ::SSL_get_mode(m_h);
+	}
+
+	long
+	setMode(long mode) {
+		ASSERT(m_h);
+		return ::SSL_set_mode(m_h, mode);
+	}
+
+	long
 	getOptions() {
 		ASSERT(m_h);
 		return ::SSL_get_options(m_h);

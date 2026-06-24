@@ -61,6 +61,18 @@ public:
 	create(const SSL_METHOD* method = SSLv23_method());
 
 	long
+	getMode() {
+		ASSERT(m_h);
+		return ::SSL_CTX_get_mode(m_h);
+	}
+
+	long
+	setMode(long mode) {
+		ASSERT(m_h);
+		return ::SSL_CTX_set_mode(m_h, mode);
+	}
+
+	long
 	getOptions() {
 		ASSERT(m_h);
 		return ::SSL_CTX_get_options(m_h);
