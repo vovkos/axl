@@ -20,6 +20,7 @@
 #include "axl_sl_CmdLineParser.h"
 #include "axl_sl_BoyerMooreFind.h"
 #include "axl_sl_HashTable.h"
+#include "axl_sl_FenwickTree.h"
 
 #include "axl_io_Socket.h"
 #include "axl_io_Serial.h"

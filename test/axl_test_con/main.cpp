@@ -10151,6 +10151,83 @@ testSystemCertStore() {
 
 //..............................................................................
 
+void
+testFenwickTree() {
+	printf("playing with sl::FenwickTree...\n");
+
+	// a page index: element i = line count of page i (zeros = folded pages)
+
+	enum {
+		PageCount = 16 + 1,
+	};
+
+	sl::FenwickTree<uint64_t> tree;
+	sl::Array<uint64_t> model; // naive reference
+
+	printf("pages: ");
+	for (size_t i = 0; i < PageCount; i++) {
+		uint64_t lineCount = rand() % 8; // zeros are frequent
+		tree.append(lineCount);
+		model.append(lineCount);
+		printf("%llu ", lineCount);
+	}
+	printf("\n");
+
+#if (0)
+	// random point increments
+	for (size_t i = 0; i < PageCount; i++) {
+		size_t index = rand() % PageCount;
+		uint64_t delta = rand() % 4;
+		tree.inc(index, delta);
+		model.rwi()[index] += delta;
+	}
+#endif
+
+	// calcSum at every index (inclusive)
+
+	uint64_t sum = 0;
+	printf("sums:  ");
+	for (size_t i = 0; i < PageCount; i++) {
+		sum += model[i];
+		uint64_t treeSum = tree.calcSum(i);
+		printf("%llu ", treeSum);
+		ASSERT(treeSum == sum);
+	}
+	printf("\n");
+
+	uint64_t total = sum;
+
+	// findBySum at every target: the smallest page index whose inclusive
+	// cumulative line count is >= target (-1 if target > total); remainder =
+	// target minus the cumulative line count before that page -- so for a
+	// 1-based target line number, the result is the page holding that line
+	// and remainder is the 1-based line number within it
+
+	size_t modelIndex = 0;  // smallest index with cumulative sum >= target
+	uint64_t modelSum = 0;  // cumulative line count before modelIndex
+	for (uint64_t target = 0; target <= total + 2; target++) {
+		while (modelIndex < PageCount && modelSum + model[modelIndex] < target) {
+			modelSum += model[modelIndex];
+			modelIndex++;
+		}
+
+		uint64_t remainder = -1;
+		size_t index = tree.findBySum(target, &remainder);
+		if (modelIndex < PageCount) {
+			printf("findBySum(%llu) -> page %zd + %llu\n", target, index, remainder);
+			ASSERT(index == modelIndex);
+			ASSERT(remainder == target - modelSum);
+		} else {
+			printf("findBySum(%llu) -> %zd (past the total)\n", target, index);
+			ASSERT(index == -1);
+		}
+	}
+
+	printf("sl::FenwickTree: OK\n");
+}
+
+//..............................................................................
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -10168,6 +10245,7 @@ main(
 #if (_AXL_OS_POSIX)
 	setvbuf(stdout, NULL, _IOLBF, 1024);
 #endif
+
 	srand((uint_t)sys::getTimestamp());
 
 #if (_AXL_OS_WIN)
@@ -10177,9 +10255,7 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-#if (_AXL_IO_SHMT)
-	benchShmtTransport();
-#endif
+	testFenwickTree();
 	return 0;
 }
 
