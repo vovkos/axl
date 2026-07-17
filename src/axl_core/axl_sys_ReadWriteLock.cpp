@@ -218,6 +218,49 @@ ReadWriteLock::writeUnlock() {
 	sys::atomicUnlock(&m_data->m_lock);
 }
 
+void
+ReadWriteLock::upgradeReadLockToWriteLock() {
+	sys::atomicLock(&m_data->m_lock);
+	if (m_data->m_activeReadCount == 1 && // we are the only reader and
+		!m_data->m_queuedWriteCount       // no other threads waiting to write
+	) {
+		// OK to take a shortcut
+		m_readEvent.reset();
+		m_data->m_activeReadCount = 0;
+		m_data->m_activeWriteCount = 1;
+#if (_AXL_SYS_READWRITELOCK_DEBUG_THREADS)
+		onRemoveReadThread();
+		onAddWriteThread();
+#endif
+		sys::atomicUnlock(&m_data->m_lock);
+		return;
+	}
+
+	// otherwise, go all the way
+	sys::atomicUnlock(&m_data->m_lock);
+	readUnlock();
+	writeLock();
+}
+
+void
+ReadWriteLock::downgradeWriteLockToReadLock() {
+	sys::atomicLock(&m_data->m_lock);
+	ASSERT(!m_data->m_activeReadCount && m_data->m_activeWriteCount == 1);
+	m_data->m_activeWriteCount = 0;
+	m_data->m_activeReadCount = 1;
+
+	if (m_data->m_queuedReadCount) { // wake other readers, too
+		bool result = m_readEvent.signal();
+		ASSERT(result);
+	}
+
+#if (_AXL_SYS_READWRITELOCK_DEBUG_THREADS)
+	onRemoveWriteThread();
+	onAddReadThread();
+#endif
+	sys::atomicUnlock(&m_data->m_lock);
+}
+
 #if (_AXL_SYS_READWRITELOCK_DEBUG_THREADS)
 
 void

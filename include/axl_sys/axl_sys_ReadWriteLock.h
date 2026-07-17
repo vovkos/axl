@@ -94,6 +94,16 @@ public:
 	void
 	writeUnlock();
 
+	// NOTE: the upgrade is NOT atomic. only the single-reader + no-queued-writers
+	// case can be promoted in place. in every other case we release read lock and
+	// re-lock as a writer
+
+	void
+	upgradeReadLockToWriteLock();
+
+	void
+	downgradeWriteLockToReadLock();
+
 protected:
 #if (_AXL_SYS_READWRITELOCK_DEBUG_THREADS)
 	void
