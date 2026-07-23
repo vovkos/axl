@@ -97,9 +97,9 @@ class MappedFile {
 	friend class MappedViewMgr;
 
 public:
-	enum DefaultsKind {
-		DefaultsKind_MaxDynamicViewCount = 32,
-		DefaultsKind_ReadAheadSize       = 64 * 1024, // 64K
+	enum Def {
+		Def_MaxDynamicViewCount = 32,
+		Def_ReadAheadSize       = 64 * 1024, // 64K
 	};
 
 protected:
@@ -113,8 +113,8 @@ protected:
 	MappedViewMgr m_dynamicViewMgr;
 	MappedViewMgr m_permanentViewMgr;
 
-	size_t m_readAheadSize;
 	size_t m_maxDynamicViewCount;
+	size_t m_readAheadSize;
 	uint_t m_fileFlags;
 
 public:
@@ -127,6 +127,16 @@ public:
 	bool
 	isOpen() const {
 		return m_file.isOpen();
+	}
+
+	size_t
+	getMaxDynamicViewCount() const {
+		return m_maxDynamicViewCount;
+	}
+
+	size_t
+	getReadAheadSize() const {
+		return m_readAheadSize;
 	}
 
 	uint_t

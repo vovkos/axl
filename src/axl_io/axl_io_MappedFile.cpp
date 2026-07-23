@@ -154,8 +154,8 @@ MappedViewMgr::limitViewCount(size_t maxViewCount) {
 MappedFile::MappedFile():
 	m_dynamicViewMgr(offsetof(MappedFile, m_dynamicViewMgr)),
 	m_permanentViewMgr(offsetof(MappedFile, m_permanentViewMgr)) {
-	m_readAheadSize = DefaultsKind_ReadAheadSize;
-	m_maxDynamicViewCount = DefaultsKind_MaxDynamicViewCount;
+	m_readAheadSize = Def_ReadAheadSize;
+	m_maxDynamicViewCount = Def_MaxDynamicViewCount;
 	m_fileFlags = 0;
 
 #if (_AXL_OS_WIN)
