@@ -20,6 +20,7 @@ set(
 	${AXL_INC_DIR}/axl_io/axl_io_FileEnumerator.h
 	${AXL_INC_DIR}/axl_io/axl_io_Mapping.h
 	${AXL_INC_DIR}/axl_io/axl_io_MappedFile.h
+	${AXL_INC_DIR}/axl_io/axl_io_FileHeap.h
 	${AXL_INC_DIR}/axl_io/axl_io_Serial.h
 	${AXL_INC_DIR}/axl_io/axl_io_SerialSettings.h
 	${AXL_INC_DIR}/axl_io/axl_io_SerialPortEnumerator.h
@@ -36,6 +37,7 @@ set(
 	axl_io_FileEnumerator.cpp
 	axl_io_Mapping.cpp
 	axl_io_MappedFile.cpp
+	axl_io_FileHeap.cpp
 	axl_io_Serial.cpp
 	axl_io_SerialSettings.cpp
 	axl_io_SockAddrParser.cpp

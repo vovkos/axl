@@ -28,6 +28,7 @@ set(
 	test_Crypto.cpp
 	test_Error.cpp
 	test_FenwickTree.cpp
+	test_FileHeap.cpp
 	test_Finalizer.cpp
 	test_HandleTable.cpp
 	test_HashTable.cpp
