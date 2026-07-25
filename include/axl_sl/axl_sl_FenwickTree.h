@@ -93,58 +93,69 @@ public:
 	// calculates sum(0 .. i)
 
 	Value
-	calcSum(size_t index) const {
-		return calcSum<Value>(index);
+	calcStat() const {
+		return calcStat<Value>();
 	}
 
-	template <typename Sum>
-	Sum
-	calcSum(size_t i) const {
-		Sum sum = m_array[i];
+	Value
+	calcStat(size_t index) const {
+		return calcStat<Value>(index);
+	}
+
+	template <typename Partial>
+	Partial
+	calcStat() const {
+		return isEmpty() ? Partial(Value()) : calcStat<Partial>(m_array.getCount() - 1);
+	}
+
+	template <typename Partial>
+	Partial
+	calcStat(size_t i) const {
+		Partial stat = m_array[i];
 		size_t j = i + 1; // 1-based index
 		for (j &= j - 1; j; j &= j - 1)
-			sum += m_array[j - 1];
+			stat += m_array[j - 1];
 
-		return sum;
+		return stat;
 	}
 
-	// finds smallest i so that targetSum <= sum(0 .. i); returns -1 if not found
+	// finds smallest i so that targetStat <= sum(0 .. i); returns -1 if not found
 	// sum must be monotonic non-decreasing for this to work
 
 	size_t
-	findBySum(
-		ValueArg targetSum,
+	findByStat(
+		ValueArg targetStat,
 		Value* remainder = NULL
 	) const {
-		return findBySum<Value, ValueArg>(targetSum, remainder);
+		return findByStat<Value, ValueArg>(targetStat, remainder);
 	}
 
 	// this overload can operate on a specific field of a multi-field value
 
 	template <
-		typename Sum,
-		typename SumArg = ArgType<Sum>
+		typename Partial,
+		typename PartialArg = ArgType<Partial>
 	>
 	size_t
-	findBySum(
-		SumArg targetSum,
-		Sum* remainder = NULL
+	findByStat(
+		PartialArg targetStat,
+		Partial* remainder = NULL
 	) const {
 		if (m_array.isEmpty())
 			return -1;
 
 		size_t count = m_array.getCount();
 		size_t base = 0; // 0-based start of search range
-		Sum sum = targetSum;
+		Partial stat = targetStat;
 
 		for (size_t bit = getHiBit(count); bit; bit >>= 1) {
 			size_t i = base + bit - 1;
 			if (i >= count)
 				continue;
 
-			Sum left = m_array[i];
-			if (left < sum) { // target beyond i, go right
-				sum -= left;
+			Partial left = m_array[i];
+			if (left < stat) { // target beyond i, go right
+				stat -= left;
 				base += bit;
 			}
 		}
@@ -153,7 +164,7 @@ public:
 			return -1;
 
 		if (remainder)
-			*remainder = sum;
+			*remainder = stat;
 
 		return base;
 	}

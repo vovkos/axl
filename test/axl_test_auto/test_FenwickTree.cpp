@@ -45,7 +45,7 @@ struct Counters {
 };
 
 // per-counter sum types: constructible from the aggregated Counters (extracts
-// one counter), += Counters for calcSum, </<= and -= for findLe
+// one counter), += Counters for calcStat, </<= and -= for findLe
 
 struct LineCount {
 	uint64_t m_value;
@@ -119,9 +119,9 @@ lcg(uint32_t* seed) {
 	return *seed >> 16;
 }
 
-// verifies calcSum at every index (inclusive semantics) and findBySum at
+// verifies calcStat at every index (inclusive semantics) and findByStat at
 // every target from 0 through past the total, against the reference element
-// array; findBySum(target) = smallest index whose inclusive cumulative sum is
+// array; findByStat(target) = smallest index whose inclusive cumulative sum is
 // >= target (ties from zero-count elements resolve to the first index), -1 if
 // target exceeds the total; on success, *remainder = target minus the
 // cumulative sum before the found element
@@ -139,8 +139,8 @@ verifyTree(
 	for (size_t i = 0; i < count; i++) {
 		lineCount += reference[i].m_lineCount;
 		zoneCount += reference[i].m_zoneCount;
-		TEST_ASSERT(tree.calcSum<LineCount>(i).m_value == lineCount);
-		TEST_ASSERT(tree.calcSum<ZoneCount>(i).m_value == zoneCount);
+		TEST_ASSERT(tree.calcStat<LineCount>(i).m_value == lineCount);
+		TEST_ASSERT(tree.calcStat<ZoneCount>(i).m_value == zoneCount);
 	}
 
 	size_t modelIndex = 0;  // smallest index with cumulative line count >= target
@@ -155,7 +155,7 @@ verifyTree(
 		}
 
 		LineCount remainder(-1);
-		size_t findIndex = tree.findBySum<LineCount>(LineCount(target), &remainder);
+		size_t findIndex = tree.findByStat<LineCount>(LineCount(target), &remainder);
 		if (modelIndex < count) {
 			TEST_ASSERT(findIndex == modelIndex);
 			TEST_ASSERT(remainder.m_value == target - modelSum);
@@ -171,11 +171,11 @@ test_Empty() {
 	TEST_ASSERT(tree.getCount() == 0);
 	TEST_ASSERT(tree.isEmpty());
 
-	size_t index = tree.findBySum<LineCount>(LineCount(7));
+	size_t index = tree.findByStat<LineCount>(LineCount(7));
 	TEST_ASSERT(index == -1);
 }
 
-// scalar value type exercising the non-template calcSum/findBySum wrappers
+// scalar value type exercising the non-template calcStat/findByStat wrappers
 
 void
 test_Scalar() {
@@ -203,7 +203,7 @@ test_Scalar() {
 	uint64_t total = 0;
 	for (size_t i = 0; i < ElementCount; i++) {
 		total += reference[i];
-		TEST_ASSERT(tree.calcSum(i) == total);
+		TEST_ASSERT(tree.calcStat(i) == total);
 	}
 
 	size_t modelIndex = 0;  // smallest index with cumulative sum >= target
@@ -218,7 +218,7 @@ test_Scalar() {
 		}
 
 		uint64_t remainder = -1;
-		size_t findIndex = tree.findBySum(target, &remainder);
+		size_t findIndex = tree.findByStat(target, &remainder);
 		if (modelIndex < ElementCount) {
 			TEST_ASSERT(findIndex == modelIndex);
 			TEST_ASSERT(remainder == target - modelSum);
