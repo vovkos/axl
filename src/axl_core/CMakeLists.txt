@@ -145,6 +145,7 @@ set(
 	${AXL_INC_DIR}/axl_sl/axl_sl_CharLiteral.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_CmdLineParser.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_FenwickTree.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_StatBTree.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_Guid.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_Handle.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_HandleTable.h
