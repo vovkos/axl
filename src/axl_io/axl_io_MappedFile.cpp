@@ -290,10 +290,15 @@ MappedFile::viewImpl(
 	if (p)
 		return p;
 
-	if (!isPermanent) {
+	uint64_t viewEnd;
+	if (isPermanent)
+		viewEnd = end;
+	else {
 		p = m_dynamicViewMgr.find(offset, end, actualEnd);
 		if (p)
 			return p;
+
+		viewEnd = end + m_readAheadSize;
 	}
 
 	// ...nope. ok, new view needed.
@@ -304,7 +309,7 @@ MappedFile::viewImpl(
 	ASSERT(sl::isPowerOf2(systemInfo->m_mappingAlignFactor));
 
 	uint64_t viewBegin = offset & ~((uint64_t)systemInfo->m_mappingAlignFactor - 1);
-	uint64_t viewEnd = sl::align(end + m_readAheadSize, systemInfo->m_pageSize);
+	viewEnd = sl::align(viewEnd, systemInfo->m_pageSize);
 
 	// make sure we don't overextend beyond the end of read-only file
 
