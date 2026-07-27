@@ -48,7 +48,7 @@ struct FileHeapHdr {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// 4GB max alloc size -- more than enough
+// 4GB max block size -- more than enough
 
 struct FileHeapBlock {
 	uint32_t m_signature;
@@ -93,10 +93,11 @@ AXL_SELECT_ANY FileHeapPtr g_nullFileHeapPtr = { NULL, (uint64_t)-1, 0 };
 class FileHeap {
 public:
 	enum: size_t {
-		Alignment    = 8,
-		MinBlockSize = sizeof(FileHeapBlock) + Alignment,
-		MaxBlockSize = 0xffffffff - Alignment + 1,
-		DefGrowSize  = 16 * 1024, // grow by 16K at a time
+		Alignment           = 8,
+		MinBlockSize        = sizeof(FileHeapBlock) + Alignment,
+		MaxBlockSize        = 0xffffffff - Alignment + 1,
+		MinDynamicViewCount = 3, // allocate()/free() need 3 views live at once (LRU evicts the tail)
+		DefGrowSize         = 16 * 1024, // grow by 16K at a time
 	};
 
 	struct BlockKey {
@@ -185,10 +186,16 @@ public:
 	);
 
 	FileHeapPtr
-	allocate(size_t size);
+	allocate(
+		size_t size,
+		bool isPermanent = false
+	);
 
 	FileHeapPtr
-	materialize(uint64_t offset);
+	materialize(
+		uint64_t offset,
+		bool isPermanent = false
+	);
 
 	bool
 	free(uint64_t offset);
@@ -204,7 +211,15 @@ protected:
 	viewBlock(
 		uint64_t offset,
 		size_t size = sizeof(FileHeapBlock),
-		size_t* viewSize = NULL
+		size_t* viewSize = NULL,
+		bool isPermanent = false
+	);
+
+	void
+	updateNextBlock(
+		FileHeapBlock* block,
+		size_t size,
+		bool isAllocated
 	);
 
 	bool
@@ -261,7 +276,12 @@ FileHeap::setup(
 	size_t readAheadSize,
 	size_t growSize
 ) {
-	ASSERT(growSize > sizeof(FileHeapBlock) && sl::isPowerOf2(growSize));
+	ASSERT(
+		maxDynamicViewCount >= MinDynamicViewCount &&
+		growSize > sizeof(FileHeapBlock) &&
+		sl::isPowerOf2(growSize)
+	);
+
 	m_file.setup(maxDynamicViewCount, readAheadSize);
 	m_growSize = growSize;
 }
@@ -271,9 +291,10 @@ FileHeapBlock*
 FileHeap::viewBlock(
 	uint64_t offset,
 	size_t size,
-	size_t* viewSize
+	size_t* viewSize,
+	bool isPermanent
 ) {
-	FileHeapBlock* block = (FileHeapBlock*)m_file.view(offset, size, viewSize);
+	FileHeapBlock* block = (FileHeapBlock*)m_file.view(offset, size, viewSize, isPermanent);
 	if (!block)
 		return NULL;
 
@@ -288,23 +309,30 @@ FileHeap::viewBlock(
 }
 
 inline
+void
+FileHeap::updateNextBlock(
+	FileHeapBlock* block,
+	size_t size,
+	bool isAllocated
+) {
+	block->m_prevSize = (uint32_t)size;
+	if (isAllocated)
+		block->m_flags |= FileHeapBlockFlag_PrevAllocated;
+	else
+		block->m_flags &= ~FileHeapBlockFlag_PrevAllocated;
+}
+
+inline
 bool
 FileHeap::updateNextBlock(
 	uint64_t offset,
 	size_t size,
 	bool isAllocated
 ) {
-	FileHeapBlock* nextBlock = viewBlock(offset + size);
-	if (!nextBlock)
-		return false;
-
-	nextBlock->m_prevSize = (uint32_t)size;
-	if (isAllocated)
-		nextBlock->m_flags |= FileHeapBlockFlag_PrevAllocated;
-	else
-		nextBlock->m_flags &= ~FileHeapBlockFlag_PrevAllocated;
-
-	return true;
+	FileHeapBlock* block = viewBlock(offset + size);
+	return block ?
+		updateNextBlock(block, size, isAllocated), true :
+		false;
 }
 
 //..............................................................................

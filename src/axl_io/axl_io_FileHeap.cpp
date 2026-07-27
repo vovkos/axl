@@ -147,7 +147,10 @@ FileHeap::load(uint64_t fileSize) {
 }
 
 FileHeapPtr
-FileHeap::allocate(size_t size) {
+FileHeap::allocate(
+	size_t size,
+	bool isPermanent
+) {
 	if (!isOpen() || (m_file.getFlags() & FileFlag_ReadOnly)) {
 		err::setError(err::SystemErrorCode_InvalidDeviceState);
 		return g_nullFileHeapPtr;
@@ -177,16 +180,14 @@ FileHeap::allocate(size_t size) {
 	ASSERT(blockKey.m_offset + blockKey.m_size <= getEndOffset());
 
 	bool isLastBlock = blockKey.m_offset + blockKey.m_size >= getEndOffset();
-	FileHeapBlock* block = viewBlock(blockKey.m_offset, requiredSize);
+
+	size_t viewSize;
+	FileHeapBlock* block = viewBlock(blockKey.m_offset, requiredSize, &viewSize, isPermanent);
 	if (!block)
 		return g_nullFileHeapPtr;
 
 	if (block->m_flags & FileHeapBlockFlag_Allocated) // marked free in map but actually allocated
 		return err::fail(g_nullFileHeapPtr, "corrupted file heap");
-
-	m_freeBlockMap.erase(it);
-
-	block->m_flags |= FileHeapBlockFlag_Allocated;
 
 	size_t leftoverSize = blockKey.m_size - requiredSize;
 	if (leftoverSize < MinBlockSize) { // leftover too small to be useful
@@ -195,15 +196,18 @@ FileHeap::allocate(size_t size) {
 			if (!result)
 				return g_nullFileHeapPtr;
 		}
-	} else { // split off the leftover as a new free block
-		block->m_size = (uint32_t)requiredSize;
 
+		m_freeBlockMap.erase(it);
+	} else { // split off the leftover as a new free block
 		uint64_t leftoverOffset = blockKey.m_offset + requiredSize;
-		FileHeapBlock* leftoverBlock = (FileHeapBlock*)((char*)block + block->m_size);
-		leftoverBlock->m_signature = FileHeapConst_BlockSignature;
-		leftoverBlock->m_size = (uint32_t)leftoverSize;
-		leftoverBlock->m_prevSize = (uint32_t)requiredSize;
-		leftoverBlock->m_flags = FileHeapBlockFlag_PrevAllocated;
+		FileHeapBlock* leftoverBlock;
+		if (viewSize >= requiredSize + sizeof(FileHeapBlock))
+			leftoverBlock = (FileHeapBlock*)((char*)block + requiredSize);
+		else {
+			leftoverBlock = (FileHeapBlock*)m_file.view(leftoverOffset, sizeof(FileHeapBlock));
+			if (!leftoverBlock)
+				return g_nullFileHeapPtr;
+		}
 
 		if (isLastBlock)
 			m_hdr->m_lastBlockOffset = leftoverOffset;
@@ -213,9 +217,19 @@ FileHeap::allocate(size_t size) {
 				return g_nullFileHeapPtr;
 		}
 
+		block->m_size = (uint32_t)requiredSize;
+
+		leftoverBlock->m_signature = FileHeapConst_BlockSignature;
+		leftoverBlock->m_size = (uint32_t)leftoverSize;
+		leftoverBlock->m_prevSize = (uint32_t)requiredSize;
+		leftoverBlock->m_flags = FileHeapBlockFlag_PrevAllocated;
+
+		m_freeBlockMap.erase(it);
 		addFreeBlock(leftoverOffset, leftoverSize);
 		m_hdr->m_blockCount++;
 	}
+
+	block->m_flags |= FileHeapBlockFlag_Allocated;
 
 	return FileHeapPtr(
 		block + 1,
@@ -225,7 +239,10 @@ FileHeap::allocate(size_t size) {
 }
 
 FileHeapPtr
-FileHeap::materialize(uint64_t offset0) {
+FileHeap::materialize(
+	uint64_t offset0,
+	bool isPermanent
+) {
 	if (offset0 < sizeof(FileHeapHdr) + sizeof(FileHeapBlock))
 		return g_nullFileHeapPtr;
 
@@ -235,8 +252,8 @@ FileHeap::materialize(uint64_t offset0) {
 	if (!block)
 		return g_nullFileHeapPtr;
 
-	if (block->m_size > viewSize) {
-		block = (FileHeapBlock*)m_file.view(offset, block->m_size);
+	if (isPermanent || block->m_size > viewSize) {
+		block = (FileHeapBlock*)m_file.view(offset, block->m_size, isPermanent);
 		if (!block)
 			return g_nullFileHeapPtr;
 	}
@@ -263,6 +280,12 @@ FileHeap::free(uint64_t offset0) {
 	if (!(block->m_flags & FileHeapBlockFlag_Allocated))
 		return err::fail("attempt to free a non-allocated file heap block");
 
+	FileHeapBlock* updateNextBlockTarget = NULL;
+	uint64_t mergeOffsets[2];
+	size_t mergeSizes[2] = { 0 };
+	size_t mergeSize = 0;
+	size_t mergeCount = 0;
+
 	// attempt to merge with the next block
 
 	uint64_t nextOffset = offset + block->m_size;
@@ -278,10 +301,19 @@ FileHeap::free(uint64_t offset0) {
 		if (!(nextBlock->m_flags & FileHeapBlockFlag_Allocated) &&
 			block->m_size <= MaxBlockSize - nextBlock->m_size
 		) {
-			removeFreeBlock(nextOffset, nextBlock->m_size);
-			m_hdr->m_blockCount--;
-			block->m_size += nextBlock->m_size;
-		}
+			uint64_t nextNextOffset = nextOffset + nextBlock->m_size;
+			if (nextNextOffset < endOffset) {
+				updateNextBlockTarget = viewBlock(nextNextOffset);
+				if (!updateNextBlockTarget)
+					return false;
+			}
+
+			mergeOffsets[0] = nextOffset;
+			mergeSizes[0] = nextBlock->m_size;
+			mergeSize = nextBlock->m_size;
+			mergeCount = 1;
+		} else
+			updateNextBlockTarget = nextBlock;
 	}
 
 	// attempt to merge with the prev block
@@ -289,30 +321,41 @@ FileHeap::free(uint64_t offset0) {
 	if (!(block->m_flags & FileHeapBlockFlag_PrevAllocated) &&
 		block->m_size <= MaxBlockSize - block->m_prevSize
 	) {
-		uint64_t prevOffset = offset - block->m_prevSize;
+		size_t blockSize = block->m_size; // viewBlock() below may evict this block
+		size_t prevSize = block->m_prevSize;
+		uint64_t prevOffset = offset - prevSize;
 		FileHeapBlock* prevBlock = viewBlock(prevOffset);
 		if (!prevBlock)
 			return false;
 
-		if (prevBlock->m_size != block->m_prevSize ||
+		if (prevBlock->m_size != prevSize ||
 			(prevBlock->m_flags & FileHeapBlockFlag_Allocated)
 		)
 			return err::fail("corrupted file heap chain");
 
-		removeFreeBlock(prevOffset, prevBlock->m_size);
-		m_hdr->m_blockCount--;
-		prevBlock->m_size += block->m_size;
+		mergeOffsets[mergeCount] = prevOffset;
+		mergeSizes[mergeCount] = prevSize;
+		mergeSize += blockSize;
+		mergeCount++;
 		offset = prevOffset;
 		block = prevBlock;
 	}
 
 	block->m_flags &= ~FileHeapBlockFlag_Allocated;
+	block->m_size += mergeSize;
+
+	m_hdr->m_blockCount -= mergeCount;
+
+	for (size_t i = 0; i < mergeCount; i++)
+		removeFreeBlock(mergeOffsets[i], mergeSizes[i]);
+
 	addFreeBlock(offset, block->m_size);
 
-	if (offset + block->m_size < endOffset)
-		return updateNextBlock(offset, block->m_size, false);
+	if (updateNextBlockTarget)
+		updateNextBlock(updateNextBlockTarget, block->m_size, false);
+	else
+		m_hdr->m_lastBlockOffset = offset;
 
-	m_hdr->m_lastBlockOffset = offset;
 	return true;
 }
 

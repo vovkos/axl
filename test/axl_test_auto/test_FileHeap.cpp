@@ -13,6 +13,7 @@
 #include "test.h"
 #include "axl_io_FileHeap.h"
 #include "axl_io_FilePathUtils.h"
+#include "axl_g_Module.h"
 
 namespace {
 
@@ -266,10 +267,187 @@ test_ReadOnly() {
 	heap.close();
 }
 
+// every heap operation keeps a view mapped across the other views it takes. with the
+// default 64K read-ahead those views overlap, so the reliance never shows. running at
+// setup(MinDynamicViewCount, 0) removes both cushions: each block gets a view ending
+// at its own page, and the LRU evicts between them
+
+void
+test_SmallViews() {
+	enum {
+		IterationCount = 4000,
+		MaxLiveTarget  = 200,
+	};
+
+	sl::String fileName = io::createTempFile();
+	TEST_ASSERT(!fileName.isEmpty());
+	io::AutoDeleteFile autoDelete(fileName);
+
+	uint32_t seed = 0x0badc0de;
+	uint8_t fillCounter = 1;
+	sl::Array<Alloc> live;
+
+	io::FileHeap heap;
+	heap.setup(io::FileHeap::MinDynamicViewCount, 0);
+
+	bool result = heap.open(fileName);
+	TEST_ASSERT(result);
+
+	churn(&heap, &live, &seed, &fillCounter, IterationCount, MaxLiveTarget);
+
+	// load() walks the physical chain, so a header written through an evicted or
+	// too-short view surfaces here as a broken chain, not merely as lost data
+
+	heap.close();
+	result = heap.open(fileName);
+	TEST_ASSERT(result);
+	verifyAll(&heap, live);
+
+	churn(&heap, &live, &seed, &fillCounter, IterationCount, MaxLiveTarget);
+
+	while (!live.isEmpty())
+		freeOne(&heap, &live, &seed);
+
+	TEST_ASSERT(heap.getBlockCount() == 1);
+	heap.close();
+}
+
+// allocate() splits a block by writing the leftover header immediately past the region
+// it mapped. size the request so the block ends exactly on a page boundary: without
+// read-ahead the view stops there and the leftover lands outside it
+
+void
+test_PageBoundarySplit() {
+	enum {
+		SeedBlockCount = 4,
+		SeedBlockSize  = 128 * 1024, // >64K, so seed views never contain one another
+	};
+
+	sl::String fileName = io::createTempFile();
+	TEST_ASSERT(!fileName.isEmpty());
+	io::AutoDeleteFile autoDelete(fileName);
+
+	sl::Array<Alloc> live;
+
+	io::FileHeap heap;
+	heap.setup(io::FileHeap::MinDynamicViewCount, 0);
+
+	bool result = heap.open(fileName);
+	TEST_ASSERT(result);
+
+	for (size_t i = 0; i < SeedBlockCount; i++) {
+		Alloc alloc;
+		alloc.m_size = SeedBlockSize;
+		alloc.m_fill = (uint8_t)(i + 1);
+
+		io::FileHeapPtr ptr = heap.allocate(alloc.m_size);
+		TEST_ASSERT(ptr.m_p);
+
+		alloc.m_offset = ptr.m_offset;
+		writePattern(ptr.m_p, alloc.m_size, alloc.m_fill);
+		live.append(alloc);
+	}
+
+	// nothing was freed, so the only free block is the tail, right past the last one
+
+	const Alloc& last = live[live.getCount() - 1];
+	io::FileHeapPtr lastPtr = heap.materialize(last.m_offset);
+	TEST_ASSERT(lastPtr.m_p);
+
+	uint64_t tailOffset = last.m_offset - sizeof(io::FileHeapBlock) + lastPtr.m_size;
+
+	// a full page out, so the leftover is always large enough to be split off
+
+	size_t pageSize = g::getModule()->getSystemInfo()->m_pageSize;
+	uint64_t boundary = sl::align(tailOffset + pageSize, pageSize);
+	size_t blockSize = (size_t)(boundary - tailOffset);
+
+	// flush the LRU, so the allocation below maps a fresh view of exactly its own
+	// size instead of being served from one of the seed views
+
+	for (size_t i = 0; i < io::FileHeap::MinDynamicViewCount; i++)
+		TEST_ASSERT(heap.materialize(live[i].m_offset).m_p);
+
+	io::FileHeapPtr ptr = heap.allocate(blockSize - sizeof(io::FileHeapBlock));
+	TEST_ASSERT(ptr.m_p);
+	TEST_ASSERT(ptr.m_offset == tailOffset + sizeof(io::FileHeapBlock)); // took the tail
+	TEST_ASSERT(ptr.m_offset - sizeof(io::FileHeapBlock) + ptr.m_size == boundary);
+
+	writePattern(ptr.m_p, blockSize - sizeof(io::FileHeapBlock), 0xc3);
+
+	// the leftover header must have landed: it has to be allocatable, and the chain
+	// has to still walk on reopen
+
+	io::FileHeapPtr leftover = heap.allocate(64);
+	TEST_ASSERT(leftover.m_p);
+	TEST_ASSERT(leftover.m_offset == boundary + sizeof(io::FileHeapBlock));
+
+	heap.close();
+	result = heap.open(fileName);
+	TEST_ASSERT(result);
+	verifyAll(&heap, live);
+	heap.close();
+}
+
+// a permanently mapped block stays valid no matter how many views are taken after it;
+// a dynamically mapped one would have been evicted long before
+
+void
+test_Permanent() {
+	enum {
+		IterationCount = 2000,
+		MaxLiveTarget  = 100,
+		PinnedSize     = 8000, // > one page, so the pin is not absorbed by the header view
+	};
+
+	sl::String fileName = io::createTempFile();
+	TEST_ASSERT(!fileName.isEmpty());
+	io::AutoDeleteFile autoDelete(fileName);
+
+	uint32_t seed = 0xfeedface;
+	uint8_t fillCounter = 1;
+	uint8_t pinnedFill = 0xa5;
+	uint8_t repinnedFill = 0x5a;
+	sl::Array<Alloc> live;
+
+	io::FileHeap heap;
+	heap.setup(io::FileHeap::MinDynamicViewCount, 0);
+
+	bool result = heap.open(fileName);
+	TEST_ASSERT(result);
+
+	// pinned at allocation time
+
+	io::FileHeapPtr pinned = heap.allocate(PinnedSize, true);
+	TEST_ASSERT(pinned.m_p);
+	writePattern(pinned.m_p, PinnedSize, pinnedFill);
+
+	// pinned after the fact, through materialize()
+
+	io::FileHeapPtr dynamic = heap.allocate(PinnedSize);
+	TEST_ASSERT(dynamic.m_p);
+	writePattern(dynamic.m_p, PinnedSize, repinnedFill);
+
+	io::FileHeapPtr repinned = heap.materialize(dynamic.m_offset, true);
+	TEST_ASSERT(repinned.m_p && repinned.m_offset == dynamic.m_offset);
+
+	churn(&heap, &live, &seed, &fillCounter, IterationCount, MaxLiveTarget);
+
+	// neither block was freed, so both pointers must still be mapped and intact
+
+	checkPattern(pinned.m_p, PinnedSize, pinnedFill);
+	checkPattern(repinned.m_p, PinnedSize, repinnedFill);
+
+	heap.close();
+}
+
 void
 run() {
 	test_ReadWrite();
 	test_ReadOnly();
+	test_SmallViews();
+	test_PageBoundarySplit();
+	test_Permanent();
 }
 
 //..............................................................................
