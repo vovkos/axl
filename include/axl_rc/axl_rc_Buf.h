@@ -523,7 +523,6 @@ public:
 		}
 
 		size_t bufferSize = sl::getAllocSize(size);
-
 		Ptr<Hdr> hdr = AXL_RC_NEW_ARGS_EXTRA(Hdr, (bufferSize), bufferSize);
 		if (!hdr)
 			return NULL;

@@ -844,15 +844,13 @@ public:
 
 	bool
 	reserve(size_t count) {
-		size_t size = count * sizeof(T);
-
 		if (this->m_hdr &&
 			this->m_hdr->getRefCount() == 1 &&
-			this->m_hdr->m_bufferSize >= size)
+			this->m_hdr->m_bufferSize >= count * sizeof(T)
+		)
 			return true;
 
-		size_t bufferSize = getAllocSize(size);
-
+		size_t bufferSize = getAllocCount<T>(count) * sizeof(T);
 		rc::Ptr<Hdr> hdr = AXL_RC_NEW_ARGS_EXTRA(Hdr, (bufferSize), bufferSize);
 		if (!hdr)
 			return false;
@@ -947,14 +945,13 @@ protected:
 	template <typename Construct>
 	bool
 	setCountImpl(size_t count) {
-		size_t size = count * sizeof(T);
-
 		if (this->m_hdr &&
-			this->m_hdr->getRefCount() == 1) {
+			this->m_hdr->getRefCount() == 1
+		) {
 			if (this->m_count == count)
 				return true;
 
-			if (this->m_hdr->m_bufferSize >= size) {
+			if (this->m_hdr->m_bufferSize >= count * sizeof(T)) {
 				if (count > this->m_count)
 					Construct() (this->m_p + this->m_count, count - this->m_count);
 				else
@@ -984,8 +981,7 @@ protected:
 
 		ASSERT(this->m_hdr);
 
-		size_t bufferSize = getAllocSize(size);
-
+		size_t bufferSize = getAllocCount<T>(count) * sizeof(T);
 		rc::Ptr<Hdr> hdr = AXL_RC_NEW_ARGS_EXTRA(Hdr, (bufferSize), bufferSize);
 		if (!hdr)
 			return false;

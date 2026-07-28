@@ -1800,23 +1800,26 @@ public:
 		bool saveContents = false
 	) {
 		size_t size = (length + 1) * sizeof(C);
-
 		if (this->m_hdr &&
 			this->m_hdr->m_bufferSize >= size &&
-			this->m_hdr->getRefCount() == 1) {
+			this->m_hdr->getRefCount() == 1
+		) {
 			if (!this->m_length || !saveContents)
 				this->m_p = (C*)(this->m_hdr + 1);
-
-			if (this->m_hdr->getLeftoverBufferSize(this->m_p) >= size) {
-				this->m_length = length;
-				this->m_p[length] = 0;
-				this->m_isNullTerminated = true;
-				return this->m_p;
+			else if (this->m_hdr->getLeftoverBufferSize(this->m_p) < size) {
+				C* p = (C*)(this->m_hdr + 1);
+				size_t copyLength = AXL_MIN(length, this->m_length);
+				Details::move(p, this->m_p, copyLength);
+				this->m_p = p;
 			}
+
+			this->m_length = length;
+			this->m_p[length] = 0;
+			this->m_isNullTerminated = true;
+			return this->m_p;
 		}
 
-		size_t bufferSize = getAllocSize(size);
-
+		size_t bufferSize = getAllocCount<C>(length + 1) * sizeof(C);
 		rc::Ptr<rc::BufHdr> hdr = AXL_RC_NEW_ARGS_EXTRA(rc::BufHdr, (bufferSize), bufferSize);
 		if (!hdr)
 			return NULL;
