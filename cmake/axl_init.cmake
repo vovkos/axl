@@ -65,7 +65,7 @@ axl_apply_std_settings()
 axl_print_std_settings()
 
 if(NOT "${GCC_FLAG_CPP_STANDARD}" MATCHES "-std=")
-	set(CMAKE_CXX_STANDARD 11) # unless specified explicitly, use c++11
+	set(CMAKE_CXX_STANDARD 14) # unless specified explicitly, use c++14
 endif()
 
 # re-include paths.cmake and dependencies.cmake -- this time ${CONFIGURATION}
