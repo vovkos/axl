@@ -13,7 +13,7 @@
 #include "mainwindow.h"
 #include "axl_sys_Thread.h"
 #include "axl_re_Regex.h"
-#include "axl_io_MappedFile.h"
+#include "axl_io_SimpleMappedFile.h"
 #include "LlvmDenseMap.h"
 
 //..............................................................................

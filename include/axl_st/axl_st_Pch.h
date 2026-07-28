@@ -11,6 +11,6 @@
 
 #pragma once
 
-#include "axl_io_MappedFile.h"
+#include "axl_io_SimpleMappedFile.h"
 #include "axl_lua_LuaState.h"
 #include "axl_lex_RagelLexer.h"

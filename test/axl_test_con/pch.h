@@ -27,6 +27,7 @@
 #include "axl_io_SerialPortEnumerator.h"
 #include "axl_io_File.h"
 #include "axl_io_MappedFile.h"
+#include "axl_io_SimpleMappedFile.h"
 #include "axl_io_FilePathUtils.h"
 #include "axl_io_NetworkAdapter.h"
 #include "axl_io_ShmtReader.h"

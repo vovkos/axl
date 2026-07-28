@@ -12,7 +12,7 @@
 #include "pch.h"
 #include "axl_io_HidDb.h"
 #include "axl_io_HidDbParser.h"
-#include "axl_io_MappedFile.h"
+#include "axl_io_SimpleMappedFile.h"
 #include "axl_io_FilePathUtils.h"
 
 namespace axl {

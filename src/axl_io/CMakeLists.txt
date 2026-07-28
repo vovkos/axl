@@ -20,6 +20,7 @@ set(
 	${AXL_INC_DIR}/axl_io/axl_io_FileEnumerator.h
 	${AXL_INC_DIR}/axl_io/axl_io_Mapping.h
 	${AXL_INC_DIR}/axl_io/axl_io_MappedFile.h
+	${AXL_INC_DIR}/axl_io/axl_io_SimpleMappedFile.h
 	${AXL_INC_DIR}/axl_io/axl_io_FileHeap.h
 	${AXL_INC_DIR}/axl_io/axl_io_Serial.h
 	${AXL_INC_DIR}/axl_io/axl_io_SerialSettings.h
