@@ -22,25 +22,25 @@ namespace sl {
 
 // finding the lowest set bit via two's complement
 
-inline
+constexpr
 uint8_t
 getLoBit8(uint8_t x) {
 	return x & -x;
 }
 
-inline
+constexpr
 uint16_t
 getLoBit16(uint16_t x) {
 	return x & -x;
 }
 
-inline
+constexpr
 uint32_t
 getLoBit32(uint32_t x) {
 	return x & -x;
 }
 
-inline
+constexpr
 uint64_t
 getLoBit64(uint64_t x) {
 	return x & -x;
@@ -50,7 +50,7 @@ getLoBit64(uint64_t x) {
 
 // finding the highest set bit, branch-free -- from Hacker's Delight
 
-inline
+constexpr
 uint8_t
 getHiBit8(uint8_t x) {
 	x = x | (x >> 1);
@@ -59,7 +59,7 @@ getHiBit8(uint8_t x) {
 	return x - (x >> 1);
 }
 
-inline
+constexpr
 uint16_t
 getHiBit16(uint16_t x) {
 	x = x | (x >> 1);
@@ -69,7 +69,7 @@ getHiBit16(uint16_t x) {
 	return x - (x >> 1);
 }
 
-inline
+constexpr
 uint32_t
 getHiBit32(uint32_t x) {
 	x = x | (x >> 1);
@@ -80,7 +80,7 @@ getHiBit32(uint32_t x) {
 	return x - (x >> 1);
 }
 
-inline
+constexpr
 uint64_t
 getHiBit64(uint64_t x) {
 	x = x | (x >> 1);
@@ -96,7 +96,7 @@ getHiBit64(uint64_t x) {
 
 // finding closest power-of-2, branch-free -- from Hacker's Delight
 
-inline
+constexpr
 uint8_t
 getPowerOf2Ge8(uint8_t x) {
 	x = x - 1;
@@ -106,7 +106,7 @@ getPowerOf2Ge8(uint8_t x) {
 	return x + 1;
 }
 
-inline
+constexpr
 uint16_t
 getPowerOf2Ge16(uint16_t x) {
 	x = x - 1;
@@ -117,7 +117,7 @@ getPowerOf2Ge16(uint16_t x) {
 	return x + 1;
 }
 
-inline
+constexpr
 uint32_t
 getPowerOf2Ge32(uint32_t x) {
 	x = x - 1;
@@ -129,7 +129,7 @@ getPowerOf2Ge32(uint32_t x) {
 	return x + 1;
 }
 
-inline
+constexpr
 uint64_t
 getPowerOf2Ge64(uint64_t x) {
 	x = x - 1;
@@ -285,19 +285,19 @@ getHiBitIdx16(uint16_t x) {
 
 // bit index 0..8
 
-inline
+constexpr
 uint8_t
 getLoBitmask8(size_t to) {
 	return (1 << (to & 15)) - 1;
 }
 
-inline
+constexpr
 uint8_t
 getHiBitmask8(size_t from) {
 	return ~((1 << (from & 15)) - 1);
 }
 
-inline
+constexpr
 uint8_t
 getBitmask8(
 	size_t from,
@@ -310,19 +310,19 @@ getBitmask8(
 
 // bit index 0..16 (inclusive)
 
-inline
+constexpr
 uint16_t
 getLoBitmask16(size_t to) {
 	return (1 << (to & 31)) - 1;
 }
 
-inline
+constexpr
 uint16_t
 getHiBitmask16(size_t from) {
 	return ~((1 << (from & 31)) - 1);
 }
 
-inline
+constexpr
 uint16_t
 getBitmask16(
 	size_t from,
@@ -335,19 +335,19 @@ getBitmask16(
 
 // bit index 0..32 (inclusive)
 
-inline
+constexpr
 uint32_t
 getLoBitmask32(size_t to) {
 	return ~(((to & 32) >> 5) - 1) | ((1 << (to & 31)) - 1);
 }
 
-inline
+constexpr
 uint32_t
 getHiBitmask32(size_t from) {
 	return (((from & 32) >> 5) - 1) & ~((1 << (from & 31)) - 1);
 }
 
-inline
+constexpr
 uint32_t
 getBitmask32(
 	size_t from,
@@ -360,19 +360,19 @@ getBitmask32(
 
 // bit index 0..64 (inclusive)
 
-inline
+constexpr
 uint64_t
 getLoBitmask64(size_t to) {
 	return ~(((to & 64ULL) >> 6) - 1) | ((1ULL << (to & 63)) - 1);
 }
 
-inline
+constexpr
 uint64_t
 getHiBitmask64(size_t from) {
 	return (((from & 64ULL) >> 6) - 1) & ~((1ULL << (from & 63)) - 1);
 }
 
-inline
+constexpr
 uint64_t
 getBitmask64(
 	size_t from,
@@ -396,9 +396,10 @@ getBitmask64(
 //..............................................................................
 
 template <typename T>
+constexpr
 bool
 isPowerOf2(T x) {
-	return !(x & (x - 1));
+	return x && !(x & (x - 1));
 }
 
 template <typename T>
@@ -415,9 +416,10 @@ template <
 	size_t factor,
 	typename T
 >
+constexpr
 bool
 isAligned(T x) {
-	ASSERT(isPowerOf2(factor));
+	static_assert(isPowerOf2(factor));
 	return !(x & (factor - 1));
 }
 
@@ -437,23 +439,38 @@ template <
 >
 T
 align(T x) {
-	ASSERT(isPowerOf2(factor));
+	static_assert(isPowerOf2(factor));
 	return (x + factor - 1) & ~((T)factor - 1);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <size_t growLimit>
+constexpr
 size_t
 getAllocSize(size_t size) {
-	ASSERT(isPowerOf2(growLimit));
+	static_assert(isPowerOf2(growLimit));
 	return size < growLimit ? getPowerOf2Ge(size) : align<growLimit>(size);
 }
 
-inline
+constexpr
 size_t
 getAllocSize(size_t size) {
 	return getAllocSize<4 * 1024>(size); // 4K grow limit
+}
+
+template <
+	typename T,
+	size_t growSizeLimit = 4 * 1024 // same 4K grow limit
+>
+constexpr
+size_t
+getAllocCount(size_t count) {
+	constexpr size_t growLimit = growSizeLimit > sizeof(T) ?
+		getPowerOf2Ge(growSizeLimit / sizeof(T)) :
+		1;
+
+	return getAllocSize<growLimit>(count);
 }
 
 //..............................................................................
