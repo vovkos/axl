@@ -65,17 +65,21 @@ checkPattern(
 		TEST_ASSERT(b[i] == (uchar_t)(fill + i));
 }
 
-// re-map the block by its handle and check its pattern is intact
+// re-map the block by its handle and check its pattern is intact.
+//
+// the churn helpers below deliberately use the unpinned forms: a pinned block is
+// never evicted, which would defeat test_SmallViews and test_PageBoundarySplit --
+// both exist to provoke exactly the eviction the pin suppresses
 
 void
 verifyBlock(
 	io::FileHeap* heap,
 	const Alloc& alloc
 ) {
-	io::FileHeapPtr ptr = heap->materialize(alloc.m_offset);
-	TEST_ASSERT(ptr.m_p && ptr.m_offset == alloc.m_offset);
-	TEST_ASSERT(ptr.m_size >= sizeof(io::FileHeapBlock) + alloc.m_size); // total block size covers the request
-	checkPattern(ptr.m_p, alloc.m_size, alloc.m_fill);
+	io::FileHeapPtr ptr = heap->materializeUnpinned(alloc.m_offset);
+	TEST_ASSERT(ptr.p() && ptr.getOffset() == alloc.m_offset);
+	TEST_ASSERT(ptr.getSize() >= sizeof(io::FileHeapBlock) + alloc.m_size); // total block size covers the request
+	checkPattern(ptr.p(), alloc.m_size, alloc.m_fill);
 }
 
 void
@@ -100,12 +104,12 @@ allocOne(
 	alloc.m_size = randomSize(seed);
 	alloc.m_fill = (*fillCounter)++;
 
-	io::FileHeapPtr ptr = heap->allocate(alloc.m_size);
-	TEST_ASSERT(ptr.m_p);
-	TEST_ASSERT(ptr.m_size >= sizeof(io::FileHeapBlock) + alloc.m_size);
+	io::FileHeapPtr ptr = heap->allocateUnpinned(alloc.m_size);
+	TEST_ASSERT(ptr.p() && !ptr.isPinned());
+	TEST_ASSERT(ptr.getSize() >= sizeof(io::FileHeapBlock) + alloc.m_size);
 
-	alloc.m_offset = ptr.m_offset;
-	writePattern(ptr.m_p, alloc.m_size, alloc.m_fill);
+	alloc.m_offset = ptr.getOffset();
+	writePattern(ptr.p(), alloc.m_size, alloc.m_fill);
 	live->append(alloc);
 }
 
@@ -202,10 +206,10 @@ test_ReadWrite() {
 	// the collapsed free space must be reusable without growing the heap
 
 	uint64_t heapSize = heap.getHeapSize();
-	io::FileHeapPtr ptr = heap.allocate(2000);
-	TEST_ASSERT(ptr.m_p);
+	io::FileHeapPtr ptr = heap.allocateUnpinned(2000);
+	TEST_ASSERT(ptr.p());
 	TEST_ASSERT(heap.getHeapSize() == heapSize);
-	heap.free(ptr.m_offset);
+	heap.free(ptr.getOffset());
 	TEST_ASSERT(heap.getBlockCount() == 1);
 
 	heap.close();
@@ -239,11 +243,11 @@ test_ReadOnly() {
 			alloc.m_size = randomSize(&seed);
 			alloc.m_fill = fillCounter++;
 
-			io::FileHeapPtr ptr = heap.allocate(alloc.m_size);
-			TEST_ASSERT(ptr.m_p);
+			io::FileHeapPtr ptr = heap.allocateUnpinned(alloc.m_size);
+			TEST_ASSERT(ptr.p());
 
-			alloc.m_offset = ptr.m_offset;
-			writePattern(ptr.m_p, alloc.m_size, alloc.m_fill);
+			alloc.m_offset = ptr.getOffset();
+			writePattern(ptr.p(), alloc.m_size, alloc.m_fill);
 			live.append(alloc);
 		}
 
@@ -262,7 +266,7 @@ test_ReadOnly() {
 	// mutating a read-only heap must fail, not crash
 
 	io::FileHeapPtr ptr = heap.allocate(100);
-	TEST_ASSERT(!ptr.m_p);
+	TEST_ASSERT(!ptr.p());
 
 	heap.close();
 }
@@ -340,21 +344,21 @@ test_PageBoundarySplit() {
 		alloc.m_size = SeedBlockSize;
 		alloc.m_fill = (uint8_t)(i + 1);
 
-		io::FileHeapPtr ptr = heap.allocate(alloc.m_size);
-		TEST_ASSERT(ptr.m_p);
+		io::FileHeapPtr ptr = heap.allocateUnpinned(alloc.m_size);
+		TEST_ASSERT(ptr.p());
 
-		alloc.m_offset = ptr.m_offset;
-		writePattern(ptr.m_p, alloc.m_size, alloc.m_fill);
+		alloc.m_offset = ptr.getOffset();
+		writePattern(ptr.p(), alloc.m_size, alloc.m_fill);
 		live.append(alloc);
 	}
 
 	// nothing was freed, so the only free block is the tail, right past the last one
 
 	const Alloc& last = live[live.getCount() - 1];
-	io::FileHeapPtr lastPtr = heap.materialize(last.m_offset);
-	TEST_ASSERT(lastPtr.m_p);
+	io::FileHeapPtr lastPtr = heap.materializeUnpinned(last.m_offset);
+	TEST_ASSERT(lastPtr.p());
 
-	uint64_t tailOffset = last.m_offset - sizeof(io::FileHeapBlock) + lastPtr.m_size;
+	uint64_t tailOffset = last.m_offset - sizeof(io::FileHeapBlock) + lastPtr.getSize();
 
 	// a full page out, so the leftover is always large enough to be split off
 
@@ -366,21 +370,21 @@ test_PageBoundarySplit() {
 	// size instead of being served from one of the seed views
 
 	for (size_t i = 0; i < io::FileHeap::MinDynamicViewCount; i++)
-		TEST_ASSERT(heap.materialize(live[i].m_offset).m_p);
+		TEST_ASSERT(heap.materializeUnpinned(live[i].m_offset).p());
 
-	io::FileHeapPtr ptr = heap.allocate(blockSize - sizeof(io::FileHeapBlock));
-	TEST_ASSERT(ptr.m_p);
-	TEST_ASSERT(ptr.m_offset == tailOffset + sizeof(io::FileHeapBlock)); // took the tail
-	TEST_ASSERT(ptr.m_offset - sizeof(io::FileHeapBlock) + ptr.m_size == boundary);
+	io::FileHeapPtr ptr = heap.allocateUnpinned(blockSize - sizeof(io::FileHeapBlock));
+	TEST_ASSERT(ptr.p());
+	TEST_ASSERT(ptr.getOffset() == tailOffset + sizeof(io::FileHeapBlock)); // took the tail
+	TEST_ASSERT(ptr.getOffset() - sizeof(io::FileHeapBlock) + ptr.getSize() == boundary);
 
-	writePattern(ptr.m_p, blockSize - sizeof(io::FileHeapBlock), 0xc3);
+	writePattern(ptr.p(), blockSize - sizeof(io::FileHeapBlock), 0xc3);
 
 	// the leftover header must have landed: it has to be allocatable, and the chain
 	// has to still walk on reopen
 
-	io::FileHeapPtr leftover = heap.allocate(64);
-	TEST_ASSERT(leftover.m_p);
-	TEST_ASSERT(leftover.m_offset == boundary + sizeof(io::FileHeapBlock));
+	io::FileHeapPtr leftover = heap.allocateUnpinned(64);
+	TEST_ASSERT(leftover.p());
+	TEST_ASSERT(leftover.getOffset() == boundary + sizeof(io::FileHeapBlock));
 
 	heap.close();
 	result = heap.open(fileName);
@@ -389,11 +393,13 @@ test_PageBoundarySplit() {
 	heap.close();
 }
 
-// a permanently mapped block stays valid no matter how many views are taken after it;
-// a dynamically mapped one would have been evicted long before
+// a FileHeapPtr from allocateAndPin()/materializeAndPin() keeps its block mapped no
+// matter how many views are taken afterwards -- the plain forms would have been
+// evicted long before. run at setup(MinDynamicViewCount, 0) so the LRU is as hostile
+// as it gets
 
 void
-test_Permanent() {
+test_Pin() {
 	enum {
 		IterationCount = 2000,
 		MaxLiveTarget  = 100,
@@ -406,8 +412,8 @@ test_Permanent() {
 
 	uint32_t seed = 0xfeedface;
 	uint8_t fillCounter = 1;
-	uint8_t pinnedFill = 0xa5;
-	uint8_t repinnedFill = 0x5a;
+	uint8_t allocFill = 0xa5;
+	uint8_t materializeFill = 0x5a;
 	sl::Array<Alloc> live;
 
 	io::FileHeap heap;
@@ -416,28 +422,53 @@ test_Permanent() {
 	bool result = heap.open(fileName);
 	TEST_ASSERT(result);
 
-	// pinned at allocation time
+	{
+		// pinned at allocation time -- allocate() pins by default
 
-	io::FileHeapPtr pinned = heap.allocate(PinnedSize, true);
-	TEST_ASSERT(pinned.m_p);
-	writePattern(pinned.m_p, PinnedSize, pinnedFill);
+		io::FileHeapPtr allocated = heap.allocate(PinnedSize);
+		TEST_ASSERT(allocated.p() && allocated.isPinned());
+		writePattern(allocated.p(), PinnedSize, allocFill);
 
-	// pinned after the fact, through materialize()
+		// pinned after the fact: allocateUnpinned() hands back no pin, so the block is
+		// only held once the materialize() below picks it up
 
-	io::FileHeapPtr dynamic = heap.allocate(PinnedSize);
-	TEST_ASSERT(dynamic.m_p);
-	writePattern(dynamic.m_p, PinnedSize, repinnedFill);
+		io::FileHeapPtr dynamic = heap.allocateUnpinned(PinnedSize);
+		TEST_ASSERT(dynamic.p() && !dynamic.isPinned());
+		writePattern(dynamic.p(), PinnedSize, materializeFill);
 
-	io::FileHeapPtr repinned = heap.materialize(dynamic.m_offset, true);
-	TEST_ASSERT(repinned.m_p && repinned.m_offset == dynamic.m_offset);
+		io::FileHeapPtr materialized = heap.materialize(dynamic.getOffset());
+		TEST_ASSERT(materialized.p() && materialized.isPinned());
+		TEST_ASSERT(materialized.getOffset() == dynamic.getOffset());
 
-	churn(&heap, &live, &seed, &fillCounter, IterationCount, MaxLiveTarget);
+		// a copy pins the same block a second time; a move transfers the pin and
+		// leaves the source null
 
-	// neither block was freed, so both pointers must still be mapped and intact
+		io::FileHeapPtr copied = allocated;
+		TEST_ASSERT(copied.isPinned());
+		TEST_ASSERT(copied.p() == allocated.p() && copied.getOffset() == allocated.getOffset());
 
-	checkPattern(pinned.m_p, PinnedSize, pinnedFill);
-	checkPattern(repinned.m_p, PinnedSize, repinnedFill);
+		io::FileHeapPtr moved = std::move(copied);
+		TEST_ASSERT(moved.isPinned() && moved.p() == allocated.p());
+		TEST_ASSERT(copied.isNull() && !copied.isPinned() && copied.getOffset() == (uint64_t)-1);
 
+		churn(&heap, &live, &seed, &fillCounter, IterationCount, MaxLiveTarget);
+
+		// nothing was freed, so every pinned pointer must still be mapped and intact
+
+		checkPattern(allocated.p(), PinnedSize, allocFill);
+		checkPattern(moved.p(), PinnedSize, allocFill);
+		checkPattern(materialized.p(), PinnedSize, materializeFill);
+
+		// dropping one pin of a doubly-pinned block must not unmap it
+
+		moved.unpin();
+		TEST_ASSERT(!moved.isPinned());
+		checkPattern(allocated.p(), PinnedSize, allocFill);
+	}
+
+	// every pin is gone, but the blocks are still reachable through the heap
+
+	verifyAll(&heap, live);
 	heap.close();
 }
 
@@ -447,7 +478,7 @@ run() {
 	test_ReadOnly();
 	test_SmallViews();
 	test_PageBoundarySplit();
-	test_Permanent();
+	test_Pin();
 }
 
 //..............................................................................

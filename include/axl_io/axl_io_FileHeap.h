@@ -21,6 +21,8 @@
 namespace axl {
 namespace io {
 
+class FileHeap;
+
 //..............................................................................
 
 enum FileHeapConst {
@@ -61,12 +63,115 @@ struct FileHeapBlock {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-struct FileHeapPtr {
+class FileHeapPtr {
+	friend class FileHeap;
+
+protected:
+	MappedFilePin m_pin;
 	void* m_p;
 	uint64_t m_offset;
 	uint32_t m_size;
 
+public:
+	FileHeapPtr() {
+		init();
+	}
+
 	FileHeapPtr(
+		void* p,
+		uint64_t offset,
+		uint32_t size
+	) {
+		setup(p, offset, size);
+	}
+
+	FileHeapPtr(
+		MappedFilePin&& pin,
+		void* p,
+		uint64_t offset,
+		uint32_t size
+	):
+		m_pin(std::move(pin)) {
+		setup(p, offset, size);
+	}
+
+	FileHeapPtr(const FileHeapPtr& src):
+		m_pin(src.m_pin) {
+		setup(src.m_p, src.m_offset, src.m_size);
+	}
+
+	FileHeapPtr(FileHeapPtr&& src):
+		m_pin(std::move(src.m_pin)) {
+		setup(src.m_p, src.m_offset, src.m_size);
+		src.init();
+	}
+
+	operator void* () const {
+		return m_p;
+	}
+
+	FileHeapPtr&
+	operator = (const FileHeapPtr& src) {
+		copy(src);
+		return *this;
+	}
+
+	FileHeapPtr&
+	operator = (FileHeapPtr&& src) {
+		move(std::move(src));
+		return *this;
+	}
+
+	bool
+	isNull() const {
+		return m_p == NULL;
+	}
+
+	bool
+	isPinned() const {
+		return !m_pin.isNull();
+	}
+
+	void*
+	p() const {
+		return m_p;
+	}
+
+	uint64_t
+	getOffset() const {
+		return m_offset;
+	}
+
+	uint32_t
+	getSize() const {
+		return m_size;
+	}
+
+	void
+	unpin() {
+		m_pin.unpin();
+	}
+
+	void
+	clear() {
+		unpin();
+		init();
+	}
+
+	void
+	copy(const FileHeapPtr& src);
+
+	void
+	move(FileHeapPtr&& src);
+
+protected:
+	void
+	init() {
+		setup(NULL, (uint64_t)-1, 0);
+	}
+
+	void
+	setup(
 		void* p,
 		uint64_t offset,
 		uint32_t size
@@ -76,7 +181,29 @@ struct FileHeapPtr {
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
-FileHeapPtr::FileHeapPtr(
+void
+FileHeapPtr::copy(const FileHeapPtr& src) {
+	if (this == &src)
+		return;
+
+	m_pin.copy(src.m_pin);
+	setup(src.m_p, src.m_offset, src.m_size);
+}
+
+inline
+void
+FileHeapPtr::move(FileHeapPtr&& src) {
+	if (this == &src)
+		return;
+
+	m_pin.move(std::move(src.m_pin));
+	setup(src.m_p, src.m_offset, src.m_size);
+	src.init();
+}
+
+inline
+void
+FileHeapPtr::setup(
 	void* p,
 	uint64_t offset,
 	uint32_t size
@@ -86,9 +213,7 @@ FileHeapPtr::FileHeapPtr(
 	m_size = size;
 }
 
-AXL_SELECT_ANY FileHeapPtr g_nullFileHeapPtr = { NULL, (uint64_t)-1, 0 };
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+//..............................................................................
 
 class FileHeap {
 public:
@@ -96,19 +221,21 @@ public:
 		Alignment           = 8,
 		MinBlockSize        = sizeof(FileHeapBlock) + Alignment,
 		MaxBlockSize        = 0xffffffff - Alignment + 1,
-		MinDynamicViewCount = 3, // allocate()/free() need 3 views live at once (LRU evicts the tail)
+		MinDynamicViewCount = 3, // free() needs 3 views live at once (LRU evicts the tail);
+		                         // allocate() pins its block, so it needs fewer
 		DefGrowSize         = 16 * 1024, // grow by 16K at a time
 	};
 
+protected:
 	struct BlockKey {
 		uint64_t m_offset;
-		size_t m_size;
+		uint32_t m_size;
 
 		BlockKey(): BlockKey(0, 0) {}
 
 		BlockKey(
 			uint64_t offset,
-			size_t size
+			uint32_t size
 		) {
 			m_offset = offset;
 			m_size = size;
@@ -121,7 +248,6 @@ public:
 		}
 	};
 
-protected:
 	typedef sl::RbTree<BlockKey, bool> BlockMap;
 
 protected:
@@ -186,48 +312,83 @@ public:
 	);
 
 	FileHeapPtr
-	allocate(
-		size_t size,
-		bool isPermanent = false
-	);
+	allocate(size_t size) {
+		return allocateImpl(size, true);
+	}
 
 	FileHeapPtr
-	materialize(
-		uint64_t offset,
-		bool isPermanent = false
-	);
+	allocateUnpinned(size_t size) {
+		return allocateImpl(size, false);
+	}
+
+	FileHeapPtr
+	materialize(uint64_t offset) {
+		return materializeImpl(offset, true);
+	}
+
+	FileHeapPtr
+	materializeUnpinned(uint64_t offset) {
+		return materializeImpl(offset, false);
+	}
 
 	bool
 	free(uint64_t offset);
 
 protected:
+	FileHeapPtr
+	allocateImpl(
+		size_t size,
+		bool isPinned
+	);
+
+	FileHeapPtr
+	materializeImpl(
+		uint64_t offset,
+		bool isPinned
+	);
+
 	bool
 	load(uint64_t fileSize);
 
 	bool
-	grow(size_t size);
+	grow(uint32_t size);
+
+	bool
+	validateBlock(
+		uint64_t offset,
+		const FileHeapBlock* block
+	) const;
 
 	FileHeapBlock*
+	viewBlockUnpinned(uint64_t offset) {
+		FileHeapBlock* block = (FileHeapBlock*)m_file.view(offset, sizeof(FileHeapBlock));
+		return block && validateBlock(offset, block) ? block : NULL;
+	}
+
+	FileHeapPtr
 	viewBlock(
 		uint64_t offset,
-		size_t size = sizeof(FileHeapBlock),
-		size_t* viewSize = NULL,
-		bool isPermanent = false
+		size_t size,
+		size_t* actualSize,
+		bool isPinned
 	);
 
 	void
 	updateNextBlock(
 		FileHeapBlock* block,
-		size_t size,
+		uint32_t size,
 		bool isAllocated
 	);
 
 	bool
 	updateNextBlock(
 		uint64_t offset,
-		size_t size,
+		uint32_t size,
 		bool isAllocated
-	);
+	) {
+		FileHeapBlock* block = viewBlockUnpinned(offset + size);
+		return block ? updateNextBlock(block, size, isAllocated), true : false;
+	}
 
 	void
 	addFreeBlock(
@@ -279,6 +440,7 @@ FileHeap::setup(
 	ASSERT(
 		maxDynamicViewCount >= MinDynamicViewCount &&
 		growSize > sizeof(FileHeapBlock) &&
+		growSize <= MaxBlockSize &&
 		sl::isPowerOf2(growSize)
 	);
 
@@ -287,52 +449,33 @@ FileHeap::setup(
 }
 
 inline
-FileHeapBlock*
-FileHeap::viewBlock(
+bool
+FileHeap::validateBlock(
 	uint64_t offset,
-	size_t size,
-	size_t* viewSize,
-	bool isPermanent
-) {
-	FileHeapBlock* block = (FileHeapBlock*)m_file.view(offset, size, viewSize, isPermanent);
-	if (!block)
-		return NULL;
-
+	const FileHeapBlock* block
+) const {
 	if (block->m_signature != FileHeapConst_BlockSignature ||
 		block->m_size < sizeof(FileHeapBlock) ||
 		block->m_size > MaxBlockSize ||
 		block->m_size + offset > getEndOffset()
 	)
-		return err::fail<FileHeapBlock*>(NULL, "corrupted file heap");
+		return err::fail("corrupted file heap");
 
-	return block;
+	return true;
 }
 
 inline
 void
 FileHeap::updateNextBlock(
 	FileHeapBlock* block,
-	size_t size,
+	uint32_t size,
 	bool isAllocated
 ) {
-	block->m_prevSize = (uint32_t)size;
+	block->m_prevSize = size;
 	if (isAllocated)
 		block->m_flags |= FileHeapBlockFlag_PrevAllocated;
 	else
 		block->m_flags &= ~FileHeapBlockFlag_PrevAllocated;
-}
-
-inline
-bool
-FileHeap::updateNextBlock(
-	uint64_t offset,
-	size_t size,
-	bool isAllocated
-) {
-	FileHeapBlock* block = viewBlock(offset + size);
-	return block ?
-		updateNextBlock(block, size, isAllocated), true :
-		false;
 }
 
 //..............................................................................
