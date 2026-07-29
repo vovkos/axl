@@ -22,7 +22,10 @@ sl::StringRef
 ErrorProvider::getErrorDescription(OSStatus status) {
 	CFStringRef description = ::SecCopyErrorMessageString(status, NULL);
 	sl::String string = cf::String(description, true).getString();
-	return !string.isEmpty() ? string : sl::formatString("OSStatus(%d)", status);
+	if (!string.isEmpty())
+		return string;
+
+	return sl::formatString("OSStatus(%d)", status);
 }
 
 //..............................................................................

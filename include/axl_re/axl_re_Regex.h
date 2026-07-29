@@ -252,10 +252,7 @@ public:
 		const StateInit& stateInit,
 		const void* p,
 		size_t size
-	) const {
-		State state(stateInit);
-		return exec(&state, p, size) ? state : State();
-	}
+	) const;
 
 	State
 	exec(
@@ -277,10 +274,7 @@ public:
 	exec(
 		const StateInit& stateInit,
 		const sl::StringRef& string
-	) const {
-		State state(stateInit);
-		return exec(&state, string.cp(), string.getLength()) ? state : State();
-	}
+	) const;
 
 	State
 	exec(const sl::StringRef& string) const {
@@ -319,6 +313,37 @@ protected:
 	void
 	prepareDfaState(const DfaState* state) const;
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+State
+Regex::exec(
+	const StateInit& stateInit,
+	const void* p,
+	size_t size
+) const {
+	State state(stateInit);
+	ExecResult result = exec(&state, p, size);
+	if (!result)
+		return State();
+
+	return state;
+}
+
+inline
+State
+Regex::exec(
+	const StateInit& stateInit,
+	const sl::StringRef& string
+) const {
+	State state(stateInit);
+	ExecResult result = exec(&state, string.cp(), string.getLength());
+	if (!result)
+		return State();
+
+	return state;
+}
 
 //..............................................................................
 

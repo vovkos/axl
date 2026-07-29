@@ -63,7 +63,11 @@ getTempDir() {
 	return getTempDir_w();
 #else
 	sl::String tmpDir = ::getenv("TMPDIR");
-	return !tmpDir.isEmpty() ? tmpDir : "/tmp";
+	if (!tmpDir.isEmpty())
+		return tmpDir;
+
+	static sl::String systemTmpDir("/tmp");
+	return systemTmpDir;
 #endif
 }
 

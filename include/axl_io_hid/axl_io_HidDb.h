@@ -125,10 +125,7 @@ public:
 	getUsageName(uint_t usage) const;
 
 	sl::String
-	getUsageString(uint_t usage) const{
-		sl::String name = getUsageName(usage);
-		return !name.isEmpty() ? name : createUnnamedUsageString(usage);
-	}
+	getUsageString(uint_t usage) const;
 
 	static
 	sl::String
@@ -157,6 +154,17 @@ HidUsagePage::getString() const {
 
 	return m_string;
 }
+
+inline
+sl::String
+HidUsagePage::getUsageString(uint_t usage) const {
+	sl::String name = getUsageName(usage);
+	if (!name.isEmpty())
+		return name;
+
+	return createUnnamedUsageString(usage);
+}
+
 
 //..............................................................................
 

@@ -280,8 +280,6 @@ FileHeap::materializeImpl(
 	if (!ptr)
 		return ptr;
 
-	// two returns rather than a ternary to ensure copy-elision
-
 	FileHeapBlock* block = (FileHeapBlock*)ptr.p() - 1;
 	if (block->m_size <= actualSize)
 		return ptr;
