@@ -23,52 +23,54 @@ class MappedFile;
 
 //..............................................................................
 
-template <typename T>
-class MappedFilePinBase {
+template <typename T = void>
+class MappedFileView {
 	template <typename T2>
-	friend class MappedFilePinBase;
+	friend class MappedFileView;
 
 protected:
 	MappedFile* m_file;
-	handle_t m_view;
+	handle_t m_pin;
 	T* m_p;
+	size_t m_size;
 
 public:
-	MappedFilePinBase() {
+	MappedFileView() {
 		init();
 	}
 
-	MappedFilePinBase(
+	MappedFileView(
 		MappedFile* file,
-		handle_t view,
-		T* p
+		handle_t pin,
+		T* p,
+		size_t size
 	) {
-		setup(file, view, p);
+		setup(file, pin, p, size);
 	}
 
-	MappedFilePinBase(const MappedFilePinBase& src) {
-		setup(src.m_file, src.m_view, src.m_p);
+	MappedFileView(const MappedFileView& src) {
+		setup(src.m_file, src.m_pin, src.m_p, src.m_size);
 		src.pin();
 	}
 
-	MappedFilePinBase(MappedFilePinBase&& src) {
-		setup(src.m_file, src.m_view, src.m_p);
+	MappedFileView(MappedFileView&& src) {
+		setup(src.m_file, src.m_pin, src.m_p, src.m_size);
 		src.init();
 	}
 
 	template <typename T2>
-	MappedFilePinBase(const MappedFilePinBase<T2>& src) {
-		setup(src.m_file, src.m_view, src.m_p);
+	MappedFileView(const MappedFileView<T2>& src) {
+		setup(src.m_file, src.m_pin, src.m_p, src.m_size);
 		src.pin();
 	}
 
 	template <typename T2>
-	MappedFilePinBase(MappedFilePinBase<T2>&& src) {
-		setup(src.m_file, src.m_view, src.m_p);
+	MappedFileView(MappedFileView<T2>&& src) {
+		setup(src.m_file, src.m_pin, src.m_p, src.m_size);
 		src.init();
 	}
 
-	~MappedFilePinBase() {
+	~MappedFileView() {
 		unpin();
 	}
 
@@ -76,14 +78,20 @@ public:
 		return m_p;
 	}
 
-	MappedFilePinBase&
-	operator = (const MappedFilePinBase& src) {
+	T*
+	operator -> () const {
+		ASSERT(m_p);
+		return m_p;
+	}
+
+	MappedFileView&
+	operator = (const MappedFileView& src) {
 		copy(src);
 		return *this;
 	}
 
-	MappedFilePinBase&
-	operator = (MappedFilePinBase&& src) {
+	MappedFileView&
+	operator = (MappedFileView&& src) {
 		move(std::move(src));
 		return *this;
 	}
@@ -93,49 +101,68 @@ public:
 		return m_p == NULL;
 	}
 
+	bool
+	isPinned() const {
+		return m_pin != NULL;
+	}
+
 	T*
 	p() const {
 		return m_p;
 	}
 
 	size_t
-	getSize() const;
-
-	void
-	copy(const MappedFilePinBase& src) {
-		if (this == &src)
-			return;
-
-		unpin();
-		setup(src.m_file, src.m_view, src.m_p);
-		src.pin();
-	}
-
-	void
-	move(MappedFilePinBase&& src) {
-		if (this == &src)
-			return;
-
-		unpin();
-		setup(src.m_file, src.m_view, src.m_p);
-		src.init();
+	getSize() const {
+		return m_size;
 	}
 
 	void
 	unpin();
 
+	void
+	clear() {
+		unpin();
+		init();
+	}
+
+	void
+	copy(const MappedFileView& src) {
+		if (this == &src)
+			return;
+
+		unpin();
+		setup(src.m_file, src.m_pin, src.m_p, src.m_size);
+		src.pin();
+	}
+
+	void
+	move(MappedFileView&& src) {
+		if (this == &src)
+			return;
+
+		unpin();
+		setup(src.m_file, src.m_pin, src.m_p, src.m_size);
+		src.init();
+	}
+
 protected:
 	void
 	init() {
-		setup(NULL, NULL, NULL);
+		setup(NULL, NULL, NULL, 0);
 	}
 
 	void
 	setup(
 		MappedFile* file,
-		handle_t view,
-		T* p
-	);
+		handle_t pin,
+		T* p,
+		size_t size
+	) {
+		m_file = file;
+		m_pin = pin;
+		m_p = p;
+		m_size = size;
+	}
 
 	void
 	pin() const;
@@ -144,27 +171,13 @@ protected:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-void
-MappedFilePinBase<T>::setup(
-	MappedFile* file,
-	handle_t view,
-	T* p
-) {
-	m_file = file;
-	m_view = view;
-	m_p = p;
-}
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-typedef MappedFilePinBase<void> MappedFilePin;
-typedef MappedFilePinBase<const void> ConstMappedFilePin;
+using ConstMappedFileView = MappedFileView<const T>;
 
 //..............................................................................
 
 class MappedFile {
 	template <typename T>
-	friend class MappedFilePinBase;
+	friend class MappedFileView;
 
 public:
 	enum Def {
@@ -304,35 +317,39 @@ public:
 		size_t readAheadSize
 	);
 
-	const void*
+	template <typename T = void>
+	const T*
 	view(
-		uint64_t offset = 0,
-		size_t size = 0,
+		uint64_t offset,
+		size_t size,
 		bool isPermanent = false
 	) const {
-		return ((MappedFile*)this)->view(offset, size, isPermanent);
+		return ((MappedFile*)this)->view<T>(offset, size, isPermanent);
 	}
 
-	void*
+	template <typename T = void>
+	T*
 	view(
-		uint64_t offset = 0,
-		size_t size = 0,
+		uint64_t offset,
+		size_t size,
 		bool isPermanent = false
 	) {
-		return view(offset, size, NULL, isPermanent);
+		return view<T>(offset, size, NULL, isPermanent);
 	}
 
-	const void*
+	template <typename T = void>
+	const T*
 	view(
 		uint64_t offset,
 		size_t size,
 		size_t* actualSize,
 		bool isPermanent = false
 	) const {
-		return ((MappedFile*)this)->view(offset, size, actualSize, isPermanent);
+		return ((MappedFile*)this)->view<T>(offset, size, actualSize, isPermanent);
 	}
 
-	void*
+	template <typename T = void>
+	T*
 	view(
 		uint64_t offset,
 		size_t size,
@@ -340,18 +357,22 @@ public:
 		bool isPermanent = false
 	);
 
-	ConstMappedFilePin
-	viewAndPin(
-		uint64_t offset = 0,
-		size_t size = 0
+	template <typename T = void>
+	ConstMappedFileView<T>
+	viewEx(
+		uint64_t offset,
+		size_t size,
+		bool isPinned = true
 	) const {
-		return ((MappedFile*)this)->viewAndPin(offset, size);
+		return ((MappedFile*)this)->viewEx<T>(offset, size, isPinned);
 	}
 
-	MappedFilePin
-	viewAndPin(
-		uint64_t offset = 0,
-		size_t size = 0
+	template <typename T = void>
+	MappedFileView<T>
+	viewEx(
+		uint64_t offset,
+		size_t size,
+		bool isPinned = true
 	);
 
 	void
@@ -492,15 +513,43 @@ MappedFile::setup(
 	evictViews();
 }
 
-inline
-MappedFilePin
-MappedFile::viewAndPin(
+template <typename T>
+T*
+MappedFile::view(
 	uint64_t offset,
-	size_t size
+	size_t size,
+	size_t* actualSize,
+	bool isPermanent
 ) {
 	uint64_t end = size ? offset + size : m_file.getSize();
-	ViewEntry* viewEntry = viewImpl(ViewKind_Pinned, offset, end);
-	return viewEntry ? MappedFilePin(this, viewEntry, viewEntry->p(offset)) : MappedFilePin();
+	ViewEntry* viewEntry = viewImpl(isPermanent ? ViewKind_Permanent : ViewKind_Dynamic, offset, end);
+	if (!viewEntry)
+		return NULL;
+
+	if (actualSize)
+		*actualSize = (size_t)(viewEntry->m_end - offset);
+
+	return (T*)viewEntry->p(offset);
+}
+
+template <typename T>
+MappedFileView<T>
+MappedFile::viewEx(
+	uint64_t offset,
+	size_t size,
+	bool isPinned
+) {
+	uint64_t end = size ? offset + size : m_file.getSize();
+	ViewEntry* viewEntry = viewImpl(isPinned ? ViewKind_Pinned : ViewKind_Dynamic , offset, end);
+	if (!viewEntry)
+		return MappedFileView<T>();
+
+	return MappedFileView<T>(
+		this,
+		isPinned ? viewEntry : NULL,
+		(T*)viewEntry->p(offset),
+		viewEntry->m_end - offset
+	);
 }
 
 inline
@@ -527,26 +576,18 @@ MappedFile::unpinView(ViewEntry* viewEntry) {
 
 template <typename T>
 void
-MappedFilePinBase<T>::pin() const {
-	if (!isNull())
-		m_file->pinView((MappedFile::ViewEntry*)m_view);
+MappedFileView<T>::pin() const {
+	if (m_pin)
+		m_file->pinView((MappedFile::ViewEntry*)m_pin);
 }
 
 template <typename T>
 void
-MappedFilePinBase<T>::unpin() {
-	if (!isNull()) {
-		m_file->unpinView((MappedFile::ViewEntry*)m_view);
-		init();
+MappedFileView<T>::unpin() {
+	if (m_pin) {
+		m_file->unpinView((MappedFile::ViewEntry*)m_pin);
+		m_pin = NULL;
 	}
-}
-
-template <typename T>
-size_t
-MappedFilePinBase<T>::getSize() const {
-	ASSERT(!isNull());
-	MappedFile::ViewEntry* view = (MappedFile::ViewEntry*)m_view;
-	return (char*)(void*)view->m_view + view->m_end - view->m_begin - (char*)m_p;
 }
 
 //..............................................................................

@@ -23,15 +23,15 @@ run() {
 
 	const char* fileName = "test.txt.in";
 
-	io::MappedFile file;
+	io::SimpleMappedFile file;
 	result = file.open(fileName, io::FileFlag_ReadOnly);
 	if (!result) {
 		printf("error: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
-	char* p = (char*)file.view();
-	size_t size = (size_t)file.getSize();
+	char* p = (char*)file.p();
+	size_t size = file.getMappingSize();
 
 	st::LuaStringTemplate st;
 

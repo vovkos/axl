@@ -75,18 +75,18 @@ run() {
 
 	const char* filePath = "D:/Prj/Ninja/ioninja/scripts/nj_ssn/nj_ssn_Serial/nj_ssn_Serial.njini";
 
-	io::MappedFile file;
+	io::SimpleMappedFile file;
 	result = file.open(filePath, io::FileFlag_ReadOnly);
 	if (!result) {
 		printf("error opening file: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
 
-	const char* p = (const char*)file.view();
-	uint64_t size = file.getSize();
+	const char* p = (const char*)file.p();
+	size_t size = file.getMappingSize();
 
 	MyParser parser;
-	result = parser.parse(filePath, sl::StringRef(p, (size_t)size));
+	result = parser.parse(filePath, sl::StringRef(p, size));
 	if (!result) {
 		printf("error parsing file: %s\n", err::getLastErrorDescription().sz());
 		return;

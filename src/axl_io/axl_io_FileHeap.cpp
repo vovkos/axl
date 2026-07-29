@@ -44,7 +44,7 @@ FileHeap::open(
 	if (fileSize || (flags & FileFlag_ReadOnly))
 		result = load(fileSize);
 	else {
-		m_hdr = (FileHeapHdr*)m_file.view(0, sizeof(FileHeapHdr), true);
+		m_hdr = m_file.view<FileHeapHdr>(0, sizeof(FileHeapHdr), true);
 		if (m_hdr) {
 			m_freeBlockMap.clear();
 			m_hdr->m_signature = FileHeapConst_FileSignature;
@@ -94,7 +94,7 @@ FileHeap::load(uint64_t fileSize) {
 
 	// keep the header permanently mapped (read-only if the file is read-only)
 
-	m_hdr = (FileHeapHdr*)m_file.view(0, sizeof(FileHeapHdr), true);
+	m_hdr = m_file.view<FileHeapHdr>(0, sizeof(FileHeapHdr), true);
 	if (!m_hdr)
 		return false;
 
@@ -147,144 +147,6 @@ FileHeap::load(uint64_t fileSize) {
 	m_hdr->m_blockCount = blockCount;
 	m_hdr->m_lastBlockOffset = prevOffset;
 	return true;
-}
-
-FileHeapPtr
-FileHeap::viewBlock(
-	uint64_t offset,
-	size_t size,
-	size_t* actualSize,
-	bool isPinned
-) {
-	FileHeapBlock* block;
-	MappedFilePin pin;
-
-	if (!isPinned)
-		block = (FileHeapBlock*)m_file.view(offset, size, actualSize);
-	else {
-		pin = m_file.viewAndPin(offset, size);
-		block = (FileHeapBlock*)pin.p();
-		if (block && actualSize)
-			*actualSize = pin.getSize();
-	}
-
-	if (!block || !validateBlock(offset, block))
-		return FileHeapPtr();
-
-	uint64_t ptrOffset = offset + sizeof(FileHeapBlock);
-	return isPinned ?
-		FileHeapPtr(std::move(pin), block + 1, ptrOffset, block->m_size) :
-		FileHeapPtr(block + 1, ptrOffset, block->m_size);
-}
-
-FileHeapPtr
-FileHeap::allocateImpl(
-	size_t size, // size_t, so an over-4GB request is rejected rather than truncated
-	bool isPinned
-) {
-	if (!isOpen() || (m_file.getFlags() & FileFlag_ReadOnly)) {
-		err::setError(err::SystemErrorCode_InvalidDeviceState);
-		return FileHeapPtr();
-	}
-
-	if (size > MaxBlockSize - sizeof(FileHeapBlock)) {
-		err::setError(err::SystemErrorCode_InvalidParameter);
-		return FileHeapPtr();
-	}
-
-	// FileHeapHdr & FileHeapBlock are already 8-byte aligned
-	// therefore aligning size on 8 is enough to keep all blocks 8-byte aligned
-
-	size_t requiredSize = sl::align<Alignment>(sizeof(FileHeapBlock) + size);
-	BlockMap::Iterator it = m_freeBlockMap.find<sl::RelOpKind_Ge>(BlockKey(0, requiredSize));
-	if (!it) {
-		bool ok = grow(requiredSize);
-		if (!ok)
-			return FileHeapPtr();
-
-		it = m_freeBlockMap.find<sl::RelOpKind_Ge>(BlockKey(0, requiredSize));
-		ASSERT(it);
-	}
-
-	BlockKey blockKey = it->getKey();
-	ASSERT(blockKey.m_size >= requiredSize);
-	ASSERT(blockKey.m_offset + blockKey.m_size <= getEndOffset());
-
-	bool isLastBlock = blockKey.m_offset + blockKey.m_size >= getEndOffset();
-
-	size_t actualSize = 0;
-	FileHeapPtr ptr = viewBlock(blockKey.m_offset, requiredSize, &actualSize, isPinned);
-	if (!ptr)
-		return ptr;
-
-	FileHeapBlock* block = (FileHeapBlock*)ptr.p() - 1;
-	if (block->m_flags & FileHeapBlockFlag_Allocated) // marked free in map but actually allocated
-		return err::fail(FileHeapPtr(), "corrupted file heap");
-
-	size_t leftoverSize = blockKey.m_size - requiredSize;
-	if (leftoverSize < MinBlockSize) { // leftover too small to be useful
-		if (!isLastBlock) {
-			bool result = updateNextBlock(blockKey.m_offset, blockKey.m_size, true);
-			if (!result)
-				return FileHeapPtr();
-		}
-
-		m_freeBlockMap.erase(it);
-	} else { // split off the leftover as a new free block
-		uint64_t leftoverOffset = blockKey.m_offset + requiredSize;
-		FileHeapBlock* leftoverBlock;
-		if (actualSize >= requiredSize + sizeof(FileHeapBlock))
-			leftoverBlock = (FileHeapBlock*)((char*)block + requiredSize);
-		else {
-			leftoverBlock = (FileHeapBlock*)m_file.view(leftoverOffset, sizeof(FileHeapBlock));
-			if (!leftoverBlock)
-				return FileHeapPtr();
-		}
-
-		if (isLastBlock)
-			m_hdr->m_lastBlockOffset = leftoverOffset;
-		else {
-			bool result = updateNextBlock(leftoverOffset, leftoverSize, false);
-			if (!result)
-				return FileHeapPtr();
-		}
-
-		block->m_size = (uint32_t)requiredSize;
-		ptr.m_size = block->m_size;
-
-		leftoverBlock->m_signature = FileHeapConst_BlockSignature;
-		leftoverBlock->m_size = (uint32_t)leftoverSize;
-		leftoverBlock->m_prevSize = (uint32_t)requiredSize;
-		leftoverBlock->m_flags = FileHeapBlockFlag_PrevAllocated;
-
-		m_freeBlockMap.erase(it);
-		addFreeBlock(leftoverOffset, leftoverSize);
-		m_hdr->m_blockCount++;
-	}
-
-	block->m_flags |= FileHeapBlockFlag_Allocated;
-	return ptr;
-}
-
-FileHeapPtr
-FileHeap::materializeImpl(
-	uint64_t offset0,
-	bool isPinned
-) {
-	if (offset0 < sizeof(FileHeapHdr) + sizeof(FileHeapBlock))
-		return FileHeapPtr();
-
-	uint64_t offset = offset0 - sizeof(FileHeapBlock);
-	size_t actualSize = 0;
-	FileHeapPtr ptr = viewBlock(offset, sizeof(FileHeapBlock), &actualSize, isPinned);
-	if (!ptr)
-		return ptr;
-
-	FileHeapBlock* block = (FileHeapBlock*)ptr.p() - 1;
-	if (block->m_size <= actualSize)
-		return ptr;
-
-	return viewBlock(offset, block->m_size, NULL, isPinned);
 }
 
 bool
@@ -343,7 +205,7 @@ FileHeap::free(uint64_t offset0) {
 	if (!(block->m_flags & FileHeapBlockFlag_PrevAllocated) &&
 		block->m_size <= MaxBlockSize - block->m_prevSize
 	) {
-		size_t blockSize = block->m_size; // viewBlock() below may evict this block
+		size_t blockSize = block->m_size; // viewBlockUnpinned() below may evict this block
 		size_t prevSize = block->m_prevSize;
 		uint64_t prevOffset = offset - prevSize;
 		FileHeapBlock* prevBlock = viewBlockUnpinned(prevOffset);
@@ -393,7 +255,7 @@ FileHeap::grow(uint32_t size0) {
 			Offset = sizeof(FileHeapHdr)
 		};
 
-		FileHeapBlock* block = (FileHeapBlock*)m_file.view(Offset, size);
+		FileHeapBlock* block = m_file.view<FileHeapBlock>(Offset, size);
 		if (!block)
 			return false;
 
@@ -428,7 +290,7 @@ FileHeap::grow(uint32_t size0) {
 		return err::fail("corrupted file heap");
 
 	size_t lastBlockSize = block->m_size;
-	block = (FileHeapBlock*)m_file.view(offset, sizeof(FileHeapBlock));
+	block = m_file.view<FileHeapBlock>(offset, sizeof(FileHeapBlock));
 	if (!block)
 		return false;
 

@@ -19,24 +19,6 @@ namespace io {
 
 //..............................................................................
 
-void*
-MappedFile::view(
-	uint64_t offset,
-	size_t size,
-	size_t* actualSize,
-	bool isPermanent
-) {
-	uint64_t end = size ? offset + size : m_file.getSize();
-	ViewEntry* viewEntry = viewImpl(isPermanent ? ViewKind_Permanent : ViewKind_Dynamic, offset, end);
-	if (!viewEntry)
-		return NULL;
-
-	if (actualSize)
-		*actualSize = (size_t)(viewEntry->m_end - offset);
-
-	return viewEntry->p(offset);
-}
-
 void
 MappedFile::unmapAllViews() {
 	// only permanent views are allowed here
