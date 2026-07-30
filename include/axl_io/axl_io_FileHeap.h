@@ -123,6 +123,10 @@ public:
 		src.init();
 	}
 
+	explicit operator bool () const {
+		return m_p != NULL;
+	}
+
 	operator T* () const {
 		return m_p;
 	}
@@ -231,7 +235,7 @@ public:
 		Alignment           = 8,
 		MinBlockSize        = sizeof(FileHeapBlock) + Alignment,
 		MaxBlockSize        = 0xffffffff - Alignment + 1,
-		MinDynamicViewCount = 3, // free() and allocate<T, false>() each keep 3 views live at once
+		MinDynamicViewCount = 3, // allocate, reallocate, free -- each need 3 views live at once
 		DefGrowSize         = 16 * 1024, // grow by 16K at a time
 	};
 
@@ -329,6 +333,14 @@ public:
 
 	template <typename T = void>
 	FileHeapPtr<T>
+	reallocate(
+		uint64_t offset,
+		size_t size,
+		bool isPinned = true
+	);
+
+	template <typename T = void>
+	FileHeapPtr<T>
 	materialize(
 		uint64_t offset,
 		bool isPinned = true
@@ -350,10 +362,28 @@ protected:
 		const FileHeapBlock* block
 	) const;
 
+	static
+	bool
+	validateBlockChain(
+		const FileHeapBlock* block,
+		uint32_t prevSize,
+		uint32_t prevFlags
+	);
+
 	FileHeapBlock*
 	viewBlockUnpinned(uint64_t offset) {
 		FileHeapBlock* block = m_file.view<FileHeapBlock>(offset, sizeof(FileHeapBlock));
 		return block && validateBlock(offset, block) ? block : NULL;
+	}
+
+	FileHeapBlock*
+	viewBlockUnpinned(
+		uint64_t offset,
+		uint32_t prevSize,
+		uint32_t prevFlags
+	) {
+		FileHeapBlock* block = viewBlockUnpinned(offset);
+		return block && validateBlockChain(block, prevSize, prevFlags) ? block : NULL;
 	}
 
 	template <typename T>
@@ -367,7 +397,7 @@ protected:
 
 	void
 	updateNextBlock(
-		FileHeapBlock* block,
+		FileHeapBlock* nextBlock,
 		uint32_t size,
 		bool isAllocated
 	);
@@ -378,9 +408,16 @@ protected:
 		uint32_t size,
 		bool isAllocated
 	) {
-		FileHeapBlock* block = viewBlockUnpinned(offset + size);
-		return block ? updateNextBlock(block, size, isAllocated), true : false;
+		FileHeapBlock* nextBlock = viewBlockUnpinned(offset + size);
+		return nextBlock ? updateNextBlock(nextBlock, size, isAllocated), true : false;
 	}
+
+	bool
+	createFreeBlock(
+		uint64_t offset,
+		uint32_t size,
+		uint32_t prevSize
+	);
 
 	void
 	addFreeBlock(
@@ -446,10 +483,7 @@ FileHeap::allocate(
 	size_t size,
 	bool isPinned
 ) {
-	if (!isOpen() || (m_file.getFlags() & FileFlag_ReadOnly)) {
-		err::setError(err::SystemErrorCode_InvalidDeviceState);
-		return FileHeapPtr<T>();
-	}
+	ASSERT(isOpen() && !(m_file.getFlags() & FileFlag_ReadOnly));
 
 	if (size > MaxBlockSize - sizeof(FileHeapBlock)) {
 		err::setError(err::SystemErrorCode_InvalidParameter);
@@ -459,11 +493,11 @@ FileHeap::allocate(
 	// FileHeapHdr & FileHeapBlock are already 8-byte aligned
 	// therefore aligning size on 8 is enough to keep all blocks 8-byte aligned
 
-	size_t requiredSize = sl::align<Alignment>(sizeof(FileHeapBlock) + size);
+	uint32_t requiredSize = sl::align<Alignment>(sizeof(FileHeapBlock) + size);
 	BlockMap::Iterator it = m_freeBlockMap.find<sl::RelOpKind_Ge>(BlockKey(0, requiredSize));
 	if (!it) {
-		bool ok = grow(requiredSize);
-		if (!ok)
+		bool result = grow(requiredSize);
+		if (!result)
 			return FileHeapPtr<T>();
 
 		it = m_freeBlockMap.find<sl::RelOpKind_Ge>(BlockKey(0, requiredSize));
@@ -474,10 +508,7 @@ FileHeap::allocate(
 	ASSERT(blockKey.m_size >= requiredSize);
 	ASSERT(blockKey.m_offset + blockKey.m_size <= getEndOffset());
 
-	bool isLastBlock = blockKey.m_offset + blockKey.m_size >= getEndOffset();
-
-	size_t actualSize = 0;
-	FileHeapPtr<T> ptr = viewBlock<T>(blockKey.m_offset, requiredSize, &actualSize, isPinned);
+	FileHeapPtr<T> ptr = viewBlock<T>(blockKey.m_offset, requiredSize, NULL, isPinned);
 	if (!ptr)
 		return ptr;
 
@@ -487,49 +518,115 @@ FileHeap::allocate(
 		return FileHeapPtr<T>();
 	}
 
-	size_t leftoverSize = blockKey.m_size - requiredSize;
-	if (leftoverSize < MinBlockSize) { // leftover too small to be useful
-		if (!isLastBlock) {
-			bool result = updateNextBlock(blockKey.m_offset, blockKey.m_size, true);
-			if (!result)
-				return FileHeapPtr<T>();
-		}
+	uint32_t leftoverSize = blockKey.m_size - requiredSize;
+	if (leftoverSize >= MinBlockSize) {
+		bool result = createFreeBlock(blockKey.m_offset + requiredSize, leftoverSize, requiredSize);
+		if (!result)
+			return FileHeapPtr<T>();
 
-		m_freeBlockMap.erase(it);
-	} else { // split off the leftover as a new free block
-		uint64_t leftoverOffset = blockKey.m_offset + requiredSize;
-		FileHeapBlock* leftoverBlock;
-		if (actualSize >= requiredSize + sizeof(FileHeapBlock))
-			leftoverBlock = (FileHeapBlock*)((char*)block + requiredSize);
-		else {
-			leftoverBlock = m_file.view<FileHeapBlock>(leftoverOffset, sizeof(FileHeapBlock));
-			if (!leftoverBlock)
-				return FileHeapPtr<T>();
-		}
-
-		if (isLastBlock)
-			m_hdr->m_lastBlockOffset = leftoverOffset;
-		else {
-			bool result = updateNextBlock(leftoverOffset, leftoverSize, false);
-			if (!result)
-				return FileHeapPtr<T>();
-		}
-
-		block->m_size = (uint32_t)requiredSize;
-		ptr.m_size = block->m_size;
-
-		leftoverBlock->m_signature = FileHeapConst_BlockSignature;
-		leftoverBlock->m_size = (uint32_t)leftoverSize;
-		leftoverBlock->m_prevSize = (uint32_t)requiredSize;
-		leftoverBlock->m_flags = FileHeapBlockFlag_PrevAllocated;
-
-		m_freeBlockMap.erase(it);
-		addFreeBlock(leftoverOffset, leftoverSize);
-		m_hdr->m_blockCount++;
+		block->m_size = requiredSize;
+		ptr.m_size = requiredSize - sizeof(FileHeapBlock);
+	} else if (blockKey.m_offset < m_hdr->m_lastBlockOffset) {
+		bool result = updateNextBlock(blockKey.m_offset, blockKey.m_size, true);
+		if (!result)
+			return FileHeapPtr<T>();
 	}
 
+	m_freeBlockMap.erase(it);
 	block->m_flags |= FileHeapBlockFlag_Allocated;
 	return ptr;
+}
+
+template <typename T>
+FileHeapPtr<T>
+FileHeap::reallocate(
+	uint64_t offset0,
+	size_t size,
+	bool isPinned
+) {
+	ASSERT(isOpen() && !(m_file.getFlags() & FileFlag_ReadOnly));
+
+	if (offset0 == -1)
+		return allocate<T>(size, isPinned);
+
+	uint64_t offset = offset0 - sizeof(FileHeapBlock);
+	if (offset < sizeof(FileHeapHdr) ||
+		offset >= getEndOffset() ||
+		size > MaxBlockSize - sizeof(FileHeapBlock)
+	) {
+		err::setError(err::SystemErrorCode_InvalidParameter);
+		return FileHeapPtr<T>();
+	}
+
+	FileHeapBlock* block = viewBlockUnpinned(offset);
+	if (!block)
+		return FileHeapPtr<T>();
+
+	if (!(block->m_flags & FileHeapBlockFlag_Allocated)) {
+		err::setError("attempt to relocate a non-allocated file heap block");
+		return FileHeapPtr<T>();
+	}
+
+	// try to reallocate in place (using the next block if possible)
+
+	bool isUpdateNextBlockNeeded = false;
+	uint32_t requiredSize = sl::align<Alignment>(sizeof(FileHeapBlock) + size);
+	if (offset < m_hdr->m_lastBlockOffset) { // merge with next free block if it's free and big enough
+		uint64_t nextOffset = offset + block->m_size;
+		FileHeapBlock* nextBlock = viewBlockUnpinned(nextOffset, block->m_size, FileHeapBlockFlag_Allocated);
+		if (!nextBlock)
+			return FileHeapPtr<T>();
+
+		uint64_t combinedSize = (uint64_t)block->m_size + nextBlock->m_size;
+		if (!(nextBlock->m_flags & FileHeapBlockFlag_Allocated) &&
+			combinedSize >= requiredSize &&
+			combinedSize <= MaxBlockSize
+		) {
+			removeFreeBlock(nextOffset, nextBlock->m_size);
+			block->m_size = (uint32_t)combinedSize;
+
+			if (m_hdr->m_lastBlockOffset == nextOffset)
+				m_hdr->m_lastBlockOffset = offset;
+			else
+				isUpdateNextBlockNeeded = true;
+
+			m_hdr->m_blockCount--;
+		}
+	}
+
+	if (block->m_size >= requiredSize) { // yes, we can reallocate in place
+		uint32_t leftoverSize = block->m_size - requiredSize;
+		if (leftoverSize >= MinBlockSize) {
+			block->m_size = requiredSize; // createFreeBlock can unmap block
+			bool result = createFreeBlock(offset + requiredSize, leftoverSize, requiredSize);
+			if (!result)
+				return FileHeapPtr<T>();
+		} else if (isUpdateNextBlockNeeded) {
+			bool result = updateNextBlock(offset, block->m_size, true);
+			if (!result)
+				return FileHeapPtr<T>();
+		}
+
+		return materialize<T>(offset0, isPinned);
+	}
+
+	// nope, full path
+
+	FileHeapPtr<T> dst = allocate<T>(size, true); // pin against free
+	FileHeapPtr<T> src = materialize<T>(offset0, false);
+	if (!src || !dst)
+		return FileHeapPtr<T>();
+
+	memcpy(dst.p(), src.p(), src.getSize());
+
+	bool result = free(offset0);
+	if (!result)
+		return FileHeapPtr<T>();
+
+	if (!isPinned)
+		dst.unpin();
+
+	return dst;
 }
 
 template <typename T>
@@ -538,16 +635,25 @@ FileHeap::materialize(
 	uint64_t offset0,
 	bool isPinned
 ) {
-	if (offset0 < sizeof(FileHeapHdr) + sizeof(FileHeapBlock))
-		return FileHeapPtr<T>();
+	ASSERT(isOpen());
 
 	uint64_t offset = offset0 - sizeof(FileHeapBlock);
+	if (offset < sizeof(FileHeapHdr) || offset >= getEndOffset()) {
+		err::setError(err::SystemErrorCode_InvalidParameter);
+		return FileHeapPtr<T>();
+	}
+
 	size_t actualSize = 0;
 	FileHeapPtr<T> ptr = viewBlock<T>(offset, sizeof(FileHeapBlock), &actualSize, isPinned);
 	if (!ptr)
 		return ptr;
 
 	FileHeapBlock* block = (FileHeapBlock*)ptr.p() - 1;
+	if (!(block->m_flags & FileHeapBlockFlag_Allocated)) {
+		err::setError("attempt to materialize a non-allocated file heap block");
+		return FileHeapPtr<T>();
+	}
+
 	if (block->m_size <= actualSize)
 		return ptr;
 
@@ -564,6 +670,21 @@ FileHeap::validateBlock(
 		block->m_size < sizeof(FileHeapBlock) ||
 		block->m_size > MaxBlockSize ||
 		block->m_size + offset > getEndOffset()
+	)
+		return err::fail("corrupted file heap");
+
+	return true;
+}
+
+inline
+bool
+FileHeap::validateBlockChain(
+	const FileHeapBlock* block,
+	uint32_t prevSize,
+	uint32_t prevFlags
+) {
+	if (block->m_prevSize != prevSize ||
+		((block->m_flags & FileHeapBlockFlag_PrevAllocated) >> 1) != (prevFlags & FileHeapBlockFlag_Allocated)
 	)
 		return err::fail("corrupted file heap");
 
@@ -587,26 +708,27 @@ FileHeap::viewBlock(
 		*actualSize = view.getSize();
 
 	T* p = (T*)(block + 1);
-	offset += sizeof(FileHeapBlock);
+	uint64_t payloadOffset = offset + sizeof(FileHeapBlock);
+	uint32_t payloadSize = block->m_size - sizeof(FileHeapBlock);
 
 	if (isPinned)
-		return FileHeapPtr<T>(std::move(view), p, offset, block->m_size);
+		return FileHeapPtr<T>(std::move(view), p, payloadOffset, payloadSize);
 	else
-		return FileHeapPtr<T>(p, offset, block->m_size);
+		return FileHeapPtr<T>(p, payloadOffset, payloadSize);
 }
 
 inline
 void
 FileHeap::updateNextBlock(
-	FileHeapBlock* block,
+	FileHeapBlock* nextBlock,
 	uint32_t size,
 	bool isAllocated
 ) {
-	block->m_prevSize = size;
+	nextBlock->m_prevSize = size;
 	if (isAllocated)
-		block->m_flags |= FileHeapBlockFlag_PrevAllocated;
+		nextBlock->m_flags |= FileHeapBlockFlag_PrevAllocated;
 	else
-		block->m_flags &= ~FileHeapBlockFlag_PrevAllocated;
+		nextBlock->m_flags &= ~FileHeapBlockFlag_PrevAllocated;
 }
 
 //..............................................................................
