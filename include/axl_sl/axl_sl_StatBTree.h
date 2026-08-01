@@ -386,13 +386,13 @@ public:
 	// the grand total over all the elements
 
 	Stat
-	calcStat() const {
-		return calcStat<Stat>();
+	getFullStat() const {
+		return getFullStat<Stat>();
 	}
 
 	template <typename Partial>
 	Partial
-	calcStat() const {
+	getFullStat() const {
 		return m_root ? Partial(m_root->m_stat) : Partial(Stat());
 	}
 

@@ -180,7 +180,7 @@ getIteratorAt(
 //   what catches broken leaf links and lost/duplicated payload)
 // - calcStat(it) equals the INCLUSIVE prefix at every position (walks UP the
 //   spine, so it catches broken parent pointers and stale node stats)
-// - calcStat() equals the grand total
+// - getFullStat() equals the grand total
 // - findByStat(target) for every target 0 .. total + 2 equals the smallest
 //   index whose inclusive prefix is >= target (ties from zero-count elements
 //   resolve to the first one), empty iterator if target > total; on success
@@ -219,11 +219,11 @@ verifyTree(
 
 	TEST_ASSERT(i == count);
 
-	SpanStat total = tree.calcStat();
+	SpanStat total = tree.getFullStat();
 	TEST_ASSERT(total.m_lineCount == lineTotal);
 	TEST_ASSERT(total.m_charCount == charTotal);
-	TEST_ASSERT(tree.template calcStat<LineStat>().m_value == lineTotal);
-	TEST_ASSERT(tree.template calcStat<CharStat>().m_value == charTotal);
+	TEST_ASSERT(tree.template getFullStat<LineStat>().m_value == lineTotal);
+	TEST_ASSERT(tree.template getFullStat<CharStat>().m_value == charTotal);
 
 	i = count;
 	for (Iterator it = tree.getTail(); it; it--) {
@@ -311,8 +311,8 @@ test_Empty() {
 	TEST_ASSERT(tree.isEmpty());
 	TEST_ASSERT(!tree.getHead());
 	TEST_ASSERT(!tree.getTail());
-	TEST_ASSERT(tree.calcStat().m_lineCount == 0);
-	TEST_ASSERT(tree.calcStat<LineStat>().m_value == 0);
+	TEST_ASSERT(tree.getFullStat().m_lineCount == 0);
+	TEST_ASSERT(tree.getFullStat<LineStat>().m_value == 0);
 	TEST_ASSERT(!tree.findByStat<LineStat>(LineStat(0)));
 	TEST_ASSERT(!tree.findByStat<LineStat>(LineStat(7)));
 	TEST_ASSERT(!tree.calcStat<LineStat>(nullIt).m_value);
@@ -324,7 +324,8 @@ test_Empty() {
 	verifyTree(tree, reference);
 }
 
-// the Stat = T default path, plus the scalar (non-projected) calcStat/findByStat
+// the Stat = T default path, plus the scalar (non-projected)
+// calcStat/getFullStat/findByStat
 
 void
 test_Scalar() {
@@ -355,7 +356,7 @@ test_Scalar() {
 	}
 
 	TEST_ASSERT(i == ElementCount);
-	TEST_ASSERT(tree.calcStat() == total);
+	TEST_ASSERT(tree.getFullStat() == total);
 
 	size_t modelIndex = 0;
 	uint64_t modelSum = 0;
