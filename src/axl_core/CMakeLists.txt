@@ -132,6 +132,7 @@ set(
 	${AXL_INC_DIR}/axl_sl/axl_sl_ArrayDetails.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_AutoPtrArray.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_BinTree.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_BinTreeBase.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_BitIdx.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_BitMap.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_BoyerMooreFind.h
@@ -162,8 +163,11 @@ set(
 	${AXL_INC_DIR}/axl_sl/axl_sl_Packer.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_Packetizer.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_Protocol.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_RbBalancer.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_RbTree.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_RangeTree.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_StatBinTree.h
+	${AXL_INC_DIR}/axl_sl/axl_sl_StatRbTree.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_String.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_StringDetails.h
 	${AXL_INC_DIR}/axl_sl/axl_sl_StringHashTable.h

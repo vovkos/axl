@@ -43,6 +43,7 @@ set(
 	test_RobinHashTable.cpp
 	test_SlruCache.cpp
 	test_StatBTree.cpp
+	test_StatBinTree.cpp
 	test_StringTemplate.cpp
 	test_Unicode.cpp
 	test_Usb.cpp

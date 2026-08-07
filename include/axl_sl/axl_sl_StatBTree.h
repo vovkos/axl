@@ -744,7 +744,6 @@ protected:
 				prev->m_stat -= stat;
 				node->m_stat += stat;
 			}
-
 		} else { // merge of borrow from right
 			ASSERT(slot < parent->m_count - 1);
 			NodeType* next = (NodeType*)parent->m_childArray[slot + 1];

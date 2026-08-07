@@ -23,6 +23,8 @@
 #include "axl_sl_RangeTree.h"
 #include "axl_sl_FenwickTree.h"
 #include "axl_sl_StatBTree.h"
+#include "axl_sl_StatBinTree.h"
+#include "axl_sl_StatRbTree.h"
 #include "axl_sl_BoxList.h"
 #include "axl_sl_BitMap.h"
 #include "axl_sl_Packer.h"
