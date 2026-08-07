@@ -13,7 +13,7 @@
 
 #define _AXL_SL_BINTREE_H
 
-#include "axl_sl_List.h"
+#include "axl_sl_BinTreeBase.h"
 #include "axl_sl_MapEntry.h"
 
 namespace axl {
@@ -22,46 +22,49 @@ namespace sl {
 //..............................................................................
 
 template <
-	typename T,
 	typename Key,
 	typename Value,
+	typename Balancer,
 	typename KeyValueArgs = ArgTypes<Key, Value>
 >
-struct BinTreeNodeBase: MapEntry<Key, Value, KeyValueArgs> {
-protected:
-	T* m_parent;
-	T* m_left;
-	T* m_right;
+struct BinTreeNode : public BinTreeNodeBase<
+	BinTreeNode<Key, Value, Balancer, KeyValueArgs>,
+	MapEntry<Key, Value, KeyValueArgs>,
+	typename std::tuple_element<0, KeyValueArgs>::type,
+	Balancer
+> {
+	typedef typename std::tuple_element<0, KeyValueArgs>::type KeyArg;
+	typedef sl::MapEntry<Key, Value, KeyValueArgs> MapEntry;
+	typedef sl::BinTreeNodeBase<BinTreeNode, MapEntry, KeyArg, Balancer> BinTreeNodeBase;
 
-protected:
-	BinTreeNodeBase(
-		typename BinTreeNodeBase::KeyArg key,
-		T* parent
+	template <
+		typename Node,
+		typename Balancer2,
+		typename Cmp
+	>
+	friend class BinTree;
+
+	BinTreeNode(
+		KeyArg key,
+		BinTreeNode* parent
 	):
-		MapEntry<Key, Value, KeyValueArgs>(key) {
-		m_parent = parent;
-		m_left = NULL;
-		m_right = NULL;
+		BinTreeNodeBase(key, parent)
+	{
 	}
-
-	// overridable
-
-	static
-	void
-	onXcg(
-		T* node1,
-		T* node2
-	) {}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename T,
 	typename Node0,
+	typename Balancer,
 	typename Cmp
 >
-class BinTreeBase {
+class BinTree: public BinTreeBase<
+	BinTree<Node0, Balancer, Cmp>,
+	Node0,
+	Balancer
+> {
 public:
 	typedef Node0 Node;
 	typedef typename Node::Key Key;
@@ -72,13 +75,10 @@ public:
 	typedef sl::ConstIterator<Node> ConstIterator;
 
 protected:
-	List<Node> m_nodeList;
-	Node* m_root;
 	Cmp m_cmp;
 
 public:
-	explicit BinTreeBase(const Cmp& cmp = Cmp()) {
-		m_root = NULL;
+	explicit BinTree(const Cmp& cmp = Cmp()) {
 		m_cmp = cmp;
 	}
 
@@ -89,37 +89,7 @@ public:
 
 	const Value&
 	operator [] (KeyArg key) const {
-		return visit(key)->m_value;
-	}
-
-	bool
-	isEmpty() const {
-		return m_nodeList.isEmpty();
-	}
-
-	size_t
-	getCount() const {
-		return m_nodeList.getCount();
-	}
-
-	Iterator
-	getHead() {
-		return m_nodeList.getHead();
-	}
-
-	ConstIterator
-	getHead() const {
-		return m_nodeList.getHead();
-	}
-
-	Iterator
-	getTail() {
-		return m_nodeList.getTail();
-	}
-
-	ConstIterator
-	getTail() const {
-		return m_nodeList.getTail();
+		return const_cast<BinTree*>(this)->visit(key)->m_value;
 	}
 
 	Iterator
@@ -130,7 +100,7 @@ public:
 
 	ConstIterator
 	find(KeyArg key) const {
-		return ((BinTreeBase*)this)->find(key); // a simple const-cast
+		return const_cast<BinTree*>(this)->find(key);
 	}
 
 	template <RelOpKind opKind>
@@ -147,12 +117,12 @@ public:
 			return leNode;
 
 		case RelOpKind_Gt:
-			return leNode ? Iterator(leNode).getNext() : getHead();
+			return leNode ? Iterator(leNode).getNext() : this->getHead();
 
 		case RelOpKind_Ge:
 			return leNode ?
 				!m_cmp(leNode->m_key, key) ? leNode : Iterator(leNode).getNext() :
-				getHead();
+				this->getHead();
 
 		default:
 			return leNode && !m_cmp(leNode->m_key, key) ? leNode : NULL;
@@ -162,7 +132,7 @@ public:
 	template <RelOpKind opKind>
 	ConstIterator
 	find(KeyArg key) const {
-		return ((BinTreeBase*)this)->find<opKind>(key); // a simple const-cast
+		return const_cast<BinTree*>(this)->find<opKind>(key);
 	}
 
 	Value
@@ -186,11 +156,11 @@ public:
 
 	Iterator
 	visit(KeyArg key) {
-		Node* node = m_root;
+		Node* node = this->m_root;
 		if (!node) {
 			node = new Node(key, NULL);
-			m_root = node;
-			return m_nodeList.insertTail(node);
+			this->m_root = node;
+			return this->m_nodeList.insertTail(node);
 		}
 
 		Node* child;
@@ -201,7 +171,7 @@ public:
 				else {
 					child = new Node(key, node);
 					node->m_left = child;
-					m_nodeList.insertBefore(child, node);
+					this->m_nodeList.insertBefore(child, node);
 					break;
 				}
 			} else if (m_cmp(node->m_key, key)) {
@@ -210,13 +180,13 @@ public:
 				else {
 					child = new Node(key, node);
 					node->m_right = child;
-					m_nodeList.insertAfter(child, node);
+					this->m_nodeList.insertAfter(child, node);
 					break;
 				}
 			} else
 				return node;
 
-		static_cast<T*>(this)->onInsert(child);
+		Balancer::onInsert(this, child);
 		return child;
 	}
 
@@ -236,13 +206,13 @@ public:
 		ValueArg value,
 		bool* isNew
 	) {
-		size_t prevCount = getCount();
+		size_t prevCount = this->getCount();
 
 		Iterator it = visit(key);
 		it->m_value = value;
 
 		if (isNew)
-			*isNew = getCount() > prevCount;
+			*isNew = this->getCount() > prevCount;
 
 		return it;
 	}
@@ -252,36 +222,15 @@ public:
 		KeyArg key,
 		ValueArg value
 	) {
-		size_t prevCount = getCount();
+		size_t prevCount = this->getCount();
 
 		Iterator it = visit(key);
 
-		if (getCount() == prevCount)
+		if (this->getCount() == prevCount)
 			return NULL;
 
 		it->m_value = value;
 		return it;
-	}
-
-	void
-	erase(Iterator it) {
-		Node* node = *it;
-
-		if (node->m_left && node->m_right) {
-			ASSERT(node->m_prev == getRightmostChild(node->m_left));
-			ASSERT(node->m_next == getLeftmostChild(node->m_right));
-
-			xcg(node, (Node*)node->m_next);
-			ASSERT(!node->m_left);
-
-			// same effect:
-			// xcg((Node*)node->m_prev, node);
-			// ASSERT(!node->m_right);
-		}
-
-		Node* child = replaceWithChild(node);
-		static_cast<T*>(this)->onErase(node, child);
-		m_nodeList.erase(node);
 	}
 
 	bool
@@ -290,21 +239,63 @@ public:
 		if (!it)
 			return false;
 
-		erase(it);
+		this->erase(it);
 		return true;
 	}
 
+#ifdef _AXL_DEBUG
 	void
-	clear() {
-		m_nodeList.clear();
-		m_root = NULL;
+	assertValid() const {
+		ASSERT(!this->m_root || !this->m_root->m_parent);
+
+		ConstIterator it = this->getHead();
+		size_t count = 0;
+		assertValidNode(this->m_root, NULL, NULL, &it, &count);
+
+		ASSERT(!it); // the chain must hold no nodes the tree doesn't
+		ASSERT(count == this->getCount());
 	}
+#endif
 
 protected:
+#ifdef _AXL_DEBUG
+	void
+	assertValidNode(
+		const Node* p,
+		const Node* lowerBound,
+		const Node* higherBound,
+		ConstIterator* it,
+		size_t* count
+	) const {
+		if (!p)
+			return;
+
+		if (lowerBound)
+			ASSERT(m_cmp(lowerBound->m_key, p->m_key)); // strictly greater than the lower bound
+
+		if (higherBound)
+			ASSERT(m_cmp(p->m_key, higherBound->m_key)); // strictly less than the upper bound
+
+		if (p->m_left)
+			ASSERT(p->m_left->m_parent == p);
+
+		if (p->m_right)
+			ASSERT(p->m_right->m_parent == p);
+
+		assertValidNode(p->m_left, lowerBound, p, it, count);
+
+		ASSERT(*it && *(*it) == p); // in-order position must match the chain
+		(*it)++;
+		(*count)++;
+
+		assertValidNode(p->m_right, p, higherBound, it, count);
+	}
+#endif
+
 	Node*
 	findLeNode(KeyArg key) {
 		Node* leNode = NULL;
-		Node* node = m_root;
+		Node* node = this->m_root;
 		while (node)
 			if (m_cmp(key, node->m_key))
 				node = node->m_left;
@@ -316,187 +307,14 @@ protected:
 		return leNode;
 	}
 
-	Node*
-	getLeftmostChild(Node* node) {
-		while (node->m_left)
-			node = node->m_left;
-
-		return node;
-	}
-
-	Node*
-	getRightmostChild(Node* node) {
-		while (node->m_right)
-			node = node->m_right;
-
-		return node;
-	}
-
-	void
-	xcg(
-		Node* prev,
-		Node* next
-	) {
-		ASSERT(prev != next->m_right);
-		ASSERT(next != prev->m_left);
-
-		// handle direct parent-child relations
-
-		if (prev == next->m_left) {
-			Node* oldLeft = prev->m_left;
-			Node* oldRight = prev->m_right;
-
-			prev->m_left = next;
-			prev->m_right = next->m_right;
-			prev->m_parent = next->m_parent;
-
-			next->m_left = oldLeft;
-			next->m_right = oldRight;
-			next->m_parent = prev;
-		} else if (next == prev->m_right) {
-			Node* oldParent = prev->m_parent;
-			Node* oldLeft = prev->m_left;
-
-			prev->m_left = next->m_left;
-			prev->m_right = next->m_right;
-			prev->m_parent = next;
-
-			next->m_left = oldLeft;
-			next->m_right = prev;
-			next->m_parent = oldParent;
-		} else {
-			Node* oldParent = prev->m_parent;
-			Node* oldLeft = prev->m_left;
-			Node* oldRight = prev->m_right;
-
-			prev->m_left = next->m_left;
-			prev->m_right = next->m_right;
-			prev->m_parent = next->m_parent;
-
-			next->m_left = oldLeft;
-			next->m_right = oldRight;
-			next->m_parent = oldParent;
-		}
-
-		// fixup parents
-
-		if (!prev->m_parent)
-			m_root = prev;
-		else if (prev->m_parent->m_left == next)
-			prev->m_parent->m_left = prev;
-		else
-			prev->m_parent->m_right = prev;
-
-		if (!next->m_parent)
-			m_root = next;
-		else if (next->m_parent->m_left == prev)
-			next->m_parent->m_left = next;
-		else
-			next->m_parent->m_right = next;
-
-		// fixup children
-
-		if (prev->m_left)
-			prev->m_left->m_parent = prev;
-
-		if (prev->m_right)
-			prev->m_right->m_parent = prev;
-
-		if (next->m_left)
-			next->m_left->m_parent = next;
-
-		if (next->m_right)
-			next->m_right->m_parent = next;
-
-		Node::onXcg(prev, next);
-	}
-
-	Node*
-	replaceWithChild(Node* node) {
-		Node* child = node->m_right ? node->m_right : node->m_left;
-
-		if (!node->m_parent) {
-			ASSERT(node == m_root);
-			m_root = child;
-		} else if (node == node->m_parent->m_left)
-			node->m_parent->m_left = child;
-		else
-			node->m_parent->m_right = child;
-
-		if (child)
-			child->m_parent = node->m_parent;
-
-		return child;
-	}
-
-	void
-	rotateLeft(Node* x) {
-		Node* y = x->m_right;
-		ASSERT(y);
-
-		x->m_right = y->m_left;
-
-		if (y->m_left)
-			y->m_left->m_parent = x;
-
-		y->m_parent = x->m_parent;
-
-		if (!x->m_parent)
-			m_root = y;
-		else if (x == x->m_parent->m_left)
-			x->m_parent->m_left = y;
-		else
-			x->m_parent->m_right = y;
-
-		y->m_left = x;
-		x->m_parent = y;
-	}
-
-	void
-	rotateRight(Node* x) {
-		Node* y = x->m_left;
-		ASSERT(y);
-
-		x->m_left = y->m_right;
-
-		if (y->m_right)
-			y->m_right->m_parent = x;
-
-		y->m_parent = x->m_parent;
-
-		if (!x->m_parent)
-			m_root = y;
-		else if (x == x->m_parent->m_right)
-			x->m_parent->m_right = y;
-		else
-			x->m_parent->m_left = y;
-
-		y->m_right = x;
-		x->m_parent = y;
-	}
-
 	void
 	adjustKey(
 		Node* x,
-		KeyArg key
+		KeyArg key // the tree order must stays intact!
 	) {
-		// assert the tree order stays intact
-
 		ASSERT(!x->m_prev || m_cmp(((Node*)x->m_prev)->m_key, key));
 		ASSERT(!x->m_next || m_cmp(key, ((Node*)x->m_next)->m_key));
 		x->m_key = key;
-	}
-
-	// overridables: tree rebalancing on insert/delete
-
-	void
-	onInsert(Node* node) {}
-
-	void
-	onErase(
-		Node* node,
-		Node* child
-	) {
 	}
 };
 

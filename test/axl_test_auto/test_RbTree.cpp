@@ -148,6 +148,12 @@ test_Randomized() {
 
 		TEST_ASSERT(tree.getCount() == expectedCount);
 
+#ifdef _AXL_DEBUG
+		// full O(n) structural check -- periodic, so the debug run stays quick
+		if ((i & 0xff) == 0)
+			tree.assertValid();
+#endif
+
 		seed = seed * 1664525 + 1013904223;
 		key = (seed >> 8) & (KeyCount - 1);
 		sl::RbTree<uint_t, uint_t>::Iterator it = tree.find(key);
@@ -167,6 +173,10 @@ test_Randomized() {
 		prev = it->getKey();
 		hasPrev = true;
 	}
+
+#ifdef _AXL_DEBUG
+	tree.assertValid();
+#endif
 }
 
 void
