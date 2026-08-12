@@ -430,7 +430,10 @@ public:
 		Arg a,
 		Arg b
 	) const {
-		return a < b ? a : b;
+		if (a < b)
+			return a;
+		else
+			return b;
 	}
 };
 
@@ -445,7 +448,10 @@ public:
 		Arg a,
 		Arg b
 	) const {
-		return a > b ? a : b;
+		if (a > b)
+			return a;
+		else
+			return b;
 	}
 };
 
@@ -650,6 +656,176 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
+	typename T,
+	typename Arg = ArgType<T>
+>
+class AddAssign {
+public:
+	void
+	operator () (
+		T& a,
+		Arg b
+	) const {
+		a += b;
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <
+	typename T,
+	typename Arg = ArgType<T>
+>
+class SubAssign {
+public:
+	void
+	operator () (
+		T& a,
+		Arg b
+	) const {
+		a -= b;
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <
+	typename T,
+	typename Arg = ArgType<T>
+>
+class MulAssign {
+public:
+	void
+	operator () (
+		T& a,
+		Arg b
+	) const {
+		a *= b;
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <
+	typename T,
+	typename Arg = ArgType<T>
+>
+class DivAssign {
+public:
+	void
+	operator () (
+		T& a,
+		Arg b
+	) const {
+		a /= b;
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <
+	typename T,
+	typename Arg = ArgType<T>
+>
+class ModAssign {
+public:
+	void
+	operator () (
+		T& a,
+		Arg b
+	) const {
+		a %= b;
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <
+	typename T,
+	typename Arg = ArgType<T>
+>
+class ShlAssign {
+public:
+	void
+	operator () (
+		T& a,
+		Arg b
+	) const {
+		a <<= b;
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <
+	typename T,
+	typename Arg = ArgType<T>
+>
+class ShrAssign {
+public:
+	void
+	operator () (
+		T& a,
+		Arg b
+	) const {
+		a >>= b;
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <
+	typename T,
+	typename Arg = ArgType<T>
+>
+class AndAssign {
+public:
+	void
+	operator () (
+		T& a,
+		Arg b
+	) const {
+		a &= b;
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <
+	typename T,
+	typename Arg = ArgType<T>
+>
+class XorAssign {
+public:
+	void
+	operator () (
+		T& a,
+		Arg b
+	) const {
+		a ^= b;
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <
+	typename T,
+	typename Arg = ArgType<T>
+>
+class OrAssign {
+public:
+	void
+	operator () (
+		T& a,
+		Arg b
+	) const {
+		a |= b;
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <
 	typename Func,
 	typename T,
 	typename Arg = ArgType<T>
@@ -661,7 +837,7 @@ public:
 		T& a,
 		Arg b
 	) const {
-		a = Func() (a, b);
+		a = Func()(a, b);
 	}
 };
 
