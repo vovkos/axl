@@ -15,6 +15,7 @@
 
 #include "axl_sl_List.h"
 #include "axl_sl_ArrayDetails.h"
+#include "axl_sl_Operator.h"
 
 namespace axl {
 namespace sl {
@@ -48,16 +49,20 @@ struct StatBTreeNodeRoot {
 
 	void
 	addStat(StatArg delta) {
-		m_stat += delta;
-		for (StatBTreeNodeRoot* p = m_parent; p; p = p->m_parent)
-			p->m_stat += delta;
+		addStat<AddAssign<Stat, StatArg> >(delta);
 	}
 
 	void
 	subStat(StatArg delta) {
-		m_stat -= delta;
+		addStat<SubAssign<Stat, StatArg> >(delta);
+	}
+
+	template <typename Op>
+	void
+	addStat(StatArg delta) {
+		Op()(m_stat, delta);
 		for (StatBTreeNodeRoot* p = m_parent; p; p = p->m_parent)
-			p->m_stat -= delta;
+			Op()(p->m_stat, delta);
 	}
 };
 
@@ -462,6 +467,8 @@ public:
 	> StatBTreeIteratorBase;
 
 	typedef typename StatBTreeIteratorBase::LeafIterator LeafIterator;
+	typedef typename StatBTreeIteratorBase::Leaf Leaf;
+	typedef typename StatBTreeIteratorBase::StatArg StatArg;
 
 	StatBTreeIterator() {}
 
@@ -469,6 +476,27 @@ public:
 		const LeafIterator& leafIt,
 		size_t slot
 	): StatBTreeIteratorBase(leafIt, slot) {}
+
+	void
+	addStat(StatArg delta) {
+		addStat<AddAssign<Stat, StatArg> >(delta);
+	}
+
+	void
+	subStat(StatArg delta) {
+		addStat<SubAssign<Stat, StatArg> >(delta);
+	}
+
+protected:
+	template <typename Op>
+	void
+	addStat(StatArg delta) {
+		Leaf* leaf = *this->m_leafIt;
+		ASSERT(leaf && this->m_slot < leaf->m_count);
+
+		Op()(leaf->m_childArray[this->m_slot], delta);
+		leaf->template addStat<Op>(delta);
+	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -797,36 +825,6 @@ public:
 			}
 		} else if (leaf->m_count < Fanout / 2) // borrow/merge only rearranges stats
 			onUnderflow(leaf);
-	}
-
-	void
-	addStat(
-		Iterator it,
-		StatArg delta
-	) {
-		ASSERT(it);
-
-		Leaf* leaf = *it.getLeafIterator();
-		size_t slot = it.getSlot();
-		ASSERT(slot < leaf->m_count);
-
-		leaf->m_childArray[slot] += delta;
-		leaf->addStat(delta);
-	}
-
-	void
-	subStat(
-		Iterator it,
-		StatArg delta
-	) {
-		ASSERT(it);
-
-		Leaf* leaf = *it.getLeafIterator();
-		size_t slot = it.getSlot();
-		ASSERT(slot < leaf->m_count);
-
-		leaf->m_childArray[slot] -= delta;
-		leaf->subStat(delta);
 	}
 
 protected:

@@ -482,8 +482,8 @@ testModify(size_t elementCount) {
 		typename sl::StatBTree<SpanStat, Span, Fanout>::Iterator it =
 			getIteratorAt(tree, index);
 
-		tree.subStat(it, SpanStat(reference[index]));
-		tree.addStat(it, SpanStat(span));
+		it.subStat(SpanStat(reference[index]));
+		it.addStat(SpanStat(span));
 		*it = span; // the value is writable straight through the iterator
 
 		reference.rwi()[index] = span;
