@@ -100,8 +100,14 @@ class StatBinTree: public BinTreeBase<
 	Node0,
 	Balancer0
 > {
-	friend BinTreeBase;
-	friend Balancer;
+	template <
+		typename T2,
+		typename Node2,
+		typename Balancer2
+	>
+	friend class BinTreeBase;
+
+	friend Balancer0;
 
 public:
 	typedef Node0 Node;
