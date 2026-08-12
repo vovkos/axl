@@ -16,9 +16,9 @@ namespace {
 
 //..............................................................................
 
-// Span exercises the T-vs-Stat split: m_id is payload that is NOT summable
-// (and must survive every split/merge intact), the two counters are the
-// summable part
+// Span is pure PAYLOAD -- the tree never looks inside it and can't derive a
+// stat from it. m_id must survive every split/merge/borrow intact; the counters
+// are only here so the test can build the stat it passes in alongside
 
 struct Span {
 	uint_t m_id;
@@ -42,9 +42,10 @@ struct Span {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// the aggregate: everything summable in a Span and nothing else. a Stat must
-// provide the full arithmetic set -- unary -, binary + and -, += and -= -- the
-// counters are unsigned, so negation wraps and cancels back out on the way up
+// the aggregate: everything summable in a Span and nothing else. the tree needs
+// += and -= and NOTHING else -- no unary minus, no binary + or -, no <. those
+// are deliberately absent here, so this file stops compiling if the tree ever
+// starts requiring them again
 
 struct SpanStat {
 	uint64_t m_lineCount;
@@ -70,24 +71,6 @@ struct SpanStat {
 		m_lineCount -= src.m_lineCount;
 		m_charCount -= src.m_charCount;
 		return *this;
-	}
-
-	SpanStat
-	operator + (const SpanStat& src) const {
-		SpanStat result = *this;
-		return result += src;
-	}
-
-	SpanStat
-	operator - (const SpanStat& src) const {
-		SpanStat result = *this;
-		return result -= src;
-	}
-
-	SpanStat
-	operator - () const {
-		SpanStat result; // zero minus this -- avoids unary minus on unsigned
-		return result -= *this;
 	}
 };
 
@@ -192,7 +175,7 @@ verifyTree(
 	const Tree& tree,
 	const sl::Array<Span>& reference
 ) {
-	typedef typename Tree::Iterator Iterator; // a const tree yields const iterators
+	typedef typename Tree::ConstIterator ConstIterator; // a const tree yields const iterators
 
 	size_t count = reference.getCount();
 	TEST_ASSERT(tree.getCount() == count);
@@ -202,10 +185,16 @@ verifyTree(
 	uint64_t charTotal = 0;
 	size_t i = 0;
 
-	for (Iterator it = tree.getHead(); it; it++, i++) {
+	for (ConstIterator it = tree.getHead(); it; it++, i++) {
 		TEST_ASSERT(i < count);
 		TEST_ASSERT(it->m_id == reference[i].m_id);
 		TEST_ASSERT((*it).m_lineCount == reference[i].m_lineCount);
+
+		// the element's stat is STORED alongside the value, not derived from it
+
+		SpanStat elementStat = it.getStat();
+		TEST_ASSERT(elementStat.m_lineCount == reference[i].m_lineCount);
+		TEST_ASSERT(elementStat.m_charCount == reference[i].m_charCount);
 
 		lineTotal += reference[i].m_lineCount;
 		charTotal += reference[i].m_charCount;
@@ -226,7 +215,7 @@ verifyTree(
 	TEST_ASSERT(tree.template getFullStat<CharStat>().m_value == charTotal);
 
 	i = count;
-	for (Iterator it = tree.getTail(); it; it--) {
+	for (ConstIterator it = tree.getTail(); it; it--) {
 		TEST_ASSERT(i);
 		i--;
 		TEST_ASSERT(it->m_id == reference[i].m_id);
@@ -247,7 +236,7 @@ verifyTree(
 		}
 
 		LineStat remainder(-1);
-		Iterator it = tree.template findByStat<LineStat>(LineStat(target), &remainder);
+		ConstIterator it = tree.template findByStat<LineStat>(LineStat(target), &remainder);
 
 		if (modelIndex < count) {
 			uint64_t inclusive = modelSum + reference[modelIndex].m_lineCount;
@@ -264,9 +253,9 @@ verifyTree(
 
 //..............................................................................
 
-// the Stat arithmetic contract itself -- the tree leans on negation cancelling
-// exactly (erase propagates -stat up the spine), which is the one identity that
-// isn't obvious with unsigned counters
+// the Stat arithmetic contract itself -- the tree leans on -= undoing += exactly
+// (erase and borrow-from-sibling both subtract a stat back out of a running
+// aggregate), which is the one identity that has to hold on unsigned counters
 
 void
 test_StatArithmetic() {
@@ -276,33 +265,35 @@ test_StatArithmetic() {
 	SpanStat statA = a;
 	SpanStat statB = b;
 
-	SpanStat sum = statA + statB;
+	SpanStat sum = statA;
+	sum += statB;
 	TEST_ASSERT(sum.m_lineCount == 8 && sum.m_charCount == 110);
 
-	SpanStat diff = sum - statB;
+	SpanStat diff = sum;
+	diff -= statB; // the erase path: subtracting back out must land on statA
 	TEST_ASSERT(diff.m_lineCount == statA.m_lineCount && diff.m_charCount == statA.m_charCount);
 
-	SpanStat negated = -statA;
-	TEST_ASSERT(negated.m_lineCount == (uint64_t)0 - 3 && negated.m_charCount == (uint64_t)0 - 40);
-
 	SpanStat cancelled = statA;
-	cancelled += negated; // the erase path: adding -stat must land back on zero
+	cancelled -= statA;
 	TEST_ASSERT(!cancelled.m_lineCount && !cancelled.m_charCount);
 
-	SpanStat viaNegation = sum + (-statB); // -= and + -(...) must agree
-	TEST_ASSERT(viaNegation.m_lineCount == diff.m_lineCount);
-	TEST_ASSERT(viaNegation.m_charCount == diff.m_charCount);
+	// intermediate underflow must cancel back out: the merge path can subtract a
+	// sibling's total before adding it back on the other side
+
+	SpanStat wrapped;
+	wrapped -= statB;
+	wrapped += statB;
+	TEST_ASSERT(!wrapped.m_lineCount && !wrapped.m_charCount);
 
 	SpanStat zero;
 	TEST_ASSERT(!zero.m_lineCount && !zero.m_charCount);
-	TEST_ASSERT(!(-zero).m_lineCount && !(-zero).m_charCount);
 }
 
 //..............................................................................
 
 void
 test_Empty() {
-	typedef sl::StatBTree<Span, SpanStat, 4> Tree; // commas can't cross TEST_ASSERT
+	typedef sl::StatBTree<SpanStat, Span, 4> Tree; // commas can't cross TEST_ASSERT
 
 	Tree tree;
 	Tree::Iterator nullIt;
@@ -324,8 +315,9 @@ test_Empty() {
 	verifyTree(tree, reference);
 }
 
-// the Stat = T default path, plus the scalar (non-projected)
-// calcStat/getFullStat/findByStat
+// a scalar Stat with a payload of its own, plus the non-projected
+// calcStat/getFullStat/findByStat. the payload here is an id that has nothing to
+// do with the stat -- so it also pins that the two are tracked independently
 
 void
 test_Scalar() {
@@ -333,14 +325,16 @@ test_Scalar() {
 		ElementCount = 200
 	};
 
+	typedef sl::StatBTree<uint64_t, uint_t> Tree; // Fanout == 16
+
 	uint32_t seed = 0x1a2b3c4d;
 
-	sl::StatBTree<uint64_t> tree; // Stat == uint64_t, Fanout == 16
+	Tree tree;
 	sl::Array<uint64_t> reference;
 
 	for (size_t i = 0; i < ElementCount; i++) {
 		uint64_t value = lcg(&seed) % 4; // zeros are frequent -- ties on purpose
-		tree.insertTail(value);
+		tree.insertTail(value, (uint_t)i + 1);
 		reference.append(value);
 	}
 
@@ -349,8 +343,9 @@ test_Scalar() {
 	uint64_t total = 0;
 	size_t i = 0;
 
-	for (sl::StatBTree<uint64_t>::Iterator it = tree.getHead(); it; it++, i++) {
-		TEST_ASSERT(*it == reference[i]);
+	for (Tree::Iterator it = tree.getHead(); it; it++, i++) {
+		TEST_ASSERT(*it == (uint_t)i + 1); // the payload
+		TEST_ASSERT(it.getStat() == reference[i]); // the stat
 		total += reference[i];
 		TEST_ASSERT(tree.calcStat(it) == total); // inclusive
 	}
@@ -368,7 +363,7 @@ test_Scalar() {
 		}
 
 		uint64_t remainder = -1;
-		sl::StatBTree<uint64_t>::Iterator it = tree.findByStat(target, &remainder);
+		Tree::Iterator it = tree.findByStat(target, &remainder);
 
 		if (modelIndex < ElementCount) {
 			TEST_ASSERT(it);
@@ -388,12 +383,12 @@ void
 testAppendSweep(size_t elementCount) {
 	uint32_t seed = 0x64536455 + (uint32_t)Fanout;
 
-	sl::StatBTree<Span, SpanStat, Fanout> tree;
+	sl::StatBTree<SpanStat, Span, Fanout> tree;
 	sl::Array<Span> reference;
 
 	for (size_t i = 0; i < elementCount; i++) {
 		Span span((uint_t)i + 1, lcg(&seed) % 4, lcg(&seed) % 100);
-		tree.insertTail(span);
+		tree.insertTail(SpanStat(span), span);
 		reference.append(span);
 		verifyTree(tree, reference);
 	}
@@ -406,12 +401,12 @@ void
 testPrependSweep(size_t elementCount) {
 	uint32_t seed = 0x1234abcd + (uint32_t)Fanout;
 
-	sl::StatBTree<Span, SpanStat, Fanout> tree;
+	sl::StatBTree<SpanStat, Span, Fanout> tree;
 	sl::Array<Span> reference;
 
 	for (size_t i = 0; i < elementCount; i++) {
 		Span span((uint_t)i + 1, lcg(&seed) % 4, lcg(&seed) % 100);
-		tree.insertHead(span);
+		tree.insertHead(SpanStat(span), span);
 		reference.insert(0, span);
 		verifyTree(tree, reference);
 	}
@@ -426,10 +421,10 @@ void
 testRandomInsertErase(size_t elementCount) {
 	uint32_t seed = 0x0badc0de + (uint32_t)Fanout;
 
-	sl::StatBTree<Span, SpanStat, Fanout> tree;
+	sl::StatBTree<SpanStat, Span, Fanout> tree;
 	sl::Array<Span> reference;
 
-	typedef typename sl::StatBTree<Span, SpanStat, Fanout>::Iterator Iterator;
+	typedef typename sl::StatBTree<SpanStat, Span, Fanout>::Iterator Iterator;
 
 	for (size_t i = 0; i < elementCount; i++) {
 		Span span((uint_t)i + 1, lcg(&seed) % 4, lcg(&seed) % 100);
@@ -437,11 +432,11 @@ testRandomInsertErase(size_t elementCount) {
 		size_t index = count ? lcg(&seed) % count : 0;
 
 		if (lcg(&seed) & 1) { // insertBefore
-			tree.insertBefore(span, getIteratorAt(tree, index));
+			tree.insertBefore(SpanStat(span), span, getIteratorAt(tree, index));
 			reference.insert(index, span);
 		} else { // insertAfter
 			Iterator it = getIteratorAt(tree, index);
-			tree.insertAfter(span, it);
+			tree.insertAfter(SpanStat(span), span, it);
 			reference.insert(it ? index + 1 : 0, span);
 		}
 
@@ -460,19 +455,21 @@ testRandomInsertErase(size_t elementCount) {
 	TEST_ASSERT(!tree.getTail());
 }
 
-// modify must re-aggregate the spine (including the zero-stat corner cases)
+// addStat/subStat must re-aggregate the spine (including the zero-stat corner
+// cases); modifyValue must touch nothing but the value. replacing a stat is
+// subStat(old) + addStat(new) -- no negative delta, hence no unary minus on Stat
 
 template <size_t Fanout>
 void
 testModify(size_t elementCount) {
 	uint32_t seed = 0xfeedface + (uint32_t)Fanout;
 
-	sl::StatBTree<Span, SpanStat, Fanout> tree;
+	sl::StatBTree<SpanStat, Span, Fanout> tree;
 	sl::Array<Span> reference;
 
 	for (size_t i = 0; i < elementCount; i++) {
 		Span span((uint_t)i + 1, lcg(&seed) % 4, lcg(&seed) % 100);
-		tree.insertTail(span);
+		tree.insertTail(SpanStat(span), span);
 		reference.append(span);
 	}
 
@@ -482,10 +479,31 @@ testModify(size_t elementCount) {
 		size_t index = lcg(&seed) % elementCount;
 		Span span(reference[index].m_id, lcg(&seed) % 6, lcg(&seed) % 200);
 
-		tree.modify(getIteratorAt(tree, index), span);
+		typename sl::StatBTree<SpanStat, Span, Fanout>::Iterator it =
+			getIteratorAt(tree, index);
+
+		tree.subStat(it, SpanStat(reference[index]));
+		tree.addStat(it, SpanStat(span));
+		*it = span; // the value is writable straight through the iterator
+
 		reference.rwi()[index] = span;
 		verifyTree(tree, reference);
 	}
+
+	// a value-only write must leave every aggregate alone -- and it needs no tree
+	// call at all, not even a whole-value assignment
+
+	SpanStat before = tree.getFullStat();
+
+	for (size_t i = 0; i < elementCount; i++) {
+		getIteratorAt(tree, i)->m_id += 1000;
+		reference.rwi()[i].m_id += 1000;
+	}
+
+	SpanStat after = tree.getFullStat();
+	TEST_ASSERT(before.m_lineCount == after.m_lineCount);
+	TEST_ASSERT(before.m_charCount == after.m_charCount);
+	verifyTree(tree, reference);
 }
 
 // interleaved inserts and erases -- keeps the tree hovering around the
@@ -496,7 +514,7 @@ void
 testMixed(size_t opCount) {
 	uint32_t seed = 0xdeadbeef + (uint32_t)Fanout;
 
-	sl::StatBTree<Span, SpanStat, Fanout> tree;
+	sl::StatBTree<SpanStat, Span, Fanout> tree;
 	sl::Array<Span> reference;
 	uint_t id = 0;
 
@@ -508,10 +526,10 @@ testMixed(size_t opCount) {
 			size_t index = count ? lcg(&seed) % (count + 1) : 0;
 
 			if (index == count) {
-				tree.insertTail(span);
+				tree.insertTail(SpanStat(span), span);
 				reference.append(span);
 			} else {
-				tree.insertBefore(span, getIteratorAt(tree, index));
+				tree.insertBefore(SpanStat(span), span, getIteratorAt(tree, index));
 				reference.insert(index, span);
 			}
 		} else {

@@ -21,11 +21,10 @@ namespace sl {
 
 //..............................................................................
 
-// nodes & leaves
-
 template <
 	typename Stat,
-	size_t Fanout
+	size_t Fanout,
+	typename StatArg
 >
 struct StatBTreeNode;
 
@@ -33,10 +32,11 @@ struct StatBTreeNode;
 
 template <
 	typename Stat,
-	size_t Fanout
+	size_t Fanout,
+	typename StatArg
 >
 struct StatBTreeNodeRoot {
-	StatBTreeNode<Stat, Fanout>* m_parent;
+	StatBTreeNode<Stat, Fanout, StatArg>* m_parent;
 	Stat m_stat; // aggregate of all children
 	size_t m_count; // slots in use
 
@@ -47,10 +47,17 @@ struct StatBTreeNodeRoot {
 	}
 
 	void
-	addStat(const Stat& delta) {
+	addStat(StatArg delta) {
 		m_stat += delta;
 		for (StatBTreeNodeRoot* p = m_parent; p; p = p->m_parent)
 			p->m_stat += delta;
+	}
+
+	void
+	subStat(StatArg delta) {
+		m_stat -= delta;
+		for (StatBTreeNodeRoot* p = m_parent; p; p = p->m_parent)
+			p->m_stat -= delta;
 	}
 };
 
@@ -58,18 +65,43 @@ struct StatBTreeNodeRoot {
 
 template <
 	typename T,
-	typename Child0,
 	typename Stat,
-	size_t Fanout
+	typename Child0,
+	size_t Fanout,
+	typename StatChildArgs
 >
-struct StatBTreeNodeBase: StatBTreeNodeRoot<Stat, Fanout>  {
+struct StatBTreeNodeBase: public StatBTreeNodeRoot<
+	Stat,
+	Fanout,
+	typename std::tuple_element<0, StatChildArgs>::type
+> {
+	typedef StatBTreeNodeRoot<
+		Stat,
+		Fanout,
+		typename std::tuple_element<0, StatChildArgs>::type
+	> NodeRoot;
+
+	typedef StatBTreeNodeBase NodeBase;
 	typedef Child0 Child;
-	typedef ArgType<Child> ChildArg;
+	typedef typename std::tuple_element<0, StatChildArgs>::type StatArg;
+	typedef typename std::tuple_element<1, StatChildArgs>::type ChildArg;
 
 	Child m_childArray[Fanout];
 
+	StatBTreeNodeBase():
+		m_childArray() {}
+
 	void
-	insertChild(
+	remove(size_t slot) {
+		ASSERT(slot < this->m_count);
+
+		Child* p = m_childArray + slot;
+		ArrayDetails<Child>::copy(p, p + 1, this->m_count - slot - 1);
+		this->m_count--;
+	}
+
+	void
+	insert(
 		size_t slot,
 		ChildArg child
 	) {
@@ -77,17 +109,24 @@ struct StatBTreeNodeBase: StatBTreeNodeRoot<Stat, Fanout>  {
 
 		Child* p = m_childArray + slot;
 		ArrayDetails<Child>::copy(p + 1, p, this->m_count - slot);
-		m_childArray[slot] = child;
+		*p = child;
 		this->m_count++;
 	}
 
 	void
-	removeChild(size_t slot) {
-		ASSERT(slot < this->m_count);
+	appendFromSibling(
+		const T* src,
+		size_t srcSlot,
+		size_t count
+	) {
+		ASSERT(
+			(!this->m_parent || this->m_parent == src->m_parent) && // split fills a sibling NOT linked to the parent yet
+			this->m_count + count <= Fanout &&
+			srcSlot + count <= src->m_count
+		);
 
-		Child* p = m_childArray + slot;
-		ArrayDetails<Child>::copy(p, p + 1, this->m_count - slot - 1);
-		this->m_count--;
+		ArrayDetails<Child>::copy(this->m_childArray + this->m_count, src->m_childArray + srcSlot, count);
+		this->m_count += count;
 	}
 
 	void
@@ -106,38 +145,58 @@ struct StatBTreeNodeBase: StatBTreeNodeRoot<Stat, Fanout>  {
 
 template <
 	typename Stat,
-	size_t Fanout
+	size_t Fanout,
+	typename StatArg
 >
 struct StatBTreeNode: StatBTreeNodeBase<
-	StatBTreeNode<Stat, Fanout>,
-	StatBTreeNodeRoot<Stat, Fanout>*,
+	StatBTreeNode<Stat, Fanout, StatArg>,
 	Stat,
-	Fanout
+	StatBTreeNodeRoot<Stat, Fanout, StatArg>*,
+	Fanout,
+	std::tuple<StatArg, StatBTreeNodeRoot<Stat, Fanout, StatArg>*>
 > {
-	typedef StatBTreeNodeRoot<Stat, Fanout> NodeRoot;
+	typedef typename StatBTreeNode::NodeRoot NodeRoot;
+	typedef typename StatBTreeNode::NodeBase NodeBase;
+	typedef typename StatBTreeNode::Child Child;
 
-	const Stat&
+	StatArg
 	getChildStat(size_t slot) const {
+		ASSERT(slot < this->m_count);
 		return this->m_childArray[slot]->m_stat;
 	}
 
 	void
-	insertChild(
+	insert(
 		size_t slot,
-		NodeRoot* child // ArgType<NodeRoot*> is the pointer itself
+		NodeRoot* child
 	) {
-		StatBTreeNodeBase<StatBTreeNode, NodeRoot*, Stat, Fanout>::insertChild(slot, child);
+		NodeBase::insert(slot, child);
 		child->m_parent = this;
 	}
 
 	size_t
-	findChild(const NodeRoot* child) const {
+	find(const NodeRoot* child) const {
 		for (size_t i = 0; i < this->m_count; i++)
 			if (this->m_childArray[i] == child)
 				return i;
 
 		ASSERT(false);
 		return -1;
+	}
+
+	void
+	insertFromSibling(
+		size_t slot,
+		const StatBTreeNode* src,
+		size_t srcSlot
+	) {
+		ASSERT(
+			this->m_parent == src->m_parent &&
+			slot <= this->m_count &&
+			srcSlot < src->m_count
+		);
+
+		insert(slot, src->m_childArray[srcSlot]);
 	}
 
 	void
@@ -158,52 +217,127 @@ struct StatBTreeNode: StatBTreeNodeBase<
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename T,
 	typename Stat,
-	size_t Fanout
+	typename Value,
+	size_t Fanout,
+	typename StatValueArgs
 >
 struct StatBTreeLeaf:
 	StatBTreeNodeBase<
-		StatBTreeLeaf<T, Stat, Fanout>,
-		T,
+		StatBTreeLeaf<Stat, Value, Fanout, StatValueArgs>,
 		Stat,
-		Fanout
+		Stat, // a leaf's slots hold the per-element stats themselves
+		Fanout,
+		std::tuple<
+			typename std::tuple_element<0, StatValueArgs>::type,
+			typename std::tuple_element<0, StatValueArgs>::type
+		>
 	>,
 	ListLink {
 
-	Stat
+	typedef typename StatBTreeLeaf::NodeBase NodeBase;
+	typedef typename StatBTreeLeaf::StatArg StatArg;
+	typedef typename StatBTreeLeaf::Child Child;
+	typedef typename std::tuple_element<1, StatValueArgs>::type ValueArg;
+
+	Value m_valueArray[Fanout];
+
+	StatBTreeLeaf():
+		m_valueArray() {}
+
+	StatArg
 	getChildStat(size_t slot) const {
-		return Stat(this->m_childArray[slot]);
+		ASSERT(slot < this->m_count);
+		return this->m_childArray[slot];
+	}
+
+	void
+	remove(size_t slot) {
+		size_t copyCount = this->m_count - slot - 1; // before Node::remove updates m_count
+		NodeBase::remove(slot);
+		Value* p = m_valueArray + slot;
+		ArrayDetails<Value>::copy(p, p + 1, copyCount);
+	}
+
+	void
+	insert(
+		size_t slot,
+		StatArg stat,
+		ValueArg value
+	) {
+		size_t copyCount = this->m_count - slot; // before Node::insert updates m_count
+		NodeBase::insert(slot, stat);
+		Value* p = m_valueArray + slot;
+		ArrayDetails<Value>::copy(p + 1, p, copyCount);
+		*p = value;
+	}
+
+	void
+	insertFromSibling(
+		size_t slot,
+		const StatBTreeLeaf* src,
+		size_t srcSlot
+	) {
+		ASSERT(
+			this->m_parent == src->m_parent && // borrow on underflow always between two siblings
+			slot <= this->m_count && // slot == m_count appends
+			srcSlot < src->m_count
+		);
+
+		insert(slot, src->m_childArray[srcSlot], src->m_valueArray[srcSlot]);
+	}
+
+	void
+	appendFromSibling(
+		const StatBTreeLeaf* src,
+		size_t srcSlot,
+		size_t count
+	) {
+		size_t dstSlot = this->m_count; // before Node::appendFromSibling updates m_count
+		NodeBase::appendFromSibling(src, srcSlot, count);
+		ArrayDetails<Value>::copy(m_valueArray + dstSlot, src->m_valueArray + srcSlot, count);
 	}
 };
 
 //..............................................................................
 
-// iterators are { leaf, slot }
-// iterators are always const: modification through iterator would break
-// parent-child stat invariants -- use StatBTree::modify instead
-
 template <
 	typename T,
 	typename Stat,
-	size_t Fanout
+	typename Value, // Value or const Value
+	size_t Fanout,
+	typename StatValueArgs
 >
-class StatBTreeIterator {
+class StatBTreeIteratorBase {
 public:
-	typedef T Value;
-	typedef StatBTreeLeaf<T, Stat, Fanout> Leaf;
+	typedef StatBTreeLeaf<
+		Stat,
+		typename std::remove_const<Value>::type,
+		Fanout,
+		StatValueArgs
+	> Leaf;
+
+	typedef typename Leaf::StatArg StatArg;
+
+	// handing out a Value& takes a mutable leaf
+
+	typedef typename std::conditional<
+		std::is_const<Value>::value,
+		sl::ConstIterator<Leaf>,
+		sl::Iterator<Leaf>
+	>::type LeafIterator;
 
 protected:
-	ConstIterator<Leaf> m_leafIt;
+	LeafIterator m_leafIt;
 	size_t m_slot;
 
 public:
-	StatBTreeIterator() {
+	StatBTreeIteratorBase() {
 		m_slot = 0;
 	}
 
-	StatBTreeIterator(
-		const ConstIterator<Leaf>& leafIt,
+	StatBTreeIteratorBase(
+		const LeafIterator& leafIt,
 		size_t slot
 	) {
 		m_leafIt = leafIt;
@@ -215,50 +349,50 @@ public:
 	}
 
 	bool
-	operator == (const StatBTreeIterator& it) const {
+	operator == (const StatBTreeIteratorBase& it) const {
 		return m_leafIt == it.m_leafIt && m_slot == it.m_slot;
 	}
 
 	bool
-	operator != (const StatBTreeIterator& it) const {
+	operator != (const StatBTreeIteratorBase& it) const {
 		return !operator == (it);
 	}
 
-	const Value&
+	Value&
 	operator * () const {
-		return m_leafIt->m_childArray[m_slot];
+		return m_leafIt->m_valueArray[m_slot];
 	}
 
-	const Value*
+	Value*
 	operator -> () const {
-		return &m_leafIt->m_childArray[m_slot];
+		return &m_leafIt->m_valueArray[m_slot];
 	}
 
-	StatBTreeIterator&
+	T&
 	operator ++ () {
 		return next();
 	}
 
-	StatBTreeIterator&
+	T&
 	operator -- () {
 		return prev();
 	}
 
-	StatBTreeIterator
+	T
 	operator ++ (int) { // post increment
-		StatBTreeIterator old = *this;
+		T old = *(T*)this;
 		next();
 		return old;
 	}
 
-	StatBTreeIterator
+	T
 	operator -- (int) { // post decrement
-		StatBTreeIterator old = *this;
+		T old = *(T*)this;
 		prev();
 		return old;
 	}
 
-	const ConstIterator<Leaf>&
+	const LeafIterator&
 	getLeafIterator() const {
 		return m_leafIt;
 	}
@@ -268,10 +402,15 @@ public:
 		return m_slot;
 	}
 
-	StatBTreeIterator&
+	StatArg
+	getStat() const {
+		return m_leafIt->getChildStat(m_slot);
+	}
+
+	T&
 	next() {
 		if (!m_leafIt)
-			return *this;
+			return *(T*)this;
 
 		m_slot++;
 		if (m_slot >= m_leafIt->m_count) {
@@ -279,13 +418,13 @@ public:
 			m_slot = 0;
 		}
 
-		return *this;
+		return *(T*)this;
 	}
 
-	StatBTreeIterator&
+	T&
 	prev() {
 		if (!m_leafIt)
-			return *this;
+			return *(T*)this;
 
 		if (m_slot)
 			m_slot--;
@@ -294,6 +433,85 @@ public:
 			m_slot = m_leafIt ? m_leafIt->m_count - 1 : 0;
 		}
 
+		return *(T*)this;
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <
+	typename Stat,
+	typename Value,
+	size_t Fanout,
+	typename StatValueArgs = ArgTypes<Stat, Value>
+>
+class StatBTreeIterator: public StatBTreeIteratorBase<
+	StatBTreeIterator<Stat, Value, Fanout, StatValueArgs>,
+	Stat,
+	Value,
+	Fanout,
+	StatValueArgs
+> {
+public:
+	typedef sl::StatBTreeIteratorBase<
+		StatBTreeIterator,
+		Stat,
+		Value,
+		Fanout,
+		StatValueArgs
+	> StatBTreeIteratorBase;
+
+	typedef typename StatBTreeIteratorBase::LeafIterator LeafIterator;
+
+	StatBTreeIterator() {}
+
+	StatBTreeIterator(
+		const LeafIterator& leafIt,
+		size_t slot
+	): StatBTreeIteratorBase(leafIt, slot) {}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+template <
+	typename Stat,
+	typename Value,
+	size_t Fanout,
+	typename StatValueArgs = ArgTypes<Stat, Value>
+>
+class StatBTreeConstIterator: public StatBTreeIteratorBase<
+	StatBTreeConstIterator<Stat, Value, Fanout, StatValueArgs>,
+	Stat,
+	const Value,
+	Fanout,
+	StatValueArgs
+> {
+public:
+	typedef sl::StatBTreeIteratorBase<
+		StatBTreeConstIterator,
+		Stat,
+		const Value,
+		Fanout,
+		StatValueArgs
+	> StatBTreeIteratorBase;
+
+	typedef typename StatBTreeIteratorBase::LeafIterator LeafIterator;
+	typedef sl::StatBTreeIterator<Stat, Value, Fanout, StatValueArgs> Iterator;
+
+	StatBTreeConstIterator() {}
+
+	StatBTreeConstIterator(
+		const LeafIterator& leafIt,
+		size_t slot
+	): StatBTreeIteratorBase(leafIt, slot) {}
+
+	StatBTreeConstIterator(const Iterator& src):
+		StatBTreeIteratorBase(src.getLeafIterator(), src.getSlot()) {}
+
+	StatBTreeConstIterator&
+	operator = (const Iterator& src) {
+		this->m_leafIt = src.getLeafIterator();
+		this->m_slot = src.getSlot();
 		return *this;
 	}
 };
@@ -301,10 +519,10 @@ public:
 //..............................................................................
 
 template <
-	typename T,
-	typename Stat0 = T,
+	typename Stat0,
+	typename Value0,
 	size_t Fanout0 = 16,
-	typename ValueArg0 = ArgType<T>
+	typename StatValueArgs = ArgTypes<Stat0, Value0>
 >
 class StatBTree {
 	AXL_DISABLE_COPY(StatBTree)
@@ -316,14 +534,15 @@ public:
 		Fanout = Fanout0,
 	};
 
-	typedef T Value;
 	typedef Stat0 Stat;
-	typedef ValueArg0 ValueArg;
-	typedef ArgType<Stat> StatArg;
-	typedef StatBTreeNodeRoot<Stat, Fanout> NodeBase;
-	typedef StatBTreeNode<Stat, Fanout> Node;
-	typedef StatBTreeLeaf<T, Stat, Fanout> Leaf;
-	typedef StatBTreeIterator<T, Stat, Fanout> Iterator;
+	typedef Value0 Value;
+	typedef typename std::tuple_element<0, StatValueArgs>::type StatArg;
+	typedef typename std::tuple_element<1, StatValueArgs>::type ValueArg;
+	typedef StatBTreeNodeRoot<Stat, Fanout, StatArg> NodeBase;
+	typedef StatBTreeNode<Stat, Fanout, StatArg> Node;
+	typedef StatBTreeLeaf<Stat, Value, Fanout, StatValueArgs> Leaf;
+	typedef StatBTreeIterator<Stat, Value, Fanout, StatValueArgs> Iterator;
+	typedef StatBTreeConstIterator<Stat, Value, Fanout, StatValueArgs> ConstIterator;
 
 protected:
 	sl::List<Leaf> m_leafList;
@@ -358,14 +577,24 @@ public:
 	}
 
 	Iterator
-	getHead() const {
+	getHead() {
 		return !m_leafList.isEmpty() ? Iterator(m_leafList.getHead(), 0) : Iterator();
 	}
 
+	ConstIterator
+	getHead() const {
+		return const_cast<StatBTree*>(this)->getHead();
+	}
+
 	Iterator
-	getTail() const {
-		sl::ConstIterator<Leaf> it = m_leafList.getTail();
+	getTail() {
+		sl::Iterator<Leaf> it = m_leafList.getTail();
 		return it ? Iterator(it, it->m_count - 1) : Iterator();
+	}
+
+	ConstIterator
+	getTail() const {
+		return const_cast<StatBTree*>(this)->getTail();
 	}
 
 	void
@@ -377,13 +606,11 @@ public:
 			delete root;
 		}
 
-		m_leafList.clear(); // owns the leaves
+		m_leafList.clear();
 		m_root = NULL;
 		m_count = 0;
 		m_height = 0;
 	}
-
-	// the grand total over all the elements
 
 	Stat
 	getFullStat() const {
@@ -396,16 +623,16 @@ public:
 		return m_root ? Partial(m_root->m_stat) : Partial(Stat());
 	}
 
-	// the total over everything up to (and including) Iterator it
+	// everything up to (and including) iterator
 
 	Stat
-	calcStat(Iterator it) const {
+	calcStat(ConstIterator it) const {
 		return calcStat<Stat>(it);
 	}
 
 	template <typename Partial>
 	Partial
-	calcStat(Iterator it) const {
+	calcStat(ConstIterator it) const {
 		Partial stat = Partial(Stat());
 		if (!it)
 			return stat;
@@ -417,7 +644,7 @@ public:
 
 		const NodeBase* node = leaf;
 		for (const Node* parent = node->m_parent; parent; parent = parent->m_parent) {
-			slot = parent->findChild(node);
+			slot = parent->find(node);
 			for (size_t i = 0; i < slot; i++)
 				stat += parent->getChildStat(i);
 
@@ -433,8 +660,16 @@ public:
 	findByStat(
 		StatArg targetStat,
 		Stat* remainder = NULL
-	) const {
+	) {
 		return findByStat<Stat, StatArg>(targetStat, remainder);
+	}
+
+	ConstIterator
+	findByStat(
+		StatArg targetStat,
+		Stat* remainder = NULL
+	) const {
+		return const_cast<StatBTree*>(this)->findByStat<Stat, StatArg>(targetStat, remainder);
 	}
 
 	// this overload can operate on a specific field of a multi-field stat
@@ -447,7 +682,7 @@ public:
 	findByStat(
 		PartialArg targetStat,
 		Partial* remainder = NULL
-	) const {
+	) {
 		if (!m_root)
 			return Iterator();
 
@@ -487,50 +722,72 @@ public:
 		return Iterator(leaf, i);
 	}
 
-	Iterator
-	insertHead(ValueArg value) {
-		return m_leafList.isEmpty() ? insertFirst(value) : insert((Leaf*)*m_leafList.getHead(), 0, value);
+	template <
+		typename Partial,
+		typename PartialArg = ArgType<Partial>
+	>
+	ConstIterator
+	findByStat(
+		PartialArg targetStat,
+		Partial* remainder = NULL
+	) const {
+		return const_cast<StatBTree*>(this)->findByStat<Partial, PartialArg>(targetStat, remainder);
 	}
 
 	Iterator
-	insertTail(ValueArg value) {
+	insertHead(
+		StatArg stat,
+		ValueArg value
+	) {
+		return m_leafList.isEmpty() ?
+			insertFirst(stat, value) :
+			insert((Leaf*)*m_leafList.getHead(), 0, stat, value);
+	}
+
+	Iterator
+	insertTail(
+		StatArg stat,
+		ValueArg value
+	) {
 		if (m_leafList.isEmpty())
-			return insertFirst(value);
+			return insertFirst(stat, value);
 
 		Leaf* leaf = (Leaf*)*m_leafList.getTail();
-		return insert(leaf, leaf->m_count, value);
+		return insert(leaf, leaf->m_count, stat, value);
 	}
 
 	Iterator
 	insertBefore(
+		StatArg stat,
 		ValueArg value,
 		Iterator beforeIt
 	) {
 		return beforeIt ?
-			insert((Leaf*)*beforeIt.getLeafIterator(), beforeIt.getSlot(), value) :
-			insertTail(value);
+			insert(*beforeIt.getLeafIterator(), beforeIt.getSlot(), stat, value) :
+			insertTail(stat, value);
 	}
 
 	Iterator
 	insertAfter(
+		StatArg stat,
 		ValueArg value,
 		Iterator afterIt
 	) {
 		return afterIt ?
-			insert((Leaf*)*afterIt.getLeafIterator(), afterIt.getSlot() + 1, value) :
-			insertHead(value);
+			insert(*afterIt.getLeafIterator(), afterIt.getSlot() + 1, stat, value) :
+			insertHead(stat, value);
 	}
 
 	void
 	erase(Iterator it) {
 		ASSERT(it);
 
-		Leaf* leaf = (Leaf*)*it.getLeafIterator();
+		Leaf* leaf = *it.getLeafIterator();
 		size_t slot = it.getSlot();
 		ASSERT(slot < leaf->m_count);
 
-		leaf->addStat(-Stat(leaf->m_childArray[slot]));
-		leaf->removeChild(slot);
+		leaf->subStat(leaf->getChildStat(slot));
+		leaf->remove(slot);
 		m_count--;
 
 		if (!leaf->m_parent) { // the root leaf is exempt from the underflow rules
@@ -543,29 +800,48 @@ public:
 	}
 
 	void
-	modify(
+	addStat(
 		Iterator it,
-		ValueArg value
+		StatArg delta
 	) {
 		ASSERT(it);
-		Leaf* leaf = (Leaf*)*it.getLeafIterator();
+
+		Leaf* leaf = *it.getLeafIterator();
 		size_t slot = it.getSlot();
 		ASSERT(slot < leaf->m_count);
 
-		Stat delta = Stat(value) - Stat(leaf->m_childArray[slot]);
-		leaf->m_childArray[slot] = value;
+		leaf->m_childArray[slot] += delta;
 		leaf->addStat(delta);
+	}
+
+	void
+	subStat(
+		Iterator it,
+		StatArg delta
+	) {
+		ASSERT(it);
+
+		Leaf* leaf = *it.getLeafIterator();
+		size_t slot = it.getSlot();
+		ASSERT(slot < leaf->m_count);
+
+		leaf->m_childArray[slot] -= delta;
+		leaf->subStat(delta);
 	}
 
 protected:
 	Iterator
-	insertFirst(ValueArg value) {
+	insertFirst(
+		StatArg stat,
+		ValueArg value
+	) {
 		ASSERT(!m_root && !m_count);
 
 		Leaf* leaf = new Leaf;
-		leaf->m_childArray[0] = value;
+		leaf->m_childArray[0] = stat;
+		leaf->m_valueArray[0] = value;
 		leaf->m_count = 1;
-		leaf->m_stat = Stat(value);
+		leaf->m_stat = stat;
 		m_leafList.insertTail(leaf);
 
 		m_root = leaf;
@@ -579,13 +855,14 @@ protected:
 	insert(
 		Leaf* leaf,
 		size_t slot,
+		StatArg stat,
 		ValueArg value
 	) {
 		m_count++;
 
 		if (leaf->m_count < Fanout) {
-			leaf->insertChild(slot, value);
-			leaf->addStat(Stat(value));
+			leaf->insert(slot, stat, value);
+			leaf->addStat(stat);
 			return Iterator(leaf, slot);
 		}
 
@@ -598,8 +875,8 @@ protected:
 			target = sibling;
 		}
 
-		target->insertChild(slot, value);
-		target->addStat(Stat(value));
+		target->insert(slot, stat, value);
+		target->addStat(stat);
 		return Iterator(target, slot);
 	}
 
@@ -629,14 +906,9 @@ protected:
 		Node* parent = node->m_parent;
 		NodeType* sibling = new NodeType;
 		size_t siblingCount = node->m_count - Fanout / 2;
-		ArrayDetails<typename NodeType::Child>::copy(
-			sibling->m_childArray,
-			node->m_childArray + Fanout / 2,
-			siblingCount
-		);
-		node->m_count = Fanout / 2;
-		sibling->m_count = siblingCount;
+		sibling->appendFromSibling(node, Fanout / 2, siblingCount);
 		sibling->recalcStat();
+		node->m_count = Fanout / 2;
 		node->m_stat -= sibling->m_stat; // not recalcStat! not the same when we are splitting parent
 		postSplit(node, sibling);
 
@@ -654,9 +926,9 @@ protected:
 			return sibling;
 		}
 
-		size_t slot = parent->findChild(node) + 1;
+		size_t slot = parent->find(node) + 1;
 		if (parent->m_count < Fanout) {
-			parent->insertChild(slot, sibling);
+			parent->insert(slot, sibling);
 			return sibling;
 		}
 
@@ -671,7 +943,7 @@ protected:
 			slot -= parent->m_count;
 		}
 
-		target->insertChild(slot, sibling);
+		target->insert(slot, sibling);
 		return sibling;
 	}
 
@@ -701,16 +973,13 @@ protected:
 		NodeType* right,
 		size_t rightSlot
 	) {
-		typedef typename NodeType::Child Child;
-
 		ASSERT(left->m_parent == right->m_parent);
 		ASSERT(left->m_count + right->m_count <= Fanout);
 
 		Node* parent = left->m_parent;
-		ArrayDetails<Child>::copy(left->m_childArray + left->m_count, right->m_childArray, right->m_count);
-		left->m_count += right->m_count;
+		left->appendFromSibling(right, 0, right->m_count);
 		left->m_stat += right->m_stat;
-		parent->removeChild(rightSlot);
+		parent->remove(rightSlot);
 		postMerge(left, right);
 
 		// parent's total stat is unchanged, so no stat propagation
@@ -733,14 +1002,16 @@ protected:
 		Node* parent = node->m_parent;
 		ASSERT(parent && parent->m_count >= 2);
 
-		size_t slot = parent->findChild(node);
+		size_t slot = parent->find(node);
 		if (slot) { // merge or borrow from left
 			NodeType* prev = (NodeType*)parent->m_childArray[slot - 1];
 			if (prev->m_count <= Fanout / 2)
 				merge(prev, node, slot);
 			else {
-				Stat stat = prev->getChildStat(prev->m_count - 1);
-				node->insertChild(0, prev->m_childArray[--prev->m_count]);
+				size_t prevSlot = prev->m_count - 1;
+				Stat stat = prev->getChildStat(prevSlot); // copy before the move
+				node->insertFromSibling(0, prev, prevSlot);
+				prev->remove(prevSlot);
 				prev->m_stat -= stat;
 				node->m_stat += stat;
 			}
@@ -750,9 +1021,9 @@ protected:
 			if (next->m_count <= Fanout / 2)
 				merge(node, next, slot + 1);
 			else {
-				Stat stat = next->getChildStat(0);
-				node->insertChild(node->m_count, next->m_childArray[0]);
-				next->removeChild(0);
+				Stat stat = next->getChildStat(0); // copy before the move
+				node->insertFromSibling(node->m_count, next, 0);
+				next->remove(0);
 				next->m_stat -= stat;
 				node->m_stat += stat;
 			}

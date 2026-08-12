@@ -33,8 +33,8 @@ struct BinTreeNode : public BinTreeNodeBase<
 	typename std::tuple_element<0, KeyValueArgs>::type,
 	Balancer
 > {
-	typedef typename std::tuple_element<0, KeyValueArgs>::type KeyArg;
 	typedef sl::MapEntry<Key, Value, KeyValueArgs> MapEntry;
+	typedef typename MapEntry::KeyArg KeyArg;
 	typedef sl::BinTreeNodeBase<BinTreeNode, MapEntry, KeyArg, Balancer> BinTreeNodeBase;
 
 	template <
@@ -45,7 +45,7 @@ struct BinTreeNode : public BinTreeNodeBase<
 	friend class BinTree;
 
 	BinTreeNode(
-		KeyArg key,
+		typename MapEntry::KeyArg key,
 		BinTreeNode* parent
 	):
 		BinTreeNodeBase(key, parent)
