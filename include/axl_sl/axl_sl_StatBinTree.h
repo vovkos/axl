@@ -14,6 +14,7 @@
 #define _AXL_SL_STATBINTREE_H
 
 #include "axl_sl_BinTreeBase.h"
+#include "axl_sl_Operator.h"
 
 namespace axl {
 namespace sl {
@@ -21,58 +22,64 @@ namespace sl {
 //..............................................................................
 
 template <
+	typename Stat0,
 	typename Value0,
-	typename Stat0 = Value0,
-	typename ValueStatArgs0 = ArgTypes<Value0, Stat0>
+	typename StatValueArgs0 = ArgTypes<Stat0, Value0>
 >
 struct StatEntry: ListLink {
-	typedef Value0 Value;
 	typedef Stat0 Stat;
-	typedef typename std::tuple_element<0, ValueStatArgs0>::type ValueArg;
-	typedef typename std::tuple_element<1, ValueStatArgs0>::type StatArg;
+	typedef Value0 Value;
+	typedef typename std::tuple_element<0, StatValueArgs0>::type StatArg;
+	typedef typename std::tuple_element<1, StatValueArgs0>::type ValueArg;
 
 protected:
-	Value m_value;
-	Stat m_stat;
+	Stat m_selfStat;
+	Stat m_fullStat;
 
 public:
-	StatEntry(ValueArg value):
-		m_value(value),
-		m_stat(value) {}
+	Value m_value;
 
-	ValueArg
-	getValue() const {
-		return m_value;
+public:
+	StatEntry(StatArg stat):
+		m_selfStat(stat),
+		m_fullStat(stat),
+		m_value() {}
+
+	StatArg
+	getSelfStat() const {
+		return m_selfStat;
 	}
 
 	StatArg
-	getStat() const {
-		return m_stat;
+	getFullStat() const {
+		return m_fullStat;
 	}
 
 	Stat
 	getChildStat() const {
-		return m_stat - Stat(m_value);
+		Stat stat = m_fullStat;
+		stat -= m_selfStat; // this way Stat doesn't need a binary minus op
+		return stat;
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <
-	typename Value,
 	typename Stat,
+	typename Value,
 	typename Balancer,
-	typename ValueStatArgs = ArgTypes<Value, Stat>
+	typename StatValueArgs = ArgTypes<Stat, Value>
 >
-struct StatBinTreeNode : public BinTreeNodeBase<
-	StatBinTreeNode<Value, Stat, Balancer, ValueStatArgs>,
-	StatEntry<Value, Stat, ValueStatArgs>,
-	typename std::tuple_element<0, ValueStatArgs>::type,
+struct StatBinTreeNode: public BinTreeNodeBase<
+	StatBinTreeNode<Stat, Value, Balancer, StatValueArgs>,
+	StatEntry<Stat, Value, StatValueArgs>,
+	typename std::tuple_element<0, StatValueArgs>::type,
 	Balancer
 > {
-	typedef typename std::tuple_element<0, ValueStatArgs>::type ValueArg;
-	typedef sl::StatEntry<Value, Stat, ValueStatArgs> StatEntry;
-	typedef sl::BinTreeNodeBase<StatBinTreeNode, StatEntry, ValueArg, Balancer> BinTreeNodeBase;
+	typedef sl::StatEntry<Stat, Value, StatValueArgs> StatEntry;
+	typedef typename StatEntry::StatArg StatArg;
+	typedef sl::BinTreeNodeBase<StatBinTreeNode, StatEntry, StatArg, Balancer> BinTreeNodeBase;
 
 	template <
 		typename Node,
@@ -81,11 +88,32 @@ struct StatBinTreeNode : public BinTreeNodeBase<
 	friend class StatBinTree;
 
 	StatBinTreeNode(
-		ValueArg value,
+		StatArg stat,
 		StatBinTreeNode* parent
 	):
-		BinTreeNodeBase(value, parent)
+		BinTreeNodeBase(stat, parent)
 	{
+	}
+
+	void
+	addStat(StatArg delta) {
+		addStat<AddAssign<Stat, StatArg> >(delta);
+	}
+
+	void
+	subStat(StatArg delta) {
+		addStat<SubAssign<Stat, StatArg> >(delta);
+	}
+
+protected:
+	template <typename Op>
+	void
+	addStat(StatArg delta) {
+		Op()(this->m_selfStat, delta);
+		Op()(this->m_fullStat, delta);
+
+		for (StatBinTreeNode* p = this->m_parent; p; p = p->m_parent)
+			Op()(p->m_fullStat, delta);
 	}
 };
 
@@ -112,10 +140,10 @@ class StatBinTree: public BinTreeBase<
 public:
 	typedef Node0 Node;
 	typedef Balancer0 Balancer;
-	typedef typename Node::Value Value;
 	typedef typename Node::Stat Stat;
-	typedef typename Node::ValueArg ValueArg;
+	typedef typename Node::Value Value;
 	typedef typename Node::StatArg StatArg;
+	typedef typename Node::ValueArg ValueArg;
 	typedef sl::BinTreeBase<StatBinTree, Node, Balancer> BinTreeBase;
 	typedef sl::Iterator<Node> Iterator;
 	typedef sl::ConstIterator<Node> ConstIterator;
@@ -131,7 +159,7 @@ public:
 	template <typename Partial>
 	Partial
 	getFullStat() const {
-		return this->m_root ? Partial(this->m_root->m_stat) : Partial(Stat());
+		return this->m_root ? Partial(this->m_root->m_fullStat) : Partial(Stat());
 	}
 
 	// the total over everything up to (and including) Iterator it
@@ -148,14 +176,14 @@ public:
 			return Partial(Stat());
 
 		const Node* p = *it;
-		Partial stat = Partial(p->m_stat);
+		Partial stat = Partial(p->m_fullStat);
 		if (p->m_right)
-			stat -= p->m_right->m_stat;
+			stat -= p->m_right->m_fullStat;
 
 		for (; p->m_parent; p = p->m_parent)
 			if (p == p->m_parent->m_right) {
-				stat += p->m_parent->m_stat;
-				stat -= p->m_stat;
+				stat += p->m_parent->m_fullStat;
+				stat -= p->m_fullStat;
 			}
 
 		return stat;
@@ -194,7 +222,7 @@ public:
 
 		for (Node* p = this->m_root; p;) {
 			if (p->m_left) {
-				Partial leftStat = p->m_left->m_stat;
+				Partial leftStat = p->m_left->m_fullStat;
 				if (!(leftStat < stat)) { // go left
 					p = p->m_left;
 					continue;
@@ -203,7 +231,7 @@ public:
 				stat -= leftStat;
 			}
 
-			Partial midStat = Stat(p->m_value);
+			Partial midStat = p->m_selfStat;
 			if (!(midStat < stat)) { // found it
 				if (remainder)
 					*remainder = stat;
@@ -230,65 +258,66 @@ public:
 		return const_cast<StatBinTree*>(this)->findByStat<Partial, PartialArg>(targetStat, remainder);
 	}
 
-	void
-	modify(
-		Iterator it,
+	Iterator
+	insertHead(
+		StatArg stat,
 		ValueArg value
 	) {
-		ASSERT(it);
+		Iterator it = !this->m_root ?
+			insertRoot(stat) :
+			insertLeft(stat, this->findLeftmostChild(this->m_root));
 
-		Node* node = *it;
-		Stat delta = Stat(value) - Stat(node->m_value);
-		node->m_value = value;
-
-		for (Node* p = node; p; p = p->m_parent)
-			p->m_stat += delta;
+		it->m_value = value;
+		return it;
 	}
 
 	Iterator
-	insertHead(ValueArg value) {
-		if (!this->m_root)
-			return insertRoot(value);
-		else
-			return insertLeft(value, this->findLeftmostChild(this->m_root));
-	}
+	insertTail(
+		StatArg stat,
+		ValueArg value
+	) {
+		Iterator it = !this->m_root ?
+			insertRoot(stat) :
+			insertRight(stat, this->findRightmostChild(this->m_root));
 
-	Iterator
-	insertTail(ValueArg value) {
-		if (!this->m_root)
-			return insertRoot(value);
-		else
-			return insertRight(value, this->findRightmostChild(this->m_root));
+		it->m_value = value;
+		return it;
 	}
 
 	Iterator
 	insertBefore(
+		StatArg stat,
 		ValueArg value,
-		Iterator beforeIt
+		ConstIterator beforeIt
 	) {
 		if (!beforeIt)
-			return insertTail(value);
+			return insertTail(stat, value);
 
-		Node* p = *beforeIt;
-		if (!p->m_left)
-			return insertLeft(value, p);
-		else
-			return insertRight(value, this->findRightmostChild(p->m_left));
+		Node* p = (Node*)*beforeIt;
+		Iterator it = !p->m_left ?
+			insertLeft(stat, p) :
+			insertRight(stat, this->findRightmostChild(p->m_left));
+
+		it->m_value = value;
+		return it;
 	}
 
 	Iterator
 	insertAfter(
+		StatArg stat,
 		ValueArg value,
-		Iterator afterIt
+		ConstIterator afterIt
 	) {
 		if (!afterIt)
-			return insertHead(value);
+			return insertHead(stat, value);
 
-		Node* p = *afterIt;
-		if (!p->m_right)
-			return insertRight(value, p);
-		else
-			return insertLeft(value, this->findLeftmostChild(p->m_right));
+		Node* p = (Node*)*afterIt;
+		Iterator it = !p->m_right ?
+			insertRight(stat, p) :
+			insertLeft(stat, this->findLeftmostChild(p->m_right));
+
+		it->m_value = value;
+		return it;
 	}
 
 #ifdef _AXL_DEBUG
@@ -307,22 +336,22 @@ public:
 
 protected:
 	Iterator
-	insertRoot(ValueArg value) {
+	insertRoot(StatArg stat) {
 		ASSERT(!this->m_root);
 
-		Node* node = new Node(value, NULL);
+		Node* node = new Node(stat, NULL);
 		this->m_root = node;
 		return this->m_nodeList.insertTail(node); // the root skips onInsert
 	}
 
 	Iterator
 	insertLeft(
-		ValueArg value,
+		StatArg stat,
 		Node* parent
 	) {
 		ASSERT(!parent->m_left);
 
-		Node* node = new Node(value, parent);
+		Node* node = new Node(stat, parent);
 		parent->m_left = node;
 		addStat(node);
 		Balancer::onInsert(this, node);
@@ -331,12 +360,12 @@ protected:
 
 	Iterator
 	insertRight(
-		ValueArg value,
+		StatArg stat,
 		Node* parent
 	) {
 		ASSERT(!parent->m_right);
 
-		Node* node = new Node(value, parent);
+		Node* node = new Node(stat, parent);
 		parent->m_right = node;
 		addStat(node);
 		Balancer::onInsert(this, node);
@@ -345,13 +374,13 @@ protected:
 
 	void
 	recalcStat(Node* p) {
-		p->m_stat = p->m_value;
+		p->m_fullStat = p->m_selfStat;
 
 		if (p->m_left)
-			p->m_stat += p->m_left->m_stat;
+			p->m_fullStat += p->m_left->m_fullStat;
 
 		if (p->m_right)
-			p->m_stat += p->m_right->m_stat;
+			p->m_fullStat += p->m_right->m_fullStat;
 	}
 
 	void
@@ -360,8 +389,8 @@ protected:
 		ASSERT(right);
 
 		BinTreeBase::rotateLeft(p);
-		right->m_stat = p->m_stat; // promoted node gets the old total
-		recalcStat(p);             // demoted node recomputes from children
+		right->m_fullStat = p->m_fullStat; // promoted node gets the old total
+		recalcStat(p);                     // demoted node recomputes from children
 	}
 
 	void
@@ -370,15 +399,15 @@ protected:
 		ASSERT(left);
 
 		BinTreeBase::rotateRight(p);
-		left->m_stat = p->m_stat;  // promoted node gets the old total
-		recalcStat(p);             // demoted node recomputes from children
+		left->m_fullStat = p->m_fullStat;  // promoted node gets the old total
+		recalcStat(p);                     // demoted node recomputes from children
 	}
 
 	void
 	addStat(Node* p0) {
-		Stat stat = p0->m_value;
+		Stat stat = p0->m_selfStat;
 		for (Node* p = p0->m_parent; p; p = p->m_parent)
-			p->m_stat += stat;
+			p->m_fullStat += stat;
 	}
 
 	void
@@ -386,9 +415,9 @@ protected:
 		const Node* p0,
 		const Node* end
 	) {
-		Stat stat = p0->m_value;
+		Stat stat = p0->m_selfStat;
 		for (Node* p = p0->m_parent; p != end; p = p->m_parent)
-			p->m_stat -= stat;
+			p->m_fullStat -= stat;
 	}
 
 	void
@@ -396,7 +425,8 @@ protected:
 		Node* dst,
 		const Node* src
 	) {
-		dst->m_stat = src->m_stat - src->m_value;
+		dst->m_fullStat = src->m_fullStat;
+		dst->m_fullStat -= src->m_selfStat; // this way Stat doesn't need a binary minus op
 	}
 
 #ifdef _AXL_DEBUG
@@ -409,19 +439,19 @@ protected:
 		if (!p)
 			return;
 
-		Stat stat = p->m_value;
+		Stat stat = p->m_selfStat;
 
 		if (p->m_left) {
 			ASSERT(p->m_left->m_parent == p);
-			stat += p->m_left->m_stat;
+			stat += p->m_left->m_fullStat;
 		}
 
 		if (p->m_right) {
 			ASSERT(p->m_right->m_parent == p);
-			stat += p->m_right->m_stat;
+			stat += p->m_right->m_fullStat;
 		}
 
-		ASSERT(p->m_stat == stat);
+		ASSERT(p->m_fullStat == stat);
 
 		assertValidNode(p->m_left, it, count);
 

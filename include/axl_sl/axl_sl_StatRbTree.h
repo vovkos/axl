@@ -22,38 +22,38 @@ namespace sl {
 //..............................................................................
 
 template <
+	typename Stat,
 	typename Value,
-	typename Stat = Value,
-	typename ValueStatArgs = ArgTypes<Value, Stat>
+	typename StatValueArgs = ArgTypes<Stat, Value>
 >
 using StatRbTreeNode = StatBinTreeNode<
-	Value,
 	Stat,
+	Value,
 	RbBalancer,
-	ValueStatArgs
+	StatValueArgs
 >;
 
 template <
+	typename Stat,
 	typename Value,
-	typename Stat = Value,
-	typename ValueStatArgs = ArgTypes<Value, Stat>
+	typename StatValueArgs = ArgTypes<Stat, Value>
 >
-using StatRbTreeIterator = Iterator<StatRbTreeNode<Value, Stat, ValueStatArgs> >;
+using StatRbTreeIterator = Iterator<StatRbTreeNode<Stat, Value, StatValueArgs> >;
 
 template <
+	typename Stat,
 	typename Value,
-	typename Stat = Value,
-	typename ValueStatArgs = ArgTypes<Value, Stat>
+	typename StatValueArgs = ArgTypes<Stat, Value>
 >
-using ConstStatRbTreeIterator = ConstIterator<StatRbTreeNode<Value, Stat, ValueStatArgs> >;
+using ConstStatRbTreeIterator = ConstIterator<StatRbTreeNode<Stat, Value, StatValueArgs> >;
 
 template <
+	typename Stat,
 	typename Value,
-	typename Stat = Value,
-	typename ValueStatArgs = ArgTypes<Value, Stat>
+	typename StatValueArgs = ArgTypes<Stat, Value>
 >
 using StatRbTree = StatBinTree<
-	StatRbTreeNode<Value, Stat, ValueStatArgs>,
+	StatRbTreeNode<Stat, Value, StatValueArgs>,
 	RbBalancer
 >;
 

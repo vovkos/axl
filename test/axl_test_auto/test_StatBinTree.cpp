@@ -16,16 +16,18 @@ namespace {
 
 //..............................................................................
 
-// Item/ItemStat exercise the Value-vs-Stat split -- m_id is payload that is NOT
-// summable and must survive every rotation intact, the two counters are the
-// summable part.
+// Item is pure PAYLOAD -- the tree never looks inside it and cannot derive a stat
+// from it. m_id must survive every rotation intact; the counters are only here so
+// the test can build the ItemStat it passes in alongside.
 //
-// the Stat concept, as required by StatBinTree:
+// the Stat concept, as required by StatBinTree -- and nothing more:
 //   Stat()                      -- the additive identity
-//   Stat(Value)                 -- implicit; also covers `m_stat = m_value`
 //   Stat& operator += (Stat)
 //   Stat& operator -= (Stat)
-//   Stat  operator -  (Stat)    -- reached from updateStat/getChildStat
+//   bool  operator == (Stat)    -- assertValid only
+//
+// no unary minus, no binary + or -: they are deliberately absent below, so this
+// file stops compiling if the tree ever starts reaching for them again
 
 struct Item {
 	uint_t m_id;
@@ -86,12 +88,6 @@ struct ItemStat {
 		m_lineCount -= stat.m_lineCount;
 		m_charCount -= stat.m_charCount;
 		return *this;
-	}
-
-	ItemStat
-	operator - (const ItemStat& stat) const {
-		ItemStat result = *this;
-		return result -= stat;
 	}
 };
 
@@ -179,8 +175,8 @@ struct CharStat {
 // spelled through the StatRbTree aliases -- this is how a consumer writes it,
 // and it is the only thing that instantiates axl_sl_StatRbTree.h
 
-typedef sl::StatRbTreeNode<Item, ItemStat> ItemNode;
-typedef sl::StatRbTree<Item, ItemStat> ItemTree;
+typedef sl::StatRbTreeNode<ItemStat, Item> ItemNode;
+typedef sl::StatRbTree<ItemStat, Item> ItemTree;
 
 //..............................................................................
 
@@ -232,7 +228,7 @@ verifyTree(
 	typename Tree::ConstIterator it = tree.getHead();
 	for (; it; it++, i++) {
 		TEST_ASSERT(i < count);
-		TEST_ASSERT(it->getValue() == reference[i]);
+		TEST_ASSERT(it->m_value == reference[i]);
 		total += Stat(reference[i]);
 	}
 
@@ -295,7 +291,7 @@ verifyQueries(
 		}
 
 		TEST_ASSERT(foundIt);
-		TEST_ASSERT(foundIt->getValue() == reference[expected]);
+		TEST_ASSERT(foundIt->m_value == reference[expected]);
 
 		// remainder == target - (cumulative BEFORE the found element)
 
@@ -343,7 +339,7 @@ test_Scalar(size_t elementCount) {
 
 	for (size_t i = 0; i < elementCount; i++) {
 		uint64_t value = lcg(&seed) % 4; // zeros are frequent -- ties on purpose
-		tree.insertTail(value);
+		tree.insertTail(value, value);
 		reference.append(value);
 		verifyTree<Tree, uint64_t, uint64_t>(tree, reference);
 	}
@@ -371,8 +367,8 @@ testAppendSweep(size_t elementCount) {
 
 	for (size_t i = 0; i < elementCount; i++) {
 		Item item = makeItem(&seed);
-		ItemTree::Iterator it = tree.insertTail(item);
-		TEST_ASSERT(it && it->getValue() == item);
+		ItemTree::Iterator it = tree.insertTail(ItemStat(item), item);
+		TEST_ASSERT(it && it->m_value == item);
 		reference.append(item);
 		verifyTree<ItemTree, ItemStat, Item>(tree, reference);
 	}
@@ -388,8 +384,8 @@ testPrependSweep(size_t elementCount) {
 
 	for (size_t i = 0; i < elementCount; i++) {
 		Item item = makeItem(&seed);
-		ItemTree::Iterator it = tree.insertHead(item);
-		TEST_ASSERT(it && it->getValue() == item);
+		ItemTree::Iterator it = tree.insertHead(ItemStat(item), item);
+		TEST_ASSERT(it && it->m_value == item);
 		reference.insert(0, item);
 		verifyTree<ItemTree, ItemStat, Item>(tree, reference);
 	}
@@ -411,17 +407,17 @@ testRandomInsert(size_t elementCount) {
 		Item item = makeItem(&seed);
 
 		if (reference.isEmpty()) {
-			tree.insertTail(item);
+			tree.insertTail(ItemStat(item), item);
 			reference.append(item);
 		} else {
 			size_t index = lcg(&seed) % reference.getCount();
 			ItemTree::Iterator it = getIteratorAt(tree, index);
 
 			if (i & 1) {
-				tree.insertBefore(item, it);
+				tree.insertBefore(ItemStat(item), item, it);
 				reference.insert(index, item);
 			} else {
-				tree.insertAfter(item, it);
+				tree.insertAfter(ItemStat(item), item, it);
 				reference.insert(index + 1, item);
 			}
 		}
@@ -442,14 +438,14 @@ testNullIterator() {
 
 	for (size_t i = 0; i < 8; i++) {
 		Item item = makeItem(&seed);
-		tree.insertBefore(item, ItemTree::Iterator());
+		tree.insertBefore(ItemStat(item), item, ItemTree::Iterator());
 		reference.append(item);
 		verifyTree<ItemTree, ItemStat, Item>(tree, reference);
 	}
 
 	for (size_t i = 0; i < 8; i++) {
 		Item item = makeItem(&seed);
-		tree.insertAfter(item, ItemTree::Iterator());
+		tree.insertAfter(ItemStat(item), item, ItemTree::Iterator());
 		reference.insert(0, item);
 		verifyTree<ItemTree, ItemStat, Item>(tree, reference);
 	}
@@ -469,7 +465,7 @@ testRandomErase(size_t elementCount) {
 
 	for (size_t i = 0; i < elementCount; i++) {
 		Item item = makeItem(&seed);
-		tree.insertTail(item);
+		tree.insertTail(ItemStat(item), item);
 		reference.append(item);
 	}
 
@@ -505,11 +501,11 @@ testMixed(size_t stepCount) {
 			Item item = makeItem(&seed);
 
 			if (!count) {
-				tree.insertHead(item);
+				tree.insertHead(ItemStat(item), item);
 				reference.insert(0, item);
 			} else {
 				size_t index = lcg(&seed) % count;
-				tree.insertAfter(item, getIteratorAt(tree, index));
+				tree.insertAfter(ItemStat(item), item, getIteratorAt(tree, index));
 				reference.insert(index + 1, item);
 			}
 		}
@@ -533,11 +529,11 @@ testQueries(size_t elementCount) {
 		Item item = makeItem(&seed);
 
 		if (reference.isEmpty()) {
-			tree.insertTail(item);
+			tree.insertTail(ItemStat(item), item);
 			reference.append(item);
 		} else {
 			size_t index = lcg(&seed) % reference.getCount();
-			tree.insertAfter(item, getIteratorAt(tree, index));
+			tree.insertAfter(ItemStat(item), item, getIteratorAt(tree, index));
 			reference.insert(index + 1, item);
 		}
 	}
@@ -574,7 +570,7 @@ testScalarQueries(size_t elementCount) {
 
 	for (size_t i = 0; i < elementCount; i++) {
 		uint64_t value = lcg(&seed) % 4; // zeros on purpose -- ties in the descent
-		tree.insertTail(value);
+		tree.insertTail(value, value);
 		reference.append(value);
 	}
 
@@ -619,8 +615,10 @@ testScalarQueries(size_t elementCount) {
 	}
 }
 
-// modify() must not touch the shape -- only the stat delta rides up. the sweep
-// deliberately includes shrinking values (a wrapping delta) and no-op rewrites
+// replacing an element must not touch the shape -- only the stat delta rides up.
+// with a delta-only API that is subStat(old) + addStat(new), and the value goes
+// straight through the iterator. the sweep deliberately includes shrinking
+// values (so the intermediate underflows) and no-op rewrites
 
 void
 testModify(size_t elementCount) {
@@ -630,7 +628,7 @@ testModify(size_t elementCount) {
 
 	for (size_t i = 0; i < elementCount; i++) {
 		Item item = makeItem(&seed);
-		tree.insertTail(item);
+		tree.insertTail(ItemStat(item), item);
 		reference.append(item);
 	}
 
@@ -640,7 +638,11 @@ testModify(size_t elementCount) {
 		size_t index = lcg(&seed) % reference.getCount();
 		Item item = makeItem(&seed);
 
-		tree.modify(getIteratorAt(tree, index), item);
+		ItemTree::Iterator it = getIteratorAt(tree, index);
+		it->subStat(ItemStat(reference[index]));
+		it->addStat(ItemStat(item));
+		it->m_value = item; // no propagation at all -- the value carries no stat
+
 		reference.rwi()[index] = item;
 
 		verifyTree<ItemTree, ItemStat, Item>(tree, reference);
@@ -650,7 +652,11 @@ testModify(size_t elementCount) {
 
 	for (size_t i = 0; i < reference.getCount(); i++) {
 		Item item(reference[i].m_id, 0, 0);
-		tree.modify(getIteratorAt(tree, i), item);
+
+		ItemTree::Iterator it = getIteratorAt(tree, i);
+		it->subStat(ItemStat(reference[i]));
+		it->m_value = item;
+
 		reference.rwi()[i] = item;
 		verifyTree<ItemTree, ItemStat, Item>(tree, reference);
 	}
