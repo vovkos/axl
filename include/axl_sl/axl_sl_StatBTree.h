@@ -848,6 +848,25 @@ public:
 			onUnderflow(leaf);
 	}
 
+#ifdef _AXL_DEBUG
+	void
+	assertValid() const {
+		if (!m_root) {
+			ASSERT(!m_count && !m_height && m_leafList.isEmpty());
+			return;
+		}
+
+		ASSERT(!m_root->m_parent);
+
+		typename sl::List<Leaf>::ConstIterator leafIt = m_leafList.getHead();
+		size_t count = 0;
+		assertValidNode(m_root, m_height, true, &leafIt, &count);
+
+		ASSERT(!leafIt); // the chain must hold no leaves the tree doesn't
+		ASSERT(count == m_count);
+	}
+#endif
+
 protected:
 	Iterator
 	insertFirst(StatArg stat) {
@@ -921,8 +940,9 @@ protected:
 		sibling->insert(0, node, Fanout / 2, siblingCount);
 		sibling->recalcStat();
 		node->m_count = Fanout / 2;
-		node->m_stat -= sibling->m_stat; // not recalcStat! not the same when we are splitting parent
 		postSplit(node, sibling);
+
+		// we deliberately postpone update of node->m_stat so it doesn't affect split(parent) below
 
 		if (!parent) {
 			Node* root = new Node;
@@ -930,32 +950,32 @@ protected:
 			root->m_childArray[1] = sibling;
 			root->m_count = 2;
 			root->m_stat = node->m_stat;
-			root->m_stat += sibling->m_stat;
 			node->m_parent = root;
 			sibling->m_parent = root;
 			m_root = root;
 			m_height++;
+			node->m_stat -= sibling->m_stat;
 			return sibling;
 		}
 
 		size_t slot = parent->find(node) + 1;
 		if (parent->m_count < Fanout) {
 			parent->insert(slot, sibling);
+			node->m_stat -= sibling->m_stat;
 			return sibling;
 		}
 
-		Node* parentSibling = split(parent);
+		Node* siblingParent = split(parent);
 		Node* target;
-		if (slot < parent->m_count) {
+		if (slot <= parent->m_count)
 			target = parent;
-		} else {
-			parent->m_stat -= sibling->m_stat;
-			parentSibling->m_stat += sibling->m_stat;
-			target = parentSibling;
+		else {
+			target = siblingParent;
 			slot -= parent->m_count;
 		}
 
 		target->insert(slot, sibling);
+		node->m_stat -= sibling->m_stat;
 		return sibling;
 	}
 
@@ -1032,6 +1052,51 @@ protected:
 			}
 		}
 	}
+
+#ifdef _AXL_DEBUG
+	void
+	assertValidNode(
+		const NodeBase* node,
+		size_t level, // 0 == a leaf
+		bool isRoot,
+		typename sl::List<Leaf>::ConstIterator* leafIt,
+		size_t* count
+	) const {
+		ASSERT(node->m_count <= Fanout);
+
+		// the root is exempt from the underflow rules
+
+		if (!isRoot)
+			ASSERT(node->m_count >= Fanout / 2);
+		else if (level)
+			ASSERT(node->m_count >= 2);
+		else
+			ASSERT(node->m_count >= 1);
+
+		Stat stat = Stat();
+		if (!level) { // a leaf: its slots hold the per-element stats themselves
+			const Leaf* leaf = (const Leaf*)node;
+
+			ASSERT(*leafIt && *(*leafIt) == leaf); // chain order must match the walk
+			(*leafIt)++;
+			*count += leaf->m_count;
+
+			for (size_t i = 0; i < leaf->m_count; i++)
+				stat += leaf->getChildStat(i);
+		} else {
+			const Node* p = (const Node*)node;
+
+			for (size_t i = 0; i < p->m_count; i++) {
+				const NodeBase* child = p->m_childArray[i];
+				ASSERT(child->m_parent == p); // the two-way link is intact
+				assertValidNode(child, level - 1, false, leafIt, count);
+				stat += child->m_stat;
+			}
+		}
+
+		ASSERT(node->m_stat == stat);
+	}
+#endif
 };
 
 //..............................................................................

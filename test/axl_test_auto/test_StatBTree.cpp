@@ -43,9 +43,9 @@ struct Span {
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // the aggregate: everything summable in a Span and nothing else. the tree needs
-// += and -= and NOTHING else -- no unary minus, no binary + or -, no <. those
-// are deliberately absent here, so this file stops compiling if the tree ever
-// starts requiring them again
+// +=, -= and == (the last one for assertValid only) and NOTHING else -- no unary
+// minus, no binary + or -, no <. those are deliberately absent here, so this
+// file stops compiling if the tree ever starts requiring them again
 
 struct SpanStat {
 	uint64_t m_lineCount;
@@ -58,6 +58,11 @@ struct SpanStat {
 	SpanStat(const Span& span):
 		m_lineCount(span.m_lineCount),
 		m_charCount(span.m_charCount) {}
+
+	bool
+	operator == (const SpanStat& src) const {
+		return m_lineCount == src.m_lineCount && m_charCount == src.m_charCount;
+	}
 
 	SpanStat&
 	operator += (const SpanStat& src) {
@@ -176,6 +181,10 @@ verifyTree(
 	const sl::Array<Span>& reference
 ) {
 	typedef typename Tree::ConstIterator ConstIterator; // a const tree yields const iterators
+
+#ifdef _AXL_DEBUG
+	tree.assertValid(); // the per-node invariant the public API can't see
+#endif
 
 	size_t count = reference.getCount();
 	TEST_ASSERT(tree.getCount() == count);
@@ -680,6 +689,102 @@ testInsertNoValueEquivalence(size_t elementCount) {
 	TEST_ASSERT(!it1 && !it2);
 }
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// REGRESSION: interior stat drift on a CASCADING split.
+//
+// split() leaves its sibling unlinked for a moment, and node goes on claiming the
+// sibling's stat until it is placed -- which is exactly what recalcStat() one
+// level up must see for whichever half receives node to come out right. what
+// makes the deferred subtraction safe is that node and its sibling land in the
+// SAME half, i.e. the slot test in split() is `<=`. with `<` they are separated
+// at slot == Fanout / 2 and their common parent drifts.
+//
+// none of that is visible from getFullStat(): the drift moves stat BETWEEN
+// subtrees, so the grand TOTAL stays correct while an interior node is wrong.
+// seeing it takes assertValid() (or calcStat), a Fanout small enough to cascade,
+// all four insert forms interleaved so `slot` sweeps across Fanout / 2, and a
+// check after every single operation -- which is why append-only and
+// before/after-only sweeps never caught it
+
+// assertValid() after EVERY operation is what catches the drift; the full
+// verifyTree() is O(total) in findByStat targets, so it runs periodically instead
+
+template <size_t Fanout>
+void
+testSplitCascade(size_t elementCount) {
+	typedef sl::StatBTree<SpanStat, Span, Fanout> Tree;
+
+	for (uint32_t i = 1; i <= 4; i++) {
+		uint32_t seed = i * 0x9e3779b9 + (uint32_t)Fanout;
+
+		Tree tree;
+		sl::Array<Span> reference;
+
+		for (size_t j = 0; j < elementCount; j++) {
+			// sequenced deliberately: two lcg() calls in one expression would
+			// leave the sequence up to the compiler's argument evaluation order
+
+			uint64_t lineCount = lcg(&seed) % 4;
+			uint64_t charCount = lcg(&seed) % 100;
+			Span span((uint_t)j + 1, lineCount, charCount);
+			size_t index;
+
+			switch (j % 4) {
+			case 0:
+				index = reference.getCount();
+				tree.insertTail(SpanStat(span), span);
+				break;
+
+			case 1:
+				index = 0;
+				tree.insertHead(SpanStat(span), span);
+				break;
+
+			case 2:
+				index = lcg(&seed) % (reference.getCount() + 1);
+				tree.insertBefore(SpanStat(span), span, getIteratorAt(tree, index));
+				break;
+
+			default:
+				index = lcg(&seed) % (reference.getCount() + 1);
+				tree.insertAfter(
+					SpanStat(span),
+					span,
+					index ? getIteratorAt(tree, index - 1) : typename Tree::Iterator()
+				);
+				break;
+			}
+
+			reference.insert(index, span);
+
+#ifdef _AXL_DEBUG
+			tree.assertValid();
+#endif
+			if (j % 32 == 0)
+				verifyTree(tree, reference);
+		}
+
+		verifyTree(tree, reference);
+
+		// ...and it must survive the way back down, too
+
+		while (!reference.isEmpty()) {
+			size_t index = lcg(&seed) % reference.getCount();
+			tree.erase(getIteratorAt(tree, index));
+			reference.remove(index);
+
+#ifdef _AXL_DEBUG
+			tree.assertValid();
+#endif
+			if (reference.getCount() % 32 == 0)
+				verifyTree(tree, reference);
+		}
+
+		TEST_ASSERT(tree.isEmpty() && !tree.getHead() && !tree.getTail());
+	}
+}
+
 //..............................................................................
 
 void
@@ -703,6 +808,10 @@ run() {
 	testRandomInsertErase<6>(60);
 	testRandomInsertErase<8>(60);
 	testRandomInsertErase<16>(60);
+
+	testSplitCascade<4>(200); // deep enough that splits cascade past one level
+	testSplitCascade<6>(200);
+	testSplitCascade<8>(200);
 
 	testInsertNoValue<4>(80);  // small Fanout: the returned iterator must survive splits
 	testInsertNoValue<16>(80);
