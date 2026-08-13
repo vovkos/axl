@@ -45,7 +45,8 @@ struct Counters {
 };
 
 // per-counter sum types: constructible from the aggregated Counters (extracts
-// one counter), += Counters for calcStat, </<= and -= for findLe
+// one counter), += Counters for calcPrefixStat, </<= and -= for findGe, and ==
+// for find()'s exact-prefix test
 
 struct LineCount {
 	uint64_t m_value;
@@ -66,6 +67,11 @@ struct LineCount {
 	operator -= (const LineCount& src) {
 		m_value -= src.m_value;
 		return *this;
+	}
+
+	bool
+	operator == (const LineCount& src) const {
+		return m_value == src.m_value;
 	}
 
 	bool
@@ -101,6 +107,11 @@ struct ZoneCount {
 	}
 
 	bool
+	operator == (const ZoneCount& src) const {
+		return m_value == src.m_value;
+	}
+
+	bool
 	operator < (const ZoneCount& src) const {
 		return m_value < src.m_value;
 	}
@@ -119,9 +130,9 @@ lcg(uint32_t* seed) {
 	return *seed >> 16;
 }
 
-// verifies calcStat at every index (inclusive semantics) and findByStat at
+// verifies calcPrefixStat at every index (inclusive semantics) and findGe
 // every target from 0 through past the total, against the reference element
-// array; findByStat(target) = smallest index whose inclusive cumulative sum is
+// array; findGe(target) = smallest index whose inclusive cumulative sum is
 // >= target (ties from zero-count elements resolve to the first index), -1 if
 // target exceeds the total; on success, *remainder = target minus the
 // cumulative sum before the found element
@@ -139,8 +150,13 @@ verifyTree(
 	for (size_t i = 0; i < count; i++) {
 		lineCount += reference[i].m_lineCount;
 		zoneCount += reference[i].m_zoneCount;
-		TEST_ASSERT(tree.calcStat<LineCount>(i).m_value == lineCount);
-		TEST_ASSERT(tree.calcStat<ZoneCount>(i).m_value == zoneCount);
+		TEST_ASSERT(tree.calcPrefixStat<LineCount>(i).m_value == lineCount);
+		TEST_ASSERT(tree.calcPrefixStat<ZoneCount>(i).m_value == zoneCount);
+
+		// calcSelfStat must reproduce the element itself, not a partial sum
+
+		TEST_ASSERT(tree.calcSelfStat<LineCount>(i).m_value == reference[i].m_lineCount);
+		TEST_ASSERT(tree.calcSelfStat<ZoneCount>(i).m_value == reference[i].m_zoneCount);
 	}
 
 	size_t modelIndex = 0;  // smallest index with cumulative line count >= target
@@ -155,12 +171,20 @@ verifyTree(
 		}
 
 		LineCount remainder(-1);
-		size_t findIndex = tree.findByStat<LineCount>(LineCount(target), &remainder);
+		size_t findIndex = tree.findGe<LineCount>(LineCount(target), &remainder);
+		// find(): the same index, but ONLY on an exact inclusive prefix
+
+		size_t exactIndex = tree.findEq<LineCount>(LineCount(target));
+
 		if (modelIndex < count) {
 			TEST_ASSERT(findIndex == modelIndex);
 			TEST_ASSERT(remainder.m_value == target - modelSum);
+
+			uint64_t inclusive = modelSum + reference[modelIndex].m_lineCount;
+			TEST_ASSERT(exactIndex == (inclusive == target ? modelIndex : -1));
 		} else {
 			TEST_ASSERT(findIndex == -1); // target > total
+			TEST_ASSERT(exactIndex == -1);
 		}
 	}
 }
@@ -171,11 +195,12 @@ test_Empty() {
 	TEST_ASSERT(tree.getCount() == 0);
 	TEST_ASSERT(tree.isEmpty());
 
-	size_t index = tree.findByStat<LineCount>(LineCount(7));
+	size_t index = tree.findGe<LineCount>(LineCount(7));
 	TEST_ASSERT(index == -1);
 }
 
-// scalar value type exercising the non-template calcStat/findByStat wrappers
+// scalar value type exercising the non-template calcPrefixStat/findGe
+// wrappers
 
 void
 test_Scalar() {
@@ -203,7 +228,7 @@ test_Scalar() {
 	uint64_t total = 0;
 	for (size_t i = 0; i < ElementCount; i++) {
 		total += reference[i];
-		TEST_ASSERT(tree.calcStat(i) == total);
+		TEST_ASSERT(tree.calcPrefixStat(i) == total);
 	}
 
 	size_t modelIndex = 0;  // smallest index with cumulative sum >= target
@@ -218,7 +243,7 @@ test_Scalar() {
 		}
 
 		uint64_t remainder = -1;
-		size_t findIndex = tree.findByStat(target, &remainder);
+		size_t findIndex = tree.findGe(target, &remainder);
 		if (modelIndex < ElementCount) {
 			TEST_ASSERT(findIndex == modelIndex);
 			TEST_ASSERT(remainder == target - modelSum);

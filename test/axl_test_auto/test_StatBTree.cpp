@@ -81,11 +81,12 @@ struct SpanStat {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// per-field projections. a Partial is deliberately NOT a full Stat -- it only
+// per-field projections. a SubStat is deliberately NOT a full Stat -- it only
 // needs what the projected paths use: constructible from the aggregated
-// SpanStat (extracts one field), += SpanStat for calcStat, -= and < for the
-// findByStat descent. keeping the surface narrow is what proves the projected
-// overloads don't quietly depend on the full Stat arithmetic
+// SpanStat (extracts one field), += SpanStat for calcPrefixStat, -= and < for
+// the findGe descent, and == for find()'s exact-prefix test. keeping the surface
+// narrow is what proves the projected overloads don't quietly depend on the full
+// Stat arithmetic
 
 struct LineStat {
 	uint64_t m_value;
@@ -95,6 +96,11 @@ struct LineStat {
 
 	LineStat(const SpanStat& stat):
 		m_value(stat.m_lineCount) {}
+
+	bool
+	operator == (const LineStat& src) const {
+		return m_value == src.m_value;
+	}
 
 	LineStat&
 	operator += (const SpanStat& src) {
@@ -122,6 +128,11 @@ struct CharStat {
 
 	CharStat(const SpanStat& stat):
 		m_value(stat.m_charCount) {}
+
+	bool
+	operator == (const CharStat& src) const {
+		return m_value == src.m_value;
+	}
 
 	CharStat&
 	operator += (const SpanStat& src) {
@@ -166,10 +177,10 @@ getIteratorAt(
 //
 // - forward and backward iteration reproduce the reference sequence (this is
 //   what catches broken leaf links and lost/duplicated payload)
-// - calcStat(it) equals the INCLUSIVE prefix at every position (walks UP the
-//   spine, so it catches broken parent pointers and stale node stats)
+// - calcPrefixStat(it) equals the INCLUSIVE prefix at every position (walks UP
+//   the spine, so it catches broken parent pointers and stale node stats)
 // - getFullStat() equals the grand total
-// - findByStat(target) for every target 0 .. total + 2 equals the smallest
+// - findGe(target) for every target 0 .. total + 2 equals the smallest
 //   index whose inclusive prefix is >= target (ties from zero-count elements
 //   resolve to the first one), empty iterator if target > total; on success
 //   *remainder == target minus the prefix before the element found
@@ -208,11 +219,11 @@ verifyTree(
 		lineTotal += reference[i].m_lineCount;
 		charTotal += reference[i].m_charCount;
 
-		SpanStat prefix = tree.calcStat(it); // inclusive -- it's own stat counts
+		SpanStat prefix = tree.calcPrefixStat(it); // inclusive -- its own counts
 		TEST_ASSERT(prefix.m_lineCount == lineTotal);
 		TEST_ASSERT(prefix.m_charCount == charTotal);
-		TEST_ASSERT(tree.template calcStat<LineStat>(it).m_value == lineTotal);
-		TEST_ASSERT(tree.template calcStat<CharStat>(it).m_value == charTotal);
+		TEST_ASSERT(tree.template calcPrefixStat<LineStat>(it).m_value == lineTotal);
+		TEST_ASSERT(tree.template calcPrefixStat<CharStat>(it).m_value == charTotal);
 	}
 
 	TEST_ASSERT(i == count);
@@ -245,16 +256,28 @@ verifyTree(
 		}
 
 		LineStat remainder(-1);
-		ConstIterator it = tree.template findByStat<LineStat>(LineStat(target), &remainder);
+		ConstIterator it = tree.template findGe<LineStat>(LineStat(target), &remainder);
+
+		// find() is findGe() landing exactly on an element's inclusive prefix
+
+		ConstIterator exactIt = tree.template findEq<LineStat>(LineStat(target));
 
 		if (modelIndex < count) {
 			uint64_t inclusive = modelSum + reference[modelIndex].m_lineCount;
 			TEST_ASSERT(it);
 			TEST_ASSERT(it->m_id == reference[modelIndex].m_id);
 			TEST_ASSERT(remainder.m_value == target - modelSum);
-			TEST_ASSERT(tree.template calcStat<LineStat>(it).m_value == inclusive);
-			TEST_ASSERT(inclusive >= target); // findByStat's defining property
+			TEST_ASSERT(tree.template calcPrefixStat<LineStat>(it).m_value == inclusive);
+			TEST_ASSERT(inclusive >= target); // findGe's defining property
+
+			if (inclusive == target) {
+				TEST_ASSERT(exactIt);
+				TEST_ASSERT(exactIt->m_id == reference[modelIndex].m_id);
+			} else {
+				TEST_ASSERT(!exactIt);
+			}
 		} else {
+			TEST_ASSERT(!exactIt); // past the grand total
 			TEST_ASSERT(!it); // target is past the grand total
 		}
 	}
@@ -313,9 +336,9 @@ test_Empty() {
 	TEST_ASSERT(!tree.getTail());
 	TEST_ASSERT(tree.getFullStat().m_lineCount == 0);
 	TEST_ASSERT(tree.getFullStat<LineStat>().m_value == 0);
-	TEST_ASSERT(!tree.findByStat<LineStat>(LineStat(0)));
-	TEST_ASSERT(!tree.findByStat<LineStat>(LineStat(7)));
-	TEST_ASSERT(!tree.calcStat<LineStat>(nullIt).m_value);
+	TEST_ASSERT(!tree.findGe<LineStat>(LineStat(0)));
+	TEST_ASSERT(!tree.findGe<LineStat>(LineStat(7)));
+	TEST_ASSERT(!tree.calcPrefixStat<LineStat>(nullIt).m_value);
 
 	sl::Array<Span> reference;
 	verifyTree(tree, reference);
@@ -325,8 +348,8 @@ test_Empty() {
 }
 
 // a scalar Stat with a payload of its own, plus the non-projected
-// calcStat/getFullStat/findByStat. the payload here is an id that has nothing to
-// do with the stat -- so it also pins that the two are tracked independently
+// calcPrefixStat/getFullStat/findGe. the payload here is an id with nothing
+// to do with the stat -- so it also pins that the two are tracked independently
 
 void
 test_Scalar() {
@@ -356,7 +379,7 @@ test_Scalar() {
 		TEST_ASSERT(*it == (uint_t)i + 1); // the payload
 		TEST_ASSERT(it.getStat() == reference[i]); // the stat
 		total += reference[i];
-		TEST_ASSERT(tree.calcStat(it) == total); // inclusive
+		TEST_ASSERT(tree.calcPrefixStat(it) == total); // inclusive
 	}
 
 	TEST_ASSERT(i == ElementCount);
@@ -372,11 +395,11 @@ test_Scalar() {
 		}
 
 		uint64_t remainder = -1;
-		Tree::Iterator it = tree.findByStat(target, &remainder);
+		Tree::Iterator it = tree.findGe(target, &remainder);
 
 		if (modelIndex < ElementCount) {
 			TEST_ASSERT(it);
-			TEST_ASSERT(tree.calcStat(it) == modelSum + reference[modelIndex]);
+			TEST_ASSERT(tree.calcPrefixStat(it) == modelSum + reference[modelIndex]);
 			TEST_ASSERT(remainder == target - modelSum);
 		} else {
 			TEST_ASSERT(!it);
@@ -557,18 +580,9 @@ testMixed(size_t opCount) {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// the no-value overloads: insertX(stat) leaves the slot's Value
-// DEFAULT-CONSTRUCTED, for the caller to fill through the iterator. that is what
-// lets a Value the tree cannot copy-assign into the tree at all, since
-// insertX(stat, value) assigns.
-//
-// the load-bearing property is that STAT AND VALUE ARE INDEPENDENT: the
-// aggregate must already be complete while the value is still default. so every
-// insert checks the totals BEFORE writing the payload.
-//
-// run at a small Fanout as well -- the returned iterator has to survive a SPLIT
-// and still address the slot the caller is about to write, which is the one way
-// this differs from the bin tree
+// insertX(stat) leaves the Value default-constructed, for the caller to fill in
+// stat and value are independent, so the totals are checked BEFORE the payload is written
+// a small Fanout also proves the returned iterator survives a split
 
 template <size_t Fanout>
 void
@@ -691,24 +705,10 @@ testInsertNoValueEquivalence(size_t elementCount) {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// REGRESSION: interior stat drift on a CASCADING split.
-//
-// split() leaves its sibling unlinked for a moment, and node goes on claiming the
-// sibling's stat until it is placed -- which is exactly what recalcStat() one
-// level up must see for whichever half receives node to come out right. what
-// makes the deferred subtraction safe is that node and its sibling land in the
-// SAME half, i.e. the slot test in split() is `<=`. with `<` they are separated
-// at slot == Fanout / 2 and their common parent drifts.
-//
-// none of that is visible from getFullStat(): the drift moves stat BETWEEN
-// subtrees, so the grand TOTAL stays correct while an interior node is wrong.
-// seeing it takes assertValid() (or calcStat), a Fanout small enough to cascade,
-// all four insert forms interleaved so `slot` sweeps across Fanout / 2, and a
-// check after every single operation -- which is why append-only and
-// before/after-only sweeps never caught it
-
-// assertValid() after EVERY operation is what catches the drift; the full
-// verifyTree() is O(total) in findByStat targets, so it runs periodically instead
+// REGRESSION: interior stat drift on a cascading split (slot test must be <=, not <)
+// invisible in getFullStat(): the drift moves stat between subtrees, so the total stays right
+// needs a small Fanout, all four insert forms so slot sweeps across Fanout / 2, and assertValid() after each op
+// verifyTree() is O(total) in findGe targets, so it runs periodically instead
 
 template <size_t Fanout>
 void

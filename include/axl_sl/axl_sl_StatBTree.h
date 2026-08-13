@@ -632,23 +632,23 @@ public:
 		return getFullStat<Stat>();
 	}
 
-	template <typename Partial>
-	Partial
+	template <typename SubStat>
+	SubStat
 	getFullStat() const {
-		return m_root ? Partial(m_root->m_stat) : Partial(Stat());
+		return m_root ? SubStat(m_root->m_stat) : SubStat(Stat());
 	}
 
 	// everything up to (and including) iterator
 
 	Stat
-	calcStat(ConstIterator it) const {
-		return calcStat<Stat>(it);
+	calcPrefixStat(ConstIterator it) const {
+		return calcPrefixStat<Stat>(it);
 	}
 
-	template <typename Partial>
-	Partial
-	calcStat(ConstIterator it) const {
-		Partial stat = Partial(Stat());
+	template <typename SubStat>
+	SubStat
+	calcPrefixStat(ConstIterator it) const {
+		SubStat stat = SubStat(Stat());
 		if (!it)
 			return stat;
 
@@ -669,46 +669,47 @@ public:
 		return stat;
 	}
 
-	// finds first iterator so that targetStat <= calcStat(it)
+	// findGe(arg): first element whose PREFIX is >= arg -- the containing element
+	// offset, if asked for, is arg minus the prefix BEFORE it
 
 	Iterator
-	findByStat(
+	findGe(
 		StatArg targetStat,
-		Stat* remainder = NULL
+		Stat* offset = NULL
 	) {
-		return findByStat<Stat, StatArg>(targetStat, remainder);
+		return findGe<Stat, StatArg>(targetStat, offset);
 	}
 
 	ConstIterator
-	findByStat(
+	findGe(
 		StatArg targetStat,
-		Stat* remainder = NULL
+		Stat* offset = NULL
 	) const {
-		return const_cast<StatBTree*>(this)->findByStat<Stat, StatArg>(targetStat, remainder);
+		return findGe<Stat, StatArg>(targetStat, offset);
 	}
 
 	// this overload can operate on a specific field of a multi-field stat
 
 	template <
-		typename Partial,
-		typename PartialArg = ArgType<Partial>
+		typename SubStat,
+		typename SubStatArg = ArgType<SubStat>
 	>
 	Iterator
-	findByStat(
-		PartialArg targetStat,
-		Partial* remainder = NULL
+	findGe(
+		SubStatArg targetStat,
+		SubStat* offset = NULL
 	) {
 		if (!m_root)
 			return Iterator();
 
-		Partial stat = targetStat;
+		SubStat stat = targetStat;
 		NodeBase* node = m_root;
 
 		for (size_t level = m_height; level; level--) {
 			Node* parent = (Node*)node;
 			size_t i = 0;
 			for (; i < parent->m_count - 1; i++) { // the last child is the fallback
-				Partial childStat = parent->getChildStat(i);
+				SubStat childStat = parent->getChildStat(i);
 				if (!(childStat < stat))
 					break;
 
@@ -721,7 +722,7 @@ public:
 		Leaf* leaf = (Leaf*)node;
 		size_t i = 0;
 		for (; i < leaf->m_count; i++) {
-			Partial childStat = leaf->getChildStat(i);
+			SubStat childStat = leaf->getChildStat(i);
 			if (!(childStat < stat))
 				break;
 
@@ -731,22 +732,55 @@ public:
 		if (i >= leaf->m_count) // targetStat is past the grand total
 			return Iterator();
 
-		if (remainder)
-			*remainder = stat;
+		if (offset)
+			*offset = stat;
 
 		return Iterator(leaf, i);
 	}
 
 	template <
-		typename Partial,
-		typename PartialArg = ArgType<Partial>
+		typename SubStat,
+		typename SubStatArg = ArgType<SubStat>
 	>
 	ConstIterator
-	findByStat(
-		PartialArg targetStat,
-		Partial* remainder = NULL
+	findGe(
+		SubStatArg targetStat,
+		SubStat* offset = NULL
 	) const {
-		return const_cast<StatBTree*>(this)->findByStat<Partial, PartialArg>(targetStat, remainder);
+		return const_cast<StatBTree*>(this)->findGe<SubStat, SubStatArg>(targetStat, offset);
+	}
+
+	// findEq(arg): the element whose prefix is exactly arg, NULL if none
+	// that is findGe landing with its offset exactly on the element's own stat
+
+	Iterator
+	findEq(StatArg targetStat) {
+		return findEq<Stat, StatArg>(targetStat);
+	}
+
+	ConstIterator
+	findEq(StatArg targetStat) const {
+		return findEq<Stat, StatArg>(targetStat);
+	}
+
+	template <
+		typename SubStat,
+		typename SubStatArg = ArgType<SubStat>
+	>
+	Iterator
+	findEq(SubStatArg targetStat) {
+		SubStat offset;
+		Iterator it = findGe<SubStat, SubStatArg>(targetStat, &offset);
+		return it && offset == SubStat(it.getStat()) ? it : Iterator();
+	}
+
+	template <
+		typename SubStat,
+		typename SubStatArg = ArgType<SubStat>
+	>
+	ConstIterator
+	findEq(SubStatArg targetStat) const {
+		return const_cast<StatBTree*>(this)->findEq<SubStat, SubStatArg>(targetStat);
 	}
 
 	Iterator

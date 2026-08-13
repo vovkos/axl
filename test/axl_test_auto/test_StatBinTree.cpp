@@ -94,9 +94,10 @@ struct ItemStat {
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // LineStat/CharStat are deliberately NARROW projections -- they define only what
-// the <Partial> overloads are allowed to reach for (ctor-from-ItemStat, ctor from
-// the raw field for the search target, operator <, += and -=). if calcStat or
-// findByStat ever reached for full Stat arithmetic, these would stop compiling
+// the <SubStat> overloads are allowed to reach for (ctor-from-ItemStat, ctor from
+// the raw field for the search target, operator <, += and -=, and == for
+// find()'s exact-prefix test). if calcPrefixStat or findGe ever reached for full
+// Stat arithmetic, these would stop compiling
 
 struct LineStat {
 	uint64_t m_lineCount;
@@ -104,7 +105,7 @@ struct LineStat {
 	LineStat():
 		m_lineCount(0) {}
 
-	LineStat(const ItemStat& stat): // implicit -- Partial is built FROM Stat
+	LineStat(const ItemStat& stat): // implicit -- SubStat is built FROM Stat
 		m_lineCount(stat.m_lineCount) {}
 
 	explicit LineStat(uint64_t lineCount):
@@ -238,11 +239,11 @@ verifyTree(
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// calcStat(it) against a running prefix sum over the reference, then findByStat
-// exhaustively for EVERY target in [0, total + 2] against a naive scan -- both
-// the resulting element and the remainder
+// calcPrefixStat(it) against a running prefix sum over the reference, then
+// findGe exhaustively for EVERY target in [0, total + 2] against a naive
+// scan -- both the resulting element and the remainder
 
-template <typename Partial>
+template <typename SubStat>
 void
 verifyQueries(
 	ItemTree& tree,
@@ -251,7 +252,7 @@ verifyQueries(
 ) {
 	size_t count = reference.getCount();
 
-	// 1. calcStat is the inclusive prefix sum
+	// 1. calcPrefixStat is the inclusive prefix sum
 
 	uint64_t running = 0;
 	size_t i = 0;
@@ -259,19 +260,19 @@ verifyQueries(
 	ItemTree::ConstIterator it = tree.getHead();
 	for (; it; it++, i++) {
 		running += reference[i].*field;
-		Partial stat = tree.template calcStat<Partial>(it);
-		TEST_ASSERT(stat == Partial(running));
+		SubStat stat = tree.template calcPrefixStat<SubStat>(it);
+		TEST_ASSERT(stat == SubStat(running));
 	}
 
 	TEST_ASSERT(i == count);
-	TEST_ASSERT(tree.template getFullStat<Partial>() == Partial(running));
+	TEST_ASSERT(tree.template getFullStat<SubStat>() == SubStat(running));
 
-	// 2. findByStat: first element whose inclusive prefix sum is >= target
+	// 2. findGe: first element whose inclusive prefix sum is >= target
 
 	uint64_t total = running;
 	for (uint64_t target = 0; target <= total + 2; target++) {
 		ItemTree::ConstIterator foundIt =
-			((const ItemTree&)tree).template findByStat<Partial>(Partial(target));
+			((const ItemTree&)tree).template findGe<SubStat>(SubStat(target));
 
 		// naive oracle
 
@@ -295,14 +296,27 @@ verifyQueries(
 
 		// remainder == target - (cumulative BEFORE the found element)
 
-		Partial remainder;
-		((const ItemTree&)tree).template findByStat<Partial>(Partial(target), &remainder);
+		SubStat remainder;
+		((const ItemTree&)tree).template findGe<SubStat>(SubStat(target), &remainder);
 
 		uint64_t before = 0;
 		for (size_t k = 0; k < expected; k++)
 			before += reference[k].*field;
 
-		TEST_ASSERT(remainder == Partial(target - before));
+		TEST_ASSERT(remainder == SubStat(target - before));
+
+		// find(): the same element, but ONLY when target lands exactly on its
+		// inclusive prefix -- i.e. when the remainder is the element's own stat
+
+		ItemTree::ConstIterator exactIt =
+			((const ItemTree&)tree).template findEq<SubStat>(SubStat(target));
+
+		if (target == cum) {
+			TEST_ASSERT(exactIt);
+			TEST_ASSERT(exactIt->m_value == reference[expected]);
+		} else {
+			TEST_ASSERT(!exactIt);
+		}
 	}
 }
 
@@ -516,8 +530,8 @@ testMixed(size_t stepCount) {
 
 //..............................................................................
 
-// exercises calcStat/findByStat on BOTH fields of the same tree -- the whole
-// point of the <Partial> overloads is that one tree answers either question
+// exercises calcPrefixStat/findGe on BOTH fields of the same tree -- the
+// point of the <SubStat> overloads is that one tree answers either question
 
 void
 testQueries(size_t elementCount) {
@@ -580,16 +594,18 @@ testScalarQueries(size_t elementCount) {
 	Tree::ConstIterator it = tree.getHead();
 	for (; it; it++, i++) {
 		running += reference[i];
-		TEST_ASSERT(tree.calcStat(it) == running);
+		TEST_ASSERT(tree.calcPrefixStat(it) == running);
 	}
 
 	uint64_t total = running;
 	TEST_ASSERT(tree.getFullStat() == total);
-	TEST_ASSERT(tree.calcStat(Tree::ConstIterator()) == 0); // NULL iterator -> identity
+	// a NULL iterator yields the identity
+
+	TEST_ASSERT(tree.calcPrefixStat(Tree::ConstIterator()) == 0);
 
 	for (uint64_t target = 0; target <= total + 2; target++) {
 		uint64_t remainder = 0;
-		Tree::Iterator foundIt = tree.findByStat(target, &remainder);
+		Tree::Iterator foundIt = tree.findGe(target, &remainder);
 
 		uint64_t cum = 0;
 		uint64_t before = 0;
@@ -610,7 +626,7 @@ testScalarQueries(size_t elementCount) {
 		}
 
 		TEST_ASSERT(foundIt);
-		TEST_ASSERT(tree.calcStat(foundIt) >= target);
+		TEST_ASSERT(tree.calcPrefixStat(foundIt) >= target);
 		TEST_ASSERT(remainder == target - before);
 	}
 }
@@ -671,18 +687,9 @@ testModify(size_t elementCount) {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// the no-value overloads: insertX(stat) leaves m_value DEFAULT-CONSTRUCTED, for
-// the caller to fill in place. that is what lets a Value the tree cannot
-// copy-assign -- one that owns state, or is merely expensive -- into the tree at
-// all, since insertX(stat, value) assigns.
-//
-// the load-bearing property is that STAT AND VALUE ARE INDEPENDENT: the
-// aggregate must already be complete and correct while the value is still
-// default-constructed. so every insert below checks the tree total BEFORE
-// writing the payload.
-//
-// all four positional forms, and both NULL-iterator fallbacks (insertBefore(NULL)
-// appends, insertAfter(NULL) prepends), the same as the value-taking overloads
+// insertX(stat) leaves m_value default-constructed, for the caller to fill in
+// stat and value are independent, so the total is checked BEFORE the payload is written
+// covers all four positional forms and both NULL-iterator fallbacks
 
 void
 testInsertNoValue(size_t elementCount) {
@@ -742,9 +749,7 @@ testInsertNoValue(size_t elementCount) {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// insertX(stat) + fill must be indistinguishable from insertX(stat, value) --
-// same elements, same stats, and (since the operation sequence is identical)
-// the same shape, which the per-node subtree stats would expose
+// insertX(stat) + fill must be indistinguishable from insertX(stat, value), shape included
 
 void
 testInsertNoValueEquivalence(size_t elementCount) {
@@ -795,14 +800,15 @@ run() {
 	testMixed(250);
 
 	testScalarQueries(120);
-	testQueries(60); // exhaustive findByStat -- keep the element count modest
+	testQueries(60); // exhaustive findGe -- keep the element count modest
 	testModify(40);
 
-	// AXL_TODO: once calcStat(Iterator)/findByStat<Partial>/modify land, add --
-	//   - calcStat(it) against a running prefix sum over the reference
-	//   - findByStat exhaustively for every target in [0, total + 2], checking
+	// AXL_TODO: once calcPrefixStat(Iterator)/findGe<SubStat>/modify land,
+	//   add --
+	//   - calcPrefixStat(it) against a running prefix sum over the reference
+	//   - findGe exhaustively for every target in [0, total + 2], checking
 	//     both the iterator and the remainder (the FenwickTree/StatBTree pattern)
-	//   - a narrow Partial projection (ctor-from-Stat, operator<, operator-=)
+	//   - a narrow SubStat projection (ctor-from-Stat, operator<, operator-=)
 	//     to prove the projected overloads don't reach for full Stat arithmetic
 	//   - modify() round-trips
 }

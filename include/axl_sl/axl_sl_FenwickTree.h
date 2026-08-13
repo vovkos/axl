@@ -90,28 +90,32 @@ public:
 		inc(i, -delta);
 	}
 
-	// calculates sum(0 .. i)
+	// grand total
 
 	Value
-	calcStat() const {
-		return calcStat<Value>();
+	calcFullStat() const {
+		return calcFullStat<Value>();
 	}
+
+	template <typename SubStat>
+	SubStat
+	calcFullStat() const {
+		return isEmpty() ?
+			SubStat(Value()) :
+			calcPrefixStat<SubStat>(m_array.getCount() - 1);
+	}
+
+	// inclusive prefix: sum(0 .. i)
 
 	Value
-	calcStat(size_t index) const {
-		return calcStat<Value>(index);
+	calcPrefixStat(size_t index) const {
+		return calcPrefixStat<Value>(index);
 	}
 
-	template <typename Partial>
-	Partial
-	calcStat() const {
-		return isEmpty() ? Partial(Value()) : calcStat<Partial>(m_array.getCount() - 1);
-	}
-
-	template <typename Partial>
-	Partial
-	calcStat(size_t i) const {
-		Partial stat = m_array[i];
+	template <typename SubStat>
+	SubStat
+	calcPrefixStat(size_t i) const {
+		SubStat stat = m_array[i];
 		size_t j = i + 1; // 1-based index
 		for (j &= j - 1; j; j &= j - 1)
 			stat += m_array[j - 1];
@@ -119,54 +123,90 @@ public:
 		return stat;
 	}
 
-	// finds smallest i so that targetStat <= sum(0 .. i); returns -1 if not found
-	// sum must be monotonic non-decreasing for this to work
+	// the stat of exactly this element -- the inverse of what append() summed in
+
+	Value
+	calcSelfStat(size_t index) const {
+		return calcSelfStat<Value>(index);
+	}
+
+	template <typename SubStat>
+	SubStat
+	calcSelfStat(size_t i) const {
+		SubStat stat = m_array[i];
+		size_t j = i + 1; // 1-based index
+		size_t base = j - getLoBit(j); // 1-based left end of the affected range
+		for (j--; j != base; j &= j - 1)
+			stat -= m_array[j - 1];
+
+		return stat;
+	}
+
+	// findGet -- first element whose prefix is >= arg, -1 if past the end
 
 	size_t
-	findByStat(
+	findGe(
 		ValueArg targetStat,
-		Value* remainder = NULL
+		Value* offset = NULL
 	) const {
-		return findByStat<Value, ValueArg>(targetStat, remainder);
+		return findGe<Value, ValueArg>(targetStat, offset);
 	}
 
 	// this overload can operate on a specific field of a multi-field value
 
 	template <
-		typename Partial,
-		typename PartialArg = ArgType<Partial>
+		typename SubStat,
+		typename SubStatArg = ArgType<SubStat>
 	>
 	size_t
-	findByStat(
-		PartialArg targetStat,
-		Partial* remainder = NULL
+	findGe(
+		SubStatArg targetStat,
+		SubStat* offset = NULL
 	) const {
 		if (m_array.isEmpty())
 			return -1;
 
 		size_t count = m_array.getCount();
 		size_t base = 0; // 0-based start of search range
-		Partial stat = targetStat;
+		SubStat stat = targetStat;
 
 		for (size_t bit = getHiBit(count); bit; bit >>= 1) {
 			size_t i = base + bit - 1;
 			if (i >= count)
 				continue;
 
-			Partial left = m_array[i];
+			SubStat left = m_array[i];
 			if (left < stat) { // target beyond i, go right
 				stat -= left;
 				base += bit;
 			}
 		}
 
-		if (base >= count)
+		if (base >= count) // targetStat is past the grand total
 			return -1;
 
-		if (remainder)
-			*remainder = stat;
+		if (offset)
+			*offset = stat;
 
 		return base;
+	}
+
+	// findEq(arg): the element whose prefix is exactly arg, -1 if none
+
+	size_t
+	findEq(ValueArg targetStat) const {
+		return findEq<Value, ValueArg>(targetStat);
+	}
+
+	template <
+		typename SubStat,
+		typename SubStatArg = ArgType<SubStat>
+	>
+	size_t
+	findEq(SubStatArg targetStat) const {
+		SubStat offset;
+		size_t i = findGe<SubStat, SubStatArg>(targetStat, &offset);
+		return i != -1 && offset == calcSelfStat<SubStat>(i) ? i : -1;
 	}
 };
 

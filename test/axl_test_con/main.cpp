@@ -10183,13 +10183,13 @@ testFenwickTree() {
 	}
 #endif
 
-	// calcStat at every index (inclusive)
+	// calcPrefixStat at every index (inclusive)
 
 	uint64_t sum = 0;
 	printf("sums:  ");
 	for (size_t i = 0; i < PageCount; i++) {
 		sum += model[i];
-		uint64_t treeSum = tree.calcStat(i);
+		uint64_t treeSum = tree.calcPrefixStat(i);
 		printf("%llu ", treeSum);
 		ASSERT(treeSum == sum);
 	}
@@ -10197,7 +10197,7 @@ testFenwickTree() {
 
 	uint64_t total = sum;
 
-	// findByStat at every target: the smallest page index whose inclusive
+	// findGe at every target: the smallest page index whose inclusive
 	// cumulative line count is >= target (-1 if target > total); remainder =
 	// target minus the cumulative line count before that page -- so for a
 	// 1-based target line number, the result is the page holding that line
@@ -10212,13 +10212,13 @@ testFenwickTree() {
 		}
 
 		uint64_t remainder = -1;
-		size_t index = tree.findByStat(target, &remainder);
+		size_t index = tree.findGe(target, &remainder);
 		if (modelIndex < PageCount) {
-			printf("findByStat(%llu) -> page %zd + %llu\n", target, index, remainder);
+			printf("findGe(%llu) -> page %zd + %llu\n", target, index, remainder);
 			ASSERT(index == modelIndex);
 			ASSERT(remainder == target - modelSum);
 		} else {
-			printf("findByStat(%llu) -> %zd (past the total)\n", target, index);
+			printf("findGe(%llu) -> %zd (past the total)\n", target, index);
 			ASSERT(index == -1);
 		}
 	}

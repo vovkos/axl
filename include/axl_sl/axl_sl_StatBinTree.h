@@ -156,27 +156,27 @@ public:
 		return getFullStat<Stat>();
 	}
 
-	template <typename Partial>
-	Partial
+	template <typename SubStat>
+	SubStat
 	getFullStat() const {
-		return this->m_root ? Partial(this->m_root->m_fullStat) : Partial(Stat());
+		return this->m_root ? SubStat(this->m_root->m_fullStat) : SubStat(Stat());
 	}
 
 	// the total over everything up to (and including) Iterator it
 
 	Stat
-	calcStat(ConstIterator it) const {
-		return calcStat<Stat>(it);
+	calcPrefixStat(ConstIterator it) const {
+		return calcPrefixStat<Stat>(it);
 	}
 
-	template <typename Partial>
-	Partial
-	calcStat(ConstIterator it) const {
+	template <typename SubStat>
+	SubStat
+	calcPrefixStat(ConstIterator it) const {
 		if (!it)
-			return Partial(Stat());
+			return SubStat(Stat());
 
 		const Node* p = *it;
-		Partial stat = Partial(p->m_fullStat);
+		SubStat stat = SubStat(p->m_fullStat);
 		if (p->m_right)
 			stat -= p->m_right->m_fullStat;
 
@@ -189,40 +189,40 @@ public:
 		return stat;
 	}
 
-	// finds first iterator so that targetStat <= calcStat(it)
+	// findGe(arg) returns first element with prefix is >= arg
 
 	Iterator
-	findByStat(
+	findGe(
 		StatArg targetStat,
-		Stat* remainder = NULL
+		Stat* offset = NULL
 	) {
-		return findByStat<Stat, StatArg>(targetStat, remainder);
+		return findGe<Stat, StatArg>(targetStat, offset);
 	}
 
 	ConstIterator
-	findByStat(
+	findGe(
 		StatArg targetStat,
-		Stat* remainder = NULL
+		Stat* offset = NULL
 	) const {
-		return const_cast<StatBinTree*>(this)->findByStat<Stat, StatArg>(targetStat, remainder);
+		return findGe<Stat, StatArg>(targetStat, offset);
 	}
 
 	// this overload descends on a single field of a multi-field stat
 
 	template <
-		typename Partial,
-		typename PartialArg = ArgType<Partial>
+		typename SubStat,
+		typename SubStatArg = ArgType<SubStat>
 	>
 	Iterator
-	findByStat(
-		PartialArg targetStat,
-		Partial* remainder = NULL
+	findGe(
+		SubStatArg targetStat,
+		SubStat* offset = NULL
 	) {
-		Partial stat = targetStat;
+		SubStat stat = targetStat;
 
 		for (Node* p = this->m_root; p;) {
 			if (p->m_left) {
-				Partial leftStat = p->m_left->m_fullStat;
+				SubStat leftStat = p->m_left->m_fullStat;
 				if (!(leftStat < stat)) { // go left
 					p = p->m_left;
 					continue;
@@ -231,10 +231,10 @@ public:
 				stat -= leftStat;
 			}
 
-			Partial midStat = p->m_selfStat;
+			SubStat midStat = p->m_selfStat;
 			if (!(midStat < stat)) { // found it
-				if (remainder)
-					*remainder = stat;
+				if (offset)
+					*offset = stat;
 
 				return p;
 			}
@@ -247,15 +247,45 @@ public:
 	}
 
 	template <
-		typename Partial,
-		typename PartialArg = ArgType<Partial>
+		typename SubStat,
+		typename SubStatArg = ArgType<SubStat>
 	>
 	ConstIterator
-	findByStat(
-		PartialArg targetStat,
-		Partial* remainder = NULL
+	findGe(
+		SubStatArg targetStat,
+		SubStat* offset = NULL
 	) const {
-		return const_cast<StatBinTree*>(this)->findByStat<Partial, PartialArg>(targetStat, remainder);
+		return const_cast<StatBinTree*>(this)->findGe<SubStat, SubStatArg>(targetStat, offset);
+	}
+
+	Iterator
+	findEq(StatArg targetStat) {
+		return findEq<Stat, StatArg>(targetStat);
+	}
+
+	ConstIterator
+	findEq(StatArg targetStat) const {
+		return findEq<Stat, StatArg>(targetStat);
+	}
+
+	template <
+		typename SubStat,
+		typename SubStatArg = ArgType<SubStat>
+	>
+	Iterator
+	findEq(SubStatArg targetStat) {
+		SubStat offset;
+		Iterator it = findGe<SubStat, SubStatArg>(targetStat, &offset);
+		return it && offset == SubStat(it->m_selfStat) ? it : Iterator();
+	}
+
+	template <
+		typename SubStat,
+		typename SubStatArg = ArgType<SubStat>
+	>
+	ConstIterator
+	findEq(SubStatArg targetStat) const {
+		return const_cast<StatBinTree*>(this)->findEq<SubStat, SubStatArg>(targetStat);
 	}
 
 	Iterator
