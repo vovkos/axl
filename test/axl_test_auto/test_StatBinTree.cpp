@@ -669,6 +669,115 @@ testModify(size_t elementCount) {
 	verifyQueries<CharStat>(tree, reference, &Item::m_charCount);
 }
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// the no-value overloads: insertX(stat) leaves m_value DEFAULT-CONSTRUCTED, for
+// the caller to fill in place. that is what lets a Value the tree cannot
+// copy-assign -- one that owns state, or is merely expensive -- into the tree at
+// all, since insertX(stat, value) assigns.
+//
+// the load-bearing property is that STAT AND VALUE ARE INDEPENDENT: the
+// aggregate must already be complete and correct while the value is still
+// default-constructed. so every insert below checks the tree total BEFORE
+// writing the payload.
+//
+// all four positional forms, and both NULL-iterator fallbacks (insertBefore(NULL)
+// appends, insertAfter(NULL) prepends), the same as the value-taking overloads
+
+void
+testInsertNoValue(size_t elementCount) {
+	ItemTree tree;
+	sl::Array<Item> reference;
+	uint32_t seed = 11;
+	ItemStat runningTotal;
+
+	for (size_t i = 0; i < elementCount; i++) {
+		Item item = makeItem(&seed);
+		size_t index;
+		ItemTree::Iterator it;
+
+		switch (i % 4) {
+		case 0:
+			index = reference.getCount();
+			it = tree.insertTail(ItemStat(item));
+			break;
+
+		case 1:
+			index = 0;
+			it = tree.insertHead(ItemStat(item));
+			break;
+
+		case 2:
+			// getIteratorAt(count) is a NULL iterator, so this also covers the
+			// insertBefore(NULL) == append fallback
+
+			index = lcg(&seed) % (reference.getCount() + 1);
+			it = tree.insertBefore(ItemStat(item), getIteratorAt(tree, index));
+			break;
+
+		default:
+			// ...and index == 0 covers insertAfter(NULL) == prepend
+
+			index = lcg(&seed) % (reference.getCount() + 1);
+			it = tree.insertAfter(
+				ItemStat(item),
+				index ? ItemTree::ConstIterator(getIteratorAt(tree, index - 1)) : ItemTree::ConstIterator()
+			);
+			break;
+		}
+
+		runningTotal += ItemStat(item);
+
+		TEST_ASSERT(it);
+		TEST_ASSERT(it->m_value == Item());              // default-constructed, not garbage
+		TEST_ASSERT(it->getSelfStat() == ItemStat(item)); // the stat landed...
+		TEST_ASSERT(tree.getFullStat() == runningTotal);  // ...and aggregated, with no value yet
+
+		it->m_value = item; // only now the payload
+
+		reference.insert(index, item);
+		verifyTree<ItemTree, ItemStat, Item>(tree, reference);
+	}
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// insertX(stat) + fill must be indistinguishable from insertX(stat, value) --
+// same elements, same stats, and (since the operation sequence is identical)
+// the same shape, which the per-node subtree stats would expose
+
+void
+testInsertNoValueEquivalence(size_t elementCount) {
+	ItemTree noValueTree;
+	ItemTree valueTree;
+	sl::Array<Item> reference;
+	uint32_t seed = 12;
+
+	for (size_t i = 0; i < elementCount; i++) {
+		Item item = makeItem(&seed);
+		size_t index = lcg(&seed) % (reference.getCount() + 1);
+
+		ItemTree::Iterator it = noValueTree.insertBefore(ItemStat(item), getIteratorAt(noValueTree, index));
+		it->m_value = item;
+
+		valueTree.insertBefore(ItemStat(item), item, getIteratorAt(valueTree, index));
+		reference.insert(index, item);
+	}
+
+	verifyTree<ItemTree, ItemStat, Item>(noValueTree, reference);
+	verifyTree<ItemTree, ItemStat, Item>(valueTree, reference);
+
+	ItemTree::ConstIterator it1 = noValueTree.getHead();
+	ItemTree::ConstIterator it2 = valueTree.getHead();
+	for (; it1 && it2; it1++, it2++) {
+		TEST_ASSERT(it1->m_value == it2->m_value);
+		TEST_ASSERT(it1->getSelfStat() == it2->getSelfStat());
+		TEST_ASSERT(it1->getFullStat() == it2->getFullStat()); // identical shape
+	}
+
+	TEST_ASSERT(!it1 && !it2);
+}
+
 //..............................................................................
 
 void
@@ -679,6 +788,8 @@ run() {
 	testAppendSweep(120);
 	testPrependSweep(120);
 	testRandomInsert(120);
+	testInsertNoValue(120);
+	testInsertNoValueEquivalence(120);
 	testNullIterator();
 	testRandomErase(80);
 	testMixed(250);

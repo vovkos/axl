@@ -259,16 +259,27 @@ public:
 	}
 
 	Iterator
+	insertHead(StatArg stat) {
+		return !this->m_root ?
+			insertRoot(stat) :
+			insertLeft(stat, this->findLeftmostChild(this->m_root));
+	}
+
+	Iterator
 	insertHead(
 		StatArg stat,
 		ValueArg value
 	) {
-		Iterator it = !this->m_root ?
-			insertRoot(stat) :
-			insertLeft(stat, this->findLeftmostChild(this->m_root));
-
+		Iterator it = insertHead(stat);
 		it->m_value = value;
 		return it;
+	}
+
+	Iterator
+	insertTail(StatArg stat) {
+		return !this->m_root ?
+			insertRoot(stat) :
+			insertRight(stat, this->findRightmostChild(this->m_root));
 	}
 
 	Iterator
@@ -276,12 +287,23 @@ public:
 		StatArg stat,
 		ValueArg value
 	) {
-		Iterator it = !this->m_root ?
-			insertRoot(stat) :
-			insertRight(stat, this->findRightmostChild(this->m_root));
-
+		Iterator it = insertTail(stat);
 		it->m_value = value;
 		return it;
+	}
+
+	Iterator
+	insertBefore(
+		StatArg stat,
+		ConstIterator beforeIt
+	) {
+		if (!beforeIt)
+			return insertTail(stat);
+
+		Node* p = (Node*)*beforeIt;
+		return !p->m_left ?
+			insertLeft(stat, p) :
+			insertRight(stat, this->findRightmostChild(p->m_left));
 	}
 
 	Iterator
@@ -290,16 +312,23 @@ public:
 		ValueArg value,
 		ConstIterator beforeIt
 	) {
-		if (!beforeIt)
-			return insertTail(stat, value);
-
-		Node* p = (Node*)*beforeIt;
-		Iterator it = !p->m_left ?
-			insertLeft(stat, p) :
-			insertRight(stat, this->findRightmostChild(p->m_left));
-
+		Iterator it = insertBefore(stat, beforeIt);
 		it->m_value = value;
 		return it;
+	}
+
+	Iterator
+	insertAfter(
+		StatArg stat,
+		ConstIterator afterIt
+	) {
+		if (!afterIt)
+			return insertHead(stat);
+
+		Node* p = (Node*)*afterIt;
+		return !p->m_right ?
+			insertRight(stat, p) :
+			insertLeft(stat, this->findLeftmostChild(p->m_right));
 	}
 
 	Iterator
@@ -308,14 +337,7 @@ public:
 		ValueArg value,
 		ConstIterator afterIt
 	) {
-		if (!afterIt)
-			return insertHead(stat, value);
-
-		Node* p = (Node*)*afterIt;
-		Iterator it = !p->m_right ?
-			insertRight(stat, p) :
-			insertLeft(stat, this->findLeftmostChild(p->m_right));
-
+		Iterator it = insertAfter(stat, afterIt);
 		it->m_value = value;
 		return it;
 	}
