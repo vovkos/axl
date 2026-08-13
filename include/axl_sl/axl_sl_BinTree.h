@@ -206,14 +206,12 @@ public:
 		ValueArg value,
 		bool* isNew
 	) {
-		size_t prevCount = this->getCount();
+		ASSERT(isNew);
 
+		size_t prevCount = this->getCount();
 		Iterator it = visit(key);
 		it->m_value = value;
-
-		if (isNew)
-			*isNew = this->getCount() > prevCount;
-
+		*isNew = this->getCount() > prevCount;
 		return it;
 	}
 
@@ -223,9 +221,7 @@ public:
 		ValueArg value
 	) {
 		size_t prevCount = this->getCount();
-
 		Iterator it = visit(key);
-
 		if (this->getCount() == prevCount)
 			return NULL;
 
@@ -258,6 +254,31 @@ public:
 #endif
 
 protected:
+	Node*
+	findLeNode(KeyArg key) {
+		Node* leNode = NULL;
+		Node* node = this->m_root;
+		while (node)
+			if (m_cmp(key, node->m_key))
+				node = node->m_left;
+			else {
+				leNode = node;
+				node = node->m_right;
+			}
+
+		return leNode;
+	}
+
+	void
+	adjustKey(
+		Node* x,
+		KeyArg key // the tree order must stays intact!
+	) {
+		ASSERT(!x->m_prev || m_cmp(((Node*)x->m_prev)->m_key, key));
+		ASSERT(!x->m_next || m_cmp(key, ((Node*)x->m_next)->m_key));
+		x->m_key = key;
+	}
+
 #ifdef _AXL_DEBUG
 	void
 	assertValidNode(
@@ -291,31 +312,6 @@ protected:
 		assertValidNode(p->m_right, p, higherBound, it, count);
 	}
 #endif
-
-	Node*
-	findLeNode(KeyArg key) {
-		Node* leNode = NULL;
-		Node* node = this->m_root;
-		while (node)
-			if (m_cmp(key, node->m_key))
-				node = node->m_left;
-			else {
-				leNode = node;
-				node = node->m_right;
-			}
-
-		return leNode;
-	}
-
-	void
-	adjustKey(
-		Node* x,
-		KeyArg key // the tree order must stays intact!
-	) {
-		ASSERT(!x->m_prev || m_cmp(((Node*)x->m_prev)->m_key, key));
-		ASSERT(!x->m_next || m_cmp(key, ((Node*)x->m_next)->m_key));
-		x->m_key = key;
-	}
 };
 
 //..............................................................................

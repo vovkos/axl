@@ -289,13 +289,12 @@ public:
 		ValueArg value,
 		bool* isNew
 	) {
+		ASSERT(isNew);
+
 		size_t prevCount = this->getCount();
 		Iterator it = this->visit(key);
 		it->m_value = value;
-
-		if (isNew)
-			*isNew = this->getCount() > prevCount;
-
+		*isNew = this->getCount() > prevCount;
 		return it;
 	}
 
