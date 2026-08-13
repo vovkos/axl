@@ -110,7 +110,7 @@ struct StatBTreeNodeBase: public StatBTreeNodeRoot<
 		size_t slot,
 		ChildArg child
 	) {
-		ASSERT(this->m_count < Fanout && slot <= this->m_count);
+		ASSERT(slot <= this->m_count && this->m_count < Fanout);
 
 		Child* p = m_childArray + slot;
 		ArrayDetails<Child>::copy(p + 1, p, this->m_count - slot);
@@ -119,18 +119,21 @@ struct StatBTreeNodeBase: public StatBTreeNodeRoot<
 	}
 
 	void
-	appendFromSibling(
+	insert(
+		size_t slot,
 		const T* src,
 		size_t srcSlot,
 		size_t count
 	) {
 		ASSERT(
-			(!this->m_parent || this->m_parent == src->m_parent) && // split fills a sibling NOT linked to the parent yet
+			slot <= this->m_count &&
 			this->m_count + count <= Fanout &&
 			srcSlot + count <= src->m_count
 		);
 
-		ArrayDetails<Child>::copy(this->m_childArray + this->m_count, src->m_childArray + srcSlot, count);
+		Child* p = m_childArray + slot;
+		ArrayDetails<Child>::copy(p + count, p, this->m_count - slot);
+		ArrayDetails<Child>::copy(p, src->m_childArray + srcSlot, count);
 		this->m_count += count;
 	}
 
@@ -170,15 +173,6 @@ struct StatBTreeNode: StatBTreeNodeBase<
 		return this->m_childArray[slot]->m_stat;
 	}
 
-	void
-	insert(
-		size_t slot,
-		NodeRoot* child
-	) {
-		NodeBase::insert(slot, child);
-		child->m_parent = this;
-	}
-
 	size_t
 	find(const NodeRoot* child) const {
 		for (size_t i = 0; i < this->m_count; i++)
@@ -190,18 +184,24 @@ struct StatBTreeNode: StatBTreeNodeBase<
 	}
 
 	void
-	insertFromSibling(
+	insert(
+		size_t slot,
+		NodeRoot* child
+	) {
+		NodeBase::insert(slot, child);
+		child->m_parent = this; // reparent
+	}
+
+	void
+	insert(
 		size_t slot,
 		const StatBTreeNode* src,
-		size_t srcSlot
+		size_t srcSlot,
+		size_t count = 1
 	) {
-		ASSERT(
-			this->m_parent == src->m_parent &&
-			slot <= this->m_count &&
-			srcSlot < src->m_count
-		);
-
-		insert(slot, src->m_childArray[srcSlot]);
+		NodeBase::insert(slot, src, srcSlot, count);
+		for (size_t i = slot, endSlot = slot + count; i < endSlot; i++)
+			this->m_childArray[i]->m_parent = this; // reparent
 	}
 
 	void
@@ -267,40 +267,27 @@ struct StatBTreeLeaf:
 	void
 	insert(
 		size_t slot,
-		StatArg stat,
-		ValueArg value
+		StatArg stat
 	) {
 		size_t copyCount = this->m_count - slot; // before Node::insert updates m_count
 		NodeBase::insert(slot, stat);
 		Value* p = m_valueArray + slot;
 		ArrayDetails<Value>::copy(p + 1, p, copyCount);
-		*p = value;
+		*p = Value();
 	}
 
 	void
-	insertFromSibling(
+	insert(
 		size_t slot,
 		const StatBTreeLeaf* src,
-		size_t srcSlot
-	) {
-		ASSERT(
-			this->m_parent == src->m_parent && // borrow on underflow always between two siblings
-			slot <= this->m_count && // slot == m_count appends
-			srcSlot < src->m_count
-		);
-
-		insert(slot, src->m_childArray[srcSlot], src->m_valueArray[srcSlot]);
-	}
-
-	void
-	appendFromSibling(
-		const StatBTreeLeaf* src,
 		size_t srcSlot,
-		size_t count
+		size_t count = 1
 	) {
-		size_t dstSlot = this->m_count; // before Node::appendFromSibling updates m_count
-		NodeBase::appendFromSibling(src, srcSlot, count);
-		ArrayDetails<Value>::copy(m_valueArray + dstSlot, src->m_valueArray + srcSlot, count);
+		size_t copyCount = this->m_count - slot; // before Node::insert updates m_count
+		NodeBase::insert(slot, src, srcSlot, count);
+		Value* p = m_valueArray + slot;
+		ArrayDetails<Value>::copy(p + count, p, copyCount);
+		ArrayDetails<Value>::copy(p, src->m_valueArray + srcSlot, count);
 	}
 };
 
@@ -763,13 +750,29 @@ public:
 	}
 
 	Iterator
+	insertHead(StatArg stat) {
+		return m_leafList.isEmpty() ?
+			insertFirst(stat) :
+			insert((Leaf*)*m_leafList.getHead(), 0, stat);
+	}
+
+	Iterator
 	insertHead(
 		StatArg stat,
 		ValueArg value
 	) {
-		return m_leafList.isEmpty() ?
-			insertFirst(stat, value) :
-			insert((Leaf*)*m_leafList.getHead(), 0, stat, value);
+		Iterator it = insertHead(stat);
+		*it = value;
+		return it;
+	}
+
+	Iterator
+	insertTail(StatArg stat) {
+		if (m_leafList.isEmpty())
+			return insertFirst(stat);
+
+		Leaf* leaf = (Leaf*)*m_leafList.getTail();
+		return insert(leaf, leaf->m_count, stat);
 	}
 
 	Iterator
@@ -777,11 +780,19 @@ public:
 		StatArg stat,
 		ValueArg value
 	) {
-		if (m_leafList.isEmpty())
-			return insertFirst(stat, value);
+		Iterator it = insertTail(stat);
+		*it = value;
+		return it;
+	}
 
-		Leaf* leaf = (Leaf*)*m_leafList.getTail();
-		return insert(leaf, leaf->m_count, stat, value);
+	Iterator
+	insertBefore(
+		StatArg stat,
+		Iterator beforeIt
+	) {
+		return beforeIt ?
+			insert(*beforeIt.getLeafIterator(), beforeIt.getSlot(), stat) :
+			insertTail(stat);
 	}
 
 	Iterator
@@ -790,9 +801,19 @@ public:
 		ValueArg value,
 		Iterator beforeIt
 	) {
-		return beforeIt ?
-			insert(*beforeIt.getLeafIterator(), beforeIt.getSlot(), stat, value) :
-			insertTail(stat, value);
+		Iterator it = insertBefore(stat, beforeIt);
+		*it = value;
+		return it;
+	}
+
+	Iterator
+	insertAfter(
+		StatArg stat,
+		Iterator afterIt
+	) {
+		return afterIt ?
+			insert(*afterIt.getLeafIterator(), afterIt.getSlot() + 1, stat) :
+			insertHead(stat);
 	}
 
 	Iterator
@@ -801,9 +822,9 @@ public:
 		ValueArg value,
 		Iterator afterIt
 	) {
-		return afterIt ?
-			insert(*afterIt.getLeafIterator(), afterIt.getSlot() + 1, stat, value) :
-			insertHead(stat, value);
+		Iterator it = insertAfter(stat, afterIt);
+		*it = value;
+		return it;
 	}
 
 	void
@@ -829,15 +850,11 @@ public:
 
 protected:
 	Iterator
-	insertFirst(
-		StatArg stat,
-		ValueArg value
-	) {
+	insertFirst(StatArg stat) {
 		ASSERT(!m_root && !m_count);
 
 		Leaf* leaf = new Leaf;
 		leaf->m_childArray[0] = stat;
-		leaf->m_valueArray[0] = value;
 		leaf->m_count = 1;
 		leaf->m_stat = stat;
 		m_leafList.insertTail(leaf);
@@ -853,13 +870,12 @@ protected:
 	insert(
 		Leaf* leaf,
 		size_t slot,
-		StatArg stat,
-		ValueArg value
+		StatArg stat
 	) {
 		m_count++;
 
 		if (leaf->m_count < Fanout) {
-			leaf->insert(slot, stat, value);
+			leaf->insert(slot, stat);
 			leaf->addStat(stat);
 			return Iterator(leaf, slot);
 		}
@@ -873,9 +889,17 @@ protected:
 			target = sibling;
 		}
 
-		target->insert(slot, stat, value);
+		target->insert(slot, stat);
 		target->addStat(stat);
 		return Iterator(target, slot);
+	}
+
+	static
+	void
+	postSplit(
+		Node* node,
+		Node* sibling
+	) {
 	}
 
 	void
@@ -886,16 +910,6 @@ protected:
 		m_leafList.insertAfter(sibling, node);
 	}
 
-	static
-	void
-	postSplit(
-		Node* node,
-		Node* sibling
-	) {
-		for (size_t i = 0; i < sibling->m_count; i++)
-			sibling->m_childArray[i]->m_parent = sibling;
-	}
-
 	template <typename NodeType>
 	NodeType*
 	split(NodeType* node) {
@@ -904,7 +918,7 @@ protected:
 		Node* parent = node->m_parent;
 		NodeType* sibling = new NodeType;
 		size_t siblingCount = node->m_count - Fanout / 2;
-		sibling->appendFromSibling(node, Fanout / 2, siblingCount);
+		sibling->insert(0, node, Fanout / 2, siblingCount);
 		sibling->recalcStat();
 		node->m_count = Fanout / 2;
 		node->m_stat -= sibling->m_stat; // not recalcStat! not the same when we are splitting parent
@@ -946,22 +960,13 @@ protected:
 	}
 
 	void
-	postMerge(
-		Leaf* left,
-		Leaf* right
-	) {
-		m_leafList.erase(right);
+	postMerge(Node* node) {
+		delete node;
 	}
 
 	void
-	postMerge(
-		Node* left,
-		Node* right
-	) {
-		for (size_t i = 0; i < right->m_count; i++)
-			right->m_childArray[i]->m_parent = left;
-
-		delete right;
+	postMerge(Leaf* node) {
+		m_leafList.erase(node);
 	}
 
 	template <typename NodeType>
@@ -975,10 +980,10 @@ protected:
 		ASSERT(left->m_count + right->m_count <= Fanout);
 
 		Node* parent = left->m_parent;
-		left->appendFromSibling(right, 0, right->m_count);
+		left->insert(left->m_count, right, 0, right->m_count);
 		left->m_stat += right->m_stat;
 		parent->remove(rightSlot);
-		postMerge(left, right);
+		postMerge(right);
 
 		// parent's total stat is unchanged, so no stat propagation
 
@@ -1008,7 +1013,7 @@ protected:
 			else {
 				size_t prevSlot = prev->m_count - 1;
 				Stat stat = prev->getChildStat(prevSlot); // copy before the move
-				node->insertFromSibling(0, prev, prevSlot);
+				node->insert(0, prev, prevSlot);
 				prev->remove(prevSlot);
 				prev->m_stat -= stat;
 				node->m_stat += stat;
@@ -1020,7 +1025,7 @@ protected:
 				merge(node, next, slot + 1);
 			else {
 				Stat stat = next->getChildStat(0); // copy before the move
-				node->insertFromSibling(node->m_count, next, 0);
+				node->insert(node->m_count, next, 0);
 				next->remove(0);
 				next->m_stat -= stat;
 				node->m_stat += stat;

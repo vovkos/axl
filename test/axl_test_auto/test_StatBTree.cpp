@@ -546,6 +546,140 @@ testMixed(size_t opCount) {
 	verifyTree(tree, reference);
 }
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// the no-value overloads: insertX(stat) leaves the slot's Value
+// DEFAULT-CONSTRUCTED, for the caller to fill through the iterator. that is what
+// lets a Value the tree cannot copy-assign into the tree at all, since
+// insertX(stat, value) assigns.
+//
+// the load-bearing property is that STAT AND VALUE ARE INDEPENDENT: the
+// aggregate must already be complete while the value is still default. so every
+// insert checks the totals BEFORE writing the payload.
+//
+// run at a small Fanout as well -- the returned iterator has to survive a SPLIT
+// and still address the slot the caller is about to write, which is the one way
+// this differs from the bin tree
+
+template <size_t Fanout>
+void
+testInsertNoValue(size_t elementCount) {
+	typedef sl::StatBTree<SpanStat, Span, Fanout> Tree;
+	typedef typename Tree::Iterator Iterator;
+
+	uint32_t seed = 0x5eed0001 + (uint32_t)Fanout;
+
+	Tree tree;
+	sl::Array<Span> reference;
+	uint64_t lineTotal = 0;
+	uint64_t charTotal = 0;
+
+	for (size_t i = 0; i < elementCount; i++) {
+		Span span((uint_t)i + 1, lcg(&seed) % 4, lcg(&seed) % 100);
+		size_t index;
+		Iterator it;
+
+		switch (i % 4) {
+		case 0:
+			index = reference.getCount();
+			it = tree.insertTail(SpanStat(span));
+			break;
+
+		case 1:
+			index = 0;
+			it = tree.insertHead(SpanStat(span));
+			break;
+
+		case 2:
+			// getIteratorAt(count) is a NULL iterator, so this also covers the
+			// insertBefore(NULL) == append fallback
+
+			index = lcg(&seed) % (reference.getCount() + 1);
+			it = tree.insertBefore(SpanStat(span), getIteratorAt(tree, index));
+			break;
+
+		default:
+			// ...and index == 0 covers insertAfter(NULL) == prepend
+
+			index = lcg(&seed) % (reference.getCount() + 1);
+			it = tree.insertAfter(SpanStat(span), index ? getIteratorAt(tree, index - 1) : Iterator());
+			break;
+		}
+
+		lineTotal += span.m_lineCount;
+		charTotal += span.m_charCount;
+
+		TEST_ASSERT(it);
+
+		// default-constructed, not garbage and not a neighbour's payload
+
+		TEST_ASSERT((*it).m_id == 0);
+		TEST_ASSERT((*it).m_lineCount == 0 && (*it).m_charCount == 0);
+
+		// the stat landed on this slot, and aggregated, with no value yet
+
+		SpanStat elementStat = it.getStat();
+		TEST_ASSERT(elementStat.m_lineCount == span.m_lineCount);
+		TEST_ASSERT(elementStat.m_charCount == span.m_charCount);
+		TEST_ASSERT(tree.getFullStat().m_lineCount == lineTotal);
+		TEST_ASSERT(tree.getFullStat().m_charCount == charTotal);
+
+		*it = span; // only now the payload
+
+		reference.insert(index, span);
+		verifyTree(tree, reference);
+	}
+
+	// and it all survives being torn down again
+
+	while (!reference.isEmpty()) {
+		size_t index = lcg(&seed) % reference.getCount();
+		tree.erase(getIteratorAt(tree, index));
+		reference.remove(index);
+		verifyTree(tree, reference);
+	}
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// insertX(stat) + fill must be indistinguishable from insertX(stat, value)
+
+template <size_t Fanout>
+void
+testInsertNoValueEquivalence(size_t elementCount) {
+	typedef sl::StatBTree<SpanStat, Span, Fanout> Tree;
+
+	uint32_t seed = 0x5eed0002 + (uint32_t)Fanout;
+
+	Tree noValueTree;
+	Tree valueTree;
+	sl::Array<Span> reference;
+
+	for (size_t i = 0; i < elementCount; i++) {
+		Span span((uint_t)i + 1, lcg(&seed) % 4, lcg(&seed) % 100);
+		size_t index = lcg(&seed) % (reference.getCount() + 1);
+
+		typename Tree::Iterator it = noValueTree.insertBefore(SpanStat(span), getIteratorAt(noValueTree, index));
+		*it = span;
+
+		valueTree.insertBefore(SpanStat(span), span, getIteratorAt(valueTree, index));
+		reference.insert(index, span);
+	}
+
+	verifyTree(noValueTree, reference);
+	verifyTree(valueTree, reference);
+
+	typename Tree::ConstIterator it1 = noValueTree.getHead();
+	typename Tree::ConstIterator it2 = valueTree.getHead();
+	for (; it1 && it2; it1++, it2++) {
+		TEST_ASSERT(it1->m_id == it2->m_id);
+		TEST_ASSERT(it1->m_lineCount == it2->m_lineCount);
+		TEST_ASSERT(it1.getStat().m_charCount == it2.getStat().m_charCount);
+	}
+
+	TEST_ASSERT(!it1 && !it2);
+}
+
 //..............................................................................
 
 void
@@ -569,6 +703,11 @@ run() {
 	testRandomInsertErase<6>(60);
 	testRandomInsertErase<8>(60);
 	testRandomInsertErase<16>(60);
+
+	testInsertNoValue<4>(80);  // small Fanout: the returned iterator must survive splits
+	testInsertNoValue<16>(80);
+	testInsertNoValueEquivalence<4>(80);
+	testInsertNoValueEquivalence<16>(80);
 
 	testModify<4>(40);
 	testModify<16>(40);
