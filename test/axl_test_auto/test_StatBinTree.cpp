@@ -59,6 +59,9 @@ struct Item {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+struct LineStat;
+struct CharStat;
+
 struct ItemStat {
 	uint64_t m_lineCount;
 	uint64_t m_charCount;
@@ -89,6 +92,22 @@ struct ItemStat {
 		m_charCount -= stat.m_charCount;
 		return *this;
 	}
+
+	// the per-field deltas -- this is the extra surface addSubStat/subSubStat
+	// of addSubStat/subSubStat require, and the whole point of them: one field moves
+	// and the other is not even read
+
+	ItemStat&
+	operator += (const LineStat& stat);
+
+	ItemStat&
+	operator -= (const LineStat& stat);
+
+	ItemStat&
+	operator += (const CharStat& stat);
+
+	ItemStat&
+	operator -= (const CharStat& stat);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -96,7 +115,7 @@ struct ItemStat {
 // LineStat/CharStat are deliberately NARROW projections -- they define only what
 // the <SubStat> overloads are allowed to reach for (ctor-from-ItemStat, ctor from
 // the raw field for the search target, operator <, += and -=, and == for
-// find()'s exact-prefix test). if calcPrefixStat or findGe ever reached for full
+// findPrefixStatEq's exact-prefix test). if calcPrefixSubStat or findPrefixSubStatGe ever reached for full
 // Stat arithmetic, these would stop compiling
 
 struct LineStat {
@@ -171,6 +190,36 @@ struct CharStat {
 	}
 };
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+ItemStat&
+ItemStat::operator += (const LineStat& stat) {
+	m_lineCount += stat.m_lineCount;
+	return *this;
+}
+
+inline
+ItemStat&
+ItemStat::operator -= (const LineStat& stat) {
+	m_lineCount -= stat.m_lineCount;
+	return *this;
+}
+
+inline
+ItemStat&
+ItemStat::operator += (const CharStat& stat) {
+	m_charCount += stat.m_charCount;
+	return *this;
+}
+
+inline
+ItemStat&
+ItemStat::operator -= (const CharStat& stat) {
+	m_charCount -= stat.m_charCount;
+	return *this;
+}
+
 //..............................................................................
 
 // spelled through the StatRbTree aliases -- this is how a consumer writes it,
@@ -240,7 +289,7 @@ verifyTree(
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 // calcPrefixStat(it) against a running prefix sum over the reference, then
-// findGe exhaustively for EVERY target in [0, total + 2] against a naive
+// findPrefixSubStatGe exhaustively for EVERY target in [0, total + 2] against a naive
 // scan -- both the resulting element and the remainder
 
 template <typename SubStat>
@@ -260,19 +309,19 @@ verifyQueries(
 	ItemTree::ConstIterator it = tree.getHead();
 	for (; it; it++, i++) {
 		running += reference[i].*field;
-		SubStat stat = tree.template calcPrefixStat<SubStat>(it);
+		SubStat stat = tree.template calcPrefixSubStat<SubStat>(it);
 		TEST_ASSERT(stat == SubStat(running));
 	}
 
 	TEST_ASSERT(i == count);
-	TEST_ASSERT(tree.template getFullStat<SubStat>() == SubStat(running));
+	TEST_ASSERT(tree.template getFullSubStat<SubStat>() == SubStat(running));
 
-	// 2. findGe: first element whose inclusive prefix sum is >= target
+	// 2. findPrefixSubStatGe: first element whose inclusive prefix sum is >= target
 
 	uint64_t total = running;
 	for (uint64_t target = 0; target <= total + 2; target++) {
 		ItemTree::ConstIterator foundIt =
-			((const ItemTree&)tree).template findGe<SubStat>(SubStat(target));
+			((const ItemTree&)tree).findPrefixSubStatGe(SubStat(target));
 
 		// naive oracle
 
@@ -297,7 +346,7 @@ verifyQueries(
 		// remainder == target - (cumulative BEFORE the found element)
 
 		SubStat remainder;
-		((const ItemTree&)tree).template findGe<SubStat>(SubStat(target), &remainder);
+		((const ItemTree&)tree).findPrefixSubStatGe(SubStat(target), &remainder);
 
 		uint64_t before = 0;
 		for (size_t k = 0; k < expected; k++)
@@ -305,11 +354,11 @@ verifyQueries(
 
 		TEST_ASSERT(remainder == SubStat(target - before));
 
-		// find(): the same element, but ONLY when target lands exactly on its
+		// findPrefixSubStatEq: the same element, but ONLY when target lands exactly on its
 		// inclusive prefix -- i.e. when the remainder is the element's own stat
 
 		ItemTree::ConstIterator exactIt =
-			((const ItemTree&)tree).template findEq<SubStat>(SubStat(target));
+			((const ItemTree&)tree).findPrefixSubStatEq(SubStat(target));
 
 		if (target == cum) {
 			TEST_ASSERT(exactIt);
@@ -530,7 +579,7 @@ testMixed(size_t stepCount) {
 
 //..............................................................................
 
-// exercises calcPrefixStat/findGe on BOTH fields of the same tree -- the
+// exercises calcPrefixStat/findPrefixStatGe on BOTH fields of the same tree -- the
 // point of the <SubStat> overloads is that one tree answers either question
 
 void
@@ -605,7 +654,7 @@ testScalarQueries(size_t elementCount) {
 
 	for (uint64_t target = 0; target <= total + 2; target++) {
 		uint64_t remainder = 0;
-		Tree::Iterator foundIt = tree.findGe(target, &remainder);
+		Tree::Iterator foundIt = tree.findPrefixStatGe(target, &remainder);
 
 		uint64_t cum = 0;
 		uint64_t before = 0;
@@ -680,6 +729,88 @@ testModify(size_t elementCount) {
 	TEST_ASSERT(tree.getFullStat() == ItemStat());
 
 	// queries must still hold after all that rewriting
+
+	verifyQueries<LineStat>(tree, reference, &Item::m_lineCount);
+	verifyQueries<CharStat>(tree, reference, &Item::m_charCount);
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// the projected addSubStat/subSubStat methods: the delta is one
+// field, so only that field may move -- on the node itself AND on every ancestor
+// the delta rides up through. the other field must come out bit-identical
+
+void
+testModifySubStat(size_t elementCount) {
+	ItemTree tree;
+	sl::Array<Item> reference;
+	uint32_t seed = 12;
+
+	for (size_t i = 0; i < elementCount; i++) {
+		Item item = makeItem(&seed);
+		tree.insertTail(ItemStat(item), item);
+		reference.append(item);
+	}
+
+	verifyTree<ItemTree, ItemStat, Item>(tree, reference);
+
+	// line-only deltas: every char count must survive untouched
+
+	CharStat charTotal = tree.getFullSubStat<CharStat>();
+
+	for (size_t i = 0; i < elementCount * 2; i++) {
+		size_t index = lcg(&seed) % reference.getCount();
+		uint64_t newLines = lcg(&seed) % 8;
+
+		ItemTree::Iterator it = getIteratorAt(tree, index);
+		it->subSubStat(LineStat(reference[index].m_lineCount));
+		it->addSubStat(LineStat(newLines));
+		it->m_value.m_lineCount = newLines; // the payload follows the stat
+
+		reference.rwi()[index].m_lineCount = newLines;
+
+		verifyTree<ItemTree, ItemStat, Item>(tree, reference);
+		TEST_ASSERT(tree.getFullSubStat<CharStat>() == charTotal);
+	}
+
+	// and the other projection, on the same tree
+
+	LineStat lineTotal = tree.getFullSubStat<LineStat>();
+
+	for (size_t i = 0; i < elementCount * 2; i++) {
+		size_t index = lcg(&seed) % reference.getCount();
+		uint64_t newChars = lcg(&seed) % 100;
+
+		ItemTree::Iterator it = getIteratorAt(tree, index);
+		it->subSubStat(CharStat(reference[index].m_charCount));
+		it->addSubStat(CharStat(newChars));
+		it->m_value.m_charCount = newChars;
+
+		reference.rwi()[index].m_charCount = newChars;
+
+		verifyTree<ItemTree, ItemStat, Item>(tree, reference);
+		TEST_ASSERT(tree.getFullSubStat<LineStat>() == lineTotal);
+	}
+
+	// a projected round trip must land back exactly where it started -- this is
+	// what catches a subStat that quietly adds (both sweeps above would still
+	// pass if subStat and addStat were the same op, since the reference follows)
+
+	ItemStat before = tree.getFullStat();
+
+	for (size_t i = 0; i < elementCount * 2; i++) {
+		LineStat delta(lcg(&seed) % 8);
+
+		ItemTree::Iterator it = getIteratorAt(tree, lcg(&seed) % reference.getCount());
+		it->addSubStat(delta);
+		it->subSubStat(delta);
+	}
+
+	TEST_ASSERT(tree.getFullStat() == before);
+	verifyTree<ItemTree, ItemStat, Item>(tree, reference);
+
+	// the projected queries must still hold -- a stat that drifted on an interior
+	// node only shows up in a descent, not in the grand total
 
 	verifyQueries<LineStat>(tree, reference, &Item::m_lineCount);
 	verifyQueries<CharStat>(tree, reference, &Item::m_charCount);
@@ -800,17 +931,9 @@ run() {
 	testMixed(250);
 
 	testScalarQueries(120);
-	testQueries(60); // exhaustive findGe -- keep the element count modest
+	testQueries(60); // exhaustive findPrefixSubStatGe -- keep the element count modest
 	testModify(40);
-
-	// AXL_TODO: once calcPrefixStat(Iterator)/findGe<SubStat>/modify land,
-	//   add --
-	//   - calcPrefixStat(it) against a running prefix sum over the reference
-	//   - findGe exhaustively for every target in [0, total + 2], checking
-	//     both the iterator and the remainder (the FenwickTree/StatBTree pattern)
-	//   - a narrow SubStat projection (ctor-from-Stat, operator<, operator-=)
-	//     to prove the projected overloads don't reach for full Stat arithmetic
-	//   - modify() round-trips
+	testModifySubStat(40);
 }
 
 //..............................................................................

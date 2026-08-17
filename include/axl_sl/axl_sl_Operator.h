@@ -843,5 +843,21 @@ public:
 
 //..............................................................................
 
+// enablers on type conversions
+
+template <
+	typename A,
+	typename B
+>
+using EnableIfConvertible = typename std::enable_if<std::is_convertible<A, B>::value>::type;
+
+template <
+	typename A,
+	typename B
+>
+using EnableIfNotConvertible = typename std::enable_if<!std::is_convertible<A, B>::value>::type;
+
+//..............................................................................
+
 } // namespace sl
 } // namespace axl

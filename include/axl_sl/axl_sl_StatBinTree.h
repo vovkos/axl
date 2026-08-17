@@ -97,18 +97,33 @@ struct StatBinTreeNode: public BinTreeNodeBase<
 
 	void
 	addStat(StatArg delta) {
-		addStat<AddAssign<Stat, StatArg> >(delta);
+		modifyStat<AddAssign<Stat, StatArg>, StatArg>(delta);
+	}
+
+	template <typename SubStat>
+	void
+	addSubStat(const SubStat& delta) {
+		modifyStat<AddAssign<Stat, const SubStat&>, const SubStat&>(delta);
 	}
 
 	void
 	subStat(StatArg delta) {
-		addStat<SubAssign<Stat, StatArg> >(delta);
+		modifyStat<SubAssign<Stat, StatArg>, StatArg>(delta);
+	}
+
+	template <typename SubStat>
+	void
+	subSubStat(const SubStat& delta) {
+		modifyStat<SubAssign<Stat, const SubStat&>, const SubStat&>(delta);
 	}
 
 protected:
-	template <typename Op>
+	template <
+		typename Op,
+		typename StatArg2
+	>
 	void
-	addStat(StatArg delta) {
+	modifyStat(StatArg2 delta) {
 		Op()(this->m_selfStat, delta);
 		Op()(this->m_fullStat, delta);
 
@@ -153,30 +168,30 @@ public:
 
 	Stat
 	getFullStat() const {
-		return getFullStat<Stat>();
+		return getFullSubStat<Stat>();
 	}
 
 	template <typename SubStat>
 	SubStat
-	getFullStat() const {
-		return this->m_root ? SubStat(this->m_root->m_fullStat) : SubStat(Stat());
+	getFullSubStat() const {
+		return this->m_root ? SubStat(this->m_root->m_fullStat) : SubStat();
 	}
 
 	// the total over everything up to (and including) Iterator it
 
 	Stat
 	calcPrefixStat(ConstIterator it) const {
-		return calcPrefixStat<Stat>(it);
+		return calcPrefixSubStat<Stat>(it);
 	}
 
 	template <typename SubStat>
 	SubStat
-	calcPrefixStat(ConstIterator it) const {
+	calcPrefixSubStat(ConstIterator it) const {
 		if (!it)
-			return SubStat(Stat());
+			return SubStat();
 
 		const Node* p = *it;
-		SubStat stat = SubStat(p->m_fullStat);
+		SubStat stat = p->m_fullStat;
 		if (p->m_right)
 			stat -= p->m_right->m_fullStat;
 
@@ -189,104 +204,67 @@ public:
 		return stat;
 	}
 
-	// findGe(arg) returns first element with prefix is >= arg
+	// findPrefixStatGe(arg) returns first element with prefix >= arg
 
 	Iterator
-	findGe(
+	findPrefixStatGe(
 		StatArg targetStat,
 		Stat* offset = NULL
 	) {
-		return findGe<Stat, StatArg>(targetStat, offset);
+		return findPrefixStatGeImpl<Stat, StatArg>(targetStat, offset);
 	}
 
 	ConstIterator
-	findGe(
+	findPrefixStatGe(
 		StatArg targetStat,
 		Stat* offset = NULL
 	) const {
-		return findGe<Stat, StatArg>(targetStat, offset);
+		return const_cast<StatBinTree*>(this)->findPrefixStatGeImpl<Stat, StatArg>(targetStat, offset);
 	}
 
 	// this overload descends on a single field of a multi-field stat
 
-	template <
-		typename SubStat,
-		typename SubStatArg = ArgType<SubStat>
-	>
+	template <typename SubStat>
 	Iterator
-	findGe(
-		SubStatArg targetStat,
+	findPrefixSubStatGe(
+		const SubStat& targetStat,
 		SubStat* offset = NULL
 	) {
-		SubStat stat = targetStat;
-
-		for (Node* p = this->m_root; p;) {
-			if (p->m_left) {
-				SubStat leftStat = p->m_left->m_fullStat;
-				if (!(leftStat < stat)) { // go left
-					p = p->m_left;
-					continue;
-				}
-
-				stat -= leftStat;
-			}
-
-			SubStat midStat = p->m_selfStat;
-			if (!(midStat < stat)) { // found it
-				if (offset)
-					*offset = stat;
-
-				return p;
-			}
-
-			stat -= midStat;
-			p = p->m_right; // go right
-		}
-
-		return Iterator(); // past the grand total
+		return findPrefixStatGeImpl<SubStat, const SubStat&>(targetStat, offset);
 	}
 
-	template <
-		typename SubStat,
-		typename SubStatArg = ArgType<SubStat>
-	>
+	template <typename SubStat>
 	ConstIterator
-	findGe(
-		SubStatArg targetStat,
+	findPrefixSubStatGe(
+		const SubStat& targetStat,
 		SubStat* offset = NULL
 	) const {
-		return const_cast<StatBinTree*>(this)->findGe<SubStat, SubStatArg>(targetStat, offset);
+		return const_cast<StatBinTree*>(this)->findPrefixStatGeImpl<SubStat, const SubStat&>(targetStat, offset);
 	}
 
 	Iterator
-	findEq(StatArg targetStat) {
-		return findEq<Stat, StatArg>(targetStat);
+	findPrefixStatEq(StatArg targetStat) {
+		return findPrefixStatEqImpl<Stat, StatArg>(targetStat);
 	}
 
 	ConstIterator
-	findEq(StatArg targetStat) const {
-		return findEq<Stat, StatArg>(targetStat);
+	findPrefixStatEq(StatArg targetStat) const {
+		return const_cast<StatBinTree*>(this)->findPrefixStatEqImpl<Stat, StatArg>(targetStat);
 	}
 
-	template <
-		typename SubStat,
-		typename SubStatArg = ArgType<SubStat>
-	>
+	template <typename SubStat>
 	Iterator
-	findEq(SubStatArg targetStat) {
-		SubStat offset;
-		Iterator it = findGe<SubStat, SubStatArg>(targetStat, &offset);
-		return it && offset == SubStat(it->m_selfStat) ? it : Iterator();
+	findPrefixSubStatEq(const SubStat& targetStat) {
+		return findPrefixStatEqImpl<SubStat, const SubStat&>(targetStat);
 	}
 
-	template <
-		typename SubStat,
-		typename SubStatArg = ArgType<SubStat>
-	>
+	template <typename SubStat>
 	ConstIterator
-	findEq(SubStatArg targetStat) const {
-		return const_cast<StatBinTree*>(this)->findEq<SubStat, SubStatArg>(targetStat);
+	findPrefixSubStatEq(const SubStat& targetStat) const {
+		return const_cast<StatBinTree*>(this)->findPrefixStatEqImpl<SubStat, const SubStat&>(targetStat);
 	}
+
+	// insertion
 
 	Iterator
 	insertHead(StatArg stat) {
@@ -387,6 +365,53 @@ public:
 #endif
 
 protected:
+	template <
+		typename Stat2,
+		typename StatArg2
+	>
+	Iterator
+	findPrefixStatGeImpl(
+		StatArg2 targetStat,
+		Stat2* offset
+	) {
+		Stat2 stat = targetStat;
+		for (Node* p = this->m_root; p;) {
+			if (p->m_left) {
+				Stat2 leftStat = p->m_left->m_fullStat;
+				if (!(leftStat < stat)) { // go left
+					p = p->m_left;
+					continue;
+				}
+
+				stat -= leftStat;
+			}
+
+			Stat2 midStat = p->m_selfStat;
+			if (!(midStat < stat)) { // found it
+				if (offset)
+					*offset = stat;
+
+				return p;
+			}
+
+			stat -= midStat;
+			p = p->m_right; // go right
+		}
+
+		return Iterator(); // past the grand total
+	}
+
+	template <
+		typename Stat2,
+		typename StatArg2
+	>
+	Iterator
+	findPrefixStatEqImpl(StatArg2 targetStat) {
+		Stat2 offset;
+		Iterator it = findPrefixStatGeImpl<Stat2, StatArg2>(targetStat, &offset);
+		return it && offset == Stat2(it->m_selfStat) ? it : Iterator();
+	}
+
 	Iterator
 	insertRoot(StatArg stat) {
 		ASSERT(!this->m_root);

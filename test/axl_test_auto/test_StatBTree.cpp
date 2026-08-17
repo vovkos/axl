@@ -47,6 +47,9 @@ struct Span {
 // minus, no binary + or -, no <. those are deliberately absent here, so this
 // file stops compiling if the tree ever starts requiring them again
 
+struct LineStat;
+struct CharStat;
+
 struct SpanStat {
 	uint64_t m_lineCount;
 	uint64_t m_charCount;
@@ -77,6 +80,22 @@ struct SpanStat {
 		m_charCount -= src.m_charCount;
 		return *this;
 	}
+
+	// the per-field deltas -- this is the extra surface the SubStat overloads of
+	// addSubStat/subSubStat require, and the whole point of them: one field moves and
+	// the other is not even read
+
+	SpanStat&
+	operator += (const LineStat& src);
+
+	SpanStat&
+	operator -= (const LineStat& src);
+
+	SpanStat&
+	operator += (const CharStat& src);
+
+	SpanStat&
+	operator -= (const CharStat& src);
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -84,7 +103,7 @@ struct SpanStat {
 // per-field projections. a SubStat is deliberately NOT a full Stat -- it only
 // needs what the projected paths use: constructible from the aggregated
 // SpanStat (extracts one field), += SpanStat for calcPrefixStat, -= and < for
-// the findGe descent, and == for find()'s exact-prefix test. keeping the surface
+// the findPrefixSubStatGe descent, and == for findPrefixStatEq's exact-prefix test. keeping the surface
 // narrow is what proves the projected overloads don't quietly depend on the full
 // Stat arithmetic
 
@@ -152,6 +171,36 @@ struct CharStat {
 	}
 };
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+SpanStat&
+SpanStat::operator += (const LineStat& src) {
+	m_lineCount += src.m_value;
+	return *this;
+}
+
+inline
+SpanStat&
+SpanStat::operator -= (const LineStat& src) {
+	m_lineCount -= src.m_value;
+	return *this;
+}
+
+inline
+SpanStat&
+SpanStat::operator += (const CharStat& src) {
+	m_charCount += src.m_value;
+	return *this;
+}
+
+inline
+SpanStat&
+SpanStat::operator -= (const CharStat& src) {
+	m_charCount -= src.m_value;
+	return *this;
+}
+
 //..............................................................................
 
 uint32_t
@@ -180,7 +229,7 @@ getIteratorAt(
 // - calcPrefixStat(it) equals the INCLUSIVE prefix at every position (walks UP
 //   the spine, so it catches broken parent pointers and stale node stats)
 // - getFullStat() equals the grand total
-// - findGe(target) for every target 0 .. total + 2 equals the smallest
+// - findPrefixStatGe(target) for every target 0 .. total + 2 equals the smallest
 //   index whose inclusive prefix is >= target (ties from zero-count elements
 //   resolve to the first one), empty iterator if target > total; on success
 //   *remainder == target minus the prefix before the element found
@@ -222,8 +271,8 @@ verifyTree(
 		SpanStat prefix = tree.calcPrefixStat(it); // inclusive -- its own counts
 		TEST_ASSERT(prefix.m_lineCount == lineTotal);
 		TEST_ASSERT(prefix.m_charCount == charTotal);
-		TEST_ASSERT(tree.template calcPrefixStat<LineStat>(it).m_value == lineTotal);
-		TEST_ASSERT(tree.template calcPrefixStat<CharStat>(it).m_value == charTotal);
+		TEST_ASSERT(tree.template calcPrefixSubStat<LineStat>(it).m_value == lineTotal);
+		TEST_ASSERT(tree.template calcPrefixSubStat<CharStat>(it).m_value == charTotal);
 	}
 
 	TEST_ASSERT(i == count);
@@ -231,8 +280,8 @@ verifyTree(
 	SpanStat total = tree.getFullStat();
 	TEST_ASSERT(total.m_lineCount == lineTotal);
 	TEST_ASSERT(total.m_charCount == charTotal);
-	TEST_ASSERT(tree.template getFullStat<LineStat>().m_value == lineTotal);
-	TEST_ASSERT(tree.template getFullStat<CharStat>().m_value == charTotal);
+	TEST_ASSERT(tree.template getFullSubStat<LineStat>().m_value == lineTotal);
+	TEST_ASSERT(tree.template getFullSubStat<CharStat>().m_value == charTotal);
 
 	i = count;
 	for (ConstIterator it = tree.getTail(); it; it--) {
@@ -256,19 +305,19 @@ verifyTree(
 		}
 
 		LineStat remainder(-1);
-		ConstIterator it = tree.template findGe<LineStat>(LineStat(target), &remainder);
+		ConstIterator it = tree.findPrefixSubStatGe(LineStat(target), &remainder);
 
-		// find() is findGe() landing exactly on an element's inclusive prefix
+		// findPrefixSubStatEq is findPrefixSubStatGe landing exactly on an element's inclusive prefix
 
-		ConstIterator exactIt = tree.template findEq<LineStat>(LineStat(target));
+		ConstIterator exactIt = tree.findPrefixSubStatEq(LineStat(target));
 
 		if (modelIndex < count) {
 			uint64_t inclusive = modelSum + reference[modelIndex].m_lineCount;
 			TEST_ASSERT(it);
 			TEST_ASSERT(it->m_id == reference[modelIndex].m_id);
 			TEST_ASSERT(remainder.m_value == target - modelSum);
-			TEST_ASSERT(tree.template calcPrefixStat<LineStat>(it).m_value == inclusive);
-			TEST_ASSERT(inclusive >= target); // findGe's defining property
+			TEST_ASSERT(tree.template calcPrefixSubStat<LineStat>(it).m_value == inclusive);
+			TEST_ASSERT(inclusive >= target); // findPrefixSubStatGe's defining property
 
 			if (inclusive == target) {
 				TEST_ASSERT(exactIt);
@@ -335,10 +384,10 @@ test_Empty() {
 	TEST_ASSERT(!tree.getHead());
 	TEST_ASSERT(!tree.getTail());
 	TEST_ASSERT(tree.getFullStat().m_lineCount == 0);
-	TEST_ASSERT(tree.getFullStat<LineStat>().m_value == 0);
-	TEST_ASSERT(!tree.findGe<LineStat>(LineStat(0)));
-	TEST_ASSERT(!tree.findGe<LineStat>(LineStat(7)));
-	TEST_ASSERT(!tree.calcPrefixStat<LineStat>(nullIt).m_value);
+	TEST_ASSERT(tree.getFullSubStat<LineStat>().m_value == 0);
+	TEST_ASSERT(!tree.findPrefixSubStatGe(LineStat(0)));
+	TEST_ASSERT(!tree.findPrefixSubStatGe(LineStat(7)));
+	TEST_ASSERT(!tree.calcPrefixSubStat<LineStat>(nullIt).m_value);
 
 	sl::Array<Span> reference;
 	verifyTree(tree, reference);
@@ -348,7 +397,7 @@ test_Empty() {
 }
 
 // a scalar Stat with a payload of its own, plus the non-projected
-// calcPrefixStat/getFullStat/findGe. the payload here is an id with nothing
+// calcPrefixStat/getFullStat/findPrefixStatGe. the payload here is an id with nothing
 // to do with the stat -- so it also pins that the two are tracked independently
 
 void
@@ -395,7 +444,7 @@ test_Scalar() {
 		}
 
 		uint64_t remainder = -1;
-		Tree::Iterator it = tree.findGe(target, &remainder);
+		Tree::Iterator it = tree.findPrefixStatGe(target, &remainder);
 
 		if (modelIndex < ElementCount) {
 			TEST_ASSERT(it);
@@ -530,6 +579,91 @@ testModify(size_t elementCount) {
 	for (size_t i = 0; i < elementCount; i++) {
 		getIteratorAt(tree, i)->m_id += 1000;
 		reference.rwi()[i].m_id += 1000;
+	}
+
+	SpanStat after = tree.getFullStat();
+	TEST_ASSERT(before.m_lineCount == after.m_lineCount);
+	TEST_ASSERT(before.m_charCount == after.m_charCount);
+	verifyTree(tree, reference);
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// the projected addSubStat/subSubStat methods: the delta is one
+// field, so only that field may move anywhere on the spine -- the other one must
+// come out bit-identical. this rides the SAME Op path as the whole-stat version
+// (leaf slot first, then every ancestor), so a small Fanout still matters: the
+// spine it walks is the deep one
+
+template <size_t Fanout>
+void
+testModifySubStat(size_t elementCount) {
+	typedef sl::StatBTree<SpanStat, Span, Fanout> Tree;
+	typedef typename Tree::Iterator Iterator;
+
+	uint32_t seed = 0x0ff5e100 + (uint32_t)Fanout;
+
+	Tree tree;
+	sl::Array<Span> reference;
+
+	for (size_t i = 0; i < elementCount; i++) {
+		Span span((uint_t)i + 1, lcg(&seed) % 4, lcg(&seed) % 100);
+		tree.insertTail(SpanStat(span), span);
+		reference.append(span);
+	}
+
+	verifyTree(tree, reference);
+
+	// line-only deltas: every char count must survive untouched
+
+	uint64_t charTotal = tree.template getFullSubStat<CharStat>().m_value;
+
+	for (size_t i = 0; i < elementCount; i++) {
+		size_t index = lcg(&seed) % elementCount;
+		uint64_t oldLines = reference[index].m_lineCount;
+		uint64_t newLines = lcg(&seed) % 6;
+
+		Iterator it = getIteratorAt(tree, index);
+		it.subSubStat(LineStat(oldLines));
+		it.addSubStat(LineStat(newLines));
+		it->m_lineCount = newLines; // the payload follows the stat
+
+		reference.rwi()[index].m_lineCount = newLines;
+		verifyTree(tree, reference);
+		TEST_ASSERT(tree.template getFullSubStat<CharStat>().m_value == charTotal);
+	}
+
+	// and the other projection, on the same tree
+
+	uint64_t lineTotal = tree.template getFullSubStat<LineStat>().m_value;
+
+	for (size_t i = 0; i < elementCount; i++) {
+		size_t index = lcg(&seed) % elementCount;
+		uint64_t oldChars = reference[index].m_charCount;
+		uint64_t newChars = lcg(&seed) % 200;
+
+		Iterator it = getIteratorAt(tree, index);
+		it.subSubStat(CharStat(oldChars));
+		it.addSubStat(CharStat(newChars));
+		it->m_charCount = newChars;
+
+		reference.rwi()[index].m_charCount = newChars;
+		verifyTree(tree, reference);
+		TEST_ASSERT(tree.template getFullSubStat<LineStat>().m_value == lineTotal);
+	}
+
+	// a projected round trip must land back exactly where it started -- this is
+	// what catches a subStat that quietly adds (both sweeps above would still
+	// pass if subStat and addStat were the same op, since the reference follows)
+
+	SpanStat before = tree.getFullStat();
+
+	for (size_t i = 0; i < elementCount; i++) {
+		LineStat delta(lcg(&seed) % 6);
+
+		Iterator it = getIteratorAt(tree, lcg(&seed) % elementCount);
+		it.addSubStat(delta);
+		it.subSubStat(delta);
 	}
 
 	SpanStat after = tree.getFullStat();
@@ -708,7 +842,7 @@ testInsertNoValueEquivalence(size_t elementCount) {
 // REGRESSION: interior stat drift on a cascading split (slot test must be <=, not <)
 // invisible in getFullStat(): the drift moves stat between subtrees, so the total stays right
 // needs a small Fanout, all four insert forms so slot sweeps across Fanout / 2, and assertValid() after each op
-// verifyTree() is O(total) in findGe targets, so it runs periodically instead
+// verifyTree() is O(total) in findPrefixStatGe targets, so it runs periodically instead
 
 template <size_t Fanout>
 void
@@ -820,6 +954,9 @@ run() {
 
 	testModify<4>(40);
 	testModify<16>(40);
+
+	testModifySubStat<4>(40);
+	testModifySubStat<16>(40);
 
 	testMixed<4>(150);
 	testMixed<6>(150);

@@ -37,6 +37,16 @@ template <
 	typename StatArg
 >
 struct StatBTreeNodeRoot {
+	// the iterator applies the same Op to the leaf slot and then to the spine
+
+	template <
+		typename Stat2,
+		typename Value2,
+		size_t Fanout2,
+		typename StatValueArgs2
+	>
+	friend class StatBTreeIterator;
+
 	StatBTreeNode<Stat, Fanout, StatArg>* m_parent;
 	Stat m_stat; // aggregate of all children
 	size_t m_count; // slots in use
@@ -49,17 +59,33 @@ struct StatBTreeNodeRoot {
 
 	void
 	addStat(StatArg delta) {
-		addStat<AddAssign<Stat, StatArg> >(delta);
+		modifyStat<AddAssign<Stat, StatArg>, StatArg>(delta);
+	}
+
+	template <typename SubStat>
+	void
+	addSubStat(const SubStat& delta) {
+		modifyStat<AddAssign<Stat, const SubStat&>, const SubStat&>(delta);
 	}
 
 	void
 	subStat(StatArg delta) {
-		addStat<SubAssign<Stat, StatArg> >(delta);
+		modifyStat<SubAssign<Stat, StatArg>, StatArg>(delta);
 	}
 
-	template <typename Op>
+	template <typename SubStat>
 	void
-	addStat(StatArg delta) {
+	subSubStat(const SubStat& delta) {
+		modifyStat<SubAssign<Stat, const SubStat&>, const SubStat&>(delta);
+	}
+
+protected:
+	template <
+		typename Op,
+		typename StatArg2
+	>
+	void
+	modifyStat(StatArg2 delta) {
 		Op()(m_stat, delta);
 		for (StatBTreeNodeRoot* p = m_parent; p; p = p->m_parent)
 			Op()(p->m_stat, delta);
@@ -466,23 +492,41 @@ public:
 
 	void
 	addStat(StatArg delta) {
-		addStat<AddAssign<Stat, StatArg> >(delta);
+		modifyStat<AddAssign<Stat, StatArg>, StatArg>(delta);
+	}
+
+	// this adjusts a single field of a multi-field stat (requires
+	// Stat::operator += (SubStat)); no need to carpet-bomb the whole stat
+
+	template <typename SubStat>
+	void
+	addSubStat(const SubStat& delta) {
+		modifyStat<AddAssign<Stat, const SubStat&>, const SubStat&>(delta);
 	}
 
 	void
 	subStat(StatArg delta) {
-		addStat<SubAssign<Stat, StatArg> >(delta);
+		modifyStat<SubAssign<Stat, StatArg>, StatArg>(delta);
+	}
+
+	template <typename SubStat>
+	void
+	subSubStat(const SubStat& delta) {
+		modifyStat<SubAssign<Stat, const SubStat&>, const SubStat&>(delta);
 	}
 
 protected:
-	template <typename Op>
+	template <
+		typename Op,
+		typename StatArg2
+	>
 	void
-	addStat(StatArg delta) {
+	modifyStat(StatArg2 delta) {
 		Leaf* leaf = *this->m_leafIt;
 		ASSERT(leaf && this->m_slot < leaf->m_count);
 
 		Op()(leaf->m_childArray[this->m_slot], delta);
-		leaf->template addStat<Op>(delta);
+		leaf->template modifyStat<Op, StatArg2>(delta);
 	}
 };
 
@@ -629,26 +673,26 @@ public:
 
 	Stat
 	getFullStat() const {
-		return getFullStat<Stat>();
+		return getFullSubStat<Stat>();
 	}
 
 	template <typename SubStat>
 	SubStat
-	getFullStat() const {
-		return m_root ? SubStat(m_root->m_stat) : SubStat(Stat());
+	getFullSubStat() const {
+		return m_root ? SubStat(m_root->m_stat) : SubStat();
 	}
 
 	// everything up to (and including) iterator
 
 	Stat
 	calcPrefixStat(ConstIterator it) const {
-		return calcPrefixStat<Stat>(it);
+		return calcPrefixSubStat<Stat>(it);
 	}
 
 	template <typename SubStat>
 	SubStat
-	calcPrefixStat(ConstIterator it) const {
-		SubStat stat = SubStat(Stat());
+	calcPrefixSubStat(ConstIterator it) const {
+		SubStat stat = SubStat();
 		if (!it)
 			return stat;
 
@@ -669,118 +713,68 @@ public:
 		return stat;
 	}
 
-	// findGe(arg): first element whose PREFIX is >= arg -- the containing element
-	// offset, if asked for, is arg minus the prefix BEFORE it
+	// findPrefixStatGe(arg): first element whose PREFIX is >= arg -- the containing
+	// element; offset, if asked for, is arg minus the prefix BEFORE it
 
 	Iterator
-	findGe(
+	findPrefixStatGe(
 		StatArg targetStat,
 		Stat* offset = NULL
 	) {
-		return findGe<Stat, StatArg>(targetStat, offset);
+		return findPrefixStatGeImpl<Stat, StatArg>(targetStat, offset);
 	}
 
 	ConstIterator
-	findGe(
+	findPrefixStatGe(
 		StatArg targetStat,
 		Stat* offset = NULL
 	) const {
-		return findGe<Stat, StatArg>(targetStat, offset);
+		return const_cast<StatBTree*>(this)->findPrefixStatGeImpl<Stat, StatArg>(targetStat, offset);
 	}
 
-	// this overload can operate on a specific field of a multi-field stat
+	// this descends on a single field of a multi-field stat
 
-	template <
-		typename SubStat,
-		typename SubStatArg = ArgType<SubStat>
-	>
+	template <typename SubStat>
 	Iterator
-	findGe(
-		SubStatArg targetStat,
+	findPrefixSubStatGe(
+		const SubStat& targetStat,
 		SubStat* offset = NULL
 	) {
-		if (!m_root)
-			return Iterator();
-
-		SubStat stat = targetStat;
-		NodeBase* node = m_root;
-
-		for (size_t level = m_height; level; level--) {
-			Node* parent = (Node*)node;
-			size_t i = 0;
-			for (; i < parent->m_count - 1; i++) { // the last child is the fallback
-				SubStat childStat = parent->getChildStat(i);
-				if (!(childStat < stat))
-					break;
-
-				stat -= childStat;
-			}
-
-			node = parent->m_childArray[i];
-		}
-
-		Leaf* leaf = (Leaf*)node;
-		size_t i = 0;
-		for (; i < leaf->m_count; i++) {
-			SubStat childStat = leaf->getChildStat(i);
-			if (!(childStat < stat))
-				break;
-
-			stat -= childStat;
-		}
-
-		if (i >= leaf->m_count) // targetStat is past the grand total
-			return Iterator();
-
-		if (offset)
-			*offset = stat;
-
-		return Iterator(leaf, i);
+		return findPrefixStatGeImpl<SubStat, const SubStat&>(targetStat, offset);
 	}
 
-	template <
-		typename SubStat,
-		typename SubStatArg = ArgType<SubStat>
-	>
+	template <typename SubStat>
 	ConstIterator
-	findGe(
-		SubStatArg targetStat,
+	findPrefixSubStatGe(
+		const SubStat& targetStat,
 		SubStat* offset = NULL
 	) const {
-		return const_cast<StatBTree*>(this)->findGe<SubStat, SubStatArg>(targetStat, offset);
+		return const_cast<StatBTree*>(this)->findPrefixStatGeImpl<SubStat, const SubStat&>(targetStat, offset);
 	}
 
-	// findEq(arg): the element whose prefix is exactly arg, NULL if none
-	// that is findGe landing with its offset exactly on the element's own stat
+	// findPrefixStatEq(arg): the element whose prefix is exactly arg, NULL if none
+	// that is findPrefixStatGe landing with its offset exactly on the element's own stat
 
 	Iterator
-	findEq(StatArg targetStat) {
-		return findEq<Stat, StatArg>(targetStat);
+	findPrefixStatEq(StatArg targetStat) {
+		return findPrefixStatEqImpl<Stat, StatArg>(targetStat);
 	}
 
 	ConstIterator
-	findEq(StatArg targetStat) const {
-		return findEq<Stat, StatArg>(targetStat);
+	findPrefixStatEq(StatArg targetStat) const {
+		return const_cast<StatBTree*>(this)->findPrefixStatEqImpl<Stat, StatArg>(targetStat);
 	}
 
-	template <
-		typename SubStat,
-		typename SubStatArg = ArgType<SubStat>
-	>
+	template <typename SubStat>
 	Iterator
-	findEq(SubStatArg targetStat) {
-		SubStat offset;
-		Iterator it = findGe<SubStat, SubStatArg>(targetStat, &offset);
-		return it && offset == SubStat(it.getStat()) ? it : Iterator();
+	findPrefixSubStatEq(const SubStat& targetStat) {
+		return findPrefixStatEqImpl<SubStat, const SubStat&>(targetStat);
 	}
 
-	template <
-		typename SubStat,
-		typename SubStatArg = ArgType<SubStat>
-	>
+	template <typename SubStat>
 	ConstIterator
-	findEq(SubStatArg targetStat) const {
-		return const_cast<StatBTree*>(this)->findEq<SubStat, SubStatArg>(targetStat);
+	findPrefixSubStatEq(const SubStat& targetStat) const {
+		return const_cast<StatBTree*>(this)->findPrefixStatEqImpl<SubStat, const SubStat&>(targetStat);
 	}
 
 	Iterator
@@ -902,6 +896,65 @@ public:
 #endif
 
 protected:
+	template <
+		typename Stat2,
+		typename StatArg2
+	>
+	Iterator
+	findPrefixStatGeImpl(
+		StatArg2 targetStat,
+		Stat2* offset
+	) {
+		if (!m_root)
+			return Iterator();
+
+		Stat2 stat = targetStat;
+		NodeBase* node = m_root;
+
+		for (size_t level = m_height; level; level--) {
+			Node* parent = (Node*)node;
+			size_t i = 0;
+			for (; i < parent->m_count - 1; i++) { // the last child is the fallback
+				Stat2 childStat = parent->getChildStat(i);
+				if (!(childStat < stat))
+					break;
+
+				stat -= childStat;
+			}
+
+			node = parent->m_childArray[i];
+		}
+
+		Leaf* leaf = (Leaf*)node;
+		size_t i = 0;
+		for (; i < leaf->m_count; i++) {
+			Stat2 childStat = leaf->getChildStat(i);
+			if (!(childStat < stat))
+				break;
+
+			stat -= childStat;
+		}
+
+		if (i >= leaf->m_count) // targetStat is past the grand total
+			return Iterator();
+
+		if (offset)
+			*offset = stat;
+
+		return Iterator(leaf, i);
+	}
+
+	template <
+		typename Stat2,
+		typename StatArg2
+	>
+	Iterator
+	findPrefixStatEqImpl(StatArg2 targetStat) {
+		Stat2 offset;
+		Iterator it = findPrefixStatGeImpl<Stat2, StatArg2>(targetStat, &offset);
+		return it && offset == Stat2(it.getStat()) ? it : Iterator();
+	}
+
 	Iterator
 	insertFirst(StatArg stat) {
 		ASSERT(!m_root && !m_count);

@@ -15,6 +15,7 @@
 
 #include "axl_sl_Array.h"
 #include "axl_sl_BitIdx.h"
+#include "axl_sl_Operator.h"
 
 namespace axl {
 namespace sl {
@@ -23,12 +24,12 @@ namespace sl {
 
 template <
 	typename T,
-	typename ValueArg0 = ArgType<T>
+	typename Arg0 = ArgType<T>
 >
 class FenwickTree {
 public:
-	typedef T Value;
-	typedef ValueArg0 ValueArg;
+	typedef T Stat;
+	typedef Arg0 StatArg;
 
 protected:
 	Array<T> m_array; // m_array[i] = sum(i + 1 - getLoBit(i + 1) .. i)
@@ -55,13 +56,13 @@ public:
 	}
 
 	size_t
-	append(ValueArg value) {
+	append(StatArg value) {
 		size_t i = m_array.getCount();
 		bool result = m_array.setCount(i + 1);
 		if (!result)
 			return -1;
 
-		Value sum = value;
+		Stat sum = value;
 		size_t j = i + 1; // 1-based index
 		size_t base = j - getLoBit(j); // 1-based left end of the affected range
 		for (j--; j != base; j &= j - 1)
@@ -71,50 +72,31 @@ public:
 		return i;
 	}
 
-	void
-	inc(
-		size_t i,
-		ValueArg delta
-	) {
-		size_t count = m_array.getCount();
-		typename Array<T>::Rwi rwi = m_array.rwi();
-		for (; i < count; i += getLoBit(i + 1))
-			rwi[i] += delta;
-	}
-
-	void
-	dec(
-		size_t i,
-		ValueArg delta
-	) {
-		inc(i, -delta);
-	}
-
 	// grand total
 
-	Value
+	Stat
 	calcFullStat() const {
-		return calcFullStat<Value>();
+		return calcFullSubStat<Stat>();
 	}
 
 	template <typename SubStat>
 	SubStat
-	calcFullStat() const {
+	calcFullSubStat() const {
 		return isEmpty() ?
-			SubStat(Value()) :
-			calcPrefixStat<SubStat>(m_array.getCount() - 1);
+			SubStat() :
+			calcPrefixSubStat<SubStat>(m_array.getCount() - 1);
 	}
 
 	// inclusive prefix: sum(0 .. i)
 
-	Value
+	Stat
 	calcPrefixStat(size_t index) const {
-		return calcPrefixStat<Value>(index);
+		return calcPrefixSubStat<Stat>(index);
 	}
 
 	template <typename SubStat>
 	SubStat
-	calcPrefixStat(size_t i) const {
+	calcPrefixSubStat(size_t i) const {
 		SubStat stat = m_array[i];
 		size_t j = i + 1; // 1-based index
 		for (j &= j - 1; j; j &= j - 1)
@@ -125,14 +107,14 @@ public:
 
 	// the stat of exactly this element -- the inverse of what append() summed in
 
-	Value
+	Stat
 	calcSelfStat(size_t index) const {
-		return calcSelfStat<Value>(index);
+		return calcSelfSubStat<Stat>(index);
 	}
 
 	template <typename SubStat>
 	SubStat
-	calcSelfStat(size_t i) const {
+	calcSelfSubStat(size_t i) const {
 		SubStat stat = m_array[i];
 		size_t j = i + 1; // 1-based index
 		size_t base = j - getLoBit(j); // 1-based left end of the affected range
@@ -142,40 +124,99 @@ public:
 		return stat;
 	}
 
-	// findGet -- first element whose prefix is >= arg, -1 if past the end
+	// findPrefixStatGe -- first element whose prefix is >= arg, -1 if past the end
 
 	size_t
-	findGe(
-		ValueArg targetStat,
-		Value* offset = NULL
+	findPrefixStatGe(
+		StatArg targetStat,
+		Stat* offset = NULL
 	) const {
-		return findGe<Value, ValueArg>(targetStat, offset);
+		return findPrefixStatGeImpl<Stat, StatArg>(targetStat, offset);
 	}
 
-	// this overload can operate on a specific field of a multi-field value
+	// this descends on a single field of a multi-field stat
 
+	template <typename SubStat>
+	size_t
+	findPrefixSubStatGe(
+		const SubStat& targetStat,
+		SubStat* offset = NULL
+	) const {
+		return findPrefixStatGeImpl<SubStat, const SubStat&>(targetStat, offset);
+	}
+
+	// findPrefixStatEq(arg): the element whose prefix is exactly arg, -1 if none
+
+	size_t
+	findPrefixStatEq(StatArg targetStat) const {
+		return findPrefixStatEqImpl<Stat, StatArg>(targetStat);
+	}
+
+	template <typename SubStat>
+	size_t
+	findPrefixSubStatEq(const SubStat& targetStat) const {
+		return findPrefixStatEqImpl<SubStat, const SubStat&>(targetStat);
+	}
+
+	// modification
+
+	void
+	addStat(
+		size_t i,
+		StatArg delta
+	) {
+		modifyStat<AddAssign<Stat, StatArg>, StatArg>(i, delta);
+	}
+
+	template <typename SubStat>
+	void
+	addSubStat(
+		size_t i,
+		const SubStat& delta
+	) {
+		modifyStat<AddAssign<Stat, const SubStat&>, const SubStat&>(i, delta);
+	}
+
+	void
+	subStat(
+		size_t i,
+		StatArg delta
+	) {
+		modifyStat<SubAssign<Stat, StatArg>, StatArg>(i, delta);
+	}
+
+	template <typename SubStat>
+	void
+	subSubStat(
+		size_t i,
+		const SubStat& delta
+	) {
+		modifyStat<SubAssign<Stat, const SubStat&>, const SubStat&>(i, delta);
+	}
+
+protected:
 	template <
-		typename SubStat,
-		typename SubStatArg = ArgType<SubStat>
+		typename Stat2,
+		typename StatArg2
 	>
 	size_t
-	findGe(
-		SubStatArg targetStat,
-		SubStat* offset = NULL
+	findPrefixStatGeImpl(
+		StatArg2 targetStat,
+		Stat2* offset
 	) const {
 		if (m_array.isEmpty())
 			return -1;
 
 		size_t count = m_array.getCount();
 		size_t base = 0; // 0-based start of search range
-		SubStat stat = targetStat;
+		Stat2 stat = targetStat;
 
 		for (size_t bit = getHiBit(count); bit; bit >>= 1) {
 			size_t i = base + bit - 1;
 			if (i >= count)
 				continue;
 
-			SubStat left = m_array[i];
+			Stat2 left = m_array[i];
 			if (left < stat) { // target beyond i, go right
 				stat -= left;
 				base += bit;
@@ -191,22 +232,30 @@ public:
 		return base;
 	}
 
-	// findEq(arg): the element whose prefix is exactly arg, -1 if none
-
+	template <
+		typename Stat2,
+		typename StatArg2
+	>
 	size_t
-	findEq(ValueArg targetStat) const {
-		return findEq<Value, ValueArg>(targetStat);
+	findPrefixStatEqImpl(StatArg2 targetStat) const {
+		Stat2 offset;
+		size_t i = findPrefixStatGeImpl<Stat2, StatArg2>(targetStat, &offset);
+		return i != -1 && offset == calcSelfSubStat<Stat2>(i) ? i : -1;
 	}
 
 	template <
-		typename SubStat,
-		typename SubStatArg = ArgType<SubStat>
+		typename Op,
+		typename StatArg2
 	>
-	size_t
-	findEq(SubStatArg targetStat) const {
-		SubStat offset;
-		size_t i = findGe<SubStat, SubStatArg>(targetStat, &offset);
-		return i != -1 && offset == calcSelfStat<SubStat>(i) ? i : -1;
+	void
+	modifyStat(
+		size_t i,
+		StatArg2 delta
+	) {
+		size_t count = m_array.getCount();
+		typename Array<T>::Rwi rwi = m_array.rwi();
+		for (; i < count; i += getLoBit(i + 1))
+			Op()(rwi[i], delta);
 	}
 };
 

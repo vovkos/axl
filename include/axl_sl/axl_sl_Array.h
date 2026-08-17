@@ -765,7 +765,7 @@ public:
 		for (;;) {
 			for (;;) { // skip e
 				if (src >= end) {
-					overrideLength(dst - this->m_p);
+					setCount(dst - this->m_p);
 					return end - dst;
 				}
 
