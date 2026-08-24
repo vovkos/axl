@@ -126,6 +126,11 @@
 #	include "axl_io_Ssl.h"
 #endif
 
+#ifdef _AXL_DB
+#	include "axl_db_MySql.h"
+#	include "axl_db_MySqlStmt.h"
+#endif
+
 #ifdef _AXL_IO_HID
 #	include "axl_io_HidDevice.h"
 #	include "axl_io_HidEnumerator.h"

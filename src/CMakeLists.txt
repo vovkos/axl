@@ -201,6 +201,22 @@ endif()
 
 #...............................................................................
 
+if(MYSQL_FOUND)
+	option(
+		BUILD_AXL_DB
+		"Build axl_db library (LibMariaDB/MySQL wrappers)"
+		ON
+	)
+else()
+	unset(BUILD_AXL_DB CACHE)
+endif()
+
+if(BUILD_AXL_DB)
+	add_subdirectory(axl_db)
+endif()
+
+#...............................................................................
+
 option(
 	BUILD_AXL_LEX
 	"Build axl_lex library"

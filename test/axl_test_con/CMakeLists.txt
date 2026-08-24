@@ -157,6 +157,13 @@ if(BUILD_AXL_CRY)
 	list(APPEND OPT_LIB_LIST axl_cry ${OPENSSL_CRYPTO_LIB_NAME})
 endif()
 
+if(BUILD_AXL_DB)
+	include_directories(${LIBMYSQL_INC_DIR})
+	link_directories(${LIBMYSQL_LIB_DIR})
+	add_definitions(-D_AXL_DB=1)
+	list(APPEND OPT_LIB_LIST axl_db ${LIBMYSQL_LIB_NAME})
+endif()
+
 if(BUILD_AXL_XML)
 	include_directories(${EXPAT_INC_DIR})
 	link_directories(${EXPAT_LIB_DIR})
@@ -311,6 +318,10 @@ if(WIN32)
 			${OPENSSL_DLL_DIR}/${OPENSSL_SSL_DLL_NAME}.dll
 			${OPENSSL_DLL_DIR}/${OPENSSL_CRYPTO_DLL_NAME}.dll
 		)
+	endif()
+
+	if(BUILD_AXL_DB AND LIBMYSQL_DLL_DIR)
+		list(APPEND _DLL_LIST ${LIBMYSQL_DLL_DIR}/libmariadb.dll)
 	endif()
 
 	if(BUILD_AXL_XML AND EXPAT_DLL_DIR)

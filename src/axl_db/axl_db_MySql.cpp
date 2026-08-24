@@ -1,0 +1,70 @@
+//..............................................................................
+//
+//  This file is part of the AXL library.
+//
+//  AXL is distributed under the MIT license.
+//  For details see accompanying license.txt file,
+//  the public copy of which is also available at:
+//  http://tibbo.com/downloads/archive/axl/license.txt
+//
+//..............................................................................
+
+#include "pch.h"
+#include "axl_db_MySql.h"
+
+namespace axl {
+namespace db {
+
+//..............................................................................
+
+sl::StringRef
+MySqlErrorProvider::getErrorDescription(const err::ErrorRef& error) {
+	if (error->m_size < sizeof(err::ErrorHdr))
+		return sl::StringRef();
+
+	size_t stringSize = error->m_size - sizeof(err::ErrorHdr);
+	if (stringSize < 2)
+		return sl::formatString("MySQL error #%d", error->m_code);
+
+	const char* p = (const char*)(error + 1);
+
+	return !p[stringSize - 1] ?
+		sl::StringRef(error.getHdr(), p, stringSize - 1, true) :
+		sl::StringRef(error.getHdr(), p, stringSize, false);
+}
+
+//..............................................................................
+
+size_t
+MySql::escapeString(
+	sl::String* string,
+	const sl::StringRef& source
+) {
+	ASSERT(m_h);
+
+	size_t length = source.getLength();
+	if (!length) {
+		string->clear();
+		return 0;
+	}
+
+	if (string->cp() == source.cp()) {
+		sl::String tmp;
+		length = escapeString(&tmp, source);
+		*string = std::move(tmp);
+		return length;
+	}
+
+	char* p = string->createBuffer(length * 2); // worst case: every char is escaped
+	if (!p)
+		return -1;
+
+	length = ::mysql_real_escape_string(m_h, p, source.cp(), (ulong_t)length);
+	string->overrideLength(length);
+	return length;
+}
+
+//..............................................................................
+
+} // namespace db
+} // namespace axl

@@ -25,6 +25,9 @@ set(
 	PCAP_LIB_DIR
 	LIBSSH2_INC_DIR
 	LIBSSH2_LIB_DIR
+	LIBMYSQL_INC_DIR
+	LIBMYSQL_LIB_DIR
+	LIBMYSQL_LIB_NAME
 	LIBUSB_INC_DIR
 	LIBUSB_LIB_DIR
 	HIDAPI_INC_DIR
@@ -60,6 +63,7 @@ set(
 		libusb
 		hidapi
 		openssl
+		libmysql
 		expat
 		re2s
 		qt

@@ -10228,6 +10228,218 @@ testFenwickTree() {
 
 //..............................................................................
 
+#if (_AXL_DB)
+
+struct MySqlConfig {
+	sl::String m_host;
+	sl::String m_user;
+	sl::String m_password;
+	sl::String m_db;
+};
+
+class MySqlConfigParser: public ini::Parser<MySqlConfigParser> {
+protected:
+	enum KeyKind {
+		KeyKind_Undefined,
+		KeyKind_Host,
+		KeyKind_User,
+		KeyKind_Password,
+		KeyKind_Db,
+	};
+
+	AXL_SL_BEGIN_STRING_HASH_TABLE(KeyNameMap, KeyKind)
+		AXL_SL_HASH_TABLE_ENTRY("host", KeyKind_Host)
+		AXL_SL_HASH_TABLE_ENTRY("user", KeyKind_User)
+		AXL_SL_HASH_TABLE_ENTRY("password", KeyKind_Password)
+		AXL_SL_HASH_TABLE_ENTRY("database", KeyKind_Db)
+	AXL_SL_END_HASH_TABLE()
+
+protected:
+	MySqlConfig* m_config;
+
+public:
+	MySqlConfigParser(MySqlConfig* config) {
+		m_config = config;
+	}
+
+	bool
+	onKeyValue(
+		sl::StringRef& name,
+		sl::StringRef& value
+	) {
+		KeyKind key = KeyNameMap::findValue(name, KeyKind_Undefined);
+		switch (key) {
+		case KeyKind_Host:
+			m_config->m_host = value;
+			break;
+		case KeyKind_User:
+			m_config->m_user = value;
+			break;
+		case KeyKind_Password:
+			m_config->m_password = value;
+			break;
+		case KeyKind_Db:
+			m_config->m_db = value;
+			break;
+		}
+
+		return true;
+	}
+};
+
+void
+testMySql() {
+	MySqlConfig config;
+	MySqlConfigParser parser(&config);
+	bool result = parser.parseFile(AXL_STR("C:/Projects/ioninja-db-test.ini"));
+	if (!result) {
+		printf("cannot read config: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	db::registerMySqlErrorProvider();
+
+	db::MySql mysql;
+
+	result =
+		mysql.create() &&
+		mysql.connect(config.m_host, config.m_user, config.m_password, config.m_db);
+
+	if (!result) {
+		printf("cannot connect: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	printf("connected to %s (%s)\n", mysql.getHostInfo().sz(), mysql.getServerInfo().sz());
+
+	// 1) direct query (never to be used!)
+
+	printf("\n-- direct query --\n");
+
+	db::MySqlRes mysqlRes;
+
+	result =
+		mysql.query(AXL_STR(
+			"SELECT id, email, name, date_create "
+			"FROM users "
+			"ORDER BY date_create DESC "
+			"LIMIT 3"
+		)) &&
+		mysql.storeResult(&mysqlRes);
+
+	if (!result) {
+		printf("query failed: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	uint_t fieldCount = mysqlRes.getFieldCount();
+	MYSQL_ROW row;
+	while ((row = mysqlRes.fetchRow()) != NULL) {
+		for (uint_t i = 0; i < fieldCount; i++)
+			printf("%s%s", i ? " | " : "", row[i] ? row[i] : "NULL");
+
+		printf("\n");
+	}
+
+	// 2) auery via a prepared statement with a bound parameter
+
+	printf("\n-- prepared statement --\n");
+
+	db::MySqlStmt mysqlStmt;
+
+	result =
+		mysqlStmt.create(mysql) &&
+		mysqlStmt.prepare(AXL_STR(
+			"SELECT id, email, name, date_create "
+			"FROM users "
+			"WHERE activated = ? "
+			"ORDER BY id DESC "
+			"LIMIT 3"
+		));
+
+	if (!result) {
+		printf("prepare failed: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	printf("param count: %d\n", mysqlStmt.getParamCount());
+
+	int8_t isActivated = 1;
+
+	MYSQL_BIND param;
+	memset(&param, 0, sizeof(param));
+	param.buffer_type = MYSQL_TYPE_TINY;
+	param.buffer = &isActivated;
+
+	uint32_t id;
+	char email[128];
+	ulong_t emailLength;
+	char name[128];
+	ulong_t nameLength;
+	MYSQL_TIME dateCreate;
+
+	MYSQL_BIND columns[4] = { 0 };
+
+	columns[0].buffer_type = MYSQL_TYPE_LONG;
+	columns[0].buffer = &id;
+	columns[0].is_unsigned = true;
+
+	columns[1].buffer_type = MYSQL_TYPE_STRING;
+	columns[1].buffer = email;
+	columns[1].buffer_length = sizeof(email);
+	columns[1].length = &emailLength;
+
+	columns[2].buffer_type = MYSQL_TYPE_STRING;
+	columns[2].buffer = name;
+	columns[2].buffer_length = sizeof(name);
+	columns[2].length = &nameLength;
+
+	columns[3].buffer_type = MYSQL_TYPE_TIMESTAMP;
+	columns[3].buffer = &dateCreate;
+
+	result =
+		mysqlStmt.bindParams(&param) &&
+		mysqlStmt.execute() &&
+		mysqlStmt.bindResult(columns) &&
+		mysqlStmt.storeResult();
+
+	if (!result) {
+		printf("execute failed: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	printf("row count: %llu\n", mysqlStmt.getRowCount());
+
+	for (;;) {
+		db::MySqlStmtFetchResult fetchResult = mysqlStmt.fetch();
+		switch (fetchResult) {
+		case db::MySqlStmtFetchResult_Error:
+			printf("fetch failed: %s\n", err::getLastErrorDescription().sz());
+			// and fall through
+
+		case db::MySqlStmtFetchResult_NoData:
+			return;
+
+		case db::MySqlStmtFetchResult_DataTruncated:
+			printf("(TRUNCATED): ");
+
+			// and fall through
+
+		default:
+			printf(
+				"%u | %.*s | %.*s | %04d-%02d-%02d %02d:%02d:%02d\n",
+				id,
+				(int)emailLength, email,
+				(int)nameLength, name,
+				dateCreate.year, dateCreate.month, dateCreate.day,
+				dateCreate.hour, dateCreate.minute, dateCreate.second
+			);
+		}
+	}
+}
+
+#endif
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -10255,7 +10467,10 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	testFenwickTree();
+#if (_AXL_DB)
+	testMySql();
+#endif
+
 	return 0;
 }
 
