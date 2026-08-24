@@ -109,7 +109,11 @@ Error::format_va(
 }
 
 size_t
-Error::createStringError(const sl::StringRef& string) {
+Error::createStringError(
+	const sl::Guid& guid,
+	uint_t code,
+	const sl::StringRef& string
+) {
 	size_t length = string.getLength();
 	size_t size = sizeof(ErrorHdr) + length + 1;
 
@@ -118,8 +122,8 @@ Error::createStringError(const sl::StringRef& string) {
 		return -1;
 
 	error->m_size = (uint32_t)size;
-	error->m_guid = g_stdErrorGuid;
-	error->m_code = StdErrorCode_String;
+	error->m_guid = guid;
+	error->m_code = code;
 
 	char* dst = (char*)(error + 1);
 
@@ -225,7 +229,7 @@ pushFormatStringError_va(
 sl::StringRef
 StdErrorProvider::getErrorDescription(const ErrorRef& error) {
 	if (error->m_size < sizeof(ErrorHdr))
-		return sl::String();
+		return sl::StringRef();
 
 	const char* p;
 	size_t stringSize;

@@ -378,7 +378,16 @@ public:
 	// string error
 
 	size_t
-	createStringError(const sl::StringRef& string);
+	createStringError(
+		const sl::Guid& guid,
+		uint_t code,
+		const sl::StringRef& string
+	);
+
+	size_t
+	createStringError(const sl::StringRef& string) {
+		return createStringError(g_stdErrorGuid, StdErrorCode_String, string);
+	}
 
 	size_t
 	pushStringError(const sl::StringRef& string) {
@@ -707,7 +716,7 @@ complete(
 
 inline
 bool
-complete(int result) {
+complete(bool_t result) {
 	return complete<bool>(result != 0, false);
 }
 
