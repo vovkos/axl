@@ -20,27 +20,18 @@ namespace db {
 
 //..............................................................................
 
-// mysql_library_init/end are not thread-safe -- call them from main();
-// they report failure but never set a per-connection error
+// call initMySqlLib once from the main thread
 
-inline
 bool
-initMySqlLibrary(
+initMySqlLib(
 	int argc = 0,
 	char** argv = NULL,
 	char** groups = NULL
-) {
-	int result = ::mysql_server_init(argc, argv, groups);
-	return result == 0 ? true : err::fail("mysql_server_init failed");
-}
+);
 
-inline
-void
-endMySqlLibrary() {
-	::mysql_server_end();
-}
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// every thread which talks to the server must be registered with libmariadb
+// every worker thread which talks to the server must be registered with libmariadb
 // (mysql_init/real_connect do it implicitly, endMySqlThread must be explicit)
 
 inline
@@ -55,6 +46,23 @@ void
 endMySqlThread() {
 	::mysql_thread_end();
 }
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+class AutoMySqlThread {
+protected:
+	bool m_isInitialized;
+
+public:
+	AutoMySqlThread() {
+		m_isInitialized = initMySqlThread();
+	}
+
+	~AutoMySqlThread() {
+		if (m_isInitialized)
+			endMySqlThread();
+	}
+};
 
 //..............................................................................
 

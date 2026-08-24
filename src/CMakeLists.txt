@@ -201,7 +201,7 @@ endif()
 
 #...............................................................................
 
-if(MYSQL_FOUND)
+if(LIBMYSQL_FOUND)
 	option(
 		BUILD_AXL_DB
 		"Build axl_db library (LibMariaDB/MySQL wrappers)"

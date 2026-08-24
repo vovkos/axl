@@ -1006,7 +1006,6 @@ axl_make_path
 	else()
 		set(${_FILE_PATH} "${_BASE_DIR}/${_FILE_NAME}")
 	endif()
-
 endmacro()
 
 macro(

@@ -10297,7 +10297,7 @@ testMySql() {
 		return;
 	}
 
-	db::registerMySqlErrorProvider();
+	db::initMySqlLib();
 
 	db::MySql mysql;
 

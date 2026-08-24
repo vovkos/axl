@@ -17,6 +17,30 @@ namespace db {
 
 //..............................................................................
 
+bool
+initMySqlLib(
+	int argc,
+	char** argv,
+	char** groups
+) {
+	int result = ::mysql_server_init(argc, argv, groups);
+	if (result != 0)
+		return err::fail("mysql_server_init failed");
+
+	class MySqlServerEnd {
+	public:
+		~MySqlServerEnd() {
+			::mysql_server_end();
+		}
+	};
+
+	registerMySqlErrorProvider();
+	sl::getSingleton<MySqlServerEnd>();
+	return true;
+}
+
+//..............................................................................
+
 sl::StringRef
 MySqlErrorProvider::getErrorDescription(const err::ErrorRef& error) {
 	if (error->m_size < sizeof(err::ErrorHdr))
