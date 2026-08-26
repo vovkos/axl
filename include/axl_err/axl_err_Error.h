@@ -248,7 +248,7 @@ public:
 		axl_va_list va
 	) {
 		size_t packSize;
-		Pack() (NULL, &packSize, va);
+		Pack()(NULL, &packSize, va);
 
 		size_t size = sizeof(ErrorHdr) + packSize;
 		createBuffer(size);
@@ -259,7 +259,7 @@ public:
 		m_p->m_guid = guid;
 		m_p->m_code = code;
 
-		Pack() (m_p + 1, &packSize, va);
+		Pack()(m_p + 1, &packSize, va);
 		return size;
 	}
 
@@ -660,6 +660,82 @@ bool
 fail(const ErrorRef& error) {
 	return fail<bool>(false, error);
 }
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// we need to correctly select the proper overload in cases like:
+// failWithStringError("abc: %s", "def");
+
+template <typename T>
+struct IsFailWithStringErrorResult: std::integral_constant<
+	bool,
+	!std::is_convertible<T, const sl::StringRef&>::value ||
+	std::is_same<T, std::nullptr_t>::value
+> {};
+
+template <typename T>
+using FailWithStringErrorResult = typename std::enable_if<
+	IsFailWithStringErrorResult<T>::value, T
+>::type;
+
+template <typename T>
+FailWithStringErrorResult<T>
+failWithStringError(
+	T failResult,
+	const sl::StringRef& string
+) {
+	setError(string);
+	return failResult;
+}
+
+inline
+bool
+failWithStringError(const sl::StringRef& string) {
+	return failWithStringError<bool>(false, string);
+}
+
+template <typename T>
+FailWithStringErrorResult<T>
+failWithStringError_va(
+	T failResult,
+	const char* formatString,
+	axl_va_list va
+) {
+	setFormatStringError_va(formatString, va);
+	return failResult;
+}
+
+inline
+bool
+failWithStringError_va(
+	const char* formatString,
+	axl_va_list va
+) {
+	return failWithStringError_va<bool>(false, formatString, va);
+}
+
+template <typename T>
+FailWithStringErrorResult<T>
+failWithStringError(
+	T failResult,
+	const char* formatString,
+	...
+) {
+	AXL_VA_DECL(va, formatString);
+	return failWithStringError_va(failResult, formatString, va);
+}
+
+inline
+bool
+failWithStringError(
+	const char* formatString,
+	...
+) {
+	AXL_VA_DECL(va, formatString);
+	return failWithStringError_va(formatString, va);
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 inline
 size_t
