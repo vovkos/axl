@@ -125,11 +125,9 @@ Error::createStringError(
 	error->m_guid = guid;
 	error->m_code = code;
 
-	char* dst = (char*)(error + 1);
-
-	memcpy(dst, string.cp(), length);
-	dst[length] = 0;
-
+	char* p = (char*)(error + 1);
+	memcpy(p, string.cp(), length);
+	p[length] = 0;
 	return size;
 }
 
@@ -138,10 +136,19 @@ Error::formatStringError_va(
 	const char* formatString,
 	axl_va_list va
 ) {
-	char buffer[256];
-	sl::String string(rc::BufKind_Stack, buffer, sizeof(buffer));
-	string.format_va(formatString, va);
-	return createStringError(string);
+	size_t length = sl::StringDetails::calcFormatLength_va(formatString, va);
+	size_t size = sizeof(ErrorHdr) + length + 1;
+
+	ErrorHdr* error = createBuffer(size);
+	if (!error)
+		return -1;
+
+	error->m_size = (uint32_t)size;
+	error->m_guid = g_stdErrorGuid;
+	error->m_code = StdErrorCode_String;
+
+	sl::StringDetails::format_va((char*)(error + 1), length + 1, formatString, va);
+	return size;
 }
 
 //..............................................................................
