@@ -82,33 +82,6 @@ Error::createSimpleError(
 }
 
 size_t
-Error::format_va(
-	const sl::Guid& guid,
-	uint_t code,
-	const char* formatString,
-	axl_va_list va
-) {
-	sl::PackerSeq packer;
-	packer.format(formatString);
-
-	size_t packSize;
-	packer.pack_va(NULL, &packSize, va);
-
-	size_t size = sizeof(ErrorHdr) + packSize;
-
-	createBuffer(size);
-	if (!m_p)
-		return -1;
-
-	m_p->m_size = (uint32_t)size;
-	m_p->m_guid = guid;
-	m_p->m_code = code;
-
-	packer.pack_va(m_p + 1, &packSize, va);
-	return size;
-}
-
-size_t
 Error::createStringError(
 	const sl::Guid& guid,
 	uint_t code,
@@ -172,30 +145,6 @@ pushError(const ErrorRef& error) {
 }
 
 //..............................................................................
-
-size_t
-setFormatError_va(
-	const sl::Guid& guid,
-	uint_t code,
-	const char* formatString,
-	axl_va_list va
-) {
-	Error error;
-	size_t result = error.format_va(guid, code, formatString, va);
-	return result != -1 ? setError(error) : -1;
-}
-
-size_t
-pushFormatError_va(
-	const sl::Guid& guid,
-	uint_t code,
-	const char* formatString,
-	axl_va_list va
-) {
-	Error error;
-	size_t result = error.format_va(guid, code, formatString, va);
-	return result != -1 ? pushError(error) : -1;
-}
 
 size_t
 setError(const sl::StringRef& string) {

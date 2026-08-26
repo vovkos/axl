@@ -33,17 +33,6 @@ run() {
 
 	sl::String s = enc::HexEncoding::encode(error.cp(), error.getSize());
 	printf("error: %s\n", s.sz());
-
-	err::Error error2;
-	error2.format(
-		sl::g_nullGuid,
-		12345,
-		"%s %d %s %d",
-		"hui", 0xdead, "govno", 0xbeaf
-	);
-
-	s = enc::HexEncoding::encode(error.cp(), error.getSize());
-	printf("error: %s\n", s.sz());
 }
 
 //..............................................................................

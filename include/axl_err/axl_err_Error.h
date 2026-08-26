@@ -300,53 +300,6 @@ public:
 		return pushPack_va<Pack>(guid, code, va);
 	}
 
-	// format
-
-	size_t
-	format_va(
-		const sl::Guid& guid,
-		uint_t code,
-		const char* formatString,
-		axl_va_list va
-	);
-
-	size_t
-	format(
-		const sl::Guid& guid,
-		uint_t code,
-		const char* formatString,
-		...
-	) {
-		AXL_VA_DECL(va, formatString);
-		return format_va(guid, code, formatString, va);
-	}
-
-	size_t
-	pushFormat_va(
-		const sl::Guid& guid,
-		uint_t code,
-		const char* formatString,
-		axl_va_list va
-	) {
-		if (!m_p)
-			return format_va(guid, code, formatString, va);
-
-		Error error;
-		error.format_va(guid, code, formatString, va);
-		return push(error);
-	}
-
-	size_t
-	pushFormat(
-		const sl::Guid& guid,
-		uint_t code,
-		const char* formatString,
-		...
-	) {
-		AXL_VA_DECL(va, formatString);
-		return pushFormat_va(guid, code, formatString, va);
-	}
-
 	// system error (push is irrelevant for system errors)
 
 	size_t
@@ -537,50 +490,6 @@ pushPackError(
 ) {
 	AXL_VA_DECL(va, code);
 	return pushPackError_va<Pack>(guid, code, va);
-}
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-// format
-
-size_t
-setFormatError_va(
-	const sl::Guid& guid,
-	uint_t code,
-	const char* formatString,
-	axl_va_list va
-);
-
-inline
-size_t
-setFormatError(
-	const sl::Guid& guid,
-	uint_t code,
-	const char* formatString,
-	...
-) {
-	AXL_VA_DECL(va, formatString);
-	return setFormatError_va(guid, code, formatString, va);
-}
-
-size_t
-pushFormatError_va(
-	const sl::Guid& guid,
-	uint_t code,
-	const char* formatString,
-	axl_va_list va
-);
-
-inline
-size_t
-pushFormatError(
-	const sl::Guid& guid,
-	uint_t code,
-	const char* formatString,
-	...
-) {
-	AXL_VA_DECL(va, formatString);
-	return pushFormatError_va(guid, code, formatString, va);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
