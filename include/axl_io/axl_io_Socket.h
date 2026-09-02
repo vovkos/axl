@@ -91,11 +91,6 @@ public:
 	}
 
 	bool
-	bind(const SockAddr& addr) {
-		return m_socket.bind(addr);
-	}
-
-	bool
 	getAddress(SockAddr* addr) {
 		return m_socket.getAddress(addr);
 	}
@@ -142,11 +137,6 @@ public:
 	}
 
 	bool
-	connect(const SockAddr& addr) {
-		return m_socket.connect(addr);
-	}
-
-	bool
 	shutdown(SocketShutdownKind shutdownKind = SocketShutdownKind_All) {
 		return m_socket.shutdown(shutdownKind);
 	}
@@ -172,15 +162,6 @@ public:
 		void* p,
 		size_t size,
 		const sockaddr* addr
-	) {
-		return m_socket.sendTo(p, size, addr);
-	}
-
-	size_t
-	sendTo(
-		void* p,
-		size_t size,
-		const SockAddr& addr
 	) {
 		return m_socket.sendTo(p, size, addr);
 	}
