@@ -171,6 +171,13 @@ if(BUILD_AXL_XML)
 	list(APPEND OPT_LIB_LIST axl_xml expat)
 endif()
 
+if(BUILD_AXL_JSON)
+	include_directories(${YAJL_INC_DIR})
+	link_directories(${YAJL_LIB_DIR})
+	add_definitions(-D_AXL_JSON=1)
+	list(APPEND OPT_LIB_LIST axl_json ${YAJL_LIB_NAME})
+endif()
+
 if(BUILD_AXL_SPY)
 	add_definitions(-D_AXL_SPY=1)
 	list(APPEND OPT_LIB_LIST axl_spy)
@@ -326,6 +333,10 @@ if(WIN32)
 
 	if(BUILD_AXL_XML AND EXPAT_DLL_DIR)
 		list(APPEND _DLL_LIST ${EXPAT_DLL_DIR}/expat.dll)
+	endif()
+
+	if(BUILD_AXL_JSON AND YAJL_DLL_DIR)
+		list(APPEND _DLL_LIST ${YAJL_DLL_DIR}/yajl.dll)
 	endif()
 
 	axl_copy_dlls_for_target(axl_test_con ${_DLL_LIST})

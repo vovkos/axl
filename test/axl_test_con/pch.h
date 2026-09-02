@@ -68,6 +68,10 @@
 #	include "axl_xml_ExpatParser.h"
 #endif
 
+#ifdef _AXL_JSON
+#	include "axl_json_YajlParser.h"
+#endif
+
 #ifdef _AXL_LUA
 #	include "axl_lua_LuaState.h"
 #endif

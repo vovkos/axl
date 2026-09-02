@@ -4461,6 +4461,168 @@ testXml() {
 
 #endif
 
+//..............................................................................
+
+#ifdef _AXL_JSON
+
+class MyJsonParser: public json::YajlParser<MyJsonParser> {
+protected:
+	size_t m_indent;
+
+public:
+	MyJsonParser() {
+		m_indent = 0;
+	}
+
+	bool
+	onNull() {
+		printIndent();
+		printf("null\n");
+		return true;
+	}
+
+	bool
+	onBoolean(bool value) {
+		printIndent();
+		printf("%s\n", value ? "true" : "false");
+		return true;
+	}
+
+	bool
+	onInteger(int64_t value) {
+		printIndent();
+		printf("%lld\n", value);
+		return true;
+	}
+
+	bool
+	onDouble(double value) {
+		printIndent();
+		printf("%f\n", value);
+		return true;
+	}
+
+	bool
+	onString(const sl::StringRef& value) {
+		printIndent();
+		printf("\"%s\"\n", value.sz());
+		return true;
+	}
+
+	bool
+	onMapKey(const sl::StringRef& key) {
+		printIndent();
+		printf("%s:\n", key.sz());
+		return true;
+	}
+
+	bool
+	onStartMap() {
+		printIndent();
+		printf("{\n");
+		m_indent++;
+		return true;
+	}
+
+	bool
+	onEndMap() {
+		m_indent--;
+		printIndent();
+		printf("}\n");
+		return true;
+	}
+
+	bool
+	onStartArray() {
+		printIndent();
+		printf("[\n");
+		m_indent++;
+		return true;
+	}
+
+	bool
+	onEndArray() {
+		m_indent--;
+		printIndent();
+		printf("]\n");
+		return true;
+	}
+
+protected:
+	void
+	printIndent() {
+		for (size_t i = 0; i < m_indent; i++)
+			printf("  ");
+	}
+};
+
+void
+testJson() {
+	static const char source[] =
+		"{\n"
+		"    \"name\":    \"IO Ninja\",\n"
+		"    \"version\": 5.3,\n"
+		"    \"plugins\": [ \"serial\", \"tcp\", \"pcap\" ],\n"
+		"    \"tap\": {\n"
+		"        \"kind\":     \"serial-tap-pro\",\n"
+		"        \"channels\": 2,\n"
+		"        \"active\":   true,\n"
+		"        \"owner\":    null\n"
+		"    }\n"
+		"}\n";
+
+	static const char badSource[] = "{ \"a\": 1, \"b\": tru }";
+
+	printf("--- whole document ---\n\n");
+
+	MyJsonParser parser;
+	bool result = parser.parse(source, lengthof(source));
+	if (!result) {
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	printf("\n--- 5-byte chunks ---\n\n");
+
+	result = parser.create();
+	if (!result) {
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	for (size_t offset = 0; offset < lengthof(source); offset += 5) {
+		size_t chunkSize = AXL_MIN(5, lengthof(source) - offset);
+		result = parser.parseChunk(source + offset, chunkSize);
+		if (!result) {
+			printf("error: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+	}
+
+	result = parser.parseEof();
+	if (!result) {
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	printf("\n--- malformed document ---\n\n");
+
+	result =
+		parser.create() &&
+		parser.parse(badSource, lengthof(badSource));
+
+	if (result) {
+		printf("error: unexpected success\n");
+		return;
+	}
+
+	printf("error: %s\n", err::getLastErrorDescription().sz());
+	printf("offset: %zd\n", parser.getConsumedByteCount());
+	printf("verbose:\n%s\n", parser.getLastErrorString(badSource, lengthof(badSource), true).sz());
+}
+
+#endif
+
 void
 testFileEnum() {
 	io::FileEnumerator fileEnum;
@@ -10469,6 +10631,10 @@ main(
 
 #if (_AXL_DB)
 	testMySql();
+#endif
+
+#if (_AXL_JSON)
+	testJson();
 #endif
 
 	return 0;

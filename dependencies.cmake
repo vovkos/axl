@@ -39,6 +39,9 @@ set(
 	OPENSSL_LIB_DIR
 	EXPAT_INC_DIR
 	EXPAT_LIB_DIR
+	YAJL_INC_DIR
+	YAJL_LIB_DIR
+	YAJL_LIB_NAME
 	QT_CMAKE_DIR
 	QT_DLL_DIR
 	RE2S_INC_DIR
@@ -65,6 +68,7 @@ set(
 		openssl
 		libmysql
 		expat
+		yajl
 		re2s
 		qt
 		ragel

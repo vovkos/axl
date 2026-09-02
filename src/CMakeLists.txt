@@ -65,6 +65,22 @@ endif()
 
 #...............................................................................
 
+if(YAJL_FOUND)
+	option(
+		BUILD_AXL_JSON
+		"Build axl_json library (YAJL JSON Parser wrappers)"
+		ON
+	)
+else()
+	unset(BUILD_AXL_JSON CACHE)
+endif()
+
+if(BUILD_AXL_JSON)
+	add_subdirectory(axl_json)
+endif()
+
+#...............................................................................
+
 if(RAGEL_FOUND)
 	option(
 		BUILD_AXL_RE
