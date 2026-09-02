@@ -20,63 +20,16 @@ namespace db {
 
 //..............................................................................
 
-// {F8E8B8D2-0303-4ECF-BD0E-4130616457C9}
-AXL_SL_DEFINE_GUID(
-	g_mySqlErrorGuid,
-	0xf8e8b8d2, 0x0303, 0x4ecf, 0xbd, 0xe, 0x41, 0x30, 0x61, 0x64, 0x57, 0xc9
-);
-
-//..............................................................................
-
-class MySqlErrorProvider: public err::ErrorProvider {
-public:
-	virtual
-	sl::StringRef
-	getErrorDescription(const err::ErrorRef& error);
-};
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-inline
-void
-registerMySqlErrorProvider() {
-	err::getErrorMgr()->registerProvider(
-		g_mySqlErrorGuid,
-		sl::getSimpleSingleton<MySqlErrorProvider>()
-	);
-}
-
-//..............................................................................
-
 // libmariadb only reports error strings (there is no client-side code-to-string
-// table), hence, the description is carried inside the error payload
-
-class MySqlError: public err::Error {
-public:
-	MySqlError() {}
-
-	MySqlError(
-		uint_t code,
-		const sl::StringRef& description
-	) {
-		create(code, description);
-	}
-
-	size_t
-	create(
-		uint_t code,
-		const sl::StringRef& description
-	) {
-		return createStringError(g_mySqlErrorGuid, code, description);
-	}
-};
-
-//..............................................................................
+// table); the numeric code stays available via MySql::getErrno/MySqlStmt::getErrno
 
 inline
 size_t
 setMySqlError(MYSQL* mysql) {
-	return err::setError(MySqlError(::mysql_errno(mysql), ::mysql_error(mysql)));
+	const char* error = ::mysql_error(mysql);
+	return *error ?
+		err::setError(error) :
+		err::setFormatStringError("MySQL error #%d", ::mysql_errno(mysql));
 }
 
 inline
@@ -103,7 +56,10 @@ completeWithLastMySqlError(
 inline
 size_t
 setMySqlStmtError(MYSQL_STMT* stmt) {
-	return err::setError(MySqlError(::mysql_stmt_errno(stmt), ::mysql_stmt_error(stmt)));
+	const char* error = ::mysql_stmt_error(stmt);
+	return *error ?
+		err::setError(error) :
+		err::setFormatStringError("MySQL error #%d", ::mysql_stmt_errno(stmt));
 }
 
 inline

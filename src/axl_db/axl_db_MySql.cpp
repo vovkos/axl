@@ -34,27 +34,8 @@ initMySqlLib(
 		}
 	};
 
-	registerMySqlErrorProvider();
 	sl::getSingleton<MySqlServerEnd>();
 	return true;
-}
-
-//..............................................................................
-
-sl::StringRef
-MySqlErrorProvider::getErrorDescription(const err::ErrorRef& error) {
-	if (error->m_size < sizeof(err::ErrorHdr))
-		return sl::StringRef();
-
-	size_t stringSize = error->m_size - sizeof(err::ErrorHdr);
-	if (stringSize < 2)
-		return sl::formatString("MySQL error #%d", error->m_code);
-
-	const char* p = (const char*)(error + 1);
-
-	return !p[stringSize - 1] ?
-		sl::StringRef(error.getHdr(), p, stringSize - 1, true) :
-		sl::StringRef(error.getHdr(), p, stringSize, false);
 }
 
 //..............................................................................
