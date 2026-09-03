@@ -114,6 +114,10 @@
 #	include "axl_io_Pcap.h"
 #endif
 
+#ifdef _AXL_IO_MDNS
+#	include "axl_io_MdnsSocket.h"
+#endif
+
 #ifdef _AXL_CRY
 #	include "axl_cry_BigNum.h"
 #	include "axl_cry_Bio.h"

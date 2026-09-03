@@ -215,6 +215,18 @@ if(BUILD_AXL_IO_SSL)
 	add_subdirectory(axl_io_ssl)
 endif()
 
+#. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+option(
+	BUILD_AXL_IO_MDNS
+	"Build axl_io_mdns library (mDNS/DNS-SD wrappers)"
+	ON
+)
+
+if(BUILD_AXL_IO_MDNS)
+	add_subdirectory(axl_io_mdns)
+endif()
+
 #...............................................................................
 
 if(LIBMYSQL_FOUND)

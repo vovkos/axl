@@ -10602,6 +10602,372 @@ testMySql() {
 
 #endif
 
+#if (_AXL_IO_MDNS)
+
+//..............................................................................
+
+// RFC 6762 (17): an mDNS packet must not exceed 9000 bytes, even fragmented
+
+enum {
+	MdnsConst_RecvBufferSize = 9000
+};
+
+const char*
+getMdnsRecordTypeString(uint_t type) {
+	// DNS record type codes are sparse, hence, a switch rather than a table
+
+	switch (type) {
+	case MDNS_RECORDTYPE_A:
+		return "A";
+
+	case MDNS_RECORDTYPE_PTR:
+		return "PTR";
+
+	case MDNS_RECORDTYPE_TXT:
+		return "TXT";
+
+	case MDNS_RECORDTYPE_AAAA:
+		return "AAAA";
+
+	case MDNS_RECORDTYPE_SRV:
+		return "SRV";
+
+	case MDNS_RECORDTYPE_ANY:
+		return "ANY";
+
+	default:
+		return "unknown-record-type";
+	}
+}
+
+const char*
+getMdnsEntryTypeString(mdns_entry_type_t type) {
+	static const char* stringTable[MDNS_ENTRYTYPE_ADDITIONAL + 1] = {
+		"question",   // MDNS_ENTRYTYPE_QUESTION,
+		"answer",     // MDNS_ENTRYTYPE_ANSWER,
+		"authority",  // MDNS_ENTRYTYPE_AUTHORITY,
+		"additional", // MDNS_ENTRYTYPE_ADDITIONAL,
+	};
+
+	return (size_t)type < countof(stringTable) ?
+		stringTable[type] :
+		"unknown-entry-type";
+}
+
+// mdns switches the socket to non-blocking mode, so poll for readiness
+
+bool
+waitMdnsSocket(
+	const io::Socket& socket,
+	uint64_t endTimestamp
+) {
+	uint64_t timestamp = sys::getTimestamp();
+	if (timestamp >= endTimestamp)
+		return false;
+
+	uint64_t delta = endTimestamp - timestamp; // in 100-nsec intervals
+
+	timeval tval;
+	tval.tv_sec = (long)(delta / 10000000);
+	tval.tv_usec = (long)(delta % 10000000 / 10);
+
+#if (_AXL_OS_WIN)
+	SOCKET fd = socket.m_socket;
+#else
+	int fd = socket.m_socket;
+#endif
+
+	fd_set readSet;
+	FD_ZERO(&readSet);
+	FD_SET(fd, &readSet);
+
+	int result = ::select((int)fd + 1, &readSet, NULL, NULL, &tval);
+	return result > 0;
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+struct MdnsCallbackContext {
+	io::SockAddr m_addr;
+	sl::StringHashTable<bool>* m_serviceMap;
+};
+
+int
+mdnsRecordCallback(
+	mdns_entry_type_t entryType,
+	uint16_t queryId,
+	uint16_t recordType,
+	uint16_t recordClass,
+	uint32_t ttl,
+	const void* packet,
+	size_t packetSize,
+	size_t nameOffset,
+	size_t nameLength,
+	size_t dataOffset,
+	size_t dataLength,
+	void* context
+) {
+	const MdnsCallbackContext* ctx = (const MdnsCallbackContext*)context;
+	sl::StringHashTable<bool>* serviceMap = ctx->m_serviceMap;
+
+	io::MdnsRecordParser parser;
+	parser.setup(
+		packet,
+		packetSize,
+		nameOffset,
+		nameLength,
+		dataOffset,
+		dataLength
+	);
+
+	printf(
+		"%s %s %s %s ttl: %d%s\n",
+		ctx->m_addr.getString().sz(),
+		getMdnsEntryTypeString(entryType),
+		getMdnsRecordTypeString(recordType),
+		parser.getName().sz(),
+		ttl,
+		(recordClass & MDNS_CACHE_FLUSH) ? " (cache-flush)" : ""
+	);
+
+	switch (recordType) {
+	case MDNS_RECORDTYPE_PTR: {
+		sl::String name = parser.parsePtr();
+		printf("    -> %s\n", name.sz());
+		if (serviceMap)
+			serviceMap->add(name, true);
+		break;
+		}
+
+	case MDNS_RECORDTYPE_SRV: {
+		io::MdnsRecordSrv srv;
+		if (parser.parseSrv(&srv))
+			printf(
+				"    -> %s:%d (priority: %d, weight: %d)\n",
+				srv.m_name.sz(),
+				srv.port,
+				srv.priority,
+				srv.weight
+			);
+		break;
+		}
+
+	case MDNS_RECORDTYPE_A: {
+		io::SockAddr addr;
+		if (parser.parseA(&addr))
+			printf("    -> %s\n", addr.getString().sz());
+		break;
+		}
+
+	case MDNS_RECORDTYPE_AAAA: {
+		io::SockAddr addr;
+		if (parser.parseAaaa(&addr))
+			printf("    -> %s\n", addr.getString().sz());
+		break;
+		}
+
+	case MDNS_RECORDTYPE_TXT: {
+		sl::Array<mdns_record_txt_t> txtArray;
+		size_t count = parser.parseTxt(&txtArray);
+		if (count == -1)
+			break;
+
+		sl::String key;
+		sl::String value;
+
+		for (size_t i = 0; i < count; i++) {
+			io::mdns2Axl(&key, txtArray[i].key);
+			io::mdns2Axl(&value, txtArray[i].value);
+			printf("    -> %s = %s\n", key.sz(), value.sz());
+		}
+
+		break;
+		}
+
+	default:
+		break;
+	}
+
+	return 0;
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+enum MdnsPassKind {
+	MdnsPassKind_Discovery,
+	MdnsPassKind_Query,
+};
+
+void
+testMdnsPass(
+	io::Socket* socket,
+	MdnsPassKind passKind,
+	sl::StringHashTable<bool>* serviceMap,
+	uint_t queryId,
+	uint_t timeout // in seconds
+) {
+	uint64_t endTimestamp = sys::getTimestamp() + (uint64_t)timeout * 10000000;
+	size_t recordCount = 0;
+	static char buffer[MdnsConst_RecvBufferSize];
+
+	MdnsCallbackContext context;
+	context.m_serviceMap = serviceMap;
+
+	// io::Socket takes the datagram off the wire, mdns only parses it
+
+	while (waitMdnsSocket(*socket, endTimestamp)) {
+		size_t size = socket->recvFrom(buffer, sizeof(buffer), &context.m_addr);
+		if (size == -1)
+			break;
+
+
+		recordCount += passKind == MdnsPassKind_Discovery ?
+			::mdns_discovery_parse(
+				buffer,
+				size,
+				mdnsRecordCallback,
+				&context
+			) :
+			::mdns_query_parse(
+				buffer,
+				size,
+				mdnsRecordCallback,
+				&context,
+				(int)queryId
+			);
+	}
+
+	printf("(%d record(s))\n", (int)recordCount);
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// build the question with mdns, put it on the wire with io::Socket
+
+int
+sendMdnsQuery(
+	io::Socket* socket,
+	const sl::StringRef& name,
+	uint_t queryId
+) {
+	static char buffer[MdnsConst_RecvBufferSize];
+
+	int size = ::mdns_query_build(
+		MDNS_RECORDTYPE_PTR,
+		name.cp(),
+		name.getLength(),
+		buffer,
+		sizeof(buffer),
+		(uint16_t)queryId,
+		MDNS_CLASS_IN | MDNS_UNICAST_RESPONSE
+	);
+
+	if (size < 0)
+		return err::fail<int>(-1, "cannot build mDNS query");
+
+	io::SockAddr groupAddr;
+	groupAddr.setup_ip4(io::g_mdnsGroupIp4, MDNS_PORT);
+	return socket->sendTo(buffer, size, groupAddr) != -1 ? (int)queryId : -1;
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+void
+testMdnsAdapter(const sockaddr* ifaceAddr) {
+	io::Socket socket;
+
+	// no bind, no group membership -- a one-shot querier collects unicast
+	// replies on the ephemeral port sendTo assigns (RFC 6762, 6.7)
+
+	bool result =
+		socket.open(ifaceAddr->sa_family, SOCK_DGRAM, IPPROTO_UDP) &&
+		io::setupMdnsSocketOptions(&socket, ifaceAddr) &&
+		socket.setBlockingMode(false);
+
+	if (!result) {
+		printf("cannot open mDNS socket: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	sl::StringHashTable<bool> serviceMap;
+
+	// 0) Rpi enumeration
+
+	int queryId = sendMdnsQuery(&socket, "_workstation._tcp.local", 0);
+	if (queryId == -1) {
+		printf("cannot send query: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	testMdnsPass(&socket, MdnsPassKind_Query, NULL, queryId, 3);
+
+	// 1) DNS-SD service type enumeration
+
+	printf("-- discovery --\n");
+
+	if (sendMdnsQuery(&socket, "_services._dns-sd._udp.local.", 0) == -1) {
+		printf("cannot send discovery: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	testMdnsPass(&socket, MdnsPassKind_Discovery, &serviceMap, 0, 3);
+
+	// 2) browse everything that turned up -- unlike discovery, the generic query
+	// path also delivers the authority/additional records, so this is where
+	// SRV/A/AAAA/TXT parsing gets exercised
+
+	sl::StringHashTableIterator<bool> it = serviceMap.getHead();
+	for (; it; it++) {
+		printf("\n-- PTR query: %s --\n", it->getKey().sz());
+		int queryId = sendMdnsQuery(&socket, it->getKey(), 0);
+		if (queryId == -1) {
+			printf("cannot send query: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		testMdnsPass(&socket, MdnsPassKind_Query, NULL, queryId, 3);
+	}
+
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// a query only reaches the segment behind the interface it goes out of, so a
+// multi-homed host needs one socket per adapter -- the routing table would
+// otherwise pick just one (often a virtual switch with nothing on it)
+
+void
+testMdns() {
+	sl::List<io::NetworkAdapterDesc> adapterList;
+	io::enumerateNetworkAdapters(&adapterList);
+
+	sl::Iterator<io::NetworkAdapterDesc> adapterIt = adapterList.getHead();
+	for (; adapterIt; adapterIt++) {
+		const io::NetworkAdapterDesc* adapter = *adapterIt;
+
+		if (adapter->m_type == io::NetworkAdapterType_Loopback ||
+			!(adapter->m_flags & io::NetworkAdapterFlag_Multicast))
+			continue;
+
+		sl::ConstIterator<io::NetworkAdapterAddress> addressIt = adapter->m_addressList.getHead();
+		for (; addressIt; addressIt++) {
+			const io::SockAddr* address = &addressIt->m_address;
+			if (address->m_addr.sa_family != AF_INET) // IPv6 needs an interface index, not an address
+				continue;
+
+			printf(
+				"\n======== %s [%s] ========\n\n",
+				adapter->m_description.sz(),
+				address->getString().sz()
+			);
+
+			testMdnsAdapter(&address->m_addr);
+		}
+	}
+}
+
+#endif
+
 #if (_AXL_OS_WIN)
 int
 wmain(
@@ -10629,12 +10995,8 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-#if (_AXL_DB)
-	testMySql();
-#endif
-
-#if (_AXL_JSON)
-	testJson();
+#if (_AXL_IO_MDNS)
+	testMdns();
 #endif
 
 	return 0;

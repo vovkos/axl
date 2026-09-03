@@ -139,6 +139,11 @@ if(BUILD_AXL_IO_PCAP)
 	list(APPEND OPT_LIB_LIST axl_io_pcap ${PCAP_LIB_NAME})
 endif()
 
+if(BUILD_AXL_IO_MDNS)
+	add_definitions(-D_AXL_IO_MDNS=1)
+	list(APPEND OPT_LIB_LIST axl_io_mdns)
+endif()
+
 if(BUILD_AXL_CRY)
 	include_directories(${OPENSSL_INC_DIR})
 	link_directories(${OPENSSL_LIB_DIR})
