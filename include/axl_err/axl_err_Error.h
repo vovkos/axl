@@ -110,7 +110,7 @@ public:
 
 	ErrorRef(uint_t code);
 	ErrorRef(const sl::StringRef& string);
-	ErrorRef(const char* string); // for overload resolving
+	ErrorRef(const char* string);
 
 	ErrorRef(
 		const sl::Guid& guid,
@@ -173,22 +173,22 @@ public:
 	}
 
 	Error(uint_t code) {
-		createSystemError(code);
+		create(code);
 	}
 
 	Error(
 		const sl::Guid& guid,
 		uint_t code
 	) {
-		createSimpleError(guid, code);
+		create(guid, code);
 	}
 
 	Error(const sl::StringRef& string) {
-		createStringError(string);
+		create(string);
 	}
 
-	Error(const char* string) { // for overload resolving
-		createStringError(string);
+	Error(const char* string) {
+		create(string);
 	}
 
 	Error(
@@ -231,14 +231,111 @@ public:
 
 	Error&
 	operator = (uint_t code) {
-		createSystemError(code);
+		create(code);
 		return *this;
+	}
+
+	Error&
+	operator = (const sl::StringRef& string) {
+		create(string);
+		return *this;
+	}
+
+	Error&
+	operator = (const char* string) {
+		create(string);
+		return *this;
+	}
+
+	// generic errors
+
+	size_t
+	create(
+		const sl::Guid& guid,
+		uint_t code
+	);
+
+	size_t
+	create(uint_t code) {
+		return create(g_systemErrorGuid, code);
 	}
 
 	size_t
 	push(const ErrorRef& error);
 
-	// pack
+	size_t
+	push(
+		const sl::Guid& guid,
+		uint_t code
+	);
+
+	// string errors
+
+	size_t
+	create(
+		const sl::Guid& guid,
+		uint_t code,
+		const sl::StringRef& string
+	);
+
+	size_t
+	create(const sl::StringRef& string) {
+		return create(g_stdErrorGuid, StdErrorCode_String, string);
+	}
+
+	size_t
+	create(const char* string) {
+		return create(g_stdErrorGuid, StdErrorCode_String, string);
+	}
+
+	size_t
+	format_va(
+		const char* formatString,
+		axl_va_list va
+	);
+
+	size_t
+	format(
+		const char* formatString,
+		...
+	) {
+		AXL_VA_DECL(va, formatString);
+		return format_va(formatString, va);
+	}
+
+	size_t
+	push(
+		const sl::Guid& guid,
+		uint_t code,
+		const sl::StringRef& string
+	);
+
+	size_t
+	push(const sl::StringRef& string) {
+		return push(g_stdErrorGuid, StdErrorCode_String, string);
+	}
+
+	size_t
+	push(const char* string) {
+		return push(g_stdErrorGuid, StdErrorCode_String, string);
+	}
+
+	size_t
+	pushFormat_va(
+		const char* formatString,
+		axl_va_list va
+	);
+
+	size_t
+	pushFormat(
+		const char* formatString,
+		...
+	) {
+		AXL_VA_DECL(va, formatString);
+		return pushFormat_va(formatString, va);
+	}
+
+	// error packing
 
 	template <typename Pack>
 	size_t
@@ -246,22 +343,7 @@ public:
 		const sl::Guid& guid,
 		uint_t code,
 		axl_va_list va
-	) {
-		size_t packSize;
-		Pack()(NULL, &packSize, va);
-
-		size_t size = sizeof(ErrorHdr) + packSize;
-		createBuffer(size);
-		if (!m_p)
-			return -1;
-
-		m_p->m_size = size;
-		m_p->m_guid = guid;
-		m_p->m_code = code;
-
-		Pack()(m_p + 1, &packSize, va);
-		return size;
-	}
+	);
 
 	template <typename Pack>
 	size_t
@@ -280,14 +362,7 @@ public:
 		const sl::Guid& guid,
 		uint_t code,
 		axl_va_list va
-	) {
-		if (!m_p)
-			return pack_va<Pack>(guid, code, va);
-
-		Error error;
-		error.pack_va<Pack>(guid, code, va);
-		return push(error);
-	}
+	);
 
 	template <typename Pack>
 	size_t
@@ -299,96 +374,90 @@ public:
 		AXL_VA_DECL(va, code);
 		return pushPack_va<Pack>(guid, code, va);
 	}
-
-	// system error (push is irrelevant for system errors)
-
-	size_t
-	createSystemError(uint_t code) {
-		return createSimpleError(g_systemErrorGuid, code);
-	}
-
-	// simple error
-
-	size_t
-	createSimpleError(
-		const sl::Guid& guid,
-		uint_t code
-	);
-
-	size_t
-	pushSimpleError(
-		const sl::Guid& guid,
-		uint_t code
-	) {
-		if (!m_p)
-			return createSimpleError(guid, code);
-
-		Error error;
-		error.createSimpleError(guid, code);
-		return push(error);
-	}
-
-	// string error
-
-	size_t
-	createStringError(
-		const sl::Guid& guid,
-		uint_t code,
-		const sl::StringRef& string
-	);
-
-	size_t
-	createStringError(const sl::StringRef& string) {
-		return createStringError(g_stdErrorGuid, StdErrorCode_String, string);
-	}
-
-	size_t
-	pushStringError(const sl::StringRef& string) {
-		if (!m_p)
-			return createStringError(string);
-
-		Error error;
-		error.createStringError(string);
-		return push(error);
-	}
-
-	size_t
-	formatStringError_va(
-		const char* formatString,
-		axl_va_list va
-	);
-
-	size_t
-	formatStringError(
-		const char* formatString,
-		...
-	) {
-		AXL_VA_DECL(va, formatString);
-		return formatStringError_va(formatString, va);
-	}
-
-	size_t
-	pushFormatStringError_va(
-		const char* formatString,
-		axl_va_list va
-	) {
-		if (!m_p)
-			return formatStringError_va(formatString, va);
-
-		Error error;
-		error.formatStringError_va(formatString, va);
-		return push(error);
-	}
-
-	size_t
-	pushFormatStringError(
-		const char* formatString,
-		...
-	) {
-		AXL_VA_DECL(va, formatString);
-		return pushFormatStringError_va(formatString, va);
-	}
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+size_t
+Error::push(
+	const sl::Guid& guid,
+	uint_t code
+) {
+	if (!m_p)
+		return create(guid, code);
+
+	Error error;
+	error.create(guid, code);
+	return push(error);
+}
+
+inline
+size_t
+Error::push(
+	const sl::Guid& guid,
+	uint_t code,
+	const sl::StringRef& string
+) {
+	if (!m_p)
+		return create(guid, code, string);
+
+	Error error;
+	error.create(guid, code, string);
+	return push(error);
+}
+
+inline
+size_t
+Error::pushFormat_va(
+	const char* formatString,
+	axl_va_list va
+) {
+	if (!m_p)
+		return format_va(formatString, va);
+
+	Error error;
+	error.format_va(formatString, va);
+	return push(error);
+}
+
+template <typename Pack>
+size_t
+Error::pack_va(
+	const sl::Guid& guid,
+	uint_t code,
+	axl_va_list va
+) {
+	size_t packSize;
+	Pack()(NULL, &packSize, va);
+
+	size_t size = sizeof(ErrorHdr) + packSize;
+	createBuffer(size);
+	if (!m_p)
+		return -1;
+
+	m_p->m_size = size;
+	m_p->m_guid = guid;
+	m_p->m_code = code;
+
+	Pack()(m_p + 1, &packSize, va);
+	return size;
+}
+
+template <typename Pack>
+size_t
+Error::pushPack_va(
+	const sl::Guid& guid,
+	uint_t code,
+	axl_va_list va
+) {
+	if (!m_p)
+		return pack_va<Pack>(guid, code, va);
+
+	Error error;
+	error.pack_va<Pack>(guid, code, va);
+	return push(error);
+}
 
 //..............................................................................
 
@@ -413,16 +482,10 @@ ErrorRef::ErrorRef(
 
 //..............................................................................
 
-// utility functions
+// error getters
 
 ErrorRef
 getLastError();
-
-size_t
-setError(const ErrorRef& error);
-
-size_t
-pushError(const ErrorRef& error);
 
 inline
 sl::String
@@ -440,6 +503,127 @@ inline
 sl::String
 getLastSystemErrorDescription() {
 	return getLastSystemError().getDescription();
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// simple error
+
+size_t
+setError(const ErrorRef& error);
+
+inline
+size_t
+setError(
+	const sl::Guid& guid,
+	uint_t code
+) {
+	return setError(Error(guid, code));
+}
+
+size_t
+pushError(const ErrorRef& error);
+
+inline
+size_t
+pushError(
+	const sl::Guid& guid,
+	uint_t code
+) {
+	return pushError(Error(guid, code));
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// string error formatting
+
+inline
+Error
+formatError_va(
+	const char* formatString,
+	axl_va_list va
+) {
+	Error error;
+	error.format_va(formatString, va);
+	return error;
+}
+
+inline
+Error
+formatError(
+	const char* formatString,
+	...
+) {
+	AXL_VA_DECL(va, formatString);
+	return formatError_va(formatString, va);
+}
+
+inline
+size_t
+setError(const sl::StringRef& string) {
+	return setError(Error(string));
+}
+
+inline
+size_t
+setError(const char* string) {
+	return setError(Error(string));
+}
+
+inline
+size_t
+setError_va(
+	const char* formatString,
+	axl_va_list va
+) {
+	return setError(formatError_va(formatString, va));
+}
+
+template <
+	typename A,
+	typename... V
+>
+size_t
+setError(
+	const char* formatString,
+	A arg,
+	V... args
+) {
+	return setError(formatError(formatString, arg, args...));
+}
+
+inline
+size_t
+pushError(const sl::StringRef& string) {
+	return pushError(Error(string));
+}
+
+inline
+size_t
+pushError(const char* string) {
+	return pushError(Error(string));
+}
+
+inline
+size_t
+pushError_va(
+	const char* formatString,
+	axl_va_list va
+) {
+	return pushError(formatError_va(formatString, va));
+}
+
+template <
+	typename A,
+	typename... V
+>
+size_t
+pushError(
+	const char* formatString,
+	A arg,
+	V... args
+) {
+	return pushError(formatError(formatString, arg, args...));
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -494,65 +678,7 @@ pushPackError(
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// simple error
-
-inline
-size_t
-setError(
-	const sl::Guid& guid,
-	uint_t code
-) {
-	return setError(Error(guid, code));
-}
-
-inline
-size_t
-pushError(
-	const sl::Guid& guid,
-	uint_t code
-) {
-	return pushError(Error(guid, code));
-}
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-// string error
-
-size_t
-setFormatStringError_va(
-	const char* formatString,
-	axl_va_list va
-);
-
-inline
-size_t
-setFormatStringError(
-	const char* formatString,
-	...
-) {
-	AXL_VA_DECL(va, formatString);
-	return setFormatStringError_va(formatString, va);
-}
-
-size_t
-pushFormatStringError_va(
-	const char* formatString,
-	axl_va_list va
-);
-
-inline
-size_t
-pushFormatStringError(
-	const char* formatString,
-	...
-) {
-	AXL_VA_DECL(va, formatString);
-	return pushFormatStringError_va(formatString, va);
-}
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-// convenient helpers
+// failing with a one-liner
 
 template <typename T>
 T
@@ -570,81 +696,64 @@ fail(const ErrorRef& error) {
 	return fail<bool>(false, error);
 }
 
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+// format string must be a literal -- that's what distinguishes
+// fail("abc: %s", "def") vs fail(failResult, error)
 
-// we need to correctly select the proper overload in cases like:
-// failWithStringError("abc: %s", "def");
-
-template <typename T>
-struct IsFailWithStringErrorResult: std::integral_constant<
-	bool,
-	!std::is_convertible<T, const sl::StringRef&>::value ||
-	std::is_same<T, std::nullptr_t>::value
-> {};
-
-template <typename T>
-using FailWithStringErrorResult = typename std::enable_if<
-	IsFailWithStringErrorResult<T>::value, T
->::type;
-
-template <typename T>
-FailWithStringErrorResult<T>
-failWithStringError(
-	T failResult,
-	const sl::StringRef& string
+template <
+	size_t N,
+	typename A,
+	typename... V
+>
+bool
+fail(
+	const char (&formatString)[N],
+	A arg,
+	V... args
 ) {
-	setError(string);
+	setError(formatString, arg, args...);
+	return false;
+}
+
+template <
+	typename T,
+	size_t N,
+	typename A,
+	typename... V
+>
+T
+fail(
+	T failResult,
+	const char (&formatString)[N],
+	A arg,
+	V... args
+) {
+	setError(formatString, arg, args...);
+	return failResult;
+}
+
+template <typename T>
+T
+fail_va(
+	T failResult,
+	const char* formatString,
+	axl_va_list va
+) {
+	setError_va(formatString, va);
 	return failResult;
 }
 
 inline
 bool
-failWithStringError(const sl::StringRef& string) {
-	return failWithStringError<bool>(false, string);
-}
-
-template <typename T>
-FailWithStringErrorResult<T>
-failWithStringError_va(
-	T failResult,
+fail_va(
 	const char* formatString,
 	axl_va_list va
 ) {
-	setFormatStringError_va(formatString, va);
-	return failResult;
-}
-
-inline
-bool
-failWithStringError_va(
-	const char* formatString,
-	axl_va_list va
-) {
-	return failWithStringError_va<bool>(false, formatString, va);
-}
-
-template <typename T>
-FailWithStringErrorResult<T>
-failWithStringError(
-	T failResult,
-	const char* formatString,
-	...
-) {
-	AXL_VA_DECL(va, formatString);
-	return failWithStringError_va(failResult, formatString, va);
-}
-
-inline
-bool
-failWithStringError(
-	const char* formatString,
-	...
-) {
-	AXL_VA_DECL(va, formatString);
-	return failWithStringError_va(formatString, va);
+	return fail_va<bool>(false, formatString, va);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// system errors
 
 inline
 size_t

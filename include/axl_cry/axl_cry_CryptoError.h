@@ -57,7 +57,7 @@ public:
 
 	size_t
 	create(ulong_t code) {
-		return createSimpleError(g_cryptoErrorGuid, code);
+		return Error::create(g_cryptoErrorGuid, code);
 	}
 };
 
@@ -90,7 +90,7 @@ public:
 
 	size_t
 	create(long code) {
-		return createSimpleError(g_x509ErrorGuid, (uint_t)code);
+		return Error::create(g_x509ErrorGuid, (uint_t)code);
 	}
 };
 

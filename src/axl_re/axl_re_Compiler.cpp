@@ -62,7 +62,7 @@ bool
 Compiler::expectToken(TokenKind tokenKind) {
 	Token token = getToken();
 	if (token != tokenKind) {
-		err::setFormatStringError("'%c' expected", getTokenString(tokenKind));
+		err::setError("'%s' expected", getTokenString(tokenKind));
 		return false;
 	}
 

@@ -21,7 +21,7 @@ namespace io {
 //..............................................................................
 
 inline
-err::Error
+size_t
 setHidError(hid_device* device = NULL) {
 	return err::setError(sl::String(::hid_error(device)));
 }

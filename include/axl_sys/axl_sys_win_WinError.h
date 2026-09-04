@@ -54,7 +54,7 @@ public:
 
 	size_t
 	create(dword_t code) {
-		return createSimpleError(g_winErrorGuid, code);
+		return Error::create(g_winErrorGuid, code);
 	}
 };
 

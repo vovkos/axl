@@ -65,7 +65,7 @@ public:
 
 	size_t
 	create(OSStatus status) {
-		return createSimpleError(g_errorGuid, status);
+		return err::Error::create(g_errorGuid, status);
 	}
 };
 

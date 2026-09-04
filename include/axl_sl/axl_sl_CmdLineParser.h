@@ -200,7 +200,7 @@ protected:
 		if (!m_valueSwitchKind)
 			return true;
 
-		err::setFormatStringError("missing value for switch '%s'", m_valueSwitchName.sz());
+		err::setError("missing value for switch '%s'", m_valueSwitchName.sz());
 		return false;
 	}
 
@@ -228,7 +228,7 @@ protected:
 
 			const SwitchInfo* switchInfo = SwitchTable::findSwitch(switchName);
 			if (!switchInfo) {
-				err::setFormatStringError("unknown switch --%s", switchName.sz());
+				err::setError("unknown switch --%s", switchName.sz());
 				return false;
 			}
 
@@ -241,7 +241,7 @@ protected:
 		for (size_t i = 1; i < length; i++) {
 			const SwitchInfo* switchInfo = SwitchTable::findSwitch(arg[i]);
 			if (!switchInfo) {
-				err::setFormatStringError("unknown switch -%c", (uchar_t)arg[i]);
+				err::setError("unknown switch -%c", (uchar_t)arg[i]);
 				return false;
 			}
 

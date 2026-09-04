@@ -64,7 +64,7 @@ public:
 
 	size_t
 	create(int code) {
-		return createSimpleError(g_usbErrorGuid, code);
+		return Error::create(g_usbErrorGuid, code);
 	}
 };
 

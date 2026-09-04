@@ -29,7 +29,7 @@ setMySqlError(MYSQL* mysql) {
 	const char* error = ::mysql_error(mysql);
 	return *error ?
 		err::setError(error) :
-		err::setFormatStringError("MySQL error #%d", ::mysql_errno(mysql));
+		err::setError("MySQL error #%d", ::mysql_errno(mysql));
 }
 
 inline
@@ -59,7 +59,7 @@ setMySqlStmtError(MYSQL_STMT* stmt) {
 	const char* error = ::mysql_stmt_error(stmt);
 	return *error ?
 		err::setError(error) :
-		err::setFormatStringError("MySQL error #%d", ::mysql_stmt_errno(stmt));
+		err::setError("MySQL error #%d", ::mysql_stmt_errno(stmt));
 }
 
 inline

@@ -31,7 +31,7 @@ createPyStatusError(const PyStatus& status) {
 		return status.err_msg;
 
 	err::Error error;
-	error.formatStringError("%s: %s", status.func, status.err_msg);
+	error.format("%s: %s", status.func, status.err_msg);
 	return error;
 }
 

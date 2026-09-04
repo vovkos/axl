@@ -54,7 +54,7 @@ public:
 
 	size_t
 	create(int code) {
-		return createSimpleError(g_errnoGuid, code);
+		return Error::create(g_errnoGuid, code);
 	}
 };
 

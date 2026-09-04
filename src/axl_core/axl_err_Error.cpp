@@ -67,7 +67,7 @@ Error::push(const ErrorRef& error) {
 }
 
 size_t
-Error::createSimpleError(
+Error::create(
 	const sl::Guid& guid,
 	uint_t code
 ) {
@@ -82,7 +82,7 @@ Error::createSimpleError(
 }
 
 size_t
-Error::createStringError(
+Error::create(
 	const sl::Guid& guid,
 	uint_t code,
 	const sl::StringRef& string
@@ -105,7 +105,7 @@ Error::createStringError(
 }
 
 size_t
-Error::formatStringError_va(
+Error::format_va(
 	const char* formatString,
 	axl_va_list va
 ) {
@@ -142,42 +142,6 @@ pushError(const ErrorRef& error) {
 	Error stack = getLastError();
 	size_t result = stack.push(error);
 	return result != -1 ? setError(stack) : -1;
-}
-
-//..............................................................................
-
-size_t
-setError(const sl::StringRef& string) {
-	Error error;
-	size_t result = error.createStringError(string);
-	return result != -1 ? setError(error) : -1;
-}
-
-size_t
-pushError(const sl::StringRef& string) {
-	Error error;
-	size_t result = error.createStringError(string);
-	return result != -1 ? pushError(error) : -1;
-}
-
-size_t
-setFormatStringError_va(
-	const char* formatString,
-	axl_va_list va
-) {
-	Error error;
-	size_t result = error.formatStringError_va(formatString, va);
-	return result != -1 ? setError(error) : -1;
-}
-
-size_t
-pushFormatStringError_va(
-	const char* formatString,
-	axl_va_list va
-) {
-	Error error;
-	size_t result = error.formatStringError_va(formatString, va);
-	return result != -1 ? pushError(error) : -1;
 }
 
 //..............................................................................
