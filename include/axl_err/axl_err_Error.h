@@ -321,19 +321,21 @@ public:
 	}
 
 	size_t
-	pushFormat_va(
+	push_va(
 		const char* formatString,
 		axl_va_list va
 	);
 
+	template <
+		typename A,
+		typename... V
+	>
 	size_t
-	pushFormat(
+	push(
 		const char* formatString,
-		...
-	) {
-		AXL_VA_DECL(va, formatString);
-		return pushFormat_va(formatString, va);
-	}
+		A arg,
+		V... args
+	);
 
 	// error packing
 
@@ -409,7 +411,7 @@ Error::push(
 
 inline
 size_t
-Error::pushFormat_va(
+Error::push_va(
 	const char* formatString,
 	axl_va_list va
 ) {
@@ -418,6 +420,24 @@ Error::pushFormat_va(
 
 	Error error;
 	error.format_va(formatString, va);
+	return push(error);
+}
+
+template <
+	typename A,
+	typename... V
+>
+size_t
+Error::push(
+	const char* formatString,
+	A arg,
+	V... args
+) {
+	if (!m_p)
+		return format(formatString, arg, args...);
+
+	Error error;
+	error.format(formatString, arg, args...);
 	return push(error);
 }
 

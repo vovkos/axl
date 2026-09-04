@@ -74,7 +74,7 @@ testCreate() {
 
 //..............................................................................
 
-// Error::push/pushFormat -- a push goes on top of the stack, and descriptions
+// Error::push -- a push goes on top of the stack, and descriptions
 // are joined with ": " from the top down
 
 void
@@ -91,7 +91,7 @@ testPush() {
 	error.push(err::g_stdErrorGuid, err::StdErrorCode_String, "c");
 	TEST_ASSERT(error.getDescription() == "c: b: a");
 
-	error.pushFormat("%d", 42);
+	error.push("%d", 42);
 	TEST_ASSERT(error.getDescription() == "42: c: b: a");
 
 	err::Error nested;
