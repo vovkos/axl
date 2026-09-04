@@ -46,10 +46,7 @@ allocateExecutablePages(size_t size) {
 		0
 	);
 
-	if (!pages)
-		err::setLastSystemError();
-
-	return pages;
+	return pages != MAP_FAILED ? pages : err::failWithLastSystemError<void*>(NULL);
 }
 
 bool
@@ -65,5 +62,5 @@ freeExecutablePages(
 
 //..............................................................................
 
-} // namespace spy
+} // namespace mem
 } // namespace axl
