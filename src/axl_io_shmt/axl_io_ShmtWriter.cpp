@@ -99,8 +99,7 @@ ShmtWriter::write(
 
 		if (m_hdr->m_state & ShmtState_Disconnected) {
 			sys::atomicUnlock(&m_hdr->m_lock);
-			err::setError(err::SystemErrorCode_InvalidDeviceState);
-			return -1;
+			return err::fail<size_t>(-1, err::SystemErrorCode_InvalidDeviceState);
 		}
 	}
 

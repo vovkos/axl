@@ -41,8 +41,7 @@ ShmtReader::read(sl::Array<char>* buffer) {
 			ASSERT(m_hdr->m_state & ShmtState_Disconnected);
 
 			sys::atomicUnlock(&m_hdr->m_lock);
-			err::setError(err::SystemErrorCode_InvalidDeviceState);
-			return -1;
+			return err::fail<size_t>(-1, err::SystemErrorCode_InvalidDeviceState);
 		}
 	}
 
@@ -69,10 +68,8 @@ ShmtReader::read(sl::Array<char>* buffer) {
 		readEndOffset = sl::align<AXL_PTR_SIZE>(readEndOffset);
 #endif
 
-		if (msgHdr->m_signature != ShmtConst_MessageSignature || readEndOffset > endOffset) {
-			err::setError(err::SystemErrorCode_InvalidParameter);
-			return -1;
-		}
+		if (msgHdr->m_signature != ShmtConst_MessageSignature || readEndOffset > endOffset)
+			return err::fail<size_t>(-1, err::SystemErrorCode_InvalidParameter);
 
 		buffer->copy((const char*)(msgHdr + 1), readSize);
 

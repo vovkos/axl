@@ -485,10 +485,8 @@ FileHeap::allocate(
 ) {
 	ASSERT(isOpen() && !(m_file.getFlags() & FileFlag_ReadOnly));
 
-	if (size > MaxBlockSize - sizeof(FileHeapBlock)) {
-		err::setError(err::SystemErrorCode_InvalidParameter);
-		return FileHeapPtr<T>();
-	}
+	if (size > MaxBlockSize - sizeof(FileHeapBlock))
+		return err::fail(FileHeapPtr<T>(), err::SystemErrorCode_InvalidParameter);
 
 	// FileHeapHdr & FileHeapBlock are already 8-byte aligned
 	// therefore aligning size on 8 is enough to keep all blocks 8-byte aligned
@@ -553,19 +551,15 @@ FileHeap::reallocate(
 	if (offset < sizeof(FileHeapHdr) ||
 		offset >= getEndOffset() ||
 		size > MaxBlockSize - sizeof(FileHeapBlock)
-	) {
-		err::setError(err::SystemErrorCode_InvalidParameter);
-		return FileHeapPtr<T>();
-	}
+	)
+		return err::fail(FileHeapPtr<T>(), err::SystemErrorCode_InvalidParameter);
 
 	FileHeapBlock* block = viewBlockUnpinned(offset);
 	if (!block)
 		return FileHeapPtr<T>();
 
-	if (!(block->m_flags & FileHeapBlockFlag_Allocated)) {
-		err::setError("attempt to relocate a non-allocated file heap block");
-		return FileHeapPtr<T>();
-	}
+	if (!(block->m_flags & FileHeapBlockFlag_Allocated))
+		return err::fail(FileHeapPtr<T>(), "attempt to relocate a non-allocated file heap block");
 
 	// try to reallocate in place (using the next block if possible)
 
@@ -638,10 +632,8 @@ FileHeap::materialize(
 	ASSERT(isOpen());
 
 	uint64_t offset = offset0 - sizeof(FileHeapBlock);
-	if (offset < sizeof(FileHeapHdr) || offset >= getEndOffset()) {
-		err::setError(err::SystemErrorCode_InvalidParameter);
-		return FileHeapPtr<T>();
-	}
+	if (offset < sizeof(FileHeapHdr) || offset >= getEndOffset())
+		return err::fail(FileHeapPtr<T>(), err::SystemErrorCode_InvalidParameter);
 
 	size_t actualSize = 0;
 	FileHeapPtr<T> ptr = viewBlock<T>(offset, sizeof(FileHeapBlock), &actualSize, isPinned);
@@ -649,10 +641,8 @@ FileHeap::materialize(
 		return ptr;
 
 	FileHeapBlock* block = (FileHeapBlock*)ptr.p() - 1;
-	if (!(block->m_flags & FileHeapBlockFlag_Allocated)) {
-		err::setError("attempt to materialize a non-allocated file heap block");
-		return FileHeapPtr<T>();
-	}
+	if (!(block->m_flags & FileHeapBlockFlag_Allocated))
+		return err::fail(FileHeapPtr<T>(), "attempt to materialize a non-allocated file heap block");
 
 	if (block->m_size <= actualSize)
 		return ptr;

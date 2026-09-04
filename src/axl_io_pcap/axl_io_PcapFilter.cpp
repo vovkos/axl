@@ -28,10 +28,8 @@ PcapFilter::compile(
 	free();
 
 	int result = ::pcap_compile(pcap, this, (char*)filter.sz(), isOptimized, netMask);
-	if (result == -1) {
-		err::setError(::pcap_geterr(pcap));
-		return false;
-	}
+	if (result == -1)
+		return err::fail(::pcap_geterr(pcap));
 
 	return true;
 }

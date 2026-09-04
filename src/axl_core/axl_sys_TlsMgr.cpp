@@ -129,10 +129,8 @@ TlsMgr::getCurrentThreadPage() {
 size_t
 createSimpleTlsSlot() {
 	dword_t slot = ::TlsAlloc();
-	if (slot == TLS_OUT_OF_INDEXES) {
-		err::setLastSystemError();
-		return -1;
-	}
+	if (slot == TLS_OUT_OF_INDEXES)
+		return err::failWithLastSystemError<size_t>(-1);
 
 	return slot;
 }
@@ -149,10 +147,8 @@ size_t
 createSimpleTlsSlot() {
 	pthread_key_t key;
 	int result = ::pthread_key_create(&key, NULL);
-	if (result != 0) {
-		err::setError(result);
-		return -1;
-	}
+	if (result != 0)
+		return err::fail<size_t>(-1, result);
 
 	ASSERT(sizeof(key) <= sizeof(size_t));
 	return (size_t)key;

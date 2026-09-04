@@ -18,10 +18,7 @@ allocateExecutablePages(size_t size) {
 		PAGE_EXECUTE_READWRITE
 	);
 
-	if (!pages)
-		err::setLastSystemError();
-
-	return pages;
+	return err::complete<void*>(pages, NULL);
 }
 
 bool

@@ -27,10 +27,8 @@ DynamicLib::open(
 	close();
 
 	m_h = ::dlopen(name.sz(), flags);
-	if (!m_h) {
-		err::setError(::dlerror());
-		return false;
-	}
+	if (!m_h)
+		return err::fail(::dlerror());
 
 	return true;
 }
@@ -38,10 +36,8 @@ DynamicLib::open(
 void*
 DynamicLib::getSymbol(const sl::StringRef& name) {
 	void* p = ::dlsym(m_h, name.sz());
-	if (!p) {
-		err::setError(::dlerror());
-		return NULL;
-	}
+	if (!p)
+		return err::fail<void*>(NULL, ::dlerror());
 
 	return p;
 }
@@ -54,10 +50,8 @@ DynamicLib::getInfo(
 	void* p
 ) {
 	int result = ::dlinfo(m_h, request, p);
-	if (result == -1) {
-		err::setError(::dlerror());
-		return false;
-	}
+	if (result == -1)
+		return err::fail(::dlerror());
 
 	return true;
 }

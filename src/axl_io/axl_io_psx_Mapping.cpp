@@ -31,10 +31,8 @@ Mapping::map(
 	close();
 
 	void* p = ::mmap(addrHint, size, protection, flags, fd, offset);
-	if (p == (void*)-1) {
-		err::setLastSystemError();
-		return NULL;
-	}
+	if (p == (void*)-1)
+		return err::failWithLastSystemError<void*>(NULL);
 
 	m_p = p;
 	m_size = size;

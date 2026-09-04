@@ -201,8 +201,7 @@ prepareTermios(
 #else
 		case SerialParity_Mark:
 		case SerialParity_Space:
-			err::setError(err::SystemErrorCode_NotImplemented);
-			return false;
+			return err::fail(err::SystemErrorCode_NotImplemented);
 #endif
 		}
 	}

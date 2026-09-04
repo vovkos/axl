@@ -250,10 +250,8 @@ BuddyAllocMap::allocate(size_t size) {
 
 	size_t levelIdx;
 
-	if (size > m_maxAllocSize) {
-		err::setError(err::SystemErrorCode_InvalidParameter);
-		return -1;
-	}
+	if (size > m_maxAllocSize)
+		return err::fail<size_t>(-1, err::SystemErrorCode_InvalidParameter);
 
 	levelIdx = getHiBitIdx(size);
 
@@ -264,10 +262,8 @@ BuddyAllocMap::allocate(size_t size) {
 	level = m_levelArray.p() + levelIdx;
 
 	page = level->getFirstAvailablePage();
-	if (!page) {
-		err::setError(err::SystemErrorCode_InsufficientResources);
-		return -1;
-	}
+	if (!page)
+		return err::fail<size_t>(-1, err::SystemErrorCode_InsufficientResources);
 
 	ASSERT(page->m_map != -1);
 

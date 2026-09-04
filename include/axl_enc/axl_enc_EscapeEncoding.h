@@ -258,10 +258,8 @@ public:
 		const sl::StringRefBase<C>& source
 	) {
 		size_t length = source.getLength();
-		if (length < 2) {
-			err::setError("invalid escape sequence");
-			return -1;
-		}
+		if (length < 2)
+			return err::fail<size_t>(-1, "invalid escape sequence");
 
 		ASSERT(source[0] == '\\');
 		C c = source[1];
@@ -294,10 +292,8 @@ public:
 		for (; i < hexCodeLen && p < end && isHexChar(*p); i++, p++)
 			hexCodeString[i] = *p;
 
-		if (!i) {
-			err::setError("invalid escape sequence");
-			return -1;
-		}
+		if (!i)
+			return err::fail<size_t>(-1, "invalid escape sequence");
 
 		hexCodeString[i] = 0;
 		*result = strtoul(hexCodeString, NULL, 16);

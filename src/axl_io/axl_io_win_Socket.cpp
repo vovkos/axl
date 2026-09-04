@@ -46,10 +46,8 @@ size_t
 Socket::getIncomingDataSize() {
 	ulong_t value;
 	int result = ::ioctlsocket(m_h, FIONREAD, &value);
-	if (result == -1) {
-		err::setLastSystemError();
-		return -1;
-	}
+	if (result == -1)
+		return err::failWithLastSystemError<size_t>(-1);
 
 	return value;
 }
@@ -108,10 +106,8 @@ Socket::completeAsyncRequest(
 		return true;
 
 	dword_t error = WSAGetLastError();
-	if (error != pendingResult) {
-		err::setError(error);
-		return false;
-	}
+	if (error != pendingResult)
+		return err::fail(error);
 
 	return true;
 }

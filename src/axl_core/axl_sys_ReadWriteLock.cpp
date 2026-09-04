@@ -81,10 +81,8 @@ ReadWriteLock::open(
 
 	m_data = (Data*)m_mapping.p();
 
-	if (m_data->m_signature != Signature) {
-		err::setError(err::SystemErrorCode_InvalidParameter);
-		return false;
-	}
+	if (m_data->m_signature != Signature)
+		return err::fail(err::SystemErrorCode_InvalidParameter);
 
 	return true;
 }

@@ -72,10 +72,8 @@ UsbPcap::getHubSymlink(sl::String_w* string) {
 	if (!result)
 		return false;
 
-	if (!actualSize) {
-		err::setError("missing USB hub symlink information");
-		return false;
-	}
+	if (!actualSize)
+		return err::fail("missing USB hub symlink information");
 
 	string->overrideLength(actualSize / sizeof(wchar_t) - 1);
 	return true;

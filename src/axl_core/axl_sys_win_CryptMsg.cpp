@@ -74,10 +74,8 @@ CryptMsg::getParam(
 		&resultSize
 	);
 
-	if (!result) {
-		err::setLastSystemError();
-		return -1;
-	}
+	if (!result)
+		return err::failWithLastSystemError<size_t>(-1);
 
 	return resultSize;
 }
@@ -120,10 +118,8 @@ getCryptMsgSignerInfoProgramName(
 	const CMSG_SIGNER_INFO* signerInfo
 ) {
 	size_t opusInfoIdx = findCryptAttr(&signerInfo->AuthAttrs, SPC_SP_OPUS_INFO_OBJID);
-	if (opusInfoIdx == -1) {
-		err::setError(err::SystemErrorCode_ObjectNameNotFound);
-		return -1;
-	}
+	if (opusInfoIdx == -1)
+		return err::fail<size_t>(-1, err::SystemErrorCode_ObjectNameNotFound);
 
 	sl::Array<char> opusInfoBuffer;
 
@@ -165,10 +161,8 @@ getRsaCounterSignTimestamp(
 
 	const CMSG_SIGNER_INFO* counterSignerInfo = (CMSG_SIGNER_INFO*)counterSignerInfoBuffer.cp();
 	size_t timestampIdx = findCryptAttr(&counterSignerInfo->AuthAttrs, szOID_RSA_signingTime);
-	if (timestampIdx == -1) {
-		err::setError(err::SystemErrorCode_ObjectNameNotFound);
-		return false;
-	}
+	if (timestampIdx == -1)
+		return err::fail(err::SystemErrorCode_ObjectNameNotFound);
 
 	return cryptDecodeObject(
 		timestamp,
@@ -217,10 +211,8 @@ getRfc3161CounterSignTimestamp(
 	if (!result)
 		return false;
 
-	if (timestampBuffer.getCount() < sizeof(TimestampInfoRfc3161)) {
-		err::setError(err::SystemErrorCode_BufferTooSmall);
-		return false;
-	}
+	if (timestampBuffer.getCount() < sizeof(TimestampInfoRfc3161))
+		return err::fail(err::SystemErrorCode_BufferTooSmall);
 
 	const TimestampInfoRfc3161* timestampInfo = (TimestampInfoRfc3161*)timestampBuffer.cp();
 	*timestamp = timestampInfo->m_timestamp;
@@ -248,8 +240,7 @@ getCryptMsgSignerInfoTimestamp(
 			signerInfo->UnauthAttrs.rgAttr[crossCertIdx].rgValue->cbData
 		);
 
-	err::setError(err::SystemErrorCode_ObjectNameNotFound);
-	return false;
+	return err::fail(err::SystemErrorCode_ObjectNameNotFound);
 }
 
 //..............................................................................

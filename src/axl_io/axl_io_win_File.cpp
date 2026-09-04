@@ -39,10 +39,8 @@ File::completeOverlappedIo(bool_t result) {
 		return true;
 
 	dword_t error = ::GetLastError();
-	if (error != ERROR_IO_PENDING) {
-		err::setError(error);
-		return false;
-	}
+	if (error != ERROR_IO_PENDING)
+		return err::fail(error);
 
 	return true;
 }
@@ -55,10 +53,8 @@ File::getOverlappedResult(
 	bool_t result = ::GetOverlappedResult(m_h, overlapped, actualSize, true);
 	if (!result) {
 		dword_t error = ::GetLastError();
-		if (error != ERROR_HANDLE_EOF) {
-			err::setError(error);
-			return false;
-		}
+		if (error != ERROR_HANDLE_EOF)
+			return err::fail(error);
 
 		*actualSize = 0; // EOF is not an error
 	}

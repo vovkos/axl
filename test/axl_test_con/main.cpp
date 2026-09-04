@@ -3526,10 +3526,8 @@ public:
 			bool result = actualSize != -1;
 #endif
 
-			if (!result) {
-				err::setLastSystemError();
-				return -1;
-			}
+			if (!result)
+				return err::failWithLastSystemError<size_t>(-1);
 
 			size += actualSize;
 		}
@@ -3555,10 +3553,8 @@ public:
 			bool result = actualSize != -1;
 #endif
 
-			if (!result) {
-				err::setLastSystemError();
-				return -1;
-			}
+			if (!result)
+				return err::failWithLastSystemError<size_t>(-1);
 
 			size += actualSize;
 		}
@@ -6674,8 +6670,7 @@ testExecPassthrough(const sl::StringRef& cmdLine) {
 	pid_t pid = ::fork();
 	switch (pid) {
 	case -1:
-		err::setLastSystemError();
-		return false;
+		return err::failWithLastSystemError();
 
 	case 0:
 		::dup2(stdinPipe.m_readFile, STDIN_FILENO);
@@ -6744,8 +6739,7 @@ testPty(const sl::StringRef& cmdLine) {
 	pid_t pid = ::fork();
 	switch (pid) {
 	case -1:
-		err::setLastSystemError();
-		return false;
+		return err::failWithLastSystemError();
 
 	case 0:
 		::setsid();

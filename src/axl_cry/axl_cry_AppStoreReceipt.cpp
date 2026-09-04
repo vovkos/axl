@@ -50,10 +50,8 @@ decodeRfc3339Timestamp(const sl::StringRef& string) {
 		&second
 	);
 
-	if (result < 3) {
-		err::setError(err::SystemErrorCode_InvalidParameter);
-		return 0;
-	}
+	if (result < 3)
+		return err::fail<uint64_t>(0, err::SystemErrorCode_InvalidParameter);
 
 	sys::Time time;
 	time.m_year = year;
@@ -62,7 +60,6 @@ decodeRfc3339Timestamp(const sl::StringRef& string) {
 	time.m_hour = hour;
 	time.m_minute = minute;
 	time.m_second = second;
-
 	return time.getTimestamp(0);
 }
 

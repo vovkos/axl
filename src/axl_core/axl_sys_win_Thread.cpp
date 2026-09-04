@@ -30,10 +30,8 @@ Thread::create(
 
 	dword_t threadId;
 	m_h = ::CreateThread(secAttr, stackSize, threadFunc, context, flags, &threadId);
-	if (!m_h) {
-		err::setLastSystemError();
-		return false;
-	}
+	if (!m_h)
+		return err::failWithLastSystemError();
 
 	m_threadId = threadId;
 	return true;

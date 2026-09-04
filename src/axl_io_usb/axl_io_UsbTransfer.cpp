@@ -57,10 +57,8 @@ UsbTransfer::create(size_t isochronousPacketCount) {
 	close();
 
 	m_h = libusb_alloc_transfer(isochronousPacketCount);
-	if (!m_h) {
-		err::setError(err::SystemErrorCode_InsufficientResources);
-		return false;
-	}
+	if (!m_h)
+		return err::fail(err::SystemErrorCode_InsufficientResources);
 
 	return true;
 }

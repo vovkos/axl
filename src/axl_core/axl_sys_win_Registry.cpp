@@ -35,10 +35,8 @@ RegKey::open(
 		&m_h
 	);
 
-	if (result != ERROR_SUCCESS) {
-		err::setError(result);
-		return false;
-	}
+	if (result != ERROR_SUCCESS)
+		return err::fail(result);
 
 	return true;
 }
@@ -66,8 +64,7 @@ RegKey::queryValue(
 			return true;
 
 		default:
-			err::setError(result);
-			return false;
+			return err::fail(result);
 		}
 
 		result = buffer->setCount(size);

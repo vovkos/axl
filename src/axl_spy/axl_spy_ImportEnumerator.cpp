@@ -27,16 +27,12 @@ getPeHdr(HMODULE hModule) {
 	char* moduleBase = (char*)hModule;
 
 	IMAGE_DOS_HEADER* dosHdr = (IMAGE_DOS_HEADER*)moduleBase;
-	if (dosHdr->e_magic != IMAGE_DOS_SIGNATURE) {
-		err::setError("invalid module (bad DOS signature)");
-		return NULL;
-	}
+	if (dosHdr->e_magic != IMAGE_DOS_SIGNATURE)
+		return err::fail<IMAGE_NT_HEADERS*>(NULL, "invalid module (bad DOS signature)");
 
 	IMAGE_NT_HEADERS* peHdr = (IMAGE_NT_HEADERS*)(moduleBase + dosHdr->e_lfanew);
-	if (peHdr->Signature != IMAGE_NT_SIGNATURE) {
-		err::setError("invalid module (bad PE signature)");
-		return NULL;
-	}
+	if (peHdr->Signature != IMAGE_NT_SIGNATURE)
+		return err::fail<IMAGE_NT_HEADERS*>(NULL, "invalid module (bad PE signature)");
 
 	return peHdr;
 }
@@ -145,10 +141,8 @@ PeCodeMap::getModuleCodeMap(size_t address) {
 			sizeof(moduleInfo)
 		);
 
-	if (!result) {
-		err::setLastSystemError();
-		return NULL;
-	}
+	if (!result)
+		return err::failWithLastSystemError<ModuleCodeMap*>(NULL);
 
 	ASSERT(moduleInfo.lpBaseOfDll == hModule);
 
@@ -424,8 +418,7 @@ enumerateImports(
 		!dynTable[DT_JMPREL] != !dynTable[DT_PLTRELSZ] ||
 		dynTable[DT_SYMENT]->d_un.d_val != sizeof(ElfW(Sym)) ||
 		dynTable[DT_GOT_RELENT] && dynTable[DT_GOT_RELENT]->d_un.d_val != sizeof(ElfRel)) {
-		err::setError("invalid ELF (missing or bad section(s))");
-		return false;
+		return err::fail("invalid ELF (missing or bad section(s))");
 	}
 
 	size_t pltRelCount = dynTable[DT_PLTRELSZ] ? dynTable[DT_PLTRELSZ]->d_un.d_val / sizeof(ElfRel) : 0;
@@ -763,10 +756,8 @@ enumerateImports(
 		cmd = (load_command*)((char*)cmd + cmd->cmdsize);
 	}
 
-	if (!linkEditSegmentCmd || !dyldInfoCmd) {
-		err::setError("invalid MACH-O file");
-		return false;
-	}
+	if (!linkEditSegmentCmd || !dyldInfoCmd)
+		return err::fail("invalid MACH-O file");
 
 	rc::Ptr<ImportEnumeration> enumeration = AXL_RC_NEW(ImportEnumeration);
 	enumeration->m_segmentArray = segmentArray;
@@ -802,8 +793,7 @@ enumerateImports(
 			return enumerateImports(iterator, i);
 	}
 
-	err::setError("module not found");
-	return false;
+	return err::fail("module not found");
 }
 
 #endif

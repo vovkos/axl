@@ -38,8 +38,7 @@ WaitableHandle::completeWait(dword_t result) {
 			return (WaitResult)(WaitResult_Object0 + result - WAIT_OBJECT_0);
 		}
 
-		err::setError(err::SystemErrorCode_InvalidParameter);
-		return WaitResult_Fail;
+		return err::fail(WaitResult_Fail, err::SystemErrorCode_InvalidParameter);
 	}
 }
 

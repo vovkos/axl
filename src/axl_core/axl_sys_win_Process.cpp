@@ -147,10 +147,8 @@ getProcessImageName(dword_t pid) {
 		if (::GetLastError() == ERROR_ACCESS_DENIED)
 			hProcess = ::OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
 
-		if (!hProcess) {
-			err::setLastSystemError();
-			return NULL;
-		}
+		if (!hProcess)
+			return err::failWithLastSystemError(sl::StringRef_w());
 	}
 
 	char stackBuffer[512];
@@ -183,10 +181,8 @@ getProcessImageName(dword_t pid) {
 		);
 	}
 
-	if (!NT_SUCCESS(status)) {
-		err::setError(NtStatus(status));
-		return NULL;
-	}
+	if (!NT_SUCCESS(status))
+		return err::fail(sl::StringRef_w(), NtStatus(status));
 
 	length = name->Length / sizeof(wchar_t);
 	return sl::String_w(name->Buffer, length);

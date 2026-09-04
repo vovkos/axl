@@ -47,10 +47,8 @@ Compiler::compile(
 		return NULL;
 
 	Token token = getToken();
-	if (token != TokenKind_Eof) {
-		err::setError("invalid regexp syntax");
-		return NULL;
-	}
+	if (token != TokenKind_Eof)
+		return err::fail<NfaState*>(NULL, "invalid regexp syntax");
 
 	NfaState* accept = m_program->getLastState();
 	accept->createAccept(acceptId);
@@ -61,10 +59,8 @@ inline
 bool
 Compiler::expectToken(TokenKind tokenKind) {
 	Token token = getToken();
-	if (token != tokenKind) {
-		err::setError("'%s' expected", getTokenString(tokenKind));
-		return false;
-	}
+	if (token != tokenKind)
+		return err::fail("'%s' expected", getTokenString(tokenKind));
 
 	nextToken();
 	return true;
@@ -257,8 +253,7 @@ Compiler::quantifier(NfaState* start) {
 		tokenCount.m_number == 0 ||
 		token != TokenKind_EndQuantifier
 	) {
-		err::setError("invalid quantifier (only simple quantifiers are currently supported)");
-		return NULL;
+		return err::fail<NfaState*>(NULL, "invalid quantifier (only simple quantifiers are currently supported)");
 	}
 
 	if (tokenCount.m_number == 1)
@@ -432,8 +427,7 @@ Compiler::single() {
 		return anyChar();
 
 	default:
-		err::setError("invalid regular expression syntax");
-		return NULL;
+		return err::fail<NfaState*>(NULL, "invalid regular expression syntax");
 	}
 }
 
@@ -533,10 +527,8 @@ Compiler::charClass() {
 			from = token.m_char;
 			nextToken();
 			token = nextToken();
-			if (token != TokenKind_Char) {
-				err::setError("invalid character class");
-				return NULL;
-			}
+			if (token != TokenKind_Char)
+				return err::fail<NfaState*>(NULL, "invalid character class");
 
 			if (from <= token.m_char)
 				start->m_charSet->add(from, token.m_char);
@@ -545,8 +537,7 @@ Compiler::charClass() {
 			break;
 
 		default:
-			err::setError("invalid character class");
-			return NULL;
+			return err::fail<NfaState*>(NULL, "invalid character class");
 		}
 
 		token = nextToken();
@@ -555,10 +546,8 @@ Compiler::charClass() {
 	if (IsNegated()())
 		start->m_charSet->invert();
 
-	if (start->m_charSet->isEmpty()) {
-		err::setError("empty character class");
-		return NULL;
-	}
+	if (start->m_charSet->isEmpty())
+		return err::fail<NfaState*>(NULL, "empty character class");
 
 	return start;
 }

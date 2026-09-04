@@ -50,10 +50,8 @@ initialize(
 	uint_t flags
 ) {
 	int result = ::Py_InitializeFromInitConfig(config);
-	if (result == -1) {
-		err::setError(InitConfig::getError(config));
-		return false;
-	}
+	if (result == -1)
+		return err::fail(InitConfig::getError(config));
 
 	setupFinalizer(flags);
 	return true;

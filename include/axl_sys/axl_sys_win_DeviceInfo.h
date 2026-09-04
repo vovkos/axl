@@ -160,7 +160,10 @@ public:
 	) const;
 
 	HKEY
-	openDeviceRegistryKey(REGSAM keyAccess = KEY_ALL_ACCESS) const;
+	openDeviceRegistryKey(REGSAM keyAccess = KEY_ALL_ACCESS) const {
+		HKEY h = ::SetupDiOpenDevRegKey(m_devInfoSet, &m_devInfoData, DICS_FLAG_GLOBAL, 0, DIREG_DEV, keyAccess);
+		return err::complete<HKEY>(h, (HKEY)INVALID_HANDLE_VALUE);
+	}
 
 	bool
 	getDeviceInstallParams(SP_DEVINSTALL_PARAMS_W* params) const {
@@ -288,16 +291,6 @@ DeviceInfo::getDeviceInterfacePath(SP_DEVICE_INTERFACE_DATA* ifaceData) const {
 	sl::String_w string;
 	getDeviceInterfacePath(ifaceData, &string);
 	return string;
-}
-
-inline
-HKEY
-DeviceInfo::openDeviceRegistryKey(REGSAM keyAccess) const {
-	HKEY h = ::SetupDiOpenDevRegKey(m_devInfoSet, &m_devInfoData, DICS_FLAG_GLOBAL, 0, DIREG_DEV, keyAccess);
-	if (h == INVALID_HANDLE_VALUE)
-		err::setLastSystemError();
-
-	return h;
 }
 
 inline

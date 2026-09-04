@@ -48,10 +48,8 @@ LuaStringTemplate::create() {
 bool
 LuaStringTemplate::setArgCount(size_t count) {
 	int top = m_luaState.getTop();
-	if (count > (size_t)top) {
-		err::setError(err::SystemErrorCode_InvalidParameter);
-		return false;
-	}
+	if (count > (size_t)top)
+		return err::fail(err::SystemErrorCode_InvalidParameter);
 
 	m_argCount = count;
 	return true;

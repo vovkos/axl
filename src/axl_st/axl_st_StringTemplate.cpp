@@ -58,8 +58,7 @@ gotoEndOfScriptSnippet(
 	for (;;) {
 		token = lexer->getToken();
 		if (token->m_token == TokenKind_Error) {
-			err::setError("invalid character '\\x%02x'", (uchar_t) token->m_data.m_integer);
-			return false;
+			return err::fail("invalid character '\\x%02x'", (uchar_t) token->m_data.m_integer);
 		} else if (token->m_token == TokenKind_Eof) {
 			lex::setUnexpectedTokenError("eof", "user-code");
 			return false;

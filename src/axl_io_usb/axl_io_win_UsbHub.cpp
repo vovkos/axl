@@ -167,10 +167,8 @@ UsbHubDb::getUsbHub(sys::win::DeviceInfo* deviceInfo) {
 	result = deviceInfoSet.findDeviceInfoByDevInst(parentDevInst, &parentDeviceInfo);
 	deviceInfoSet.detach();
 
-	if (!result) {
-		err::setError("can't find SP_DEVINFO_DATA of the device's parent");
-		return NULL;
-	}
+	if (!result)
+		return err::fail<UsbHub*>(NULL, "can't find SP_DEVINFO_DATA of the device's parent");
 
 	char buffer[256];
 	sl::String_w path(rc::BufKind_Stack, buffer, sizeof(buffer));

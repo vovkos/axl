@@ -79,10 +79,8 @@ MappedFile::viewImpl(
 
 	if (m_fileFlags & FileFlag_ReadOnly) {
 		uint64_t fileSize = m_file.getSize();
-		if (end > fileSize) {
-			err::setError(err::SystemErrorCode_InvalidDeviceRequest);
-			return NULL;
-		}
+		if (end > fileSize)
+			return err::fail<ViewEntry*>(NULL, err::SystemErrorCode_InvalidDeviceRequest);
 
 		if (viewEnd > fileSize)
 			viewEnd = fileSize;

@@ -57,10 +57,8 @@ NetworkAdapterEnumerator::createAdapterList(sl::List<NetworkAdapterDesc>* adapte
 		if (error == ERROR_SUCCESS)
 			break;
 
-		if (error != ERROR_BUFFER_OVERFLOW) {
-			err::setError(error);
-			return -1;
-		}
+		if (error != ERROR_BUFFER_OVERFLOW)
+			return err::fail<size_t>(-1, error);
 	}
 
 	IP_ADAPTER_ADDRESSES* srcAdapter = (IP_ADAPTER_ADDRESSES*)buffer.p();

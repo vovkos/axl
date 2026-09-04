@@ -62,10 +62,8 @@ Socket::connect(const sockaddr* addr) {
 	if (result != -1)
 		return true;
 
-	if (errno != EINPROGRESS) {
-		err::setError(errno);
-		return false;
-	}
+	if (errno != EINPROGRESS)
+		return err::fail(errno);
 
 	return true;
 }

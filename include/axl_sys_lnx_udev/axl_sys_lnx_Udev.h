@@ -590,8 +590,7 @@ extern udev_hwdb_get_properties_list_entry_t* udev_hwdb_get_properties_list_entr
 inline
 bool
 failWithUdevError(const char* function) {
-	err::setError("libudev failed: %s", function);
-	return false;
+	return err::fail("libudev failed: %s", function);
 }
 
 inline
@@ -606,10 +605,8 @@ completeUdev(
 inline
 bool
 completeUdevErrno(int result) {
-	if (result < 0) {
-		err::setError(err::Errno(-result));
-		return false;
-	}
+	if (result < 0)
+		return err::fail(err::Errno(-result));
 
 	return true;
 }

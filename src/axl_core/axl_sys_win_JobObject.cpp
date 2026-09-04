@@ -26,10 +26,8 @@ JobObject::queryInformation(
 ) {
 	dword_t resultSize;
 	bool_t result = ::QueryInformationJobObject(m_h, infoClass, p,  (dword_t)size, &resultSize);
-	if (!result) {
-		err::setLastSystemError();
-		return -1;
-	}
+	if (!result)
+		return err::failWithLastSystemError<size_t>(-1);
 
 	return resultSize;
 }

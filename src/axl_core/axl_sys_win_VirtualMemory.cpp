@@ -28,10 +28,8 @@ VirtualMemory::alloc(
 	release();
 
 	void* p = ::VirtualAlloc(p0, size, allocationFlags, protectionFlags);
-	if (!p) {
-		err::setLastSystemError();
-		return NULL;
-	}
+	if (!p)
+		return err::failWithLastSystemError<void*>(NULL);
 
 	m_p = p;
 	m_size = size;
@@ -55,10 +53,8 @@ VirtualMemory::protect(
 ) {
 	dword_t prevProtectionFlags;
 	bool_t result = ::VirtualProtect(m_p, m_size, protectionFlags, &prevProtectionFlags);
-	if (!result) {
-		err::setLastSystemError();
-		return false;
-	}
+	if (!result)
+		return err::failWithLastSystemError();
 
 	if (prevProtectionFlags0)
 		*prevProtectionFlags0 = prevProtectionFlags;

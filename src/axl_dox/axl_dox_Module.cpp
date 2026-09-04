@@ -182,10 +182,8 @@ Module::generateDocumentation(
 	if (!result)
 		return false;
 
-	if (nspaceXml.isEmpty()) {
-		err::setError("module does not contain any documentable items");
-		return false;
-	}
+	if (nspaceXml.isEmpty())
+		return err::fail("module does not contain any documentable items");
 
 	result = generateGroupDocumentation(outputDir, &indexXml);
 	if (!result)

@@ -1381,10 +1381,8 @@ Pcap::openDevice(const sl::StringRef& device) {
 
 	char errorBuffer[PCAP_ERRBUF_SIZE];
 	m_h = ::pcap_create(device.sz(), errorBuffer);
-	if (!m_h) {
-		err::setError(errorBuffer);
-		return false;
-	}
+	if (!m_h)
+		return err::fail(errorBuffer);
 
 	return true;
 }
@@ -1407,10 +1405,8 @@ Pcap::openLive(
 		errorBuffer
 	);
 
-	if (!m_h) {
-		err::setError(errorBuffer);
-		return false;
-	}
+	if (!m_h)
+		return err::fail(errorBuffer);
 
 	return true;
 }
@@ -1421,10 +1417,8 @@ Pcap::openFile(const sl::StringRef& fileName) {
 
 	char errorBuffer[PCAP_ERRBUF_SIZE];
 	m_h = ::pcap_open_offline(fileName.sz(), errorBuffer);
-	if (!m_h) {
-		err::setError(errorBuffer);
-		return false;
-	}
+	if (!m_h)
+		return err::fail(errorBuffer);
 
 	return true;
 }
@@ -1437,10 +1431,8 @@ Pcap::openDead(
 	close();
 
 	m_h = ::pcap_open_dead(linkType, (int)snapshotSize);
-	if (!m_h) {
-		err::setError("pcap_open_dead failed");
-		return false;
-	}
+	if (!m_h)
+		return err::fail("pcap_open_dead failed");
 
 	return true;
 }
@@ -1529,10 +1521,8 @@ Pcap::setBlockingMode(bool isBlocking) {
 
 	char errorBuffer[PCAP_ERRBUF_SIZE];
 	int result = ::pcap_setnonblock(m_h, !isBlocking, errorBuffer);
-	if (result == -1) {
-		err::setError(errorBuffer);
-		return false;
-	}
+	if (result == -1)
+		return err::fail(errorBuffer);
 
 	return true;
 }

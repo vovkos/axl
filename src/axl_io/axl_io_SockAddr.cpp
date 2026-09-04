@@ -538,10 +538,8 @@ resolveHostName(
 		return false;
 	}
 
-	if (!addrInfoList) {
-		err::setError(err::SystemErrorCode_InvalidParameter);
-		return false;
-	}
+	if (!addrInfoList)
+		return err::fail(err::SystemErrorCode_InvalidParameter);
 
 	addrinfo* addrInfo = addrInfoList;
 	addrArray->reserve(addrInfo->ai_next ? 4 : 1);

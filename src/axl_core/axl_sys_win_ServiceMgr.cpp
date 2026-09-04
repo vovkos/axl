@@ -62,10 +62,8 @@ ServiceMgr::createService(
 		password.szn()
 	);
 
-	if (!h) {
-		err::setLastSystemError();
-		return false;
-	}
+	if (!h)
+		return err::failWithLastSystemError();
 
 	service->attach(h);
 	return true;
@@ -78,10 +76,8 @@ ServiceMgr::openService(
 	dword_t access
 ) {
 	SC_HANDLE h = ::OpenServiceW(m_h, name.szn(), access);
-	if (!h) {
-		err::setLastSystemError();
-		return false;
-	}
+	if (!h)
+		return err::failWithLastSystemError();
 
 	service->attach(h);
 	return true;

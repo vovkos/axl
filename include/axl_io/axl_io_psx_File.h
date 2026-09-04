@@ -90,7 +90,7 @@ public:
 	int
 	ioctl(uint_t code) {
 		int result = ::ioctl(m_h, code);
-		return err::complete(result, -1);
+		return err::complete<int>(result, -1);
 	}
 
 	template <typename T>
@@ -100,16 +100,13 @@ public:
 		T param
 	) {
 		int result = ::ioctl(m_h, code, param);
-		if (result == -1)
-			err::setLastSystemError();
-
-		return result;
+		return err::complete<int>(result, -1);
 	}
 
 	int
 	fcntl(uint_t code) {
 		int result = ::fcntl(m_h, code);
-		return err::complete(result, -1);
+		return err::complete<int>(result, -1);
 	}
 
 	template <typename T>
@@ -119,23 +116,26 @@ public:
 		T param
 	) {
 		int result = ::fcntl(m_h, code, param);
-		if (result == -1)
-			err::setLastSystemError();
-
-		return result;
+		return err::complete<int>(result, -1);
 	}
 
 	size_t
 	read(
 		void* p,
 		size_t size
-	);
+	) {
+		size_t result = ::read(m_h, p, size);
+		return err::complete<size_t>(result, -1);
+	}
 
 	size_t
 	write(
 		const void* p,
 		size_t size
-	);
+	) {
+		size_t result = ::write(m_h, p, size);
+		return err::complete<size_t>(result, -1);
+	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -167,38 +167,10 @@ size_t
 File::getIncomingDataSize() const {
 	int value;
 	int result = ::ioctl(m_h, FIONREAD, &value);
-	if (result == -1) {
-		err::setLastSystemError();
-		return -1;
-	}
+	if (result == -1)
+		return err::failWithLastSystemError<size_t>(-1);
 
 	return value;
-}
-
-inline
-size_t
-File::read(
-	void* p,
-	size_t size
-) {
-	size_t actualSize = ::read(m_h, p, size);
-	if (actualSize == -1)
-		err::setLastSystemError();
-
-	return actualSize;
-}
-
-inline
-size_t
-File::write(
-	const void* p,
-	size_t size
-) {
-	size_t actualSize = ::write(m_h, p, size);
-	if (actualSize == -1)
-		err::setLastSystemError();
-
-	return actualSize;
 }
 
 //..............................................................................

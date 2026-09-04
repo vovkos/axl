@@ -172,10 +172,8 @@ ShmtBase::initializeMapping(
 			return false;
 	} else {
 		uint64_t fileSize = m_file.getSize();
-		if (fileSize < size) {
-			err::setError(err::SystemErrorCode_InvalidParameter);
-			return false;
-		}
+		if (fileSize < size)
+			return err::fail(err::SystemErrorCode_InvalidParameter);
 	}
 
 	void* p = m_mapping.open(&m_file, 0, size);

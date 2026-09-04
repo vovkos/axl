@@ -61,8 +61,7 @@ public:
 		} else if (!m_emitContextStack.isEmpty()) {
 			output = m_emitContextStack.getTail()->m_output; // append to the last output buffer
 		} else {
-			err::setError(err::SystemErrorCode_InvalidParameter);
-			return false;
+			return err::fail(err::SystemErrorCode_InvalidParameter);
 		}
 
 		sl::String scriptSource;
@@ -134,10 +133,8 @@ public:
 
 	bool
 	append(const sl::StringRef& string) {
-		if (m_emitContextStack.isEmpty()) {
-			err::setError(err::SystemErrorCode_InvalidParameter);
-			return false;
-		}
+		if (m_emitContextStack.isEmpty())
+			return err::fail(err::SystemErrorCode_InvalidParameter);
 
 		return m_emitContextStack.getTail()->m_output->append(string) != -1;
 	}
@@ -164,10 +161,8 @@ protected:
 		for (;;) {
 			const Token* token = lexer.getToken();
 
-			if (token->m_token == TokenKind_Error) {
-				err::setError("invalid character '\\x%02x'", (uchar_t)token->m_data.m_integer);
-				return false;
-			}
+			if (token->m_token == TokenKind_Error)
+				return err::fail("invalid character '\\x%02x'", (uchar_t)token->m_data.m_integer);
 
 			if (token->m_pos.m_offset > offset)
 				static_cast<T*>(this)->createPassthroughCall(

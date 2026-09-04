@@ -141,8 +141,7 @@ UsbPcapTransferParser::parseHeader(
 		break;
 
 	default:
-		err::setError("unsupported USBPcap transfer type: 0x%02x", m_buffer.m_packetHdr.transfer);
-		return -1;
+		return err::fail<size_t>(-1, "unsupported USBPcap transfer type: 0x%02x", m_buffer.m_packetHdr.transfer);
 	}
 
 	m_state = UsbMonTransferParserState_CompleteHeader;

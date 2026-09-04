@@ -60,10 +60,8 @@ SockAddrParser::parse(sockaddr_in* addr) {
 			return false;
 
 		skipWhiteSpace();
-		if (m_p != m_end) {
-			err::setError(err::SystemErrorCode_InvalidAddress);
-			return false;
-		}
+		if (m_p != m_end)
+			return err::fail(err::SystemErrorCode_InvalidAddress);
 
 		*(uint32_t*)&addr->sin_addr = 0;
 		addr->sin_port = sl::swapByteOrder16((uint16_t)port);
@@ -110,10 +108,8 @@ SockAddrParser::parse(in6_addr* addr) {
 		if (!result) {
 			result = tryChar('.');
 			if (result) {
-				if (i > 6) {
-					err::setError(err::SystemErrorCode_InvalidAddress);
-					return false;
-				}
+				if (i > 6)
+					return err::fail(err::SystemErrorCode_InvalidAddress);
 
 				ip4[0] = (uchar_t)
 					((word & 0x0f) +
@@ -165,8 +161,7 @@ SockAddrParser::parse(in6_addr* addr) {
 			memset(&ip[zeroRunIdx], 0, zeroRunLength * sizeof(uint16_t));
 		}
 	} else if (i != 8) {
-		err::setError(err::SystemErrorCode_InvalidAddress);
-		return false;
+		return err::fail(err::SystemErrorCode_InvalidAddress);
 	}
 
 	return true;
@@ -229,10 +224,8 @@ SockAddrParser::parse(
 	SockAddrParser clone = *this;
 
 	if (trySockAddr_ip4()) {
-		if (size < sizeof(sockaddr_in)) {
-			err::setError(err::SystemErrorCode_BufferTooSmall);
-			return false;
-		}
+		if (size < sizeof(sockaddr_in))
+			return err::fail(err::SystemErrorCode_BufferTooSmall);
 
 		*this = clone;
 		return parse((sockaddr_in*)addr);
@@ -241,17 +234,14 @@ SockAddrParser::parse(
 	*this = clone;
 
 	if (trySockAddr_ip6()) {
-		if (size < sizeof(sockaddr_in6)) {
-			err::setError(err::SystemErrorCode_BufferTooSmall);
-			return false;
-		}
+		if (size < sizeof(sockaddr_in6))
+			return err::fail(err::SystemErrorCode_BufferTooSmall);
 
 		*this = clone;
 		return parse((sockaddr_in6*)addr);
 	}
 
-	err::setError(err::SystemErrorCode_InvalidAddress);
-	return false;
+	return err::fail(err::SystemErrorCode_InvalidAddress);
 }
 
 bool
@@ -415,10 +405,8 @@ SockAddrParser::parseInt(
 	else
 		end = (char*)m_p;
 
-	if (end == m_p) {
-		err::setError(err::SystemErrorCode_InvalidAddress);
-		return false;
-	}
+	if (end == m_p)
+		return err::fail(err::SystemErrorCode_InvalidAddress);
 
 	m_p = end;
 	return true;
@@ -449,10 +437,8 @@ bool
 SockAddrParser::expectChar(char c) {
 	bool result = tryChar(c);
 
-	if (!result) {
-		err::setError(err::SystemErrorCode_InvalidAddress);
-		return false;
-	}
+	if (!result)
+		return err::fail(err::SystemErrorCode_InvalidAddress);
 
 	return true;
 }

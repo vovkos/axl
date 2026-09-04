@@ -23,10 +23,8 @@ uint_t
 Serial::getStatusLines() const {
 	int lines = 0;
 	int result = ::ioctl(m_h, TIOCMGET, &lines);
-	if (result == -1) {
-		err::setLastSystemError();
-		return -1;
-	}
+	if (result == -1)
+		return err::failWithLastSystemError<uint_t>(-1);
 
 	return lines;
 }

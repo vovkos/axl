@@ -146,10 +146,8 @@ UsbPcapDeviceEnumerator::enumerate(
 
 	NtHandle deviceDir;
 	long status = ntOpenDirectoryObject(deviceDir.p(), DIRECTORY_QUERY | DIRECTORY_TRAVERSE, &oa);
-	if (status < 0) {
-		err::setError(NtStatus(status));
-		return -1;
-	}
+	if (status < 0)
+		return err::fail<size_t>(-1, NtStatus(status));
 
 	sl::String_w hubName;
 	sl::String_w hubDeviceName;
@@ -178,8 +176,7 @@ UsbPcapDeviceEnumerator::enumerate(
 			if (status == STATUS_NO_MORE_ENTRIES)
 				break;
 
-			err::setError(sys::win::NtStatus(status));
-			return -1;
+			return err::fail<size_t>(-1, sys::win::NtStatus(status));
 		}
 
 		const OBJECT_DIRECTORY_INFORMATION* dirInfo = (OBJECT_DIRECTORY_INFORMATION*)dirBufferBase;

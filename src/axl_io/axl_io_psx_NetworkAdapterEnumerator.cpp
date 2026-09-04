@@ -57,10 +57,8 @@ NetworkAdapterEnumerator::createAdapterList(sl::List<NetworkAdapterDesc>* adapte
 
 	ifaddrs* ifaceAddressList = NULL;
 	int result = ::getifaddrs(&ifaceAddressList);
-	if (result != 0 || !ifaceAddressList) {
-		err::setLastSystemError();
-		return -1;
-	}
+	if (result != 0 || !ifaceAddressList)
+		return err::failWithLastSystemError<size_t>(-1);
 
 	io::psx::Socket socket;
 #if (_AXL_IO_USE_SIOCGIFHWADDR)

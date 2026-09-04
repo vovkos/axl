@@ -494,19 +494,15 @@ getSymbolicLinkTarget(
 
 	Handle link; // NT uses NULL for invalid handle value
 	status = ntOpenSymbolicLinkObject(link.p(), GENERIC_READ, &oa);
-	if (status < 0) {
-		err::setError(NtStatus(status));
-		return false;
-	}
+	if (status < 0)
+		return err::fail(NtStatus(status));
 
 	UNICODE_STRING uniTarget = { 0 };
 	ULONG bufferSize = 0;
 
 	status = ntQuerySymbolicLinkObject(link, &uniTarget, &bufferSize);
-	if (status != STATUS_BUFFER_TOO_SMALL) {
-		err::setError(NtStatus(status));
-		return false;
-	}
+	if (status != STATUS_BUFFER_TOO_SMALL)
+		return err::fail(NtStatus(status));
 
 	wchar_t* p = targetName->createBuffer(bufferSize / sizeof(WCHAR));
 
@@ -515,10 +511,8 @@ getSymbolicLinkTarget(
 	uniTarget.MaximumLength = (USHORT)bufferSize;
 
 	status = ntQuerySymbolicLinkObject(link, &uniTarget, &bufferSize);
-	if (status < 0) {
-		err::setError(NtStatus(status));
-		return false;
-	}
+	if (status < 0)
+		return err::fail(NtStatus(status));
 
 	ASSERT(uniTarget.Length <= uniTarget.MaximumLength);
 	targetName->overrideLength(uniTarget.Length / sizeof(WCHAR));

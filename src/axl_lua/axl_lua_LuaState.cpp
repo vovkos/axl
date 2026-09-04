@@ -55,10 +55,8 @@ LuaState::create() {
 	close();
 
 	m_h = luaL_newstate();
-	if (!m_h) {
-		err::setError(err::SystemErrorCode_InsufficientResources);
-		return false;
-	}
+	if (!m_h)
+		return err::fail(err::SystemErrorCode_InsufficientResources);
 
 	return true;
 }
@@ -70,8 +68,7 @@ LuaState::complete(int result) {
 	if (result == LUA_OK)
 		return true;
 
-	err::setError(popString());
-	return false;
+	return err::fail(popString());
 }
 
 bool
@@ -149,10 +146,8 @@ LuaState::tryCheckStack(int extraSlotCount) {
 	ASSERT(isOpen());
 
 	int result = lua_checkstack(m_h, extraSlotCount);
-	if (!result) {
-		err::setError(err::SystemErrorCode_InsufficientResources);
-		return false;
-	}
+	if (!result)
+		return err::fail(err::SystemErrorCode_InsufficientResources);
 
 	return true;
 }
