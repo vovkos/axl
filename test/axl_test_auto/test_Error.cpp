@@ -18,15 +18,16 @@
 #	include "axl_sys_win_CfgMgrError.h"
 #endif
 
-namespace {
-
-//..............................................................................
-
 // {6D3B1C24-9A0E-4E7B-9C21-4F5A2E8D6B10}
+// keep out of the anonymous namespace -- AXL_SELECT_ANY can't be internal linkage
 AXL_SL_DEFINE_GUID(
 	g_testErrorGuid,
 	0x6d3b1c24, 0x9a0e, 0x4e7b, 0x9c, 0x21, 0x4f, 0x5a, 0x2e, 0x8d, 0x6b, 0x10
 );
+
+namespace {
+
+//..............................................................................
 
 enum {
 	TestErrorCode = 42
