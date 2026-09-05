@@ -34,11 +34,18 @@ endmacro()
 macro(
 axl_apply_target_cpu_setting)
 
+	# the compiler ABI probe (run by cmake early on) has already set CMAKE_LIBRARY_ARCHITECTURE
+	# retarget CMAKE_LIBRARY_ARCHITECTURE to the chosen CPU so that find_library looks in correct dir
+
 	if("${TARGET_CPU}" STREQUAL "amd64")
 		set(CMAKE_SIZEOF_VOID_P 8)
 
 		set_property(GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS TRUE)
 		set_property(GLOBAL PROPERTY FIND_LIBRARY_USE_LIB32_PATHS FALSE)
+
+		if(CMAKE_LIBRARY_ARCHITECTURE)
+			string(REGEX REPLACE "^[^-]+" "x86_64" CMAKE_LIBRARY_ARCHITECTURE ${CMAKE_LIBRARY_ARCHITECTURE})
+		endif()
 
 		if(GCC)
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64 -mcx16")
@@ -49,6 +56,10 @@ axl_apply_target_cpu_setting)
 
 		set_property(GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS FALSE)
 		set_property(GLOBAL PROPERTY FIND_LIBRARY_USE_LIB32_PATHS TRUE)
+
+		if(CMAKE_LIBRARY_ARCHITECTURE)
+			string(REGEX REPLACE "^[^-]+" "i386" CMAKE_LIBRARY_ARCHITECTURE ${CMAKE_LIBRARY_ARCHITECTURE})
+		endif()
 
 		if(GCC)
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
