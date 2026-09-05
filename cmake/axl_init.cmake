@@ -23,9 +23,7 @@ endif()
 
 # CMake policies
 
-# as of now, we have CMake version requirement of 3.3, and all the default
-# policy values work well with AXL CMake infrastructure.
-
+# as of now, all the default policy values work well with AXL infrastructure.
 # when in need to adjust a policy, use the following template:
 
 # if (POLICY CMPNNNN)
@@ -33,6 +31,10 @@ endif()
 # endif ()
 
 #...............................................................................
+
+# capture resource dir
+
+set(AXL_CMAKE_RES_DIR ${CMAKE_CURRENT_LIST_DIR}/res)
 
 include(${CMAKE_CURRENT_LIST_DIR}/axl_utils.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/axl_std_settings.cmake)

@@ -628,9 +628,7 @@ axl_apply_gcc_settings)
 
 	if(NOT APPLE)
 		if(GCC_LINK_EXPORTLESS_EXE)
-			set(_FILE "${CMAKE_CURRENT_BINARY_DIR}/exportless-exe.version")
-			file(WRITE ${_FILE} "{ local: *; };")
-			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--version-script='${_FILE}'")
+			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--version-script='${AXL_CMAKE_RES_DIR}/exportless-exe.version'")
 		endif()
 
 		if(GCC_LINK_GLIBC_WRAPPERS)

@@ -823,6 +823,7 @@ axl_find_inc_dir
 )
 
 	unset(_DIR)
+	unset(_DIR CACHE) # orthogonal to the above -- either alone still shadows the search
 	find_path(_DIR ${ARGN})
 
 	if(NOT _DIR)
@@ -907,6 +908,27 @@ axl_find_lib_dir
 	axl_find_lib(${_RESULT} _UNUSED ${_LIB_NAME} ${ARGN})
 endmacro()
 
+# CMAKE_LIBRARY_ARCHITECTURE and FIND_LIBRARY_USE_LIB32/64_PATHS only *add* search dirs
+# the only way to make sure the found library works is to link against it
+
+macro(
+axl_try_link_lib
+	_RESULT
+	_PATH
+)
+
+	string(MAKE_C_IDENTIFIER "AXL_LINK_RESULT_${_PATH}" _LINK_RESULT)
+
+	try_compile(
+		${_LINK_RESULT}
+		${CMAKE_CURRENT_BINARY_DIR}
+		${AXL_CMAKE_RES_DIR}/empty-main.cpp
+		LINK_LIBRARIES ${_PATH}
+	)
+
+	set(${_RESULT} ${${_LINK_RESULT}})
+endmacro()
+
 macro(
 axl_find_lib
 	_RESULT_LIB_DIR
@@ -916,7 +938,16 @@ axl_find_lib
 )
 
 	unset(_PATH)
+	unset(_PATH CACHE) # orthogonal to the above -- either alone still shadows the search
+
 	find_library(_PATH ${_LIB_NAME} ${ARGN})
+
+	if(_PATH)
+		axl_try_link_lib(_LINK_RESULT ${_PATH})
+		if(NOT _LINK_RESULT)
+			unset(_PATH CACHE) # a normal set() would still be shadowed by the cache
+		endif()
+	endif()
 
 	if(NOT _PATH)
 		set(${_RESULT_LIB_DIR} ${_RESULT_LIB_DIR}-NOTFOUND)

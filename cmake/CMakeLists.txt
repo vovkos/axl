@@ -42,6 +42,11 @@ install(
 )
 
 install(
+	DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/res
+	DESTINATION ${AXL_INSTALL_CMAKE_SUBDIR}
+)
+
+install(
 	FILES ${CMAKE_CURRENT_BINARY_DIR}/axl_config_install.cmake
 	RENAME axl_config.cmake
 	DESTINATION ${AXL_INSTALL_CMAKE_SUBDIR}
