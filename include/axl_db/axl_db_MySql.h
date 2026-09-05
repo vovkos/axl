@@ -37,7 +37,7 @@ initMySqlLib(
 inline
 bool
 initMySqlThread() {
-	my_bool result = ::mysql_thread_init();
+	int result = ::mysql_thread_init();
 	return !result ? true : err::fail("mysql_thread_init failed");
 }
 
@@ -243,6 +243,7 @@ public:
 		return ::mysql_get_ssl_cipher(m_h);
 	}
 
+#if (_AXL_DB_MARIADB)
 	// for non-blocking IO (MYSQL_OPT_NONBLOCK); pair with getTimeoutValueMs()
 
 	my_socket
@@ -256,6 +257,7 @@ public:
 		ASSERT(m_h);
 		return ::mysql_get_timeout_value_ms(m_h);
 	}
+#endif
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -386,7 +388,7 @@ inline
 bool
 MySql::readQueryResult() {
 	ASSERT(m_h);
-	my_bool result = ::mysql_read_query_result(m_h);
+	int result = ::mysql_read_query_result(m_h);
 	return completeWithLastMySqlError(m_h, !result);
 }
 
@@ -429,7 +431,7 @@ inline
 bool
 MySql::setAutoCommit(bool isAutoCommit) {
 	ASSERT(m_h);
-	my_bool result = ::mysql_autocommit(m_h, isAutoCommit);
+	int result = ::mysql_autocommit(m_h, isAutoCommit);
 	return completeWithLastMySqlError(m_h, !result);
 }
 
@@ -437,7 +439,7 @@ inline
 bool
 MySql::commit() {
 	ASSERT(m_h);
-	my_bool result = ::mysql_commit(m_h);
+	int result = ::mysql_commit(m_h);
 	return completeWithLastMySqlError(m_h, !result);
 }
 
@@ -445,7 +447,7 @@ inline
 bool
 MySql::rollback() {
 	ASSERT(m_h);
-	my_bool result = ::mysql_rollback(m_h);
+	int result = ::mysql_rollback(m_h);
 	return completeWithLastMySqlError(m_h, !result);
 }
 

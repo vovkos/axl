@@ -18,6 +18,13 @@
 
 #include <mysql.h>
 
+// MariaDB Connector/C is a superset of the Oracle client -- it also carries the
+// non-blocking IO calls and the per-statement warning/result-set queries
+
+#ifdef MARIADB_BASE_VERSION
+#	define _AXL_DB_MARIADB 1
+#endif
+
 // errmsg.h (CR_*) and mysqld_error.h (ER_*) are deliberately NOT included:
 // on Windows the CR_* macros collide with cfgmgr32.h CONFIGRET codes.
 // Include them locally where you compare against specific error codes.

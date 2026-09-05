@@ -94,11 +94,13 @@ public:
 	bool
 	nextResult();
 
+#if (_AXL_DB_MARIADB)
 	bool
 	moreResults() {
 		ASSERT(m_h);
 		return ::mysql_stmt_more_results(m_h) != 0;
 	}
+#endif
 
 	bool
 	reset();
@@ -142,11 +144,13 @@ public:
 		return ::mysql_stmt_insert_id(m_h);
 	}
 
+#if (_AXL_DB_MARIADB)
 	uint_t
 	getWarningCount() {
 		ASSERT(m_h);
 		return ::mysql_stmt_warning_count(m_h);
 	}
+#endif
 
 	uint_t
 	getErrno() {
@@ -192,7 +196,7 @@ MySqlStmt::setAttr(
 	const void* value
 ) {
 	ASSERT(m_h);
-	my_bool result = ::mysql_stmt_attr_set(m_h, attr, value);
+	int result = ::mysql_stmt_attr_set(m_h, attr, value);
 	return completeWithLastMySqlStmtError(m_h, !result);
 }
 
@@ -203,7 +207,7 @@ MySqlStmt::getAttr(
 	void* value
 ) {
 	ASSERT(m_h);
-	my_bool result = ::mysql_stmt_attr_get(m_h, attr, value);
+	int result = ::mysql_stmt_attr_get(m_h, attr, value);
 	return completeWithLastMySqlStmtError(m_h, !result);
 }
 
@@ -211,7 +215,7 @@ inline
 bool
 MySqlStmt::bindParams(MYSQL_BIND* bindTable) {
 	ASSERT(m_h);
-	my_bool result = ::mysql_stmt_bind_param(m_h, bindTable);
+	int result = ::mysql_stmt_bind_param(m_h, bindTable);
 	return completeWithLastMySqlStmtError(m_h, !result);
 }
 
@@ -219,7 +223,7 @@ inline
 bool
 MySqlStmt::bindResult(MYSQL_BIND* bindTable) {
 	ASSERT(m_h);
-	my_bool result = ::mysql_stmt_bind_result(m_h, bindTable);
+	int result = ::mysql_stmt_bind_result(m_h, bindTable);
 	return completeWithLastMySqlStmtError(m_h, !result);
 }
 
@@ -231,7 +235,7 @@ MySqlStmt::sendLongData(
 	size_t size
 ) {
 	ASSERT(m_h);
-	my_bool result = ::mysql_stmt_send_long_data(m_h, param, (const char*)p, (ulong_t)size);
+	int result = ::mysql_stmt_send_long_data(m_h, param, (const char*)p, (ulong_t)size);
 	return completeWithLastMySqlStmtError(m_h, !result);
 }
 
@@ -280,7 +284,7 @@ inline
 bool
 MySqlStmt::freeResult() {
 	ASSERT(m_h);
-	my_bool result = ::mysql_stmt_free_result(m_h);
+	int result = ::mysql_stmt_free_result(m_h);
 	return completeWithLastMySqlStmtError(m_h, !result);
 }
 
@@ -299,7 +303,7 @@ inline
 bool
 MySqlStmt::reset() {
 	ASSERT(m_h);
-	my_bool result = ::mysql_stmt_reset(m_h);
+	int result = ::mysql_stmt_reset(m_h);
 	return completeWithLastMySqlStmtError(m_h, !result);
 }
 
