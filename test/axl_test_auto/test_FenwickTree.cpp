@@ -315,9 +315,9 @@ test_Scalar() {
 
 void
 test_ScalarLiteral() {
-	sl::FenwickTree<size_t> tree;
+	sl::FenwickTree<uint64_t> tree; // uint64_t, not size_t -- the sums below overflow 32 bits
 
-	size_t big = 3000000000ULL; // past INT_MAX, so a descent typed `int` truncates
+	uint64_t big = 3000000000ULL; // past INT_MAX, so a descent typed `int` truncates
 	tree.append(big);
 	tree.append(big);
 	tree.append(big);
