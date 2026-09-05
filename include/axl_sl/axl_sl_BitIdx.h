@@ -419,7 +419,7 @@ template <
 constexpr
 bool
 isAligned(T x) {
-	static_assert(isPowerOf2(factor));
+	static_assert(isPowerOf2(factor), "alignment factor must be a power of 2");
 	return !(x & (factor - 1));
 }
 
@@ -439,7 +439,7 @@ template <
 >
 T
 align(T x) {
-	static_assert(isPowerOf2(factor));
+	static_assert(isPowerOf2(factor), "alignment factor must be a power of 2");
 	return (x + (T)factor - 1) & ~((T)factor - 1);
 }
 
@@ -449,7 +449,7 @@ template <size_t growLimit>
 constexpr
 size_t
 getAllocSize(size_t size) {
-	static_assert(isPowerOf2(growLimit));
+	static_assert(isPowerOf2(growLimit), "grow limit must be a power of 2");
 	return size < growLimit ? getPowerOf2Ge(size) : align<growLimit>(size);
 }
 
