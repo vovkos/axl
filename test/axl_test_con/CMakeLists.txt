@@ -173,7 +173,7 @@ if(BUILD_AXL_XML)
 	include_directories(${EXPAT_INC_DIR})
 	link_directories(${EXPAT_LIB_DIR})
 	add_definitions(-D_AXL_XML=1)
-	list(APPEND OPT_LIB_LIST axl_xml expat)
+	list(APPEND OPT_LIB_LIST axl_xml ${EXPAT_LIB_NAME})
 endif()
 
 if(BUILD_AXL_JSON)
