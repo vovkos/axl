@@ -22,6 +22,10 @@ if /i "%1" == "i386" goto :x86
 if /i "%1" == "amd64" goto :amd64
 if /i "%1" == "x86_64" goto :amd64
 if /i "%1" == "x64" goto :amd64
+if /i "%1" == "arm64" goto :arm64
+if /i "%1" == "aarch64" goto :arm64
+if /i "%1" == "debug" goto :debug
+if /i "%1" == "release" goto :release
 
 echo Invalid argument: '%1'
 exit -1
@@ -79,6 +83,31 @@ set PROGRAM_FILES_DIR_SUFFIX=
 shift
 goto :loop
 
+:arm64
+set TARGET_CPU=arm64
+set CMAKE_ARCH_SUFFIX=
+set CMAKE_ARCH_OPTIONS=-A ARM64
+set OPENSSL_DIR_SUFFIX=
+set OPENSSL_DLL_SUFFIX=-3-arm64
+set CHOCO_PLATFORM=
+set PROGRAM_FILES_DIR_SUFFIX=
+shift
+goto :loop
+
+:: . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+:: Configuration
+
+:debug
+set CONFIGURATION=Debug
+shift
+goto :loop
+
+:release
+set CONFIGURATION=Release
+shift
+goto :loop
+
 :: . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 :finalize
@@ -89,12 +118,12 @@ if "%CONFIGURATION%" == "" (set CONFIGURATION=Release)
 if "%CMAKE_USE_ARCH_OPTIONS%" == "" (set CMAKE_GENERATOR=%CMAKE_GENERATOR%%CMAKE_ARCH_SUFFIX%)
 if not "%CMAKE_USE_ARCH_OPTIONS%" == "" (set CMAKE_OPTIONS=%CMAKE_OPTIONS%%CMAKE_ARCH_OPTIONS%)
 
-set EXPAT_VERSION=2.1.0
-set EXPAT_VERSION_TAG=R_2_1_0
+set EXPAT_VERSION=2.7.5
+set EXPAT_VERSION_TAG=R_2_7_5
 set EXPAT_DOWNLOAD_FILE=expat-%EXPAT_VERSION%.tar.gz
 set EXPAT_DOWNLOAD_URL=https://github.com/libexpat/libexpat/releases/download/%EXPAT_VERSION_TAG%/%EXPAT_DOWNLOAD_FILE%
 
-set LUA_VERSION=5.4.5
+set LUA_VERSION=5.4.7
 set LUA_DOWNLOAD_URL=https://github.com/walterschell/Lua/archive/refs/tags/v%LUA_VERSION%.zip
 
 set OPENSSL_VERSION=1.1.1.2100
