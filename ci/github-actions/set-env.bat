@@ -37,7 +37,6 @@ exit -1
 :msvc15
 set TOOLCHAIN=msvc15
 set CMAKE_GENERATOR=Visual Studio 15 2017
-set LUA_TOOLCHAIN=dll15
 shift
 goto :loop
 
@@ -45,7 +44,6 @@ goto :loop
 set TOOLCHAIN=msvc16
 set CMAKE_GENERATOR=Visual Studio 16 2019
 set CMAKE_USE_ARCH_OPTIONS=true
-set LUA_TOOLCHAIN=dll16
 shift
 goto :loop
 
@@ -53,7 +51,6 @@ goto :loop
 set TOOLCHAIN=msvc17
 set CMAKE_GENERATOR=Visual Studio 17 2022
 set CMAKE_USE_ARCH_OPTIONS=true
-set LUA_TOOLCHAIN=dll16
 shift
 goto :loop
 
