@@ -25,6 +25,7 @@ set(
 	test_BitMask.cpp
 	test_BoyerMooreFind.cpp
 	test_CmdLineParser.cpp
+	test_CountSort.cpp
 	test_Crypto.cpp
 	test_Error.cpp
 	test_FenwickTree.cpp
