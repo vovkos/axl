@@ -287,6 +287,18 @@ public:
 		int fileType = SSL_FILETYPE_PEM
 	);
 
+	bool
+	usePrivateKeyPem(
+		const sl::StringRef& pem,
+		const sl::StringRef& passphrase
+	);
+
+	bool
+	usePrivateKeyPemFile(
+		const sl::StringRef& fileName,
+		const sl::StringRef& passphrase
+	);
+
 	X509*
 	getPeerCertificate() const {
 		ASSERT(m_h);

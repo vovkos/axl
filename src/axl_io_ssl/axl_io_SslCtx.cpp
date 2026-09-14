@@ -12,6 +12,7 @@
 #include "pch.h"
 #include "axl_io_SslCtx.h"
 #include "axl_cry_CryptoError.h"
+#include "axl_cry_Pkey.h"
 
 namespace axl {
 namespace io {
@@ -94,6 +95,32 @@ SslCtx::usePrivateKeyFile(
 	ASSERT(m_h);
 	int result = ::SSL_CTX_use_PrivateKey_file(m_h, fileName.sz(), fileType);
 	return cry::completeWithLastCryptoError(result > 0);
+}
+
+bool
+SslCtx::usePrivateKeyPem(
+	const sl::StringRef& pem,
+	const sl::StringRef& passphrase
+) {
+	ASSERT(m_h);
+
+	cry::Pkey key;
+	return
+		key.readPrivateKeyPem(pem, passphrase) &&
+		usePrivateKey(key);
+}
+
+bool
+SslCtx::usePrivateKeyPemFile(
+	const sl::StringRef& fileName,
+	const sl::StringRef& passphrase
+) {
+	ASSERT(m_h);
+
+	cry::Pkey key;
+	return
+		key.readPrivateKeyPemFile(fileName, passphrase) &&
+		usePrivateKey(key);
 }
 
 bool

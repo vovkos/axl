@@ -201,6 +201,18 @@ public:
 	);
 
 	bool
+	usePrivateKeyPem(
+		const sl::StringRef& pem,
+		const sl::StringRef& passphrase
+	);
+
+	bool
+	usePrivateKeyPemFile(
+		const sl::StringRef& fileName,
+		const sl::StringRef& passphrase
+	);
+
+	bool
 	addExtraChainCertificate(const X509* cert);
 
 	void

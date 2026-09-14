@@ -11,6 +11,7 @@
 
 #include "pch.h"
 #include "axl_io_Ssl.h"
+#include "axl_cry_Pkey.h"
 
 namespace axl {
 namespace io {
@@ -117,6 +118,32 @@ Ssl::usePrivateKeyFile(
 	ASSERT(m_h);
 	int result = ::SSL_use_PrivateKey_file(m_h, fileName.sz(), fileType);
 	return complete(result);
+}
+
+bool
+Ssl::usePrivateKeyPem(
+	const sl::StringRef& pem,
+	const sl::StringRef& passphrase
+) {
+	ASSERT(m_h);
+
+	cry::Pkey key;
+	return
+		key.readPrivateKeyPem(pem, passphrase) &&
+		usePrivateKey(key);
+}
+
+bool
+Ssl::usePrivateKeyPemFile(
+	const sl::StringRef& fileName,
+	const sl::StringRef& passphrase
+) {
+	ASSERT(m_h);
+
+	cry::Pkey key;
+	return
+		key.readPrivateKeyPemFile(fileName, passphrase) &&
+		usePrivateKey(key);
 }
 
 bool
