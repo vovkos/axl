@@ -30,6 +30,14 @@ public:
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+enum PrivateKeyResult {
+	PrivateKeyResult_PassphraseError = -2,
+	PrivateKeyResult_Error           = -1,
+	PrivateKeyResult_Success         = 0,
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 class Pkey: public sl::Handle<EVP_PKEY*, FreePkey> {
 public:
 	Pkey() {}
@@ -37,13 +45,13 @@ public:
 	Pkey(EVP_PKEY* h):
 		sl::Handle<EVP_PKEY*, FreePkey>(h) {}
 
-	bool
+	PrivateKeyResult
 	readPrivateKeyPem(
 		const sl::StringRef& pem,
 		const sl::StringRef& passphrase = sl::StringRef()
 	);
 
-	bool
+	PrivateKeyResult
 	readPrivateKeyPemFile(
 		const sl::StringRef& fileName,
 		const sl::StringRef& passphrase = sl::StringRef()

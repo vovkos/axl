@@ -97,7 +97,7 @@ SslCtx::usePrivateKeyFile(
 	return cry::completeWithLastCryptoError(result > 0);
 }
 
-bool
+cry::PrivateKeyResult
 SslCtx::usePrivateKeyPem(
 	const sl::StringRef& pem,
 	const sl::StringRef& passphrase
@@ -105,12 +105,16 @@ SslCtx::usePrivateKeyPem(
 	ASSERT(m_h);
 
 	cry::Pkey key;
+	cry::PrivateKeyResult result = key.readPrivateKeyPem(pem, passphrase);
 	return
-		key.readPrivateKeyPem(pem, passphrase) &&
-		usePrivateKey(key);
+		result < 0 ?
+			result :
+		usePrivateKey(key) ?
+			cry::PrivateKeyResult_Success :
+			cry::PrivateKeyResult_Error;
 }
 
-bool
+cry::PrivateKeyResult
 SslCtx::usePrivateKeyPemFile(
 	const sl::StringRef& fileName,
 	const sl::StringRef& passphrase
@@ -118,9 +122,13 @@ SslCtx::usePrivateKeyPemFile(
 	ASSERT(m_h);
 
 	cry::Pkey key;
+	cry::PrivateKeyResult result = key.readPrivateKeyPemFile(fileName, passphrase);
 	return
-		key.readPrivateKeyPemFile(fileName, passphrase) &&
-		usePrivateKey(key);
+		result < 0 ?
+			result :
+		usePrivateKey(key) ?
+			cry::PrivateKeyResult_Success :
+			cry::PrivateKeyResult_Error;
 }
 
 bool

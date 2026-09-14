@@ -18,26 +18,35 @@ namespace cry {
 
 //..............................................................................
 
+struct PassphraseContext {
+	const sl::StringRef* m_passphrase;
+	bool m_isPassphraseProtected;
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 static
 int
 passphraseCallback(
 	char* buffer,
 	int size,
 	int rwFlag,
-	void* context
+	void* context0
 ) {
-	const sl::StringRef* passphrase = (const sl::StringRef*)context;
-	size_t length = passphrase->getLength();
+	PassphraseContext* context = (PassphraseContext*)context0;
+	context->m_isPassphraseProtected = true;
+
+	size_t length = context->m_passphrase->getLength();
 	if (length > (size_t)size)
 		return -1;
 
-	memcpy(buffer, passphrase->cp(), length); // not null-terminated
+	memcpy(buffer, context->m_passphrase->cp(), length);
 	return (int)length;
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-bool
+PrivateKeyResult
 Pkey::readPrivateKeyPem(
 	const sl::StringRef& pem,
 	const sl::StringRef& passphrase
@@ -47,13 +56,20 @@ Pkey::readPrivateKeyPem(
 	Bio bio;
 	bool result = bio.createMemBuf(pem.cp(), pem.getLength());
 	if (!result)
-		return false;
+		return PrivateKeyResult_Error;
 
-	m_h = ::PEM_read_bio_PrivateKey(bio, NULL, passphraseCallback, (void*)&passphrase);
-	return completeWithLastCryptoError(m_h != NULL);
+	PassphraseContext context = { &passphrase, false };
+	m_h = ::PEM_read_bio_PrivateKey(bio, NULL, passphraseCallback, &context);
+	return m_h ?
+		PrivateKeyResult_Success :
+		failWithLastCryptoError(
+			context.m_isPassphraseProtected ?
+			PrivateKeyResult_PassphraseError :
+			PrivateKeyResult_Error
+		);
 }
 
-bool
+PrivateKeyResult
 Pkey::readPrivateKeyPemFile(
 	const sl::StringRef& fileName,
 	const sl::StringRef& passphrase
@@ -63,10 +79,17 @@ Pkey::readPrivateKeyPemFile(
 	Bio bio;
 	bool result = bio.createFile(fileName);
 	if (!result)
-		return false;
+		return PrivateKeyResult_Error;
 
-	m_h = ::PEM_read_bio_PrivateKey(bio, NULL, passphraseCallback, (void*)&passphrase);
-	return completeWithLastCryptoError(m_h != NULL);
+	PassphraseContext context = { &passphrase, false };
+	m_h = ::PEM_read_bio_PrivateKey(bio, NULL, passphraseCallback, &context);
+	return m_h ?
+		PrivateKeyResult_Success :
+		failWithLastCryptoError(
+			context.m_isPassphraseProtected ?
+			PrivateKeyResult_PassphraseError :
+			PrivateKeyResult_Error
+		);
 }
 
 //..............................................................................

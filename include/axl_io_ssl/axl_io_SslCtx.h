@@ -14,6 +14,7 @@
 #define _AXL_IO_SSLCTX_H
 
 #include "axl_io_SslPch.h"
+#include "axl_cry_Pkey.h"
 
 namespace axl {
 namespace io {
@@ -200,13 +201,13 @@ public:
 		int fileType = SSL_FILETYPE_PEM
 	);
 
-	bool
+	cry::PrivateKeyResult
 	usePrivateKeyPem(
 		const sl::StringRef& pem,
 		const sl::StringRef& passphrase
 	);
 
-	bool
+	cry::PrivateKeyResult
 	usePrivateKeyPemFile(
 		const sl::StringRef& fileName,
 		const sl::StringRef& passphrase
