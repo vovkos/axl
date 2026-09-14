@@ -28,6 +28,7 @@ set(
 	${AXL_INC_DIR}/axl_cry/axl_cry_X509.h
 	${AXL_INC_DIR}/axl_cry/axl_cry_Pkcs7.h
 	${AXL_INC_DIR}/axl_cry/axl_cry_Pem.h
+	${AXL_INC_DIR}/axl_cry/axl_cry_Pkey.h
 )
 
 set(
@@ -44,6 +45,7 @@ set(
 	axl_cry_X509.cpp
 	axl_cry_Pkcs7.cpp
 	axl_cry_Pem.cpp
+	axl_cry_Pkey.cpp
 )
 
 source_group(

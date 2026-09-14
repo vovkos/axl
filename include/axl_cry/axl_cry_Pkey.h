@@ -11,86 +11,43 @@
 
 #pragma once
 
-#define _AXL_CRY_BIO_H
+#define _AXL_CRY_PKEY_H
 
-#include "axl_cry_Pch.h"
+#include "axl_cry_CryptoError.h"
 
 namespace axl {
 namespace cry {
 
-#if (_AXL_OS_WIN)
-typedef SOCKET socket_t;
-#else
-typedef int socket_t;
-#endif
-
 //..............................................................................
 
-class FreeBio {
+class FreePkey {
 public:
 	void
-	operator () (BIO* h) {
-		::BIO_free(h);
+	operator () (EVP_PKEY* h) {
+		EVP_PKEY_free(h);
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-class Bio: public sl::Handle<BIO*, FreeBio> {
+class Pkey: public sl::Handle<EVP_PKEY*, FreePkey> {
 public:
-	Bio() {}
+	Pkey() {}
 
-#if (OPENSSL_VERSION_NUMBER >= 0x10100000)
-	bool
-	create(const BIO_METHOD* method);
-#else
-	bool
-	create(BIO_METHOD* method);
-#endif
+	Pkey(EVP_PKEY* h):
+		sl::Handle<EVP_PKEY*, FreePkey>(h) {}
 
 	bool
-	createMem() {
-		return create(BIO_s_mem());
-	}
-
-	bool
-	createMemBuf(
-		const void* p,
-		size_t size = -1
+	readPrivateKeyPem(
+		const sl::StringRef& pem,
+		const sl::StringRef& passphrase = sl::StringRef()
 	);
 
 	bool
-	createSocket(
-		socket_t socket,
-		bool isAutoClose = false
-	);
-
-	bool
-	createFp(
-		FILE* file,
-		bool isAutoClose = false
-	);
-
-	bool
-	createFd(
-		int fd,
-		bool isAutoClose = false
-	);
-
-	bool
-	createFile(
+	readPrivateKeyPemFile(
 		const sl::StringRef& fileName,
-		const char* mode = "rb"
+		const sl::StringRef& passphrase = sl::StringRef()
 	);
-
-	void
-	freeAll() {
-		ASSERT(m_h);
-		::BIO_free_all(detach());
-	}
-
-	BUF_MEM*
-	getBufMem();
 };
 
 //..............................................................................

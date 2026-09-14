@@ -62,6 +62,16 @@ Bio::createFd(
 }
 
 bool
+Bio::createFile(
+	const sl::StringRef& fileName,
+	const char* mode
+) {
+	close();
+	m_h = BIO_new_file(fileName.sz(), mode);
+	return completeWithLastCryptoError(m_h != NULL);
+}
+
+bool
 Bio::createMemBuf(
 	const void* p,
 	size_t size
