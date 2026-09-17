@@ -34,6 +34,7 @@ set(
 	test_HandleTable.cpp
 	test_HashTable.cpp
 	test_IniParser.cpp
+	test_Json.cpp
 	test_List.cpp
 	test_Packer.cpp
 	test_Packetizer.cpp
@@ -85,6 +86,14 @@ include_directories(${AXL_INC_DIR})
 link_directories(${AXL_LIB_DIR})
 
 set(OPT_LIB_LIST)
+
+if(BUILD_AXL_JSON)
+	include_directories(${YAJL_INC_DIR})
+	link_directories(${YAJL_LIB_DIR})
+	list(APPEND OPT_LIB_LIST axl_json ${YAJL_LIB_NAME})
+else()
+	axl_exclude_from_build(test_Json.cpp)
+endif()
 
 if(BUILD_AXL_CRY)
 	include_directories(${OPENSSL_INC_DIR})

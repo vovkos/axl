@@ -49,6 +49,35 @@ setYajlError(
 	return result;
 }
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+void
+registerYajlGenErrorProvider() {
+	err::getErrorMgr()->registerProvider(
+		g_yajlGenErrorGuid,
+		sl::getSimpleSingleton<YajlGenErrorProvider>()
+	);
+}
+
+sl::StringRef
+YajlGenErrorProvider::getErrorDescription(yajl_gen_status status) {
+	static const char* stringTable[] = {
+		"OK",                                                  // yajl_gen_status_ok
+		"JSON keys must be strings",                           // yajl_gen_keys_must_be_strings
+		"maximum JSON generation depth exceeded",              // yajl_max_depth_exceeded
+		"JSON generator is in error state",                    // yajl_gen_in_error_state
+		"JSON generation is already complete",                 // yajl_gen_generation_complete
+		"invalid JSON number",                                 // yajl_gen_invalid_number
+		"no JSON generator buffer (print callback is in use)", // yajl_gen_no_buf
+		"invalid UTF-8 in a JSON string",                      // yajl_gen_invalid_string
+	};
+
+	size_t i = (size_t)status;
+	return i < countof(stringTable) ?
+		sl::StringRef(stringTable[i]) :
+		sl::formatString("unknown JSON generator error: %d", status);
+}
+
 //..............................................................................
 
 } // namespace json

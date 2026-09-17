@@ -15,6 +15,7 @@
 #include "axl_sl_String.h"
 #include "axl_sl_SimpleSingleton.h"
 #include "axl_io_SimpleMappedFile.h"
-#include "axl_err_Error.h"
+#include "axl_err_ErrorMgr.h"
 
 #include <yajl/yajl_parse.h>
+#include <yajl/yajl_gen.h>

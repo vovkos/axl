@@ -16,12 +16,14 @@
 set(
 	LIB_H_LIST
 	${AXL_INC_DIR}/axl_json/axl_json_YajlError.h
+	${AXL_INC_DIR}/axl_json/axl_json_YajlGen.h
 	${AXL_INC_DIR}/axl_json/axl_json_YajlParser.h
 )
 
 set(
 	LIB_CPP_LIST
 	axl_json_YajlError.cpp
+	axl_json_YajlGen.cpp
 )
 
 source_group(
