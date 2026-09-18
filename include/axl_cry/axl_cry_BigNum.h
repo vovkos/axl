@@ -31,6 +31,8 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class BnCtx: public sl::Handle<BN_CTX*, FreeBnCtx> {
+	AXL_DISABLE_COPY(BnCtx)
+
 public:
 	BnCtx() {}
 
@@ -64,6 +66,8 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class BigNum: public sl::Handle<BIGNUM*, FreeBigNum> {
+	AXL_DISABLE_COPY(BigNum)
+
 public:
 	BigNum() {
 		m_h = NULL;

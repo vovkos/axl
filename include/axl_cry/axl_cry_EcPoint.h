@@ -31,6 +31,8 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class EcPoint: public sl::Handle<EC_POINT*, FreeEcPoint> {
+	AXL_DISABLE_COPY(EcPoint)
+
 public:
 	EcPoint(EC_GROUP* group) {
 		create(group);

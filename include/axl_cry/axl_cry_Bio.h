@@ -37,6 +37,8 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class Bio: public sl::Handle<BIO*, FreeBio> {
+	AXL_DISABLE_COPY(Bio)
+
 public:
 	Bio() {}
 

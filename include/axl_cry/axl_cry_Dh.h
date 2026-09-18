@@ -32,6 +32,8 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class Dh: public sl::Handle<DH*, FreeDh> {
+	AXL_DISABLE_COPY(Dh)
+
 public:
 	Dh() {}
 
