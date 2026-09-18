@@ -24,12 +24,44 @@ namespace cry {
 //..............................................................................
 
 bool
-X509Cert::create() {
-	close();
+X509Name::addEntry(
+	const sl::StringRef& field,
+	const sl::StringRef& value
+) {
+	ASSERT(m_h);
 
-	m_h = X509_new();
-	return completeWithLastCryptoError(m_h != NULL);
+	int result = ::X509_NAME_add_entry_by_txt(
+		m_h,
+		field.sz(),
+		MBSTRING_UTF8,
+		(const uchar_t*)value.cp(),
+		(int)value.getLength(),
+		-1, // append
+		0   // not multi-valued
+	);
+
+	return completeWithLastCryptoError(result);
 }
+
+size_t
+X509Name::getString(sl::String* string) const {
+	ASSERT(m_h);
+
+	Bio bio;
+	bool result = bio.createMem();
+	if (!result)
+		return -1;
+
+	// RFC 2253 -- X509_NAME_oneline's format is legacy and ambiguous
+
+	if (::X509_NAME_print_ex(bio, m_h, 0, XN_FLAG_RFC2253) < 0)
+		return failWithLastCryptoError<size_t>(-1);
+
+	BUF_MEM* mem = bio.getBufMem();
+	return string->copy(mem->data, mem->length);
+}
+
+//..............................................................................
 
 bool
 X509Cert::loadDer(
@@ -39,8 +71,8 @@ X509Cert::loadDer(
 	close();
 
 	const uchar_t* p = (uchar_t*)p0;
-	X509* cert = X509_new();
-	X509* result = d2i_X509(&cert, &p, size);
+	X509* cert = ::X509_new();
+	X509* result = ::d2i_X509(&cert, &p, size);
 	if (!result) {
 		ASSERT(cert == NULL); // should have been freed already
 		return failWithLastCryptoError();
@@ -53,7 +85,7 @@ X509Cert::loadDer(
 size_t
 X509Cert::saveDer(sl::Array<char>* buffer) const {
 	uchar_t* p = NULL;
-	int length = i2d_X509(m_h, &p);
+	int length = ::i2d_X509(m_h, &p);
 	if (length <= 0)
 		return failWithLastCryptoError<size_t>(-1);
 
@@ -72,8 +104,8 @@ X509Cert::loadPem(
 	Bio bio;
 	bio.createMemBuf(p, size);
 
-	X509* cert = X509_new();
-	X509* result = PEM_read_bio_X509(bio, &cert, NULL, NULL);
+	X509* cert = ::X509_new();
+	X509* result = ::PEM_read_bio_X509(bio, &cert, NULL, NULL);
 	if (!result) {
 		ASSERT(cert == NULL); // should have been freed already
 		return failWithLastCryptoError();
@@ -87,27 +119,13 @@ size_t
 X509Cert::savePem(sl::String* string) const {
 	Bio bio;
 	bio.createMem();
-	PEM_write_bio_X509(bio, m_h);
+	::PEM_write_bio_X509(bio, m_h);
 
 	BUF_MEM* mem = bio.getBufMem();
 	return string->copy(mem->data, mem->length);
 }
 
 //..............................................................................
-
-bool
-X509Store::create() {
-	close();
-	m_h = X509_STORE_new();
-	return completeWithLastCryptoError(m_h != NULL);
-}
-
-bool
-X509Store::addCert(X509* cert) {
-	ASSERT(m_h);
-	int result = X509_STORE_add_cert(m_h, cert);
-	return completeWithLastCryptoError(result);
-}
 
 #if (_AXL_OS_WIN)
 

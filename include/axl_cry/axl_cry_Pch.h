@@ -24,3 +24,8 @@
 #include <openssl/rsa.h>
 #include <openssl/aes.h>
 #include <openssl/pem.h>
+
+// wincrypt.h (pulled in by windows.h) defines X509_NAME as a macro
+// we need X509_NAME as an OpenSSL type
+
+#undef X509_NAME

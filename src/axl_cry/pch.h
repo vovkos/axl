@@ -14,5 +14,6 @@
 #include "axl_cry_Pch.h"
 
 #if (_AXL_OS_WIN)
-#	include <wincrypt.h>
+#	include <wincrypt.h> // needs windows.h, hence after axl_cry_Pch.h
+#	undef X509_NAME      // ...which re-defines the macro (see axl_cry_Pch.h)
 #endif
