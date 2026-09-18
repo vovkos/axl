@@ -191,6 +191,12 @@ getTimestampFromTimespec(const timespec* tspec) {
 #endif
 
 inline
+time_t
+getUnixTimeFromTimestamp(uint64_t timestamp) {
+	return (time_t)(timestamp / 10000000 - AXL_SYS_EPOCH_DIFF);
+}
+
+inline
 uint64_t
 getTimestampFromTimeval(
 	uint64_t sec,
