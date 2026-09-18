@@ -26,6 +26,9 @@ set(
 	${AXL_INC_DIR}/axl_cry/axl_cry_Dh.h
 	${AXL_INC_DIR}/axl_cry/axl_cry_Aes.h
 	${AXL_INC_DIR}/axl_cry/axl_cry_X509.h
+	${AXL_INC_DIR}/axl_cry/axl_cry_X509Name.h
+	${AXL_INC_DIR}/axl_cry/axl_cry_X509Cert.h
+	${AXL_INC_DIR}/axl_cry/axl_cry_X509Store.h
 	${AXL_INC_DIR}/axl_cry/axl_cry_Pkcs7.h
 	${AXL_INC_DIR}/axl_cry/axl_cry_Pem.h
 	${AXL_INC_DIR}/axl_cry/axl_cry_Pkey.h
@@ -42,7 +45,9 @@ set(
 	axl_cry_EcPoint.cpp
 	axl_cry_Rsa.cpp
 	axl_cry_Dh.cpp
-	axl_cry_X509.cpp
+	axl_cry_X509Name.cpp
+	axl_cry_X509Cert.cpp
+	axl_cry_X509Store.cpp
 	axl_cry_Pkcs7.cpp
 	axl_cry_Pem.cpp
 	axl_cry_Pkey.cpp
