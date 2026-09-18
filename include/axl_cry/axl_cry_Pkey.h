@@ -39,11 +39,19 @@ enum PrivateKeyResult {
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class Pkey: public sl::Handle<EVP_PKEY*, FreePkey> {
+	AXL_DISABLE_COPY(Pkey)
+
 public:
 	Pkey() {}
 
 	Pkey(EVP_PKEY* h):
 		sl::Handle<EVP_PKEY*, FreePkey>(h) {}
+
+	void
+	upRef() const {
+		ASSERT(m_h);
+		::EVP_PKEY_up_ref(m_h);
+	}
 
 	PrivateKeyResult
 	readPrivateKeyPem(
@@ -56,6 +64,17 @@ public:
 		const sl::StringRef& fileName,
 		const sl::StringRef& passphrase = sl::StringRef()
 	);
+
+	size_t
+	writePrivateKeyPem(sl::String* string) const;
+
+	inline
+	sl::String
+	writePrivateKeyPem() const {
+		sl::String string;
+		writePrivateKeyPem(&string);
+		return string;
+	}
 };
 
 //..............................................................................

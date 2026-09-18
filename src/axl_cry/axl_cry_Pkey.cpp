@@ -92,6 +92,23 @@ Pkey::readPrivateKeyPemFile(
 		);
 }
 
+size_t
+Pkey::writePrivateKeyPem(sl::String* string) const {
+	ASSERT(m_h);
+
+	Bio bio;
+	bool result = bio.createMem();
+	if (!result)
+		return -1;
+
+	result = ::PEM_write_bio_PrivateKey(bio, m_h, NULL, NULL, 0, NULL, NULL) != 0;
+	if (!result)
+		return failWithLastCryptoError<size_t>(-1);
+
+	BUF_MEM* mem = bio.getBufMem();
+	return string->copy(mem->data, mem->length);
+}
+
 //..............................................................................
 
 } // namespace cry
