@@ -32,8 +32,8 @@ public:
 	typedef typename Details::ValueArg ValueArg;
 
 protected:
-	T* m_p;
 	Hdr* m_hdr;
+	T* m_p;
 	size_t m_count;
 
 public:
@@ -41,30 +41,28 @@ public:
 		initialize();
 	}
 
-	ArrayRef(ArrayRef&& src) {
-		initialize();
-		move(std::move(src));
-	}
-
 	ArrayRef(const ArrayRef& src) {
-		initialize();
-		attach(src);
+		initialize(src.m_hdr, src.m_p, src.m_count);
+		incRef();
+	}
+
+	ArrayRef(ArrayRef&& src) {
+		initialize(src.m_hdr, src.m_p, src.m_count);
+		src.initialize();
 	}
 
 	ArrayRef(
 		const T* p,
 		size_t count
 	) {
-		initialize();
-		attach(NULL, (T*)p, count);
+		initialize(NULL, p, count);
 	}
 
 	ArrayRef(
 		const T* p,
 		const void* end
 	) {
-		initialize();
-		attach(NULL, (T*)p, (const T*)end - p);
+		initialize(NULL, p, (const T*)end - p);
 	}
 
 	ArrayRef(
@@ -72,8 +70,8 @@ public:
 		const T* p,
 		size_t count
 	) {
-		initialize();
-		attach(hdr, (T*)p, count);
+		initialize(hdr, p, count);
+		incRef();
 	}
 
 	ArrayRef(
@@ -81,12 +79,12 @@ public:
 		const T* p,
 		const void* end
 	) {
-		initialize();
-		attach(hdr, (T*)p, (const T*)end - p);
+		initialize(hdr, p, (const T*)end - p);
+		incRef();
 	}
 
 	~ArrayRef() {
-		release();
+		decRef();
 	}
 
 	operator const T* () const {
@@ -94,14 +92,14 @@ public:
 	}
 
 	ArrayRef&
-	operator = (ArrayRef&& src) {
-		move(std::move(src));
+	operator = (const ArrayRef& src) {
+		setup(src.m_hdr, src.m_p, src.m_count);
 		return *this;
 	}
 
 	ArrayRef&
-	operator = (const ArrayRef& src) {
-		attach(src);
+	operator = (ArrayRef&& src) {
+		move(std::move(src));
 		return *this;
 	}
 
@@ -168,35 +166,46 @@ public:
 
 	void
 	release() {
-		if (m_hdr)
-			m_hdr->release();
-
+		decRef();
 		initialize();
 	}
 
 protected:
 	void
 	initialize() {
-		m_p = NULL;
-		m_hdr = NULL;
-		m_count = 0;
+		initialize(NULL, NULL, 0);
+	}
+
+	void
+	initialize(
+		Hdr* hdr,
+		const T* p,
+		size_t count
+	) {
+		m_hdr = hdr;
+		m_p = (T*)p;
+		m_count = count;
+	}
+
+	void
+	incRef() const {
+		if (m_hdr)
+			m_hdr->incRef();
+	}
+
+	void
+	decRef() const {
+		if (m_hdr)
+			m_hdr->decRef();
 	}
 
 	void
 	move(ArrayRef&& src) {
-		if (m_hdr)
-			m_hdr->release();
-
-		m_p = src.m_p;
-		m_hdr = src.m_hdr;
-		m_count = src.m_count;
+		Hdr* hdr = src.m_hdr;
+		T* p = src.m_p;
+		size_t count = src.m_count;
 		src.initialize();
-	}
-
-	void
-	attach(const ArrayRef& src) {
-		if (&src != this)
-			attach(src.m_hdr, src.m_p, src.m_count);
+		attach(hdr, p, count);
 	}
 
 	void
@@ -205,13 +214,23 @@ protected:
 		T* p,
 		size_t count
 	) {
-		if (hdr != m_hdr) { // try to avoid unnecessary interlocked ops
+		decRef();
+		m_hdr = hdr;
+		m_p = p;
+		m_count = count;
+	}
+
+	void
+	setup(
+		Hdr* hdr,
+		T* p,
+		size_t count
+	) {
+		if (hdr != m_hdr) {
 			if (hdr)
-				hdr->addRef();
+				hdr->incRef();
 
-			if (m_hdr)
-				m_hdr->release();
-
+			decRef();
 			m_hdr = hdr;
 		}
 
@@ -268,20 +287,20 @@ public:
 public:
 	Array() {}
 
-	Array(Array&& src) {
-		move(std::move(src));
-	}
-
-	Array(ArrayRef&& src) {
-		move(std::move(src));
-	}
-
 	Array(const Array& src) {
 		copy(src);
 	}
 
 	Array(const ArrayRef& src) {
 		copy(src);
+	}
+
+	Array(Array&& src) {
+		move(std::move(src));
+	}
+
+	Array(ArrayRef&& src) {
+		move(std::move(src));
 	}
 
 	explicit Array(size_t count) {
@@ -322,18 +341,6 @@ public:
 	}
 
 	Array&
-	operator = (Array&& src) {
-		move(std::move(src));
-		return *this;
-	}
-
-	Array&
-	operator = (ArrayRef&& src) {
-		move(std::move(src));
-		return *this;
-	}
-
-	Array&
 	operator = (const Array& src) {
 		copy(src);
 		return *this;
@@ -342,6 +349,18 @@ public:
 	Array&
 	operator = (const ArrayRef& src) {
 		copy(src);
+		return *this;
+	}
+
+	Array&
+	operator = (Array&& src) {
+		move(std::move(src));
+		return *this;
+	}
+
+	Array&
+	operator = (ArrayRef&& src) {
+		move(std::move(src));
 		return *this;
 	}
 
@@ -408,25 +427,6 @@ public:
 	}
 
 	size_t
-	move(ArrayRef&& src) {
-		if (src.isEmpty()) {
-			clear();
-			src.release();
-			return 0;
-		}
-
-		Hdr* hdr = src.getHdr();
-		if (!hdr || (hdr->m_flags & rc::BufHdrFlag_Exclusive)) {
-			copy(src, src.getCount());
-			src.release();
-			return this->m_count;
-		}
-
-		this->ArrayRef::move(std::move(src));
-		return this->m_count;
-	}
-
-	size_t
 	forceCopy(const ArrayRef& src) {
 		return copy(src, src.getCount());
 	}
@@ -445,7 +445,7 @@ public:
 		if (!hdr || (hdr->m_flags & rc::BufHdrFlag_Exclusive))
 			return copy(src, src.getCount());
 
-		this->attach(src);
+		this->setup(hdr, (T*)src.cp(), src.getCount());
 		return this->m_count;
 	}
 
@@ -524,6 +524,27 @@ public:
 			*p = e;
 
 		return count;
+	}
+
+	size_t
+	move(ArrayRef&& src) {
+		ASSERT(this != &src);
+
+		if (src.isEmpty()) {
+			clear();
+			src.release();
+			return 0;
+		}
+
+		Hdr* hdr = src.getHdr();
+		if (!hdr || (hdr->m_flags & rc::BufHdrFlag_Exclusive)) {
+			copy(src, src.getCount());
+			src.release();
+			return this->m_count;
+		}
+
+		this->ArrayRef::move(std::move(src));
+		return this->m_count;
 	}
 
 	size_t
@@ -862,9 +883,7 @@ public:
 		if (this->m_count)
 			Details::constructCopy(p, this->m_p, this->m_count);
 
-		if (this->m_hdr)
-			this->m_hdr->release();
-
+		this->decRef();
 		this->m_p = p;
 		this->m_hdr = hdr.detach();
 		return true;
@@ -910,13 +929,10 @@ public:
 		rc::Ptr<Hdr> hdr = AXL_RC_NEW_ARGS_INPLACE(Hdr, (bufferSize, flags), p, NULL);
 		Details::setHdrCount(hdr, 0);
 
-		if (this->m_hdr)
-			this->m_hdr->release();
-
+		this->decRef();
 		this->m_p = (T*)(hdr + 1);
 		this->m_hdr = hdr.detach();
 		this->m_count = 0;
-
 		return bufferSize / sizeof(T);
 	}
 
@@ -990,15 +1006,14 @@ protected:
 
 		T* p = (T*)(hdr + 1);
 
-		if (count <= this->m_count) {
+		if (count <= this->m_count)
 			Details::constructCopy(p, this->m_p, count);
-		} else {
+		else {
 			Details::constructCopy(p, this->m_p, this->m_count);
 			Construct() (p + this->m_count, count - this->m_count);
 		}
 
-		this->m_hdr->release();
-
+		this->m_hdr->decRef(); // safe here
 		this->m_p = p;
 		this->m_hdr = hdr.detach();
 		this->m_count = count;

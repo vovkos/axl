@@ -44,8 +44,7 @@ public:
 	}
 
 	Handle(Handle&& src) {
-		m_h = src.m_h;
-		src.m_h = GetInvalidHandle()();
+		m_h = src.detach();
 	}
 
 	~Handle() {
@@ -74,8 +73,7 @@ public:
 
 	Handle&
 	operator = (Handle&& src) {
-		attach(src.m_h);
-		src.m_h = GetInvalidHandle()();
+		attach(src.detach());
 		return *this;
 	}
 

@@ -63,10 +63,12 @@ State::copy(const State& src) {
 
 void
 State::move(State&& src) {
-	delete m_impl;
-	m_impl = src.m_impl;
-	m_match = std::move(src.m_match);
+	Impl* impl = src.m_impl;
 	src.m_impl = NULL;
+
+	delete m_impl;
+	m_impl = impl;
+	m_match = std::move(src.m_match);
 }
 
 bool

@@ -473,7 +473,6 @@ public:
 
 	void
 	attach(PyObject* p) {
-		ASSERT(p != this->m_p);
 		Py_XDECREF(this->m_p);
 		this->m_p = p;
 	}
@@ -504,12 +503,7 @@ public:
 	template <typename T2>
 	void
 	move(ObjectImpl<T2>&& src) {
-		if (&this->m_p == &src.m_p) // operator & is overloaded
-			return;
-
-		Py_XDECREF(this->m_p);
-		this->m_p = src.m_p;
-		src.m_p = NULL;
+		attach(src.detach());
 	}
 
 protected:

@@ -87,8 +87,8 @@ template <
 >
 class BufRef {
 protected:
-	T* m_p;
 	BufHdr* m_hdr;
+	T* m_p;
 	size_t m_size;
 
 public:
@@ -96,44 +96,40 @@ public:
 		initialize();
 	}
 
-	BufRef(BufRef&& src) {
-		initialize();
-		move(std::move(src));
+	BufRef(const BufRef& src) {
+		initialize(src.m_hdr, src.m_p, src.m_size);
+		incRef();
 	}
 
-	BufRef(const BufRef& src) {
-		initialize();
-		attach(src);
+	BufRef(BufRef&& src) {
+		initialize(src.m_hdr, src.m_p, src.m_size);
+		src.initialize();
 	}
 
 	BufRef(const T* p) {
-		initialize();
-		if (p)
-			attach(NULL, p, SizeOf() (p));
+		initialize(NULL, p, p ? SizeOf()(p) : 0);
 	}
 
 	BufRef(
 		const T* p,
 		size_t size
 	) {
-		initialize();
-		attach(NULL, p, size);
+		initialize(NULL, p, size);
 	}
 
 	BufRef(
 		const T* p,
 		const void* end
 	) {
-		initialize();
-		attach(NULL, p, (char*)end - (char*)p);
+		initialize(NULL, p, (char*)end - (char*)p);
 	}
 
 	BufRef(
 		BufHdr* hdr,
 		const T* p
 	) {
-		initialize();
-		attach(hdr, p, SizeOf() (p));
+		initialize(hdr, p, p ? SizeOf()(p) : 0);
+		incRef();
 	}
 
 	BufRef(
@@ -141,8 +137,8 @@ public:
 		const T* p,
 		size_t size
 	) {
-		initialize();
-		attach(hdr, p, size);
+		initialize(hdr, p, size);
+		incRef();
 	}
 
 	BufRef(
@@ -150,12 +146,12 @@ public:
 		const T* p,
 		const void* end
 	) {
-		initialize();
-		attach(hdr, p, (char*)end - (char*)p);
+		initialize(hdr, p, (char*)end - (char*)p);
+		incRef();
 	}
 
 	~BufRef() {
-		release();
+		decRef();
 	}
 
 	operator const T* () const {
@@ -169,14 +165,14 @@ public:
 	}
 
 	BufRef&
-	operator = (BufRef&& src) {
-		move(std::move(src));
+	operator = (const BufRef& src) {
+		setup(src.m_hdr, src.m_p, src.m_size);
 		return *this;
 	}
 
 	BufRef&
-	operator = (const BufRef& src) {
-		attach(src);
+	operator = (BufRef&& src) {
+		move(std::move(src));
 		return *this;
 	}
 
@@ -207,49 +203,46 @@ public:
 
 	void
 	release() {
-		if (m_hdr)
-			m_hdr->release();
-
+		decRef();
 		initialize();
 	}
 
 protected:
 	void
 	initialize() {
-		m_p = NULL;
-		m_hdr = NULL;
-		m_size = 0;
+		initialize(NULL, NULL, 0);
+	}
+
+	void
+	initialize(
+		BufHdr* hdr,
+		const T* p,
+		size_t size
+	) {
+		m_hdr = hdr;
+		m_p = (T*)p;
+		m_size = size;
+	}
+
+	void
+	incRef() const {
+		if (m_hdr)
+			m_hdr->incRef();
+	}
+
+	void
+	decRef() const {
+		if (m_hdr)
+			m_hdr->decRef();
 	}
 
 	void
 	move(BufRef&& src) {
-		if (m_hdr)
-			m_hdr->release();
-
-		m_p = src.m_p;
-		m_hdr = src.m_hdr;
-		m_size = src.m_size;
+		BufHdr* hdr = src.m_hdr;
+		const T* p = src.m_p;
+		size_t size = src.m_size;
 		src.initialize();
-	}
-
-	void
-	attachBufHdr(BufHdr* hdr) {
-		if (hdr == m_hdr)
-			return; // try to avoid unnecessary interlocked ops
-
-		if (hdr)
-			hdr->addRef();
-
-		if (m_hdr)
-			m_hdr->release();
-
-		m_hdr = hdr;
-	}
-
-	void
-	attach(const BufRef& src) {
-		if (&src != this)
-			attach(src.m_hdr, src.m_p, src.m_size);
+		attach(hdr, p, size);
 	}
 
 	void
@@ -258,7 +251,25 @@ protected:
 		const T* p,
 		size_t size
 	) {
-		attachBufHdr(hdr);
+		decRef();
+		m_hdr = hdr;
+		m_p = (T*)p;
+		m_size = size;
+	}
+
+	void
+	setup(
+		BufHdr* hdr,
+		const T* p,
+		size_t size
+	) {
+		if (hdr != m_hdr) {
+			if (hdr)
+				hdr->incRef();
+
+			decRef();
+			m_hdr = hdr;
+		}
 
 		m_p = (T*)p;
 		m_size = size;
@@ -293,20 +304,20 @@ protected:
 public:
 	Buf() {}
 
-	Buf(Buf&& src) {
-		move(std::move(src));
-	}
-
-	Buf(Ref&& src) {
-		move(std::move(src));
-	}
-
 	Buf(const Buf& src) {
 		copy(src);
 	}
 
 	Buf(const Ref& src) {
 		copy(src);
+	}
+
+	Buf(Buf&& src) {
+		move(std::move(src));
+	}
+
+	Buf(Ref&& src) {
+		move(std::move(src));
 	}
 
 	Buf(
@@ -345,18 +356,6 @@ public:
 	}
 
 	Buf&
-	operator = (Buf&& src) {
-		move(std::move(src));
-		return *this;
-	}
-
-	Buf&
-	operator = (Ref&& src) {
-		move(std::move(src));
-		return *this;
-	}
-
-	Buf&
 	operator = (const Buf& src) {
 		copy(src);
 		return *this;
@@ -365,6 +364,18 @@ public:
 	Buf&
 	operator = (const Ref& src) {
 		copy(src);
+		return *this;
+	}
+
+	Buf&
+	operator = (Buf&& src) {
+		move(std::move(src));
+		return *this;
+	}
+
+	Buf&
+	operator = (Ref&& src) {
+		move(std::move(src));
 		return *this;
 	}
 
@@ -399,25 +410,6 @@ public:
 	}
 
 	size_t
-	move(Ref&& src) {
-		if (src.isEmpty()) {
-			clear();
-			src.release();
-			return 0;
-		}
-
-		BufHdr* hdr = src.getHdr();
-		if (!hdr || (hdr->m_flags & BufHdrFlag_Exclusive)) {
-			copy(src, src.getSize());
-			src.release();
-			return this->m_size;
-		}
-
-		this->Ref::move(std::move(src));
-		return this->m_size;
-	}
-
-	size_t
 	copy(const Ref& src) {
 		if (&src == this)
 			return this->m_size;
@@ -431,7 +423,7 @@ public:
 		if (!hdr || (hdr->m_flags & BufHdrFlag_Exclusive))
 			return copy(src, src.getSize());
 
-		this->attach(src);
+		this->setup(hdr, src.cp(), src.getSize());
 		return this->m_size;
 	}
 
@@ -473,6 +465,27 @@ public:
 			memcpy(this->m_p + 1, p + 1, size - sizeof(T));
 
 		return size;
+	}
+
+	size_t
+	move(Ref&& src) {
+		ASSERT(this != &src);
+
+		if (src.isEmpty()) {
+			clear();
+			src.release();
+			return 0;
+		}
+
+		BufHdr* hdr = src.getHdr();
+		if (!hdr || (hdr->m_flags & BufHdrFlag_Exclusive)) {
+			copy(src, src.getSize());
+			src.release();
+			return this->m_size;
+		}
+
+		this->Ref::move(std::move(src));
+		return this->m_size;
 	}
 
 	bool
@@ -538,11 +551,9 @@ public:
 			new (p) T;
 		}
 
-		if (this->m_hdr)
-			this->m_hdr->release();
-
-		this->m_p = p;
+		this->decRef();
 		this->m_hdr = hdr.detach();
+		this->m_p = p;
 		this->m_size = size;
 		return p;
 	}
@@ -560,13 +571,10 @@ public:
 
 		Ptr<Hdr> hdr = AXL_RC_NEW_ARGS_INPLACE(Hdr, (bufferSize, flags), p, NULL);
 
-		if (this->m_hdr)
-			this->m_hdr->release();
-
+		this->decRef();
 		this->m_p = (T*)(hdr + 1);
 		this->m_hdr = hdr.detach();
 		this->m_size = 0;
-
 		return bufferSize;
 	}
 };

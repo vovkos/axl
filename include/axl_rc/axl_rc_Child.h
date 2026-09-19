@@ -40,13 +40,13 @@ protected:
 public:
 	Child(RefCount* parent) {
 		m_parentOffset = m_buffer - (char*)parent;
-		AXL_RC_NEW_INPLACE(T, m_buffer, weakReleaseParent);
-		parent->addWeakRef();
-		p()->addRef();
+		AXL_RC_NEW_INPLACE(T, m_buffer, decWeakRefParent);
+		parent->incWeakRef();
+		p()->incRef();
 	}
 
 	~Child() {
-		p()->release();
+		p()->decRef();
 	}
 
 	operator T* () {
@@ -68,9 +68,9 @@ public:
 	}
 
 protected:
-	static void weakReleaseParent(void* p) {
+	static void decWeakRefParent(void* p) {
 		size_t parentOffset = *(size_t*)((uint64_t*)p - 1);
-		((RefCount*)((char*)p - parentOffset))->weakRelease();
+		((RefCount*)((char*)p - parentOffset))->decWeakRef();
 	}
 };
 

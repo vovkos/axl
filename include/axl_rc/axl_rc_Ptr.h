@@ -20,6 +20,52 @@ namespace rc {
 
 //..............................................................................
 
+// a detached (disowned) pointer -- carries the ref-count along, but reads as a plain T*
+
+template <typename T>
+class DetachedPtr {
+public:
+	T* m_p;
+	RefCount* m_refCount;
+
+public:
+	DetachedPtr() {
+		m_p = NULL;
+		m_refCount = NULL;
+	}
+
+	DetachedPtr(const NullPtr&) {
+		m_p = NULL;
+		m_refCount = NULL;
+	}
+
+	template <typename T2>
+	DetachedPtr(T2* p) {
+		m_p = p;
+		m_refCount = p;
+	}
+
+	DetachedPtr(
+		T* p,
+		RefCount* refCount
+	) {
+		m_p = p;
+		m_refCount = refCount;
+	}
+
+	operator T* () const {
+		return m_p;
+	}
+
+	T*
+	operator -> () const {
+		ASSERT(m_p);
+		return m_p;
+	}
+};
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 template <typename T>
 class Ptr {
 	template <typename T2>
@@ -41,45 +87,52 @@ public:
 		initialize();
 	}
 
-	Ptr(Ptr&& src) {
-		initialize();
-		move(std::move(src));
-	}
-
 	Ptr(const Ptr& src) {
-		initialize();
-		copy(src);
+		initialize(src.m_p, src.m_refCount);
+		incRef();
 	}
 
-	template <typename A>
-	Ptr(const Ptr<A>& src) {
-		initialize();
-		copy(src.m_p, src.m_refCount);
+	Ptr(Ptr&& src) {
+		initialize(src.m_p, src.m_refCount);
+		src.initialize();
 	}
 
-	template <typename A>
-	Ptr(const WeakPtr<A>& src) {
-		initialize();
-		if (src.m_refCount && src.m_refCount->addRefByWeakPtr())
-			attach(src.m_p, src.m_refCount);
+	template <typename T2>
+	Ptr(const Ptr<T2>& src) {
+		initialize(src.m_p, src.m_refCount);
+		incRef();
 	}
 
-	template <typename A>
-	Ptr(A* p) {
-		initialize();
-		copy(p, p);
+	template <typename T2>
+	Ptr(Ptr<T2>&& src) {
+		initialize(src.m_p, src.m_refCount);
+		src.initialize();
+	}
+
+	template <typename T2>
+	Ptr(const WeakPtr<T2>& src) {
+		if (src.m_refCount && src.m_refCount->incRefByWeakPtr())
+			initialize(src.m_p, src.m_refCount);
+		else
+			initialize();
+	}
+
+	template <typename T2>
+	Ptr(T2* p) {
+		initialize(p, p);
+		incRef();
 	}
 
 	Ptr(
 		T* p,
 		RefCount* refCount
 	) {
-		m_p = NULL, m_refCount = NULL;
-		copy(p, refCount);
+		initialize(p, refCount);
+		incRef();
 	}
 
 	~Ptr() {
-		clear();
+		decRef();
 	}
 
 	operator T* () const {
@@ -99,15 +152,53 @@ public:
 	}
 
 	Ptr&
-	operator = (Ptr&& src) {
-		copy(src);
+	operator = (const Ptr& src) {
+		setup(src.m_p, src.m_refCount);
 		return *this;
 	}
 
 	Ptr&
-	operator = (const Ptr& src) {
-		copy(src);
+	operator = (Ptr&& src) {
+		move(std::move(src));
 		return *this;
+	}
+
+	template <typename T2>
+	Ptr&
+	operator = (const Ptr<T2>& src) {
+		setup(src.m_p, src.m_refCount);
+		return *this;
+	}
+
+	template <typename T2>
+	Ptr&
+	operator = (Ptr<T2>&& src) {
+		move(std::move(src));
+		return *this;
+	}
+
+	template <typename T2>
+	Ptr&
+	operator = (const WeakPtr<T2>& src) {
+		if (src.m_refCount && src.m_refCount->incRefByWeakPtr())
+			attach(src.m_p, src.m_refCount);
+		else
+			clear();
+
+		return *this;
+	}
+
+	template <typename T2>
+	Ptr&
+	operator = (T2* p) {
+		setup(p, p);
+		return *this;
+	}
+
+	bool
+	isExclusive() const {
+		ASSERT(m_refCount);
+		return m_refCount->getRefCount() == 1;
 	}
 
 	T*
@@ -115,84 +206,104 @@ public:
 		return m_p;
 	}
 
-	bool
-	isExclusive() const {
-		ASSERT(m_p);
-		return m_p->getRefCount() == 1;
-	}
-
 	RefCount*
 	getRefCount() const {
 		return m_refCount;
 	}
 
+	template <typename T2>
 	void
-	move(Ptr&& src) {
-		m_p = src.m_p;
-		m_refCount = src.m_refCount;
-		src.initialize();
+	setup(T2* p) {
+		setup(p, p);
 	}
 
+	template <typename T2>
 	void
-	copy(const Ptr& src) {
-		copy(src.m_p, src.m_refCount);
-	}
-
-	void
-	copy(
-		T* p,
+	setup(
+		T2* p,
 		RefCount* refCount
 	) {
 		m_p = p;
 
-		if (m_refCount == refCount)
-			return;
+		if (refCount != m_refCount) {
+			if (refCount)
+				refCount->incRef();
 
-		if (refCount)
-			refCount->addRef();
-
-		if (m_refCount)
-			m_refCount->release();
-
-		m_refCount = refCount;
+			decRef();
+			m_refCount = refCount;
+		}
 	}
 
+	template <typename T2>
+	void
+	move(Ptr<T2>&& src) {
+		T2* p = src.m_p;
+		RefCount* refCount = src.m_refCount;
+		src.initialize();
+		attach(p, refCount);
+	}
+
+	template <typename T2>
+	void
+	attach(T2* p) {
+		attach(p, p);
+	}
+
+	template <typename T2>
 	void
 	attach(
-		T* p,
+		T2* p,
 		RefCount* refCount
 	) {
-		if (m_refCount)
-			m_refCount->release();
-
+		decRef();
 		m_p = p;
 		m_refCount = refCount;
 	}
 
-	T*
-	detach(RefCount** refCount = NULL) {
-		T* p = m_p;
+	template <typename T2>
+	void
+	attach(const DetachedPtr<T2>& src) {
+		attach(src.m_p, src.m_refCount);
+	}
 
-		if (refCount)
-			*refCount = m_refCount;
-
+	DetachedPtr<T>
+	detach() {
+		DetachedPtr<T> detached(m_p, m_refCount);
 		initialize();
-		return p;
+		return detached;
 	}
 
 	void
 	clear() {
-		if (m_refCount)
-			m_refCount->release();
-
+		decRef();
 		initialize();
 	}
 
 protected:
 	void
 	initialize() {
-		m_p = NULL;
-		m_refCount = NULL;
+		initialize(NULL, NULL);
+	}
+
+	void
+	initialize(
+		T* p,
+		RefCount* refCount
+	) {
+		m_p = p;
+		m_refCount = refCount;
+	}
+
+	void
+	incRef() const {
+		if (m_refCount)
+			m_refCount->incRef();
+	}
+
+	void
+	decRef() const {
+		if (m_refCount)
+			m_refCount->decRef();
 	}
 };
 

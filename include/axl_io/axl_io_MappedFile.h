@@ -137,12 +137,13 @@ public:
 
 	void
 	move(MappedFileView&& src) {
-		if (this == &src)
-			return;
-
-		unpin();
-		setup(src.m_file, src.m_pin, src.m_p, src.m_size);
+		MappedFile* file = src.m_file;
+		handle_t pin = src.m_pin;
+		T* p = src.m_p;
+		size_t size = src.m_size;
 		src.init();
+		unpin();
+		setup(file, pin, p, size);
 	}
 
 protected:

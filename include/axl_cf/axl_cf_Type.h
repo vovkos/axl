@@ -161,11 +161,7 @@ public:
 
 	void
 	move(TypeBase&& src) {
-		if (m_p)
-			::CFRelease(m_p);
-
-		m_p = src.m_p;
-		src.m_p = NULL;
+		attach(src.detach());
 	}
 
 	intptr_t

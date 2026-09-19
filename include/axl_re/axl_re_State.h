@@ -88,13 +88,11 @@ protected:
 public:
 	State() {}
 
-	State(State&& src) {
-		m_p.move(std::move(src.m_p));
-	}
+	State(const State& src):
+		m_p(src.m_p) {}
 
-	State(const State& src) {
-		m_p.copy(src.m_p);
-	}
+	State(State&& src):
+		m_p(std::move(src.m_p)) {}
 
 	State(const StateInit& init) {
 		initialize(init);
@@ -105,14 +103,14 @@ public:
 	}
 
 	State&
-	operator = (State&& src) {
-		m_p.move(std::move(src.m_p));
+	operator = (const State& src) {
+		m_p = src.m_p;
 		return *this;
 	}
 
 	State&
-	operator = (const State& src) {
-		m_p.copy(src.m_p);
+	operator = (State&& src) {
+		m_p = std::move(src.m_p);
 		return *this;
 	}
 

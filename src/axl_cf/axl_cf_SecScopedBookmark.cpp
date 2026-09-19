@@ -62,6 +62,8 @@ SecScopedBookmark::copy(const SecScopedBookmark& src) {
 
 void
 SecScopedBookmark::move(SecScopedBookmark&& src) {
+	ASSERT(this != &src);
+
 	stopAccess();
 
 	m_filePath = std::move(src.m_filePath);

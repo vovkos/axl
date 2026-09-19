@@ -196,12 +196,12 @@ public:
 
 	void
 	move(FileHeapPtr&& src) {
-		if (this == &src)
-			return;
-
 		m_pin.move(std::move(src.m_pin));
-		setup(src.m_p, src.m_offset, src.m_size);
+		T* p = src.m_p;
+		uint64_t offset = src.m_offset;
+		uint32_t size = src.m_size;
 		src.init();
+		setup(p, offset, size);
 	}
 
 protected:

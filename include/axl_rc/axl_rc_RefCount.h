@@ -67,23 +67,23 @@ public:
 	}
 
 	size_t
-	addRef() {
+	incRef() {
 		return sys::atomicInc(&m_refCount);
 	}
 
 	size_t
-	release();
+	decRef();
 
 	size_t
-	addWeakRef() {
+	incWeakRef() {
 		return sys::atomicInc(&m_weakRefCount);
 	}
 
 	size_t
-	weakRelease();
+	decWeakRef();
 
 	size_t
-	addRefByWeakPtr();
+	incRefByWeakPtr();
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -98,12 +98,12 @@ RefCount::RefCount() {
 
 inline
 size_t
-RefCount::release() {
+RefCount::decRef() {
 	intptr_t refCount = sys::atomicDec(&m_refCount);
 
 	if (!refCount) {
 		this->~RefCount();
-		weakRelease(); // weakRelease () should be here, not in ~RefCount ()
+		decWeakRef(); // decWeakRef () should be here, not in ~RefCount ()
 	}
 
 	return refCount;
@@ -111,7 +111,7 @@ RefCount::release() {
 
 inline
 size_t
-RefCount::weakRelease() {
+RefCount::decWeakRef() {
 	intptr_t refCount = sys::atomicDec(&m_weakRefCount);
 	if (!refCount && m_freeFunc)
 		m_freeFunc(this);
@@ -121,7 +121,7 @@ RefCount::weakRelease() {
 
 inline
 size_t
-RefCount::addRefByWeakPtr() {
+RefCount::incRefByWeakPtr() {
 	for (;;) {
 		int32_t old = m_refCount;
 		if (old == 0)
@@ -143,22 +143,22 @@ class Box:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class Release {
+class DecRef {
 public:
 	void
 	operator () (T* p) const {
-		p->release();
+		p->decRef();
 	}
 };
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <typename T>
-class WeakRelease {
+class DecWeakRef {
 public:
 	void
 	operator () (T* p) const {
-		p->weakRelease();
+		p->decWeakRef();
 	}
 };
 

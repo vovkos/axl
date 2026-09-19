@@ -103,10 +103,10 @@ public:
 			return;
 
 		if (refCount)
-			refCount->addWeakRef();
+			refCount->incWeakRef();
 
 		if (m_refCount)
-			m_refCount->weakRelease();
+			m_refCount->decWeakRef();
 
 		m_refCount = refCount;
 	}
@@ -117,7 +117,7 @@ public:
 		RefCount* refCount
 	) {
 		if (m_refCount)
-			m_refCount->weakRelease();
+			m_refCount->decWeakRef();
 
 		m_p = p;
 		m_refCount = refCount;
@@ -141,7 +141,7 @@ public:
 	void
 	clear() {
 		if (m_refCount)
-			m_refCount->weakRelease();
+			m_refCount->decWeakRef();
 
 		m_p = NULL;
 		m_refCount = NULL;

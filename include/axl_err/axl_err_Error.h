@@ -99,11 +99,11 @@ public:
 public:
 	ErrorRef() {}
 
-	ErrorRef(ErrorRef&& src):
-		BaseType(std::move(src)) {}
-
 	ErrorRef(const ErrorRef& src):
 		BaseType(src) {}
+
+	ErrorRef(ErrorRef&& src):
+		BaseType(std::move(src)) {}
 
 	ErrorRef(const ErrorHdr* src):
 		BaseType(src) {}
@@ -118,14 +118,14 @@ public:
 	);
 
 	ErrorRef&
-	operator = (ErrorRef&& src) {
-		move(std::move(src));
+	operator = (const ErrorRef& src) {
+		setup(src.m_hdr, src.m_p, src.m_size);
 		return *this;
 	}
 
 	ErrorRef&
-	operator = (const ErrorRef& src) {
-		attach(src);
+	operator = (ErrorRef&& src) {
+		move(std::move(src));
 		return *this;
 	}
 
@@ -152,20 +152,20 @@ class Error: public rc::Buf<ErrorHdr, SizeOfError, ErrorRef> {
 public:
 	Error() {}
 
-	Error(Error&& src) {
-		move(std::move(src));
-	}
-
-	Error(ErrorRef&& src) {
-		move(std::move(src));
-	}
-
 	Error(const Error& src) {
 		copy(src);
 	}
 
 	Error(const ErrorRef& src) {
 		copy(src);
+	}
+
+	Error(Error&& src) {
+		move(std::move(src));
+	}
+
+	Error(ErrorRef&& src) {
+		move(std::move(src));
 	}
 
 	Error(const ErrorHdr* src) {
@@ -200,18 +200,6 @@ public:
 	}
 
 	Error&
-	operator = (Error&& src) {
-		move(std::move(src));
-		return *this;
-	}
-
-	Error&
-	operator = (ErrorRef&& src) {
-		move(std::move(src));
-		return *this;
-	}
-
-	Error&
 	operator = (const Error& src) {
 		copy(src);
 		return *this;
@@ -220,6 +208,18 @@ public:
 	Error&
 	operator = (const ErrorRef& src) {
 		copy(src);
+		return *this;
+	}
+
+	Error&
+	operator = (Error&& src) {
+		move(std::move(src));
+		return *this;
+	}
+
+	Error&
+	operator = (ErrorRef&& src) {
+		move(std::move(src));
 		return *this;
 	}
 

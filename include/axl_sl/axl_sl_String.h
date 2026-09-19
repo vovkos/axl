@@ -59,8 +59,8 @@ public:
 	typedef StringBase<C3, Details3> String3;
 
 protected:
-	mutable C* m_p;
 	mutable rc::BufHdr* m_hdr;
+	mutable C* m_p;
 	size_t m_length;
 	mutable bool m_isNullTerminated;
 
@@ -69,19 +69,18 @@ public:
 		initialize();
 	}
 
-	StringRefBase(StringRef&& src) {
-		initialize();
-		move(std::move(src));
+	StringRefBase(const StringRef& src) {
+		initialize(src.m_hdr, src.m_p, src.m_length, src.m_isNullTerminated);
+		incRef();
 	}
 
-	StringRefBase(const StringRef& src) {
-		initialize();
-		attach(src);
+	StringRefBase(StringRef&& src) {
+		initialize(src.m_hdr, src.m_p, src.m_length, src.m_isNullTerminated);
+		src.initialize();
 	}
 
 	StringRefBase(const C* p) {
-		initialize();
-		attach(NULL, p, Details::calcLength(p), p != NULL);
+		initialize(NULL, p, Details::calcLength(p), p != NULL);
 	}
 
 	StringRefBase(
@@ -89,8 +88,7 @@ public:
 		size_t length,
 		bool isNullTerminated = false
 	) {
-		initialize();
-		attach(NULL, p, length, isNullTerminated);
+		initialize(NULL, p, length, isNullTerminated);
 	}
 
 	StringRefBase(
@@ -98,16 +96,15 @@ public:
 		const void* end,
 		bool isNullTerminated = false
 	) {
-		initialize();
-		attach(NULL, p, (C*)end - p, isNullTerminated);
+		initialize(NULL, p, (C*)end - p, isNullTerminated);
 	}
 
 	StringRefBase(
 		rc::BufHdr* hdr,
 		const C* p
 	) {
-		initialize();
-		attach(hdr, p, Details::calcLength(p), p != NULL);
+		initialize(hdr, p, Details::calcLength(p), p != NULL);
+		incRef();
 	}
 
 	StringRefBase(
@@ -116,8 +113,8 @@ public:
 		size_t length,
 		bool isNullTerminated = false
 	) {
-		initialize();
-		attach(hdr, p, length, isNullTerminated);
+		initialize(hdr, p, length, isNullTerminated);
+		incRef();
 	}
 
 	StringRefBase(
@@ -126,23 +123,23 @@ public:
 		const void* end,
 		bool isNullTerminated = false
 	) {
-		initialize();
-		attach(hdr, p, (C*)end - p, isNullTerminated);
+		initialize(hdr, p, (C*)end - p, isNullTerminated);
+		incRef();
 	}
 
 	~StringRefBase() {
-		release();
+		decRef();
+	}
+
+	StringRefBase&
+	operator = (const StringRef& src) {
+		setup(src.m_hdr, src.m_p, src.m_length, src.m_isNullTerminated);
+		return *this;
 	}
 
 	StringRefBase&
 	operator = (StringRef&& src) {
 		move(std::move(src));
-		return *this;
-	}
-
-	StringRefBase&
-	operator = (const StringRef& src) {
-		attach(src);
 		return *this;
 	}
 
@@ -318,9 +315,7 @@ public:
 
 	void
 	release() {
-		if (m_hdr)
-			m_hdr->release();
-
+		decRef();
 		initialize();
 	}
 
@@ -605,10 +600,8 @@ public:
 			return StringRef();
 		else if (i == 0)
 			return *this;
-
-		StringRef string;
-		string.attach(m_hdr, m_p + i, m_length - i, m_isNullTerminated);
-		return string;
+		else
+			return StringRef(m_hdr, m_p + i, m_length - i, m_isNullTerminated);
 	}
 
 	StringRef
@@ -619,10 +612,8 @@ public:
 			return StringRef();
 		else if (i == m_length - 1)
 			return *this;
-
-		StringRef string;
-		string.attach(m_hdr, m_p, i + 1, false);
-		return string;
+		else
+			return StringRef(m_hdr, m_p, i + 1, false);
 	}
 
 	StringRef
@@ -635,17 +626,12 @@ public:
 		size_t j = reverseFindNotOneOf(whitespace);
 		ASSERT(j != -1);
 
-		if (j != m_length - 1) {
-			StringRef string;
-			string.attach(m_hdr, m_p + i, j + 1 - i, false);
-			return string;
-		} else if (i != 0) {
-			StringRef string;
-			string.attach(m_hdr, m_p + i, m_length - i, m_isNullTerminated);
-			return string;
-		} else {
+		if (j != m_length - 1)
+			return StringRef(m_hdr, m_p + i, j + 1 - i, false);
+		else if (i != 0)
+			return StringRef(m_hdr, m_p + i, m_length - i, m_isNullTerminated);
+		else
 			return *this;
-		}
 	}
 
 	String
@@ -682,12 +668,11 @@ protected:
 			return m_p;
 		}
 
-		if (m_hdr)
-			m_hdr->release();
+		decRef();
 
 		String string(*this);
-		m_p = (C*)string.sz();
 		m_hdr = string.getHdr();
+		m_p = (C*)string.sz();
 		m_isNullTerminated = true;
 		((StringRef*)&string)->m_hdr = NULL;
 		return m_p;
@@ -695,42 +680,42 @@ protected:
 
 	void
 	initialize() {
-		m_p = NULL;
-		m_hdr = NULL;
-		m_length = 0;
-		m_isNullTerminated = false;
+		initialize(NULL, NULL, 0, false);
+	}
+
+	void
+	initialize(
+		rc::BufHdr* hdr,
+		const C* p,
+		size_t length,
+		bool isNullTerminated
+	) {
+		m_hdr = hdr;
+		m_p = (C*)p;
+		m_length = length;
+		m_isNullTerminated = isNullTerminated;
+	}
+
+	void
+	incRef() const {
+		if (m_hdr)
+			m_hdr->incRef();
+	}
+
+	void
+	decRef() const {
+		if (m_hdr)
+			m_hdr->decRef();
 	}
 
 	void
 	move(StringRefBase&& src) {
-		if (m_hdr)
-			m_hdr->release();
-
-		m_p = src.m_p;
-		m_hdr = src.m_hdr;
-		m_length = src.m_length;
-		m_isNullTerminated = src.m_isNullTerminated;
+		rc::BufHdr* hdr = src.m_hdr;
+		C* p = src.m_p;
+		size_t length = src.m_length;
+		bool isNullTerminated = src.m_isNullTerminated;
 		src.initialize();
-	}
-
-	void
-	attachBufHdr(rc::BufHdr* hdr) const {
-		if (hdr == m_hdr)
-			return; // try to avoid unnecessary interlocked ops
-
-		if (hdr)
-			hdr->addRef();
-
-		if (m_hdr)
-			m_hdr->release();
-
-		m_hdr = hdr;
-	}
-
-	void
-	attach(const StringRef& src) {
-		if (&src != this)
-			attach(src.m_hdr, src.m_p, src.m_length, src.m_isNullTerminated);
+		attach(hdr, p, length, isNullTerminated);
 	}
 
 	void
@@ -742,7 +727,29 @@ protected:
 	) {
 		ASSERT(length != -1 && (!isNullTerminated || !p[length]));
 
-		attachBufHdr(hdr);
+		decRef();
+		m_hdr = hdr;
+		m_p = (C*)p;
+		m_length = length;
+		m_isNullTerminated = isNullTerminated;
+	}
+
+	void
+	setup(
+		rc::BufHdr* hdr,
+		const C* p,
+		size_t length,
+		bool isNullTerminated
+	) {
+		ASSERT(length != -1 && (!isNullTerminated || !p[length]));
+
+		if (hdr != m_hdr) {
+			if (hdr)
+				hdr->incRef();
+
+			decRef();
+			m_hdr = hdr;
+		}
 
 		m_p = (C*)p;
 		m_length = length;
@@ -901,20 +908,20 @@ public:
 public:
 	StringBase() {}
 
-	StringBase(StringBase&& src) {
-		move(std::move(src));
-	}
-
-	StringBase(StringRef&& src) {
-		move(std::move(src));
-	}
-
 	StringBase(const StringBase& src) {
 		copy(src);
 	}
 
 	StringBase(const StringRef& src) {
 		copy(src);
+	}
+
+	StringBase(StringBase&& src) {
+		move(std::move(src));
+	}
+
+	StringBase(StringRef&& src) {
+		move(std::move(src));
 	}
 
 	StringBase(const StringRef2& src) {
@@ -991,18 +998,6 @@ public:
 	}
 
 	StringBase&
-	operator = (StringBase&& src) {
-		move(std::move(src));
-		return *this;
-	}
-
-	StringBase&
-	operator = (StringRef&& src) {
-		move(std::move(src));
-		return *this;
-	}
-
-	StringBase&
 	operator = (const StringBase& src) {
 		copy(src);
 		return *this;
@@ -1011,6 +1006,18 @@ public:
 	StringBase&
 	operator = (const StringRef& src) {
 		copy(src);
+		return *this;
+	}
+
+	StringBase&
+	operator = (StringBase&& src) {
+		move(std::move(src));
+		return *this;
+	}
+
+	StringBase&
+	operator = (StringRef&& src) {
+		move(std::move(src));
 		return *this;
 	}
 
@@ -1132,25 +1139,6 @@ public:
 	}
 
 	size_t
-	move(StringRef&& src) {
-		if (src.isEmpty()) {
-			clear();
-			src.release();
-			return 0;
-		}
-
-		rc::BufHdr* hdr = src.getHdr();
-		if (!hdr || (hdr->m_flags & rc::BufHdrFlag_Exclusive) || !src.isNullTerminated()) {
-			copy(src.cp(), src.getLength());
-			src.release();
-			return this->m_length;
-		}
-
-		this->StringRef::move(std::move(src));
-		return this->m_length;
-	}
-
-	size_t
 	forceCopy(const StringRef& src) {
 		return copy(src.cp(), src.getLength());
 	}
@@ -1169,7 +1157,7 @@ public:
 		if (!hdr || (hdr->m_flags & rc::BufHdrFlag_Exclusive) || !src.isNullTerminated())
 			return copy(src.cp(), src.getLength());
 
-		this->attach(src);
+		this->setup(hdr, src.cp(), src.getLength(), src.isNullTerminated());
 		return this->m_length;
 	}
 
@@ -1293,6 +1281,27 @@ public:
 
 		fillWithPattern(this->m_p, pattern, codePointLength, count);
 		return newLength;
+	}
+
+	size_t
+	move(StringRef&& src) {
+		ASSERT(this != &src);
+
+		if (src.isEmpty()) {
+			clear();
+			src.release();
+			return 0;
+		}
+
+		rc::BufHdr* hdr = src.getHdr();
+		if (!hdr || (hdr->m_flags & rc::BufHdrFlag_Exclusive) || !src.isNullTerminated()) {
+			copy(src.cp(), src.getLength());
+			src.release();
+			return this->m_length;
+		}
+
+		this->StringRef::move(std::move(src));
+		return this->m_length;
 	}
 
 	size_t
@@ -1813,8 +1822,8 @@ public:
 				this->m_p = p;
 			}
 
-			this->m_length = length;
 			this->m_p[length] = 0;
+			this->m_length = length;
 			this->m_isNullTerminated = true;
 			return this->m_p;
 		}
@@ -1831,13 +1840,11 @@ public:
 			Details::copy(p, this->m_p, copyLength);
 		}
 
-		if (this->m_hdr)
-			this->m_hdr->release();
-
 		p[length] = 0; // ensure zero termination
 
-		this->m_p = p;
+		this->decRef();
 		this->m_hdr = hdr.detach();
+		this->m_p = p;
 		this->m_length = length;
 		this->m_isNullTerminated = true;
 		return p;
@@ -1856,12 +1863,10 @@ public:
 
 		rc::Ptr<rc::BufHdr> hdr = AXL_RC_NEW_ARGS_INPLACE(rc::BufHdr, (bufferSize, flags), p, NULL);
 
-		if (this->m_hdr)
-			this->m_hdr->release();
-
+		this->decRef();
 		this->m_p = (C*)(hdr + 1);
-		this->m_p[0] = 0;
 		this->m_hdr = hdr.detach();
+		this->m_p[0] = 0;
 		this->m_length = 0;
 		this->m_isNullTerminated = true;
 		return bufferSize / sizeof(C) - 1;
