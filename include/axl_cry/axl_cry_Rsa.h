@@ -32,8 +32,6 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class Rsa: public sl::Handle<RSA*, FreeRsa> {
-	AXL_DISABLE_COPY(Rsa)
-
 public:
 	Rsa() {}
 

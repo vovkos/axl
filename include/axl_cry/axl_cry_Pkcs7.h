@@ -31,8 +31,6 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class Pkcs7: public sl::Handle<PKCS7*, FreePkcs7> {
-	AXL_DISABLE_COPY(Pkcs7)
-
 public:
 	Pkcs7() {}
 

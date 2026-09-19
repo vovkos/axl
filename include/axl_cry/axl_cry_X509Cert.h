@@ -45,8 +45,6 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class X509Cert: public sl::Handle<X509*, FreeX509> {
-	AXL_DISABLE_COPY(X509Cert)
-
 public:
 	X509Cert() {}
 

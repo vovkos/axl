@@ -33,8 +33,6 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class X509Name: public sl::Handle<X509_NAME*, FreeX509Name> {
-	AXL_DISABLE_COPY(X509Name)
-
 public:
 	X509Name() {}
 

@@ -39,8 +39,6 @@ enum PrivateKeyResult {
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class Pkey: public sl::Handle<EVP_PKEY*, FreePkey> {
-	AXL_DISABLE_COPY(Pkey)
-
 public:
 	Pkey() {}
 

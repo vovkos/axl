@@ -45,8 +45,6 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class X509Store: public sl::Handle<X509_STORE*, FreeX509Store> {
-	AXL_DISABLE_COPY(X509Store)
-
 public:
 	X509Store() {}
 

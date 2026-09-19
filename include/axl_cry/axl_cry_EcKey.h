@@ -32,8 +32,6 @@ public:
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 class EcKey: public sl::Handle<EC_KEY*, FreeEcKey> {
-	AXL_DISABLE_COPY(EcKey)
-
 public:
 	EcKey() {
 		create();

@@ -26,6 +26,8 @@ template <
 	typename GetInvalidHandle = Zero<T>
 >
 class Handle {
+	AXL_DISABLE_COPY(Handle)
+
 public:
 	typedef T H;
 
@@ -39,6 +41,11 @@ public:
 
 	Handle(T h) {
 		m_h = h;
+	}
+
+	Handle(Handle&& src) {
+		m_h = src.m_h;
+		src.m_h = GetInvalidHandle()();
 	}
 
 	~Handle() {
@@ -59,9 +66,16 @@ public:
 		return m_h;
 	}
 
-	const Handle&
+	Handle&
 	operator = (T h) {
 		attach(h);
+		return *this;
+	}
+
+	Handle&
+	operator = (Handle&& src) {
+		attach(src.m_h);
+		src.m_h = GetInvalidHandle()();
 		return *this;
 	}
 
