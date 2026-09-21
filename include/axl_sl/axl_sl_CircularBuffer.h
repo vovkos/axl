@@ -150,6 +150,8 @@ public:
 		char buffer[256];
 		sl::Array<C> data(rc::BufKind_Stack, buffer, sizeof(buffer));
 		size_t dataLength = readAll(&data);
+		if (dataLength == -1)
+			return false;
 
 		bool result = create(length);
 		if (!result)
