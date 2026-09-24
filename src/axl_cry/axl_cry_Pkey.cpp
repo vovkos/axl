@@ -12,6 +12,7 @@
 #include "pch.h"
 #include "axl_cry_Pkey.h"
 #include "axl_cry_Bio.h"
+#include "axl_enc_HexEncoding.h"
 
 namespace axl {
 namespace cry {
@@ -107,6 +108,27 @@ Pkey::writePrivateKeyPem(sl::String* string) const {
 
 	BUF_MEM* mem = bio.getBufMem();
 	return string->copy(mem->data, mem->length);
+}
+
+bool
+Pkey::createFingerprint(sl::String* fingerprint) const {
+	ASSERT(m_h);
+
+	uchar_t* spki = NULL;
+	int spkiSize = ::i2d_PUBKEY(m_h, &spki);
+	if (spkiSize <= 0)
+		return cry::failWithLastCryptoError();
+
+	uchar_t hash[32];
+	uint_t hashSize = 0;
+	int result = ::EVP_Digest(spki, spkiSize, hash, &hashSize, ::EVP_sha256(), NULL);
+	::OPENSSL_free(spki);
+
+	if (!result)
+		return cry::failWithLastCryptoError();
+
+	ASSERT(hashSize == sizeof(hash));
+	return enc::HexEncoding::encode(fingerprint, hash, hashSize, enc::HexEncodingFlag_NoSpace) != -1;
 }
 
 //..............................................................................

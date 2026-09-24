@@ -73,7 +73,23 @@ public:
 		writePrivateKeyPem(&string);
 		return string;
 	}
+
+	bool
+	createFingerprint(sl::String* fingerprint) const;
+
+	sl::String
+	createFingerprint() const;
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+sl::String
+Pkey::createFingerprint() const {
+	sl::String fingerprint;
+	createFingerprint(&fingerprint);
+	return fingerprint;
+}
 
 //..............................................................................
 
