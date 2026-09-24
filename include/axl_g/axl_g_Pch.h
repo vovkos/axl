@@ -208,6 +208,7 @@
 #include <utility>
 #include <algorithm>
 #include <tuple>
+#include <memory>
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
