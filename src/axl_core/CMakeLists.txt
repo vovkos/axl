@@ -421,6 +421,7 @@ set(
 	${AXL_INC_DIR}/axl_sys_lnx_udev/axl_sys_lnx_UdevDevice.h
 	${AXL_INC_DIR}/axl_sys_lnx_udev/axl_sys_lnx_UdevListEntry.h
 	${AXL_INC_DIR}/axl_sys_lnx_udev/axl_sys_lnx_UdevEnumerate.h
+	${AXL_INC_DIR}/axl_sys_lnx_udev/axl_sys_lnx_UdevMonitor.h
 	${AXL_INC_DIR}/axl_sys_lnx_udev/axl_sys_lnx_UdevHwdb.h
 )
 
