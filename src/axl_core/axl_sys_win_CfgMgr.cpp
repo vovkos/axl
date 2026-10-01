@@ -12,6 +12,7 @@
 #include "pch.h"
 #include "axl_sys_win_CfgMgr.h"
 #include "axl_sys_win_CfgMgrError.h"
+#include "axl_sys_win_Library.h"
 
 #include <initguid.h>
 #include <devpkey.h>
@@ -19,6 +20,45 @@
 namespace axl {
 namespace sys {
 namespace win {
+
+//..............................................................................
+
+bool
+initCfgMgrFunctions() {
+	Library cfgMgr;
+	if (!cfgMgr.loadLibrary(L"cfgmgr32.dll"))
+		return false;
+
+	cmRegisterNotification = (CmRegisterNotificationFunc*)cfgMgr.getProcAddress("CM_Register_Notification");
+	cmUnregisterNotification = (CmUnregisterNotificationFunc*)cfgMgr.getProcAddress("CM_Unregister_Notification");
+	cfgMgr.detach(); // keep it loaded
+
+	return
+		cmRegisterNotification != NULL &&
+		cmUnregisterNotification != NULL;
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+bool
+CfgMgrNotification::create(
+	const CM_NOTIFY_FILTER* filter,
+	void* context,
+	PCM_NOTIFY_CALLBACK callback
+) {
+	close();
+
+	if (!cmRegisterNotification || !cmUnregisterNotification)
+		return err::fail(err::SystemErrorCode_NotImplemented);
+
+	HCMNOTIFICATION h;
+	CONFIGRET cret = cmRegisterNotification((PCM_NOTIFY_FILTER)filter, context, callback, &h);
+	if (cret != CR_SUCCESS)
+		return fail(CfgMgrError(cret));
+
+	m_h = h;
+	return true;
+}
 
 //..............................................................................
 
