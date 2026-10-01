@@ -19,6 +19,7 @@ set(
 	${AXL_INC_DIR}/axl_io_usb/axl_io_UsbEventThread.h
 	${AXL_INC_DIR}/axl_io_usb/axl_io_UsbDevice.h
 	${AXL_INC_DIR}/axl_io_usb/axl_io_UsbDeviceList.h
+	${AXL_INC_DIR}/axl_io_usb/axl_io_UsbHotplugCallback.h
 	${AXL_INC_DIR}/axl_io_usb/axl_io_UsbDeviceStrings.h
 	${AXL_INC_DIR}/axl_io_usb/axl_io_UsbEnumerator.h
 	${AXL_INC_DIR}/axl_io_usb/axl_io_UsbTransfer.h
