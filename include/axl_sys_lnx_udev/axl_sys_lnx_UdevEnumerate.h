@@ -49,7 +49,7 @@ public:
 
 	void
 	unref() {
-		udev_enumerate_ref(m_h);
+		udev_enumerate_unref(m_h);
 	}
 
 	bool
@@ -89,7 +89,7 @@ public:
 		const sl::StringRef& sysAttr,
 		const sl::StringRef& value
 	) {
-		int result = udev_enumerate_add_match_sysattr(m_h, sysAttr.sz(), value.sz());
+		int result = udev_enumerate_add_nomatch_sysattr(m_h, sysAttr.sz(), value.sz());
 		return completeUdevErrno(result);
 	}
 
