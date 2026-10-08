@@ -20,6 +20,7 @@ set(
 	${AXL_INC_DIR}/axl_cry/axl_cry_Asn1.h
 	${AXL_INC_DIR}/axl_cry/axl_cry_Bio.h
 	${AXL_INC_DIR}/axl_cry/axl_cry_BigNum.h
+	${AXL_INC_DIR}/axl_cry/axl_cry_EcGroup.h
 	${AXL_INC_DIR}/axl_cry/axl_cry_EcKey.h
 	${AXL_INC_DIR}/axl_cry/axl_cry_EcPoint.h
 	${AXL_INC_DIR}/axl_cry/axl_cry_Rsa.h
@@ -41,6 +42,7 @@ set(
 	axl_cry_Asn1.cpp
 	axl_cry_Bio.cpp
 	axl_cry_BigNum.cpp
+	axl_cry_EcGroup.cpp
 	axl_cry_EcKey.cpp
 	axl_cry_EcPoint.cpp
 	axl_cry_Rsa.cpp
