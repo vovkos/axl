@@ -11,7 +11,10 @@
 
 #include "pch.h"
 #include "axl_io_Ssl.h"
+#include "axl_io_SslCipher.h"
 #include "axl_cry_Pkey.h"
+#include "axl_cry_EcKey.h"
+#include "axl_cry_EcGroup.h"
 
 namespace axl {
 namespace io {
@@ -56,24 +59,48 @@ Ssl::setCipherList(const sl::StringRef& listString) {
 	return complete(result);
 }
 
-sl::String
-Ssl::getCurrentCipherDescription() {
+sl::StringRef
+Ssl::getKeyExchangeGroupName() {
 	ASSERT(m_h);
-	const SSL_CIPHER* cipher = ::SSL_get_current_cipher(m_h);
-	if (!cipher)
-		return sl::String();
 
-	char buffer[256];
-	::SSL_CIPHER_description(cipher, buffer, sizeof(buffer));
-	return buffer;
-}
+	// a client sees the group in the server's ephemeral key; a TLS 1.2 server keeps no keys
+	// after the exchange, but with ECDHE, the first shared group is the one it picked
 
-int
-Ssl::getCurrentCipherBits() {
-	ASSERT(m_h);
-	int bits = 0;
-	::SSL_CIPHER_get_bits(SSL_get_current_cipher(m_h), &bits);
-	return bits;
+	int nid;
+	cry::Pkey key;
+#if (OPENSSL_VERSION_NUMBER >= 0x10101000L) // openssl-1.1.1
+	int result = ::SSL_get_peer_tmp_key(m_h, key.p());
+#else
+	int result = ::SSL_get_server_tmp_key(m_h, key.p()); // client-side only, but so is 1.1.0's TLS 1.2
+#endif
+	if (result) {
+		nid = key.getId();
+		if (nid == EVP_PKEY_DH) // arbitrary parameters, so the size is all there is
+			return sl::formatString("DH %d", ::EVP_PKEY_bits(key));
+
+		if (nid == EVP_PKEY_EC) { // the curve is inside the key
+			cry::EcKey ecKey(key.getEcKey());
+			cry::EcGroup ecGroup(ecKey.getGroup());
+			nid = ecGroup.getCurveId();
+			ecKey.detach();
+			ecGroup.detach();
+		}
+	} else {
+		const SSL_CIPHER* cipher = getCurrentCipher();
+		if (!isServer() || !cipher || SslCipher(cipher).getKeyExchangeNid() != NID_kx_ecdhe)
+			return sl::StringRef();
+
+#if (OPENSSL_VERSION_NUMBER >= 0x10101000L) // openssl-1.1.1
+		nid = ::SSL_get_shared_group(m_h, 0);
+#else
+		nid = ::SSL_get_shared_curve(m_h, 0);
+#endif
+	}
+
+	if (nid <= 0)
+		return sl::StringRef();
+
+	return cry::EcGroup::getCurveName(nid); // X25519 & X448 are key types themselves
 }
 
 bool

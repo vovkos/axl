@@ -36,6 +36,12 @@ public:
 	bool
 	create(SSL_CTX* ctx);
 
+	bool
+	isServer() {
+		ASSERT(m_h);
+		return ::SSL_is_server(m_h) != 0;
+	}
+
 	int
 	getError(int retCode) {
 		int error = ::SSL_get_error(m_h, retCode);
@@ -234,16 +240,19 @@ public:
 	}
 
 	const char*
-	getCurrentCipherName() {
+	getVersionString() {
 		ASSERT(m_h);
-		return ::SSL_CIPHER_get_name(SSL_get_current_cipher(m_h));
+		return ::SSL_get_version(m_h);
 	}
 
-	sl::String
-	getCurrentCipherDescription();
+	sl::StringRef
+	getKeyExchangeGroupName(); // P-256, X25519, DH 2048, etc; empty if none or unknown
 
-	int
-	getCurrentCipherBits();
+	const SSL_CIPHER*
+	getCurrentCipher() { // wrap with io::SslCipher to query
+		ASSERT(m_h);
+		return ::SSL_get_current_cipher(m_h);
+	}
 
 	void*
 	getExtraData(int index) {
