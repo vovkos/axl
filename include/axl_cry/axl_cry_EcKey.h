@@ -59,6 +59,12 @@ public:
 		return completeWithLastCryptoError(result != NULL);
 	}
 
+	void
+	upRef() const {
+		ASSERT(m_h);
+		::EC_KEY_up_ref(m_h);
+	}
+
 	uint_t
 	getFlags() {
 		return EC_KEY_get_flags(m_h);

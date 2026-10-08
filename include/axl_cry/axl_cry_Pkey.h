@@ -45,10 +45,22 @@ public:
 	Pkey(EVP_PKEY* h):
 		sl::Handle<EVP_PKEY*, FreePkey>(h) {}
 
+	int
+	getId() const {
+		ASSERT(m_h);
+		return ::EVP_PKEY_id(m_h);
+	}
+
 	void
 	upRef() const {
 		ASSERT(m_h);
 		::EVP_PKEY_up_ref(m_h);
+	}
+
+	EC_KEY*
+	getEcKey() const {
+		ASSERT(m_h);
+		return (EC_KEY*)::EVP_PKEY_get0_EC_KEY(m_h);
 	}
 
 	PrivateKeyResult
