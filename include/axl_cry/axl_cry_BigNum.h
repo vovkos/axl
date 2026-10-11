@@ -99,13 +99,13 @@ public:
 	getData(
 		void* p,
 		size_t size
-	);
+	) {
+		ASSERT(size >= getSize());
+		return BN_bn2bin(m_h, (uchar_t*)p); // can't fail; 0 for a zero value
+	}
 
 	bool
-	getData(sl::Array<char>* data) {
-		size_t size = getSize();
-		return data->setCount(size) && getData(data->p(), size);
-	}
+	getData(sl::Array<char>* data);
 
 	sl::Array<char>
 	getData() {
@@ -178,6 +178,19 @@ public:
 		return completeWithLastCryptoError(result);
 	}
 };
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+inline
+bool
+BigNum::getData(sl::Array<char>* data) {
+	size_t size = getSize();
+	if (!data->setCount(size))
+		return false;
+
+	getData(data->p(), size);
+	return true;
+}
 
 //..............................................................................
 

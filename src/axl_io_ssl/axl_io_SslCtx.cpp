@@ -61,35 +61,35 @@ SslCtx::loadVerifyLocations(
 		!caDir.isEmpty() ? caDir.sz() : NULL
 	);
 
-	return cry::completeWithLastCryptoError(result > 0);
+	return cry::completeWithLastCryptoError(result);
 }
 
 bool
 SslCtx::setTmpDh(DH* dh) {
 	ASSERT(m_h);
 	int result = ::SSL_CTX_set_tmp_dh(m_h, dh);
-	return cry::completeWithLastCryptoError(result > 0);
+	return cry::completeWithLastCryptoError(result);
 }
 
 bool
 SslCtx::setTmpEcdh(EC_KEY* ecKey) {
 	ASSERT(m_h);
 	int result = ::SSL_CTX_set_tmp_ecdh(m_h, ecKey);
-	return cry::completeWithLastCryptoError(result > 0);
+	return cry::completeWithLastCryptoError(result);
 }
 
 bool
 SslCtx::setCipherList(const sl::StringRef& listString) {
 	ASSERT(m_h);
 	int result = ::SSL_CTX_set_cipher_list(m_h, listString.sz());
-	return cry::completeWithLastCryptoError(result > 0);
+	return cry::completeWithLastCryptoError(result);
 }
 
 bool
 SslCtx::useCertificate(const X509* cert) {
 	ASSERT(m_h);
 	int result = ::SSL_CTX_use_certificate(m_h, (X509*)cert);
-	return cry::completeWithLastCryptoError(result > 0);
+	return cry::completeWithLastCryptoError(result);
 }
 
 bool
@@ -99,14 +99,14 @@ SslCtx::useCertificateFile(
 ) {
 	ASSERT(m_h);
 	int result = ::SSL_CTX_use_certificate_file(m_h, fileName.sz(), fileType);
-	return cry::completeWithLastCryptoError(result > 0);
+	return cry::completeWithLastCryptoError(result);
 }
 
 bool
 SslCtx::usePrivateKey(const EVP_PKEY* key) {
 	ASSERT(m_h);
 	int result = ::SSL_CTX_use_PrivateKey(m_h, (EVP_PKEY*)key);
-	return cry::completeWithLastCryptoError(result > 0);
+	return cry::completeWithLastCryptoError(result);
 }
 
 bool
@@ -116,7 +116,7 @@ SslCtx::usePrivateKeyFile(
 ) {
 	ASSERT(m_h);
 	int result = ::SSL_CTX_use_PrivateKey_file(m_h, fileName.sz(), fileType);
-	return cry::completeWithLastCryptoError(result > 0);
+	return cry::completeWithLastCryptoError(result);
 }
 
 cry::PrivateKeyResult
@@ -157,7 +157,7 @@ bool
 SslCtx::addExtraChainCertificate(const X509* cert) {
 	ASSERT(m_h);
 	int result = ::SSL_CTX_add_extra_chain_cert(m_h, (X509*)cert);
-	return cry::completeWithLastCryptoError(result > 0);
+	return cry::completeWithLastCryptoError(result);
 }
 
 //..............................................................................

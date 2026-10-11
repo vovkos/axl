@@ -44,14 +44,14 @@ EcPoint::getData(
 	BN_CTX* ctx
 ) {
 	int result = EC_POINT_point2oct(group, m_h, form, NULL, 0, ctx);
-	if (result <= 0)
+	if (!result)
 		return failWithLastCryptoError();
 
 	size_t size = result;
 	data->setCount(result);
 
 	result = EC_POINT_point2oct(group, m_h, form, (uchar_t*)data->p(), size, ctx);
-	return completeWithLastCryptoError(result > 0);
+	return completeWithLastCryptoError(result);
 }
 
 bool

@@ -41,20 +41,6 @@ BigNum::createCopy(BIGNUM* src) {
 	return completeWithLastCryptoError(m_h != NULL);
 }
 
-size_t
-BigNum::getData(
-	void* p,
-	size_t size
-) {
-	ASSERT(size >= getSize());
-
-	int result = BN_bn2bin(m_h, (uchar_t*)p);
-	if (result <= 0)
-		return failWithLastCryptoError<size_t>(-1);
-
-	return result;
-}
-
 bool
 BigNum::getDecString(sl::String* string) {
 	char* p = BN_bn2dec(m_h);

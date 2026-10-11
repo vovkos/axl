@@ -42,14 +42,14 @@ bool
 Ssl::setTmpDh(DH* dh) {
 	ASSERT(m_h);
 	int result = ::SSL_set_tmp_dh(m_h, dh);
-	return cry::completeWithLastCryptoError(result > 0);
+	return cry::completeWithLastCryptoError(result);
 }
 
 bool
 Ssl::setTmpEcdh(EC_KEY* ec) {
 	ASSERT(m_h);
 	int result = ::SSL_set_tmp_ecdh(m_h, ec);
-	return cry::completeWithLastCryptoError(result > 0);
+	return cry::completeWithLastCryptoError(result);
 }
 
 bool
