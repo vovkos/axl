@@ -63,6 +63,12 @@ sl::StringRef
 Ssl::getKeyExchangeGroupName() {
 	ASSERT(m_h);
 
+#if (OPENSSL_VERSION_NUMBER >= 0x30200000L) // openssl-3.2
+	const char* name = ::SSL_get0_group_name(m_h); // also names KEM groups (no tmp key)
+	if (name)
+		return sl::StringRef(name);
+#endif
+
 	// a client sees the group in the server's ephemeral key; a TLS 1.2 server keeps no keys
 	// after the exchange, but with ECDHE, the first shared group is the one it picked
 
