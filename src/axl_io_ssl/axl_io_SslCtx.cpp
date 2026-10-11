@@ -14,6 +14,11 @@
 #include "axl_cry_CryptoError.h"
 #include "axl_cry_Pkey.h"
 
+#if (_AXL_OS_WIN)
+#	include "axl_cry_X509Store.h"
+#	include "axl_sys_win_Certificate.h"
+#endif
+
 namespace axl {
 namespace io {
 
@@ -32,6 +37,23 @@ SslCtx::loadVerifyLocations(
 	const sl::StringRef& caDir
 ) {
 	ASSERT(m_h);
+
+	if (caFileName.isEmpty() && caDir.isEmpty()) {
+#if (_AXL_OS_WIN)
+		// on windows, OpenSSL's default paths point to its build tree -- use system root store instead
+		sys::win::CertStore winStore;
+		bool result = winStore.openSystemStore(CERT_SYSTEM_STORE_CURRENT_USER, L"ROOT");
+		if (!result)
+			return false;
+
+		cry::X509Store store(getCertStore());
+		result = store.addWinCertStore(winStore) != -1;
+		store.detach(); // owned by the SSL_CTX
+		return result;
+#else
+		return setDefaultVerifyPaths();
+#endif
+	}
 
 	int result = ::SSL_CTX_load_verify_locations(
 		m_h,
