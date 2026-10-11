@@ -254,6 +254,7 @@ if(WIN32)
 		axl_test_con
 		setupapi
 		psapi
+		crypt32
 	)
 
 	if(BUILD_AXL_IO_PCAP)
