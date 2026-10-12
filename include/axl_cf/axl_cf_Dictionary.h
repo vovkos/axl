@@ -35,9 +35,8 @@ public:
 	DictionaryBase(
 		T p,
 		bool isAttach = false
-	) {
-		isAttach ? this->copy(p) : this->attach(p);
-	}
+	):
+		TypeBase<T>(p, isAttach) {}
 
 	DictionaryBase&
 	operator = (const DictionaryBase& src) {
