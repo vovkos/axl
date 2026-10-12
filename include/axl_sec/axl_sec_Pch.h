@@ -15,3 +15,5 @@
 #include <Security/SecBase.h>
 #include <Security/SecCode.h>
 #include <Security/SecStaticCode.h>
+#include <Security/SecCertificate.h>
+#include <Security/SecTrust.h>

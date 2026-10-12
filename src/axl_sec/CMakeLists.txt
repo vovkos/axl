@@ -18,6 +18,7 @@ set(
 	${AXL_INC_DIR}/axl_sec/axl_sec_Error.h
 	${AXL_INC_DIR}/axl_sec/axl_sec_Code.h
 	${AXL_INC_DIR}/axl_sec/axl_sec_StaticCode.h
+	${AXL_INC_DIR}/axl_sec/axl_sec_Certificate.h
 )
 
 set(
