@@ -154,7 +154,7 @@ public:
 	setDefaultVerifyPaths();
 
 	bool
-	loadVerifyLocations( // both empty: the system trust store
+	loadVerifyLocations(
 		const sl::StringRef& caFileName,
 		const sl::StringRef& caDir = sl::StringRef()
 	);
@@ -225,16 +225,6 @@ public:
 		::SSL_CTX_clear_chain_certs(m_h);
 	}
 };
-
-// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-inline
-bool
-SslCtx::setDefaultVerifyPaths() {
-	ASSERT(m_h);
-	int result = ::SSL_CTX_set_default_verify_paths(m_h);
-	return cry::completeWithLastCryptoError(result);
-}
 
 //..............................................................................
 

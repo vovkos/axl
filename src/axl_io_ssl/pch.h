@@ -12,3 +12,7 @@
 #pragma once
 
 #include "axl_io_SslPch.h"
+
+#if (_AXL_OS_WIN)
+#	include <wincrypt.h>
+#endif

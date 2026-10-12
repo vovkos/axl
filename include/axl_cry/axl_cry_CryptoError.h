@@ -114,7 +114,8 @@ clearCryptoError() {
 inline
 size_t
 setLastCryptoError() {
-	return setCryptoError(::ERR_peek_last_error());
+	ulong_t error = ::ERR_peek_last_error();
+	return error ? setCryptoError(error) : err::setError("unspecified openssl function failure");
 }
 
 template <typename T>

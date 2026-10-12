@@ -6433,6 +6433,17 @@ void testSsl() {
 	::SSL_load_error_strings();
 	cry::registerCryptoErrorProviders();
 
+	io::SslCtx ctx0;
+	result =
+		ctx0.create() &&
+		(ctx0.loadVerifyLocations(NULL, NULL) || ctx0.setDefaultVerifyPaths());
+
+	if (!result) {
+		printf("error: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+
 //	const char* ipString = "216.58.200.238";  // google.com
 	const char* ipString = "104.236.152.161"; // ioninja.com
 //	const char* ipString = "93.174.104.89";   // tibbo.com
@@ -10989,9 +11000,10 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-#if (_AXL_IO_MDNS)
-	testMdns();
+#if (_AXL_IO_SSL)
+	testSsl();
 #endif
+
 
 	return 0;
 }

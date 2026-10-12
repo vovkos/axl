@@ -32,35 +32,35 @@ SslCtx::create(const SSL_METHOD* method) {
 }
 
 bool
+SslCtx::setDefaultVerifyPaths() {
+	ASSERT(m_h);
+
+#if (_AXL_OS_WIN)
+	// on windows, SSL_CTX_set_default_verify_paths point to its build tree (useless)
+	// instead, use the system root store as default
+
+	sys::win::CertStore winStore;
+	bool result = winStore.openSystemStore(CERT_SYSTEM_STORE_CURRENT_USER, L"ROOT");
+	if (!result)
+		return false;
+
+	cry::X509Store store(getCertStore());
+	result = store.addWinCertStore(winStore) != -1;
+	store.detach(); // owned by the SSL_CTX
+	return result;
+#else
+	int result = ::SSL_CTX_set_default_verify_paths(m_h);
+	return cry::completeWithLastCryptoError(result);
+#endif
+}
+
+bool
 SslCtx::loadVerifyLocations(
 	const sl::StringRef& caFileName,
 	const sl::StringRef& caDir
 ) {
 	ASSERT(m_h);
-
-	if (caFileName.isEmpty() && caDir.isEmpty()) {
-#if (_AXL_OS_WIN)
-		// on windows, OpenSSL's default paths point to its build tree -- use system root store instead
-		sys::win::CertStore winStore;
-		bool result = winStore.openSystemStore(CERT_SYSTEM_STORE_CURRENT_USER, L"ROOT");
-		if (!result)
-			return false;
-
-		cry::X509Store store(getCertStore());
-		result = store.addWinCertStore(winStore) != -1;
-		store.detach(); // owned by the SSL_CTX
-		return result;
-#else
-		return setDefaultVerifyPaths();
-#endif
-	}
-
-	int result = ::SSL_CTX_load_verify_locations(
-		m_h,
-		!caFileName.isEmpty() ? caFileName.sz() : NULL,
-		!caDir.isEmpty() ? caDir.sz() : NULL
-	);
-
+	int result = ::SSL_CTX_load_verify_locations(m_h, caFileName.szn(), caDir.szn());
 	return cry::completeWithLastCryptoError(result);
 }
 
