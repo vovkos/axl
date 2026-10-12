@@ -14,11 +14,6 @@
 #include "axl_cry_CryptoError.h"
 #include "axl_cry_Pkey.h"
 
-#if (_AXL_OS_WIN)
-#	include "axl_cry_X509Store.h"
-#	include "axl_sys_win_Certificate.h"
-#endif
-
 namespace axl {
 namespace io {
 
@@ -29,29 +24,6 @@ SslCtx::create(const SSL_METHOD* method) {
 	close();
 	m_h = SSL_CTX_new(method);
 	return cry::completeWithLastCryptoError(m_h != NULL);
-}
-
-bool
-SslCtx::setDefaultVerifyPaths() {
-	ASSERT(m_h);
-
-#if (_AXL_OS_WIN)
-	// on windows, SSL_CTX_set_default_verify_paths point to its build tree (useless)
-	// instead, use the system root store as default
-
-	sys::win::CertStore winStore;
-	bool result = winStore.openSystemStore(CERT_SYSTEM_STORE_CURRENT_USER, L"ROOT");
-	if (!result)
-		return false;
-
-	cry::X509Store store(getCertStore());
-	result = store.addWinCertStore(winStore) != -1;
-	store.detach(); // owned by the SSL_CTX
-	return result;
-#else
-	int result = ::SSL_CTX_set_default_verify_paths(m_h);
-	return cry::completeWithLastCryptoError(result);
-#endif
 }
 
 bool

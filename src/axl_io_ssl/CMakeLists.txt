@@ -24,6 +24,7 @@ set(
 set(
 	LIB_CPP_LIST
 	axl_io_SslCtx.cpp
+	axl_io_SslCtx_setDefaultVerifyPaths.cpp
 	axl_io_SslCipher.cpp
 	axl_io_Ssl.cpp
 )
