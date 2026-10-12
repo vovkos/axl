@@ -18,6 +18,7 @@ set(
 	${AXL_INC_DIR}/axl_cf/axl_cf_Type.h
 	${AXL_INC_DIR}/axl_cf/axl_cf_Number.h
 	${AXL_INC_DIR}/axl_cf/axl_cf_Data.h
+	${AXL_INC_DIR}/axl_cf/axl_cf_Array.h
 	${AXL_INC_DIR}/axl_cf/axl_cf_String.h
 	${AXL_INC_DIR}/axl_cf/axl_cf_Dictionary.h
 	${AXL_INC_DIR}/axl_cf/axl_cf_Url.h
