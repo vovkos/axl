@@ -16,20 +16,13 @@
 
 #include "axl_cry_CryptoError.h"
 
+#if (_AXL_OS_WIN)
+typedef void* HCERTSTORE;
+#elif (_AXL_OS_DARWIN)
+typedef const struct __CFArray* CFArrayRef;
+#endif
+
 namespace axl {
-
-#ifdef _AXL_OS_WIN
-
-namespace sys {
-namespace win {
-
-class CertStore;
-
-} // namespace win
-} // namespace sys
-
-#endif // _AXL_OS_WIN
-
 namespace cry {
 
 //..............................................................................
@@ -55,12 +48,21 @@ public:
 	bool
 	create();
 
+	size_t
+	getObjectCount() const {
+		ASSERT(m_h);
+		return sk_X509_OBJECT_num(::X509_STORE_get0_objects(m_h));
+	}
+
 	bool
 	addCert(X509* cert);
 
-#ifdef _AXL_OS_WIN
+#if (_AXL_OS_WIN)
 	size_t
-	addWinCertStore(const sys::win::CertStore& store);
+	addWinCertStore(HCERTSTORE store);
+#elif (_AXL_OS_DARWIN)
+	size_t
+	addDarwinCertArray(CFArrayRef certificateArray); // an array of SecCertificateRef
 #endif
 };
 
