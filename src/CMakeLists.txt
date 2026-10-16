@@ -10,6 +10,7 @@
 #...............................................................................
 
 add_subdirectory(axl_core)
+add_subdirectory(axl_test)
 
 if(GCC_LINK_GLIBC_WRAPPERS)
 	add_subdirectory(axl_glibc)
