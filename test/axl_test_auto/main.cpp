@@ -10,40 +10,8 @@
 //..............................................................................
 
 #include "pch.h"
-#include "test.h"
 
-//.............................................................................
-
-bool
-runTest(
-	size_t index,
-	size_t total,
-	const sl::StringRef& name,
-	TestFunc* func
-) {
-	printf(
-		"Test %d/%d: %s\n"
-		"...................................................................\n",
-		index,
-		total,
-		name.sz()
-	);
-
-	bool result = true;
-	try {
-		func();
-	} catch (const char* message) {
-		printf("%s\n", message);
-		result = false;
-	} catch (...) {
-		result = false;
-	}
-
-	printf(result ? "\n>>> Passed\n\n" : "\n>>> FAILED\n\n");
-	return result;
-}
-
-//.............................................................................
+//..............................................................................
 
 #if (_AXL_OS_WIN)
 int
@@ -71,35 +39,7 @@ main(
 #endif
 	lex::registerParseErrorProvider();
 
-	size_t total;
-	size_t passed = 0;
-
-	if (argc < 2) { // run all
-		total = getTestCaseSet()->getCount();
-		sl::StringHashTableIterator<TestFunc*> it = getTestCaseSet()->getHead();
-		for (size_t i = 0; it; it++, i++)
-			passed += runTest(i, total, it->getKey(), it->m_value);
-	} else {
-		total = argc - 1;
-		sl::String name;
-
-		for (int i = 1; i < argc; i++) {
-			name = argv[i];
-			sl::StringHashTableIterator<TestFunc*> it = getTestCaseSet()->find(name);
-			if (it)
-				passed += runTest(i, total, it->getKey(), it->m_value);
-			else
-				printf("TEST NOT FOUND: %s\n", name.sz());
-		}
-	}
-
-	printf("%d%% tests passed, %d tests failed out of %d\n",
-		total ? passed * 100 / total : 0,
-		total - passed,
-		total
-	);
-
-	return passed - total; // return negation of the number of failed tests
+	return test::runTests(argc, argv);
 }
 
 //..............................................................................

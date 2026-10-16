@@ -13,7 +13,6 @@
 #include "axl_io_UsbDevice.h"
 #include "axl_io_UsbDeviceList.h"
 #include "axl_io_UsbContext.h"
-#include "test.h"
 
 
 namespace {
@@ -80,6 +79,6 @@ run() {
 
 //..............................................................................
 
-ADD_TEST_CASE("test_Usb", run)
+AXL_TEST_ADD("test_Usb", run)
 
 }

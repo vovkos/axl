@@ -10,7 +10,6 @@
 //..............................................................................
 
 #include "pch.h"
-#include "test.h"
 
 namespace {
 
@@ -200,20 +199,20 @@ verifyTree(
 	const sl::Array<Counters>& reference
 ) {
 	size_t count = reference.getCount();
-	TEST_ASSERT(tree.getCount() == count);
+	AXL_TEST_ASSERT(tree.getCount() == count);
 
 	uint64_t lineCount = 0;
 	uint64_t zoneCount = 0;
 	for (size_t i = 0; i < count; i++) {
 		lineCount += reference[i].m_lineCount;
 		zoneCount += reference[i].m_zoneCount;
-		TEST_ASSERT(tree.calcPrefixSubStat<LineCount>(i).m_value == lineCount);
-		TEST_ASSERT(tree.calcPrefixSubStat<ZoneCount>(i).m_value == zoneCount);
+		AXL_TEST_ASSERT(tree.calcPrefixSubStat<LineCount>(i).m_value == lineCount);
+		AXL_TEST_ASSERT(tree.calcPrefixSubStat<ZoneCount>(i).m_value == zoneCount);
 
 		// calcSelfSubStat must reproduce the element itself, not a partial sum
 
-		TEST_ASSERT(tree.calcSelfSubStat<LineCount>(i).m_value == reference[i].m_lineCount);
-		TEST_ASSERT(tree.calcSelfSubStat<ZoneCount>(i).m_value == reference[i].m_zoneCount);
+		AXL_TEST_ASSERT(tree.calcSelfSubStat<LineCount>(i).m_value == reference[i].m_lineCount);
+		AXL_TEST_ASSERT(tree.calcSelfSubStat<ZoneCount>(i).m_value == reference[i].m_zoneCount);
 	}
 
 	size_t modelIndex = 0;  // smallest index with cumulative line count >= target
@@ -234,14 +233,14 @@ verifyTree(
 		size_t exactIndex = tree.findPrefixSubStatEq(LineCount(target));
 
 		if (modelIndex < count) {
-			TEST_ASSERT(findIndex == modelIndex);
-			TEST_ASSERT(remainder.m_value == target - modelSum);
+			AXL_TEST_ASSERT(findIndex == modelIndex);
+			AXL_TEST_ASSERT(remainder.m_value == target - modelSum);
 
 			uint64_t inclusive = modelSum + reference[modelIndex].m_lineCount;
-			TEST_ASSERT(exactIndex == (inclusive == target ? modelIndex : -1));
+			AXL_TEST_ASSERT(exactIndex == (inclusive == target ? modelIndex : -1));
 		} else {
-			TEST_ASSERT(findIndex == -1); // target > total
-			TEST_ASSERT(exactIndex == -1);
+			AXL_TEST_ASSERT(findIndex == -1); // target > total
+			AXL_TEST_ASSERT(exactIndex == -1);
 		}
 	}
 }
@@ -249,11 +248,11 @@ verifyTree(
 void
 test_Empty() {
 	FenwickTree tree;
-	TEST_ASSERT(tree.getCount() == 0);
-	TEST_ASSERT(tree.isEmpty());
+	AXL_TEST_ASSERT(tree.getCount() == 0);
+	AXL_TEST_ASSERT(tree.isEmpty());
 
 	size_t index = tree.findPrefixSubStatGe(LineCount(7));
-	TEST_ASSERT(index == -1);
+	AXL_TEST_ASSERT(index == -1);
 }
 
 // scalar value type exercising the non-template calcPrefixStat/findPrefixStatGe
@@ -285,7 +284,7 @@ test_Scalar() {
 	uint64_t total = 0;
 	for (size_t i = 0; i < ElementCount; i++) {
 		total += reference[i];
-		TEST_ASSERT(tree.calcPrefixStat(i) == total);
+		AXL_TEST_ASSERT(tree.calcPrefixStat(i) == total);
 	}
 
 	size_t modelIndex = 0;  // smallest index with cumulative sum >= target
@@ -302,10 +301,10 @@ test_Scalar() {
 		uint64_t remainder = -1;
 		size_t findIndex = tree.findPrefixStatGe(target, &remainder);
 		if (modelIndex < ElementCount) {
-			TEST_ASSERT(findIndex == modelIndex);
-			TEST_ASSERT(remainder == target - modelSum);
+			AXL_TEST_ASSERT(findIndex == modelIndex);
+			AXL_TEST_ASSERT(remainder == target - modelSum);
 		} else {
-			TEST_ASSERT(findIndex == -1); // target > total
+			AXL_TEST_ASSERT(findIndex == -1); // target > total
 		}
 	}
 }
@@ -322,11 +321,11 @@ test_ScalarLiteral() {
 	tree.append(big);
 	tree.append(big);
 
-	TEST_ASSERT(tree.findPrefixStatGe(7) == 0);
-	TEST_ASSERT(tree.findPrefixStatGe(4000000000ULL) == 1);
-	TEST_ASSERT(tree.findPrefixStatEq(big) == 0);
-	TEST_ASSERT(tree.findPrefixStatEq(9000000000ULL) == 2);
-	TEST_ASSERT(tree.calcPrefixStat(2) == big * 3);
+	AXL_TEST_ASSERT(tree.findPrefixStatGe(7) == 0);
+	AXL_TEST_ASSERT(tree.findPrefixStatGe(4000000000ULL) == 1);
+	AXL_TEST_ASSERT(tree.findPrefixStatEq(big) == 0);
+	AXL_TEST_ASSERT(tree.findPrefixStatEq(9000000000ULL) == 2);
+	AXL_TEST_ASSERT(tree.calcPrefixStat(2) == big * 3);
 }
 
 // exhaustively covers the boundary math of the implicit tree at every count
@@ -350,7 +349,7 @@ test_SmallCountSweep() {
 		for (size_t i = 0; i < count; i++) {
 			Counters counters(lcg(&seed) % 4, lcg(&seed) % 3); // zeros are frequent
 			size_t index = tree.append(counters);
-			TEST_ASSERT(index == i);
+			AXL_TEST_ASSERT(index == i);
 			reference.append(counters);
 		}
 
@@ -373,7 +372,7 @@ test_Randomized() {
 	for (size_t i = 0; i < ElementCount; i++) {
 		Counters counters(lcg(&seed) % 8, lcg(&seed) % 4);
 		size_t index = tree.append(counters);
-		TEST_ASSERT(index == i);
+		AXL_TEST_ASSERT(index == i);
 		reference.append(counters);
 	}
 
@@ -549,8 +548,8 @@ test_SubStatDelta() {
 	}
 
 	Counters after = tree.calcFullStat();
-	TEST_ASSERT(before.m_lineCount == after.m_lineCount);
-	TEST_ASSERT(before.m_zoneCount == after.m_zoneCount);
+	AXL_TEST_ASSERT(before.m_lineCount == after.m_lineCount);
+	AXL_TEST_ASSERT(before.m_zoneCount == after.m_zoneCount);
 	verifyTree(tree, reference);
 }
 
@@ -568,6 +567,6 @@ run() {
 
 //..............................................................................
 
-ADD_TEST_CASE("test_FenwickTree", run)
+AXL_TEST_ADD("test_FenwickTree", run)
 
 } // namespace

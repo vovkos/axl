@@ -10,7 +10,6 @@
 //..............................................................................
 
 #include "pch.h"
-#include "test.h"
 
 namespace {
 
@@ -64,7 +63,7 @@ testBinForwardOne(
 	size_t needleLength
 ) {
 	Find find(needle, needleLength);
-	TEST_ASSERT(find.find(haystack, haystackLength) == naiveFind(haystack, haystackLength, needle, needleLength));
+	AXL_TEST_ASSERT(find.find(haystack, haystackLength) == naiveFind(haystack, haystackLength, needle, needleLength));
 }
 
 template <typename Find>
@@ -78,7 +77,7 @@ testBinReverseOne(
 	Find find(needle, needleLength);
 	size_t expected = naiveReverseFind(haystack, haystackLength, needle, needleLength);
 	size_t result = find.find(haystack, haystackLength);
-	TEST_ASSERT(result == (expected == -1 ? (size_t)-1 : haystackLength - expected - needleLength));
+	AXL_TEST_ASSERT(result == (expected == -1 ? (size_t)-1 : haystackLength - expected - needleLength));
 }
 
 template <typename Find>
@@ -104,7 +103,7 @@ testBinIncrementalForwardOne(
 		offset += size;
 	}
 
-	TEST_ASSERT(result == expected);
+	AXL_TEST_ASSERT(result == expected);
 }
 
 template <typename Find>
@@ -132,7 +131,7 @@ testBinIncrementalReverseOne(
 		end -= size;
 	}
 
-	TEST_ASSERT(result == expected);
+	AXL_TEST_ASSERT(result == expected);
 }
 
 void
@@ -247,18 +246,18 @@ void
 test_TextBasic() {
 	sl::BoyerMooreTextFind find(ref("aba"));
 	sl::BoyerMooreTextFindResult result = find.find("xx aba ababa", strlen("xx aba ababa"));
-	TEST_ASSERT(result.isValid());
-	TEST_ASSERT(result.m_cpOffset == 3);
-	TEST_ASSERT(result.m_cuOffset == 3);
-	TEST_ASSERT(result.m_cuEndOffset == 6);
+	AXL_TEST_ASSERT(result.isValid());
+	AXL_TEST_ASSERT(result.m_cpOffset == 3);
+	AXL_TEST_ASSERT(result.m_cuOffset == 3);
+	AXL_TEST_ASSERT(result.m_cuEndOffset == 6);
 
 	result = find.find("no match", strlen("no match"));
-	TEST_ASSERT(!result.isValid());
+	AXL_TEST_ASSERT(!result.isValid());
 
 	sl::BoyerMooreReverseTextFind reverseFind(ref("aba"));
 	result = reverseFind.find("xx aba ababa", strlen("xx aba ababa"));
-	TEST_ASSERT(result.isValid());
-	TEST_ASSERT(strlen("xx aba ababa") - strlen("aba") - result.m_cuOffset == 9);
+	AXL_TEST_ASSERT(result.isValid());
+	AXL_TEST_ASSERT(strlen("xx aba ababa") - strlen("aba") - result.m_cuOffset == 9);
 }
 
 void
@@ -280,9 +279,9 @@ test_TextIncremental() {
 			offset += size;
 		}
 
-		TEST_ASSERT(result.isValid());
-		TEST_ASSERT(result.m_cuOffset == 10);
-		TEST_ASSERT(result.m_cuEndOffset == 16);
+		AXL_TEST_ASSERT(result.isValid());
+		AXL_TEST_ASSERT(result.m_cuOffset == 10);
+		AXL_TEST_ASSERT(result.m_cuEndOffset == 16);
 	}
 }
 
@@ -290,24 +289,24 @@ void
 test_TextCaseFoldedWholeWord() {
 	sl::BoyerMooreCaseFoldedTextFind caseFoldedFind(ref("MurA"));
 	sl::BoyerMooreTextFindResult result = caseFoldedFind.find("xx mura yy", strlen("xx mura yy"));
-	TEST_ASSERT(result.isValid());
-	TEST_ASSERT(result.m_cuOffset == 3);
+	AXL_TEST_ASSERT(result.isValid());
+	AXL_TEST_ASSERT(result.m_cuOffset == 3);
 
 	sl::BoyerMooreWholeWordTextFind wholeWordFind(ref("cat"));
 	result = wholeWordFind.find("bobcat cat cat1 cat", strlen("bobcat cat cat1 cat"));
-	TEST_ASSERT(result.isValid());
-	TEST_ASSERT(result.m_cuOffset == 7);
+	AXL_TEST_ASSERT(result.isValid());
+	AXL_TEST_ASSERT(result.m_cuOffset == 7);
 
 	result = wholeWordFind.find("bobcat cat1 scat", strlen("bobcat cat1 scat"));
-	TEST_ASSERT(!result.isValid());
+	AXL_TEST_ASSERT(!result.isValid());
 
 	sl::BoyerMooreWholeWordTextFind eofFind(ref("cat"));
 	sl::BoyerMooreTextState state(ref("cat"));
 	result = eofFind.find(&state, "xx cat", strlen("xx cat"));
-	TEST_ASSERT(!result.isValid());
+	AXL_TEST_ASSERT(!result.isValid());
 	result = eofFind.eof(&state);
-	TEST_ASSERT(result.isValid());
-	TEST_ASSERT(result.m_cuOffset == 3);
+	AXL_TEST_ASSERT(result.isValid());
+	AXL_TEST_ASSERT(result.m_cuOffset == 3);
 }
 
 void
@@ -317,10 +316,10 @@ test_TextUtf8Offsets() {
 
 	sl::BoyerMooreTextFind find(ref(needle));
 	sl::BoyerMooreTextFindResult result = find.find(haystack, strlen(haystack));
-	TEST_ASSERT(result.isValid());
-	TEST_ASSERT(result.m_cpOffset == 2);
-	TEST_ASSERT(result.m_cuOffset == 2);
-	TEST_ASSERT(result.m_cuEndOffset == 8);
+	AXL_TEST_ASSERT(result.isValid());
+	AXL_TEST_ASSERT(result.m_cpOffset == 2);
+	AXL_TEST_ASSERT(result.m_cuOffset == 2);
+	AXL_TEST_ASSERT(result.m_cuEndOffset == 8);
 
 	for (size_t chunkSize = 1; chunkSize <= 4; chunkSize++) {
 		sl::BoyerMooreTextState state(ref(needle));
@@ -335,10 +334,10 @@ test_TextUtf8Offsets() {
 			offset += size;
 		}
 
-		TEST_ASSERT(result.isValid());
-		TEST_ASSERT(result.m_cpOffset == 2);
-		TEST_ASSERT(result.m_cuOffset == 2);
-		TEST_ASSERT(result.m_cuEndOffset == 8);
+		AXL_TEST_ASSERT(result.isValid());
+		AXL_TEST_ASSERT(result.m_cpOffset == 2);
+		AXL_TEST_ASSERT(result.m_cuOffset == 2);
+		AXL_TEST_ASSERT(result.m_cuEndOffset == 8);
 	}
 }
 
@@ -349,10 +348,10 @@ test_TextUtf16Offsets() {
 
 	sl::BoyerMooreTextFind_utf16 find(sl::StringRef_utf32(needle, countof(needle)));
 	sl::BoyerMooreTextFindResult result = find.find(haystack, countof(haystack));
-	TEST_ASSERT(result.isValid());
-	TEST_ASSERT(result.m_cpOffset == 2);
-	TEST_ASSERT(result.m_cuOffset == 2);
-	TEST_ASSERT(result.m_cuEndOffset == 5);
+	AXL_TEST_ASSERT(result.isValid());
+	AXL_TEST_ASSERT(result.m_cpOffset == 2);
+	AXL_TEST_ASSERT(result.m_cuOffset == 2);
+	AXL_TEST_ASSERT(result.m_cuEndOffset == 5);
 
 	for (size_t chunkSize = 1; chunkSize <= 3; chunkSize++) {
 		sl::BoyerMooreTextState_utf16 state(sl::StringRef_utf32(needle, countof(needle)));
@@ -367,10 +366,10 @@ test_TextUtf16Offsets() {
 			offset += size;
 		}
 
-		TEST_ASSERT(result.isValid());
-		TEST_ASSERT(result.m_cpOffset == 2);
-		TEST_ASSERT(result.m_cuOffset == 2);
-		TEST_ASSERT(result.m_cuEndOffset == 5);
+		AXL_TEST_ASSERT(result.isValid());
+		AXL_TEST_ASSERT(result.m_cpOffset == 2);
+		AXL_TEST_ASSERT(result.m_cuOffset == 2);
+		AXL_TEST_ASSERT(result.m_cuEndOffset == 5);
 	}
 }
 
@@ -381,15 +380,15 @@ test_TextUtf32Offsets() {
 
 	sl::BoyerMooreTextFind_utf32 find(sl::StringRef_utf32(needle, countof(needle)));
 	sl::BoyerMooreTextFindResult result = find.find(haystack, countof(haystack));
-	TEST_ASSERT(result.isValid());
-	TEST_ASSERT(result.m_cpOffset == 2);
-	TEST_ASSERT(result.m_cuOffset == 2);
-	TEST_ASSERT(result.m_cuEndOffset == 4);
+	AXL_TEST_ASSERT(result.isValid());
+	AXL_TEST_ASSERT(result.m_cpOffset == 2);
+	AXL_TEST_ASSERT(result.m_cuOffset == 2);
+	AXL_TEST_ASSERT(result.m_cuEndOffset == 4);
 
 	sl::BoyerMooreReverseTextFind_utf32 reverseFind(sl::StringRef_utf32(needle, countof(needle)));
 	result = reverseFind.find(haystack, countof(haystack));
-	TEST_ASSERT(result.isValid());
-	TEST_ASSERT(countof(haystack) - countof(needle) - result.m_cuOffset == 2);
+	AXL_TEST_ASSERT(result.isValid());
+	AXL_TEST_ASSERT(countof(haystack) - countof(needle) - result.m_cuOffset == 2);
 }
 
 void
@@ -408,6 +407,6 @@ run() {
 
 //..............................................................................
 
-ADD_TEST_CASE("test_BoyerMooreFind", run)
+AXL_TEST_ADD("test_BoyerMooreFind", run)
 
 } // namespace

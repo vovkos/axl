@@ -10,7 +10,6 @@
 //..............................................................................
 
 #include "pch.h"
-#include "test.h"
 #include "axl_err_Errno.h"
 
 #if (_AXL_OS_WIN)
@@ -48,29 +47,29 @@ testCreate() {
 	err::Error error;
 
 	error.create("abc");
-	TEST_ASSERT(error.getDescription() == "abc");
+	AXL_TEST_ASSERT(error.getDescription() == "abc");
 
 	error.create(sl::StringRef("xyz"));
-	TEST_ASSERT(error.getDescription() == "xyz");
+	AXL_TEST_ASSERT(error.getDescription() == "xyz");
 
 	error.create(err::g_stdErrorGuid, err::StdErrorCode_String, "guid-code-string");
-	TEST_ASSERT(error.getDescription() == "guid-code-string");
+	AXL_TEST_ASSERT(error.getDescription() == "guid-code-string");
 
 	error.create(g_testErrorGuid, TestErrorCode);
-	TEST_ASSERT(error.isKindOf(g_testErrorGuid, TestErrorCode));
+	AXL_TEST_ASSERT(error.isKindOf(g_testErrorGuid, TestErrorCode));
 
 	error.create((uint_t)5);
-	TEST_ASSERT(error.isKindOf(err::g_systemErrorGuid, 5));
+	AXL_TEST_ASSERT(error.isKindOf(err::g_systemErrorGuid, 5));
 
 	error.format("%s-%d", "abc", 42);
-	TEST_ASSERT(error.getDescription() == "abc-42");
+	AXL_TEST_ASSERT(error.getDescription() == "abc-42");
 
 	// create() takes a plain string; only format() expands conversions
 	error.create("100%% literal");
-	TEST_ASSERT(error.getDescription() == "100%% literal");
+	AXL_TEST_ASSERT(error.getDescription() == "100%% literal");
 
 	error.format("100%% formatted");
-	TEST_ASSERT(error.getDescription() == "100% formatted");
+	AXL_TEST_ASSERT(error.getDescription() == "100% formatted");
 }
 
 //..............................................................................
@@ -84,22 +83,22 @@ testPush() {
 
 	// push on an empty error creates it
 	error.push("a");
-	TEST_ASSERT(error.getDescription() == "a");
+	AXL_TEST_ASSERT(error.getDescription() == "a");
 
 	error.push(sl::StringRef("b"));
-	TEST_ASSERT(error.getDescription() == "b: a");
+	AXL_TEST_ASSERT(error.getDescription() == "b: a");
 
 	error.push(err::g_stdErrorGuid, err::StdErrorCode_String, "c");
-	TEST_ASSERT(error.getDescription() == "c: b: a");
+	AXL_TEST_ASSERT(error.getDescription() == "c: b: a");
 
 	error.push("%d", 42);
-	TEST_ASSERT(error.getDescription() == "42: c: b: a");
+	AXL_TEST_ASSERT(error.getDescription() == "42: c: b: a");
 
 	err::Error nested;
 	nested.create("x");
 	error.push(nested);
-	TEST_ASSERT(error.getDescription() == "x: 42: c: b: a");
-	TEST_ASSERT(error.isKindOf(err::g_stdErrorGuid, err::StdErrorCode_Stack));
+	AXL_TEST_ASSERT(error.getDescription() == "x: 42: c: b: a");
+	AXL_TEST_ASSERT(error.isKindOf(err::g_stdErrorGuid, err::StdErrorCode_Stack));
 }
 
 //..............................................................................
@@ -118,53 +117,53 @@ setErrorVa(
 void
 testSetError() {
 	err::setError("abc");
-	TEST_ASSERT(err::getLastErrorDescription() == "abc");
+	AXL_TEST_ASSERT(err::getLastErrorDescription() == "abc");
 
 	err::setError(sl::StringRef("xyz"));
-	TEST_ASSERT(err::getLastErrorDescription() == "xyz");
+	AXL_TEST_ASSERT(err::getLastErrorDescription() == "xyz");
 
 	err::setError(g_testErrorGuid, TestErrorCode);
-	TEST_ASSERT(err::getLastError().isKindOf(g_testErrorGuid, TestErrorCode));
+	AXL_TEST_ASSERT(err::getLastError().isKindOf(g_testErrorGuid, TestErrorCode));
 
 	err::Error error;
 	error.create("boom");
 	err::setError(error);
-	TEST_ASSERT(err::getLastErrorDescription() == "boom");
+	AXL_TEST_ASSERT(err::getLastErrorDescription() == "boom");
 
 	err::setError("%s-%d", "abc", 42);
-	TEST_ASSERT(err::getLastErrorDescription() == "abc-42");
+	AXL_TEST_ASSERT(err::getLastErrorDescription() == "abc-42");
 
 	setErrorVa("%s/%d", "va", 7);
-	TEST_ASSERT(err::getLastErrorDescription() == "va/7");
+	AXL_TEST_ASSERT(err::getLastErrorDescription() == "va/7");
 
 	// a lone string is a message, never a format string -- neither as a literal...
 	err::setError("100%% literal");
-	TEST_ASSERT(err::getLastErrorDescription() == "100%% literal");
+	AXL_TEST_ASSERT(err::getLastErrorDescription() == "100%% literal");
 
 	// ...nor as a run-time buffer, which is where a format string would be a hazard
 	char buffer[64];
 	strncpy(buffer, "buffer %s %d", sizeof(buffer));
 	err::setError(buffer);
-	TEST_ASSERT(err::getLastErrorDescription() == "buffer %s %d");
+	AXL_TEST_ASSERT(err::getLastErrorDescription() == "buffer %s %d");
 
 	const char* p = "pointer %n";
 	err::setError(p);
-	TEST_ASSERT(err::getLastErrorDescription() == "pointer %n");
+	AXL_TEST_ASSERT(err::getLastErrorDescription() == "pointer %n");
 }
 
 void
 testPushError() {
 	err::setError("a");
 	err::pushError("b");
-	TEST_ASSERT(err::getLastErrorDescription() == "b: a");
+	AXL_TEST_ASSERT(err::getLastErrorDescription() == "b: a");
 
 	err::pushError(sl::StringRef("c"));
-	TEST_ASSERT(err::getLastErrorDescription() == "c: b: a");
+	AXL_TEST_ASSERT(err::getLastErrorDescription() == "c: b: a");
 
 	err::pushError("%d", 42);
-	TEST_ASSERT(err::getLastErrorDescription() == "42: c: b: a");
+	AXL_TEST_ASSERT(err::getLastErrorDescription() == "42: c: b: a");
 
-	TEST_ASSERT(err::getLastError()->isStack());
+	AXL_TEST_ASSERT(err::getLastError()->isStack());
 }
 
 //..............................................................................
@@ -194,41 +193,41 @@ testFail() {
 	TEST_OVERLOAD(err::fail<const char*>(NULL, "abc"),     const char*);
 	TEST_OVERLOAD(err::fail<const char*>(NULL, errorRef),  const char*);
 
-	TEST_ASSERT(err::fail("abc") == false);
-	TEST_ASSERT(err::getLastErrorDescription() == "abc");
+	AXL_TEST_ASSERT(err::fail("abc") == false);
+	AXL_TEST_ASSERT(err::getLastErrorDescription() == "abc");
 
-	TEST_ASSERT(err::fail(sl::StringRef("xyz")) == false);
-	TEST_ASSERT(err::getLastErrorDescription() == "xyz");
+	AXL_TEST_ASSERT(err::fail(sl::StringRef("xyz")) == false);
+	AXL_TEST_ASSERT(err::getLastErrorDescription() == "xyz");
 
-	TEST_ASSERT(err::fail("100%% literal") == false);
-	TEST_ASSERT(err::getLastErrorDescription() == "100%% literal");
+	AXL_TEST_ASSERT(err::fail("100%% literal") == false);
+	AXL_TEST_ASSERT(err::getLastErrorDescription() == "100%% literal");
 
-	TEST_ASSERT(err::fail("a %s", "b") == false);
-	TEST_ASSERT(err::getLastErrorDescription() == "a b");
+	AXL_TEST_ASSERT(err::fail("a %s", "b") == false);
+	AXL_TEST_ASSERT(err::getLastErrorDescription() == "a b");
 
-	TEST_ASSERT(err::fail("a %d %s", 1, sz) == false);
-	TEST_ASSERT(err::getLastErrorDescription() == "a 1 x");
+	AXL_TEST_ASSERT(err::fail("a %d %s", 1, sz) == false);
+	AXL_TEST_ASSERT(err::getLastErrorDescription() == "a 1 x");
 
-	TEST_ASSERT(err::fail<size_t>(-1, "sized") == (size_t)-1);
-	TEST_ASSERT(err::getLastErrorDescription() == "sized");
+	AXL_TEST_ASSERT(err::fail<size_t>(-1, "sized") == (size_t)-1);
+	AXL_TEST_ASSERT(err::getLastErrorDescription() == "sized");
 
-	TEST_ASSERT(err::fail<size_t>(-1, "a %s", "b") == (size_t)-1);
-	TEST_ASSERT(err::getLastErrorDescription() == "a b");
+	AXL_TEST_ASSERT(err::fail<size_t>(-1, "a %s", "b") == (size_t)-1);
+	AXL_TEST_ASSERT(err::getLastErrorDescription() == "a b");
 
-	TEST_ASSERT(err::fail<const char*>(NULL, "pointered") == NULL);
-	TEST_ASSERT(err::getLastErrorDescription() == "pointered");
+	AXL_TEST_ASSERT(err::fail<const char*>(NULL, "pointered") == NULL);
+	AXL_TEST_ASSERT(err::getLastErrorDescription() == "pointered");
 
 	err::Error error;
 	error.create("boom");
 
-	TEST_ASSERT(err::fail(error) == false);
-	TEST_ASSERT(err::getLastErrorDescription() == "boom");
+	AXL_TEST_ASSERT(err::fail(error) == false);
+	AXL_TEST_ASSERT(err::getLastErrorDescription() == "boom");
 
-	TEST_ASSERT(err::fail<const char*>(NULL, error) == NULL);
-	TEST_ASSERT(err::getLastErrorDescription() == "boom");
+	AXL_TEST_ASSERT(err::fail<const char*>(NULL, error) == NULL);
+	AXL_TEST_ASSERT(err::getLastErrorDescription() == "boom");
 
-	TEST_ASSERT(err::fail<size_t>(-1, error) == (size_t)-1);
-	TEST_ASSERT(err::getLastErrorDescription() == "boom");
+	AXL_TEST_ASSERT(err::fail<size_t>(-1, error) == (size_t)-1);
+	AXL_TEST_ASSERT(err::getLastErrorDescription() == "boom");
 }
 
 //..............................................................................
@@ -239,14 +238,14 @@ testFail() {
 void
 testDerived() {
 	err::Errno errnoError(EINVAL);
-	TEST_ASSERT(errnoError.isKindOf(err::g_errnoGuid, EINVAL));
+	AXL_TEST_ASSERT(errnoError.isKindOf(err::g_errnoGuid, EINVAL));
 
 #if (_AXL_OS_WIN)
 	sys::win::WinError winError(ERROR_ACCESS_DENIED);
-	TEST_ASSERT(winError.isKindOf(sys::win::g_winErrorGuid, ERROR_ACCESS_DENIED));
+	AXL_TEST_ASSERT(winError.isKindOf(sys::win::g_winErrorGuid, ERROR_ACCESS_DENIED));
 
 	sys::win::CfgMgrError cfgMgrError(7);
-	TEST_ASSERT(cfgMgrError.isKindOf(sys::win::g_cfgMgrErrorGuid, 7));
+	AXL_TEST_ASSERT(cfgMgrError.isKindOf(sys::win::g_cfgMgrErrorGuid, 7));
 #endif
 }
 
@@ -269,9 +268,9 @@ testPack() {
 		"abc", 0xdead, "xyz", 0xbeaf
 	);
 
-	TEST_ASSERT(size == error.getSize());
-	TEST_ASSERT(size > sizeof(err::ErrorHdr));
-	TEST_ASSERT(error.isKindOf(err::g_stdErrorGuid, TestErrorCode));
+	AXL_TEST_ASSERT(size == error.getSize());
+	AXL_TEST_ASSERT(size > sizeof(err::ErrorHdr));
+	AXL_TEST_ASSERT(error.isKindOf(err::g_stdErrorGuid, TestErrorCode));
 }
 
 //..............................................................................
@@ -295,9 +294,9 @@ void
 testProvider() {
 	err::Error error;
 	error.create(g_testErrorGuid, TestErrorCode, "provided");
-	TEST_ASSERT(error.isKindOf(g_testErrorGuid, TestErrorCode));
+	AXL_TEST_ASSERT(error.isKindOf(g_testErrorGuid, TestErrorCode));
 
-	TEST_ASSERT(error.getDescription() == sl::formatString(
+	AXL_TEST_ASSERT(error.getDescription() == sl::formatString(
 		"%s::%d",
 		g_testErrorGuid.getString().sz(),
 		TestErrorCode
@@ -305,7 +304,7 @@ testProvider() {
 
 	static TestErrorProvider provider;
 	err::getErrorMgr()->registerProvider(g_testErrorGuid, &provider);
-	TEST_ASSERT(error.getDescription() == "provided");
+	AXL_TEST_ASSERT(error.getDescription() == "provided");
 }
 
 //..............................................................................
@@ -324,6 +323,6 @@ run() {
 
 //..............................................................................
 
-ADD_TEST_CASE("test_Error", run)
+AXL_TEST_ADD("test_Error", run)
 
 }

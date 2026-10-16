@@ -10,7 +10,6 @@
 //..............................................................................
 
 #include "pch.h"
-#include "test.h"
 #include "axl_sl_CountSort.h"
 
 namespace {
@@ -50,10 +49,10 @@ checkSorted(
 	// 1. keys are non-descending, and equal keys kept their original order
 
 	for (size_t i = 1; i < count; i++) {
-		TEST_ASSERT(dst[i - 1].m_key <= dst[i].m_key);
+		AXL_TEST_ASSERT(dst[i - 1].m_key <= dst[i].m_key);
 
 		if (dst[i - 1].m_key == dst[i].m_key)
-			TEST_ASSERT(dst[i - 1].m_serial < dst[i].m_serial); // stable
+			AXL_TEST_ASSERT(dst[i - 1].m_serial < dst[i].m_serial); // stable
 	}
 
 	// 2. every element survived exactly once
@@ -63,18 +62,18 @@ checkSorted(
 
 	sl::Array<size_t>::Rwi seenRwi = seen.rwi();
 	for (size_t i = 0; i < count; i++) {
-		TEST_ASSERT(dst[i].m_serial < count);
+		AXL_TEST_ASSERT(dst[i].m_serial < count);
 		seenRwi[dst[i].m_serial]++;
 	}
 
 	for (size_t i = 0; i < count; i++)
-		TEST_ASSERT(seen[i] == 1);
+		AXL_TEST_ASSERT(seen[i] == 1);
 
 	// 3. indexes[k] is the start of row k
 
 	size_t base = 0;
 	for (size_t k = 0; k <= limit; k++) {
-		TEST_ASSERT(indexes[k] == base);
+		AXL_TEST_ASSERT(indexes[k] == base);
 
 		for (size_t i = 0; i < count; i++)
 			if (keys[i] == k)
@@ -86,7 +85,7 @@ checkSorted(
 	for (size_t k = 0; k <= limit; k++) {
 		size_t end = k < limit ? indexes[k + 1] : count;
 		for (size_t i = indexes[k]; i < end; i++)
-			TEST_ASSERT(dst[i].m_key == k);
+			AXL_TEST_ASSERT(dst[i].m_key == k);
 	}
 }
 
@@ -127,7 +126,7 @@ void run() {
 		sl::countSort<Item, GetItemKey>(NULL, NULL, 0, indexes, 3);
 
 		for (size_t i = 0; i <= 3; i++)
-			TEST_ASSERT(indexes[i] == 0);
+			AXL_TEST_ASSERT(indexes[i] == 0);
 	}
 
 	// single element
@@ -198,7 +197,7 @@ void run() {
 		sl::countSort<Item, GetItemKey>(dst.p(), src.cp(), count, indexes.p(), limit);
 		checkSorted(dst.cp(), indexes.cp(), keys, count, limit);
 
-		TEST_ASSERT(indexes[limit] == count); // sentinel
+		AXL_TEST_ASSERT(indexes[limit] == count); // sentinel
 	}
 
 	// default key accessor on a scalar array
@@ -210,16 +209,16 @@ void run() {
 
 		sl::countSort(dst, src, countof(src), indexes, 3);
 
-		TEST_ASSERT(dst[0] == 0);
-		TEST_ASSERT(dst[1] == 1);
-		TEST_ASSERT(dst[2] == 1);
-		TEST_ASSERT(dst[3] == 2);
-		TEST_ASSERT(dst[4] == 3);
+		AXL_TEST_ASSERT(dst[0] == 0);
+		AXL_TEST_ASSERT(dst[1] == 1);
+		AXL_TEST_ASSERT(dst[2] == 1);
+		AXL_TEST_ASSERT(dst[3] == 2);
+		AXL_TEST_ASSERT(dst[4] == 3);
 
-		TEST_ASSERT(indexes[0] == 0);
-		TEST_ASSERT(indexes[1] == 1);
-		TEST_ASSERT(indexes[2] == 3);
-		TEST_ASSERT(indexes[3] == 4);
+		AXL_TEST_ASSERT(indexes[0] == 0);
+		AXL_TEST_ASSERT(indexes[1] == 1);
+		AXL_TEST_ASSERT(indexes[2] == 3);
+		AXL_TEST_ASSERT(indexes[3] == 4);
 	}
 
 	// wide-ish range, many duplicates -- exercises the prefix sum
@@ -241,6 +240,6 @@ void run() {
 
 //..............................................................................
 
-ADD_TEST_CASE("test_CountSort", run)
+AXL_TEST_ADD("test_CountSort", run)
 
 }

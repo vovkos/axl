@@ -10,7 +10,6 @@
 //..............................................................................
 
 #include "pch.h"
-#include "test.h"
 
 namespace {
 
@@ -247,50 +246,50 @@ verifyTree(
 #endif
 
 	size_t count = reference.getCount();
-	TEST_ASSERT(tree.getCount() == count);
-	TEST_ASSERT(tree.isEmpty() == (count == 0));
+	AXL_TEST_ASSERT(tree.getCount() == count);
+	AXL_TEST_ASSERT(tree.isEmpty() == (count == 0));
 
 	uint64_t lineTotal = 0;
 	uint64_t charTotal = 0;
 	size_t i = 0;
 
 	for (ConstIterator it = tree.getHead(); it; it++, i++) {
-		TEST_ASSERT(i < count);
-		TEST_ASSERT(it->m_id == reference[i].m_id);
-		TEST_ASSERT((*it).m_lineCount == reference[i].m_lineCount);
+		AXL_TEST_ASSERT(i < count);
+		AXL_TEST_ASSERT(it->m_id == reference[i].m_id);
+		AXL_TEST_ASSERT((*it).m_lineCount == reference[i].m_lineCount);
 
 		// the element's stat is STORED alongside the value, not derived from it
 
 		SpanStat elementStat = it.getStat();
-		TEST_ASSERT(elementStat.m_lineCount == reference[i].m_lineCount);
-		TEST_ASSERT(elementStat.m_charCount == reference[i].m_charCount);
+		AXL_TEST_ASSERT(elementStat.m_lineCount == reference[i].m_lineCount);
+		AXL_TEST_ASSERT(elementStat.m_charCount == reference[i].m_charCount);
 
 		lineTotal += reference[i].m_lineCount;
 		charTotal += reference[i].m_charCount;
 
 		SpanStat prefix = tree.calcPrefixStat(it); // inclusive -- its own counts
-		TEST_ASSERT(prefix.m_lineCount == lineTotal);
-		TEST_ASSERT(prefix.m_charCount == charTotal);
-		TEST_ASSERT(tree.template calcPrefixSubStat<LineStat>(it).m_value == lineTotal);
-		TEST_ASSERT(tree.template calcPrefixSubStat<CharStat>(it).m_value == charTotal);
+		AXL_TEST_ASSERT(prefix.m_lineCount == lineTotal);
+		AXL_TEST_ASSERT(prefix.m_charCount == charTotal);
+		AXL_TEST_ASSERT(tree.template calcPrefixSubStat<LineStat>(it).m_value == lineTotal);
+		AXL_TEST_ASSERT(tree.template calcPrefixSubStat<CharStat>(it).m_value == charTotal);
 	}
 
-	TEST_ASSERT(i == count);
+	AXL_TEST_ASSERT(i == count);
 
 	SpanStat total = tree.getFullStat();
-	TEST_ASSERT(total.m_lineCount == lineTotal);
-	TEST_ASSERT(total.m_charCount == charTotal);
-	TEST_ASSERT(tree.template getFullSubStat<LineStat>().m_value == lineTotal);
-	TEST_ASSERT(tree.template getFullSubStat<CharStat>().m_value == charTotal);
+	AXL_TEST_ASSERT(total.m_lineCount == lineTotal);
+	AXL_TEST_ASSERT(total.m_charCount == charTotal);
+	AXL_TEST_ASSERT(tree.template getFullSubStat<LineStat>().m_value == lineTotal);
+	AXL_TEST_ASSERT(tree.template getFullSubStat<CharStat>().m_value == charTotal);
 
 	i = count;
 	for (ConstIterator it = tree.getTail(); it; it--) {
-		TEST_ASSERT(i);
+		AXL_TEST_ASSERT(i);
 		i--;
-		TEST_ASSERT(it->m_id == reference[i].m_id);
+		AXL_TEST_ASSERT(it->m_id == reference[i].m_id);
 	}
 
-	TEST_ASSERT(i == 0);
+	AXL_TEST_ASSERT(i == 0);
 
 	size_t modelIndex = 0; // smallest index with an inclusive prefix >= target
 	uint64_t modelSum = 0; // the prefix before modelIndex
@@ -313,21 +312,21 @@ verifyTree(
 
 		if (modelIndex < count) {
 			uint64_t inclusive = modelSum + reference[modelIndex].m_lineCount;
-			TEST_ASSERT(it);
-			TEST_ASSERT(it->m_id == reference[modelIndex].m_id);
-			TEST_ASSERT(remainder.m_value == target - modelSum);
-			TEST_ASSERT(tree.template calcPrefixSubStat<LineStat>(it).m_value == inclusive);
-			TEST_ASSERT(inclusive >= target); // findPrefixSubStatGe's defining property
+			AXL_TEST_ASSERT(it);
+			AXL_TEST_ASSERT(it->m_id == reference[modelIndex].m_id);
+			AXL_TEST_ASSERT(remainder.m_value == target - modelSum);
+			AXL_TEST_ASSERT(tree.template calcPrefixSubStat<LineStat>(it).m_value == inclusive);
+			AXL_TEST_ASSERT(inclusive >= target); // findPrefixSubStatGe's defining property
 
 			if (inclusive == target) {
-				TEST_ASSERT(exactIt);
-				TEST_ASSERT(exactIt->m_id == reference[modelIndex].m_id);
+				AXL_TEST_ASSERT(exactIt);
+				AXL_TEST_ASSERT(exactIt->m_id == reference[modelIndex].m_id);
 			} else {
-				TEST_ASSERT(!exactIt);
+				AXL_TEST_ASSERT(!exactIt);
 			}
 		} else {
-			TEST_ASSERT(!exactIt); // past the grand total
-			TEST_ASSERT(!it); // target is past the grand total
+			AXL_TEST_ASSERT(!exactIt); // past the grand total
+			AXL_TEST_ASSERT(!it); // target is past the grand total
 		}
 	}
 }
@@ -348,15 +347,15 @@ test_StatArithmetic() {
 
 	SpanStat sum = statA;
 	sum += statB;
-	TEST_ASSERT(sum.m_lineCount == 8 && sum.m_charCount == 110);
+	AXL_TEST_ASSERT(sum.m_lineCount == 8 && sum.m_charCount == 110);
 
 	SpanStat diff = sum;
 	diff -= statB; // the erase path: subtracting back out must land on statA
-	TEST_ASSERT(diff.m_lineCount == statA.m_lineCount && diff.m_charCount == statA.m_charCount);
+	AXL_TEST_ASSERT(diff.m_lineCount == statA.m_lineCount && diff.m_charCount == statA.m_charCount);
 
 	SpanStat cancelled = statA;
 	cancelled -= statA;
-	TEST_ASSERT(!cancelled.m_lineCount && !cancelled.m_charCount);
+	AXL_TEST_ASSERT(!cancelled.m_lineCount && !cancelled.m_charCount);
 
 	// intermediate underflow must cancel back out: the merge path can subtract a
 	// sibling's total before adding it back on the other side
@@ -364,30 +363,30 @@ test_StatArithmetic() {
 	SpanStat wrapped;
 	wrapped -= statB;
 	wrapped += statB;
-	TEST_ASSERT(!wrapped.m_lineCount && !wrapped.m_charCount);
+	AXL_TEST_ASSERT(!wrapped.m_lineCount && !wrapped.m_charCount);
 
 	SpanStat zero;
-	TEST_ASSERT(!zero.m_lineCount && !zero.m_charCount);
+	AXL_TEST_ASSERT(!zero.m_lineCount && !zero.m_charCount);
 }
 
 //..............................................................................
 
 void
 test_Empty() {
-	typedef sl::StatBTree<SpanStat, Span, 4> Tree; // commas can't cross TEST_ASSERT
+	typedef sl::StatBTree<SpanStat, Span, 4> Tree; // commas can't cross AXL_TEST_ASSERT
 
 	Tree tree;
 	Tree::Iterator nullIt;
 
-	TEST_ASSERT(tree.getCount() == 0);
-	TEST_ASSERT(tree.isEmpty());
-	TEST_ASSERT(!tree.getHead());
-	TEST_ASSERT(!tree.getTail());
-	TEST_ASSERT(tree.getFullStat().m_lineCount == 0);
-	TEST_ASSERT(tree.getFullSubStat<LineStat>().m_value == 0);
-	TEST_ASSERT(!tree.findPrefixSubStatGe(LineStat(0)));
-	TEST_ASSERT(!tree.findPrefixSubStatGe(LineStat(7)));
-	TEST_ASSERT(!tree.calcPrefixSubStat<LineStat>(nullIt).m_value);
+	AXL_TEST_ASSERT(tree.getCount() == 0);
+	AXL_TEST_ASSERT(tree.isEmpty());
+	AXL_TEST_ASSERT(!tree.getHead());
+	AXL_TEST_ASSERT(!tree.getTail());
+	AXL_TEST_ASSERT(tree.getFullStat().m_lineCount == 0);
+	AXL_TEST_ASSERT(tree.getFullSubStat<LineStat>().m_value == 0);
+	AXL_TEST_ASSERT(!tree.findPrefixSubStatGe(LineStat(0)));
+	AXL_TEST_ASSERT(!tree.findPrefixSubStatGe(LineStat(7)));
+	AXL_TEST_ASSERT(!tree.calcPrefixSubStat<LineStat>(nullIt).m_value);
 
 	sl::Array<Span> reference;
 	verifyTree(tree, reference);
@@ -419,20 +418,20 @@ test_Scalar() {
 		reference.append(value);
 	}
 
-	TEST_ASSERT(tree.getCount() == ElementCount);
+	AXL_TEST_ASSERT(tree.getCount() == ElementCount);
 
 	uint64_t total = 0;
 	size_t i = 0;
 
 	for (Tree::Iterator it = tree.getHead(); it; it++, i++) {
-		TEST_ASSERT(*it == (uint_t)i + 1); // the payload
-		TEST_ASSERT(it.getStat() == reference[i]); // the stat
+		AXL_TEST_ASSERT(*it == (uint_t)i + 1); // the payload
+		AXL_TEST_ASSERT(it.getStat() == reference[i]); // the stat
 		total += reference[i];
-		TEST_ASSERT(tree.calcPrefixStat(it) == total); // inclusive
+		AXL_TEST_ASSERT(tree.calcPrefixStat(it) == total); // inclusive
 	}
 
-	TEST_ASSERT(i == ElementCount);
-	TEST_ASSERT(tree.getFullStat() == total);
+	AXL_TEST_ASSERT(i == ElementCount);
+	AXL_TEST_ASSERT(tree.getFullStat() == total);
 
 	size_t modelIndex = 0;
 	uint64_t modelSum = 0;
@@ -447,11 +446,11 @@ test_Scalar() {
 		Tree::Iterator it = tree.findPrefixStatGe(target, &remainder);
 
 		if (modelIndex < ElementCount) {
-			TEST_ASSERT(it);
-			TEST_ASSERT(tree.calcPrefixStat(it) == modelSum + reference[modelIndex]);
-			TEST_ASSERT(remainder == target - modelSum);
+			AXL_TEST_ASSERT(it);
+			AXL_TEST_ASSERT(tree.calcPrefixStat(it) == modelSum + reference[modelIndex]);
+			AXL_TEST_ASSERT(remainder == target - modelSum);
 		} else {
-			TEST_ASSERT(!it);
+			AXL_TEST_ASSERT(!it);
 		}
 	}
 }
@@ -531,9 +530,9 @@ testRandomInsertErase(size_t elementCount) {
 		verifyTree(tree, reference);
 	}
 
-	TEST_ASSERT(tree.isEmpty());
-	TEST_ASSERT(!tree.getHead());
-	TEST_ASSERT(!tree.getTail());
+	AXL_TEST_ASSERT(tree.isEmpty());
+	AXL_TEST_ASSERT(!tree.getHead());
+	AXL_TEST_ASSERT(!tree.getTail());
 }
 
 // addStat/subStat must re-aggregate the spine (including the zero-stat corner
@@ -582,8 +581,8 @@ testModify(size_t elementCount) {
 	}
 
 	SpanStat after = tree.getFullStat();
-	TEST_ASSERT(before.m_lineCount == after.m_lineCount);
-	TEST_ASSERT(before.m_charCount == after.m_charCount);
+	AXL_TEST_ASSERT(before.m_lineCount == after.m_lineCount);
+	AXL_TEST_ASSERT(before.m_charCount == after.m_charCount);
 	verifyTree(tree, reference);
 }
 
@@ -630,7 +629,7 @@ testModifySubStat(size_t elementCount) {
 
 		reference.rwi()[index].m_lineCount = newLines;
 		verifyTree(tree, reference);
-		TEST_ASSERT(tree.template getFullSubStat<CharStat>().m_value == charTotal);
+		AXL_TEST_ASSERT(tree.template getFullSubStat<CharStat>().m_value == charTotal);
 	}
 
 	// and the other projection, on the same tree
@@ -649,7 +648,7 @@ testModifySubStat(size_t elementCount) {
 
 		reference.rwi()[index].m_charCount = newChars;
 		verifyTree(tree, reference);
-		TEST_ASSERT(tree.template getFullSubStat<LineStat>().m_value == lineTotal);
+		AXL_TEST_ASSERT(tree.template getFullSubStat<LineStat>().m_value == lineTotal);
 	}
 
 	// a projected round trip must land back exactly where it started -- this is
@@ -667,8 +666,8 @@ testModifySubStat(size_t elementCount) {
 	}
 
 	SpanStat after = tree.getFullStat();
-	TEST_ASSERT(before.m_lineCount == after.m_lineCount);
-	TEST_ASSERT(before.m_charCount == after.m_charCount);
+	AXL_TEST_ASSERT(before.m_lineCount == after.m_lineCount);
+	AXL_TEST_ASSERT(before.m_charCount == after.m_charCount);
 	verifyTree(tree, reference);
 }
 
@@ -766,20 +765,20 @@ testInsertNoValue(size_t elementCount) {
 		lineTotal += span.m_lineCount;
 		charTotal += span.m_charCount;
 
-		TEST_ASSERT(it);
+		AXL_TEST_ASSERT(it);
 
 		// default-constructed, not garbage and not a neighbour's payload
 
-		TEST_ASSERT((*it).m_id == 0);
-		TEST_ASSERT((*it).m_lineCount == 0 && (*it).m_charCount == 0);
+		AXL_TEST_ASSERT((*it).m_id == 0);
+		AXL_TEST_ASSERT((*it).m_lineCount == 0 && (*it).m_charCount == 0);
 
 		// the stat landed on this slot, and aggregated, with no value yet
 
 		SpanStat elementStat = it.getStat();
-		TEST_ASSERT(elementStat.m_lineCount == span.m_lineCount);
-		TEST_ASSERT(elementStat.m_charCount == span.m_charCount);
-		TEST_ASSERT(tree.getFullStat().m_lineCount == lineTotal);
-		TEST_ASSERT(tree.getFullStat().m_charCount == charTotal);
+		AXL_TEST_ASSERT(elementStat.m_lineCount == span.m_lineCount);
+		AXL_TEST_ASSERT(elementStat.m_charCount == span.m_charCount);
+		AXL_TEST_ASSERT(tree.getFullStat().m_lineCount == lineTotal);
+		AXL_TEST_ASSERT(tree.getFullStat().m_charCount == charTotal);
 
 		*it = span; // only now the payload
 
@@ -829,12 +828,12 @@ testInsertNoValueEquivalence(size_t elementCount) {
 	typename Tree::ConstIterator it1 = noValueTree.getHead();
 	typename Tree::ConstIterator it2 = valueTree.getHead();
 	for (; it1 && it2; it1++, it2++) {
-		TEST_ASSERT(it1->m_id == it2->m_id);
-		TEST_ASSERT(it1->m_lineCount == it2->m_lineCount);
-		TEST_ASSERT(it1.getStat().m_charCount == it2.getStat().m_charCount);
+		AXL_TEST_ASSERT(it1->m_id == it2->m_id);
+		AXL_TEST_ASSERT(it1->m_lineCount == it2->m_lineCount);
+		AXL_TEST_ASSERT(it1.getStat().m_charCount == it2.getStat().m_charCount);
 	}
 
-	TEST_ASSERT(!it1 && !it2);
+	AXL_TEST_ASSERT(!it1 && !it2);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -915,7 +914,7 @@ testSplitCascade(size_t elementCount) {
 				verifyTree(tree, reference);
 		}
 
-		TEST_ASSERT(tree.isEmpty() && !tree.getHead() && !tree.getTail());
+		AXL_TEST_ASSERT(tree.isEmpty() && !tree.getHead() && !tree.getTail());
 	}
 }
 
@@ -965,6 +964,6 @@ run() {
 
 //..............................................................................
 
-ADD_TEST_CASE("test_StatBTree", run)
+AXL_TEST_ADD("test_StatBTree", run)
 
 } // namespace

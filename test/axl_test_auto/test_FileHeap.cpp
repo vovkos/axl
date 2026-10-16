@@ -10,7 +10,6 @@
 //..............................................................................
 
 #include "pch.h"
-#include "test.h"
 #include "axl_io_FileHeap.h"
 #include "axl_io_FilePathUtils.h"
 #include "axl_g_Module.h"
@@ -62,7 +61,7 @@ checkPattern(
 ) {
 	const uchar_t* b = (const uchar_t*)p;
 	for (size_t i = 0; i < size; i++)
-		TEST_ASSERT(b[i] == (uchar_t)(fill + i));
+		AXL_TEST_ASSERT(b[i] == (uchar_t)(fill + i));
 }
 
 // re-map the block by its handle and check its pattern is intact.
@@ -77,8 +76,8 @@ verifyBlock(
 	const Alloc& alloc
 ) {
 	io::FileHeapPtr<> ptr = heap->materialize<void>(alloc.m_offset, false);
-	TEST_ASSERT(ptr.p() && ptr.getOffset() == alloc.m_offset);
-	TEST_ASSERT(ptr.getSize() >= alloc.m_size); // payload covers the request
+	AXL_TEST_ASSERT(ptr.p() && ptr.getOffset() == alloc.m_offset);
+	AXL_TEST_ASSERT(ptr.getSize() >= alloc.m_size); // payload covers the request
 	checkPattern(ptr.p(), alloc.m_size, alloc.m_fill);
 }
 
@@ -87,7 +86,7 @@ verifyAll(
 	io::FileHeap* heap,
 	const sl::Array<Alloc>& live
 ) {
-	TEST_ASSERT(heap->getBlockCount() >= live.getCount()); // total blocks >= allocated blocks
+	AXL_TEST_ASSERT(heap->getBlockCount() >= live.getCount()); // total blocks >= allocated blocks
 
 	for (size_t i = 0; i < live.getCount(); i++)
 		verifyBlock(heap, live[i]);
@@ -105,8 +104,8 @@ allocOne(
 	alloc.m_fill = (*fillCounter)++;
 
 	io::FileHeapPtr<> ptr = heap->allocate<void>(alloc.m_size, false);
-	TEST_ASSERT(ptr.p() && !ptr.isPinned());
-	TEST_ASSERT(ptr.getSize() >= alloc.m_size);
+	AXL_TEST_ASSERT(ptr.p() && !ptr.isPinned());
+	AXL_TEST_ASSERT(ptr.getSize() >= alloc.m_size);
 
 	alloc.m_offset = ptr.getOffset();
 	writePattern(ptr.p(), alloc.m_size, alloc.m_fill);
@@ -145,8 +144,8 @@ reallocOne(
 	Alloc& alloc = live->rwi()[index];
 
 	io::FileHeapPtr<> ptr = heap->reallocate<void>(alloc.m_offset, size, false);
-	TEST_ASSERT(ptr.p() && !ptr.isPinned());
-	TEST_ASSERT(ptr.getSize() >= size);
+	AXL_TEST_ASSERT(ptr.p() && !ptr.isPinned());
+	AXL_TEST_ASSERT(ptr.getSize() >= size);
 
 	checkPattern(ptr.p(), size < alloc.m_size ? size : alloc.m_size, alloc.m_fill);
 
@@ -192,7 +191,7 @@ test_ReadWrite() {
 	};
 
 	sl::String fileName = io::createTempFile();
-	TEST_ASSERT(!fileName.isEmpty());
+	AXL_TEST_ASSERT(!fileName.isEmpty());
 	io::AutoDeleteFile autoDelete(fileName);
 
 	uint32_t seed = 0x12345678;
@@ -201,9 +200,9 @@ test_ReadWrite() {
 
 	io::FileHeap heap;
 	bool result = heap.open(fileName); // empty file -> create
-	TEST_ASSERT(result);
-	TEST_ASSERT(heap.getBlockCount() == 0);
-	TEST_ASSERT(heap.getHeapSize() == 0);
+	AXL_TEST_ASSERT(result);
+	AXL_TEST_ASSERT(heap.getBlockCount() == 0);
+	AXL_TEST_ASSERT(heap.getHeapSize() == 0);
 
 	churn(&heap, &live, &seed, &fillCounter, IterationCount, MaxLiveTarget);
 
@@ -212,8 +211,8 @@ test_ReadWrite() {
 	uint64_t heapSizeBeforeReload = heap.getHeapSize();
 	heap.close();
 	result = heap.open(fileName); // non-empty file -> load
-	TEST_ASSERT(result);
-	TEST_ASSERT(heap.getHeapSize() == heapSizeBeforeReload);
+	AXL_TEST_ASSERT(result);
+	AXL_TEST_ASSERT(heap.getHeapSize() == heapSizeBeforeReload);
 	verifyAll(&heap, live);
 
 	// keep operating after the reload
@@ -225,16 +224,16 @@ test_ReadWrite() {
 	while (!live.isEmpty())
 		freeOne(&heap, &live, &seed);
 
-	TEST_ASSERT(heap.getBlockCount() == 1);
+	AXL_TEST_ASSERT(heap.getBlockCount() == 1);
 
 	// the collapsed free space must be reusable without growing the heap
 
 	uint64_t heapSize = heap.getHeapSize();
 	io::FileHeapPtr<> ptr = heap.allocate<void>(2000, false);
-	TEST_ASSERT(ptr.p());
-	TEST_ASSERT(heap.getHeapSize() == heapSize);
+	AXL_TEST_ASSERT(ptr.p());
+	AXL_TEST_ASSERT(heap.getHeapSize() == heapSize);
 	heap.free(ptr.getOffset());
-	TEST_ASSERT(heap.getBlockCount() == 1);
+	AXL_TEST_ASSERT(heap.getBlockCount() == 1);
 
 	heap.close();
 }
@@ -250,7 +249,7 @@ test_ReadOnly() {
 	};
 
 	sl::String fileName = io::createTempFile();
-	TEST_ASSERT(!fileName.isEmpty());
+	AXL_TEST_ASSERT(!fileName.isEmpty());
 	io::AutoDeleteFile autoDelete(fileName);
 
 	uint32_t seed = 0x2468ace0;
@@ -260,7 +259,7 @@ test_ReadOnly() {
 	{
 		io::FileHeap heap;
 		bool result = heap.open(fileName);
-		TEST_ASSERT(result);
+		AXL_TEST_ASSERT(result);
 
 		for (size_t i = 0; i < BlockCount; i++) {
 			Alloc alloc;
@@ -268,7 +267,7 @@ test_ReadOnly() {
 			alloc.m_fill = fillCounter++;
 
 			io::FileHeapPtr<> ptr = heap.allocate<void>(alloc.m_size, false);
-			TEST_ASSERT(ptr.p());
+			AXL_TEST_ASSERT(ptr.p());
 
 			alloc.m_offset = ptr.getOffset();
 			writePattern(ptr.p(), alloc.m_size, alloc.m_fill);
@@ -282,8 +281,8 @@ test_ReadOnly() {
 
 	io::FileHeap heap;
 	bool result = heap.open(fileName, io::FileFlag_ReadOnly);
-	TEST_ASSERT(result);
-	TEST_ASSERT(heap.getBlockCount() >= live.getCount());
+	AXL_TEST_ASSERT(result);
+	AXL_TEST_ASSERT(heap.getBlockCount() >= live.getCount());
 
 	verifyAll(&heap, live);
 
@@ -306,7 +305,7 @@ test_SmallViews() {
 	};
 
 	sl::String fileName = io::createTempFile();
-	TEST_ASSERT(!fileName.isEmpty());
+	AXL_TEST_ASSERT(!fileName.isEmpty());
 	io::AutoDeleteFile autoDelete(fileName);
 
 	uint32_t seed = 0x0badc0de;
@@ -317,7 +316,7 @@ test_SmallViews() {
 	heap.setup(io::FileHeap::MinDynamicViewCount, 0);
 
 	bool result = heap.open(fileName);
-	TEST_ASSERT(result);
+	AXL_TEST_ASSERT(result);
 
 	churn(&heap, &live, &seed, &fillCounter, IterationCount, MaxLiveTarget);
 
@@ -326,7 +325,7 @@ test_SmallViews() {
 
 	heap.close();
 	result = heap.open(fileName);
-	TEST_ASSERT(result);
+	AXL_TEST_ASSERT(result);
 	verifyAll(&heap, live);
 
 	churn(&heap, &live, &seed, &fillCounter, IterationCount, MaxLiveTarget);
@@ -334,7 +333,7 @@ test_SmallViews() {
 	while (!live.isEmpty())
 		freeOne(&heap, &live, &seed);
 
-	TEST_ASSERT(heap.getBlockCount() == 1);
+	AXL_TEST_ASSERT(heap.getBlockCount() == 1);
 	heap.close();
 }
 
@@ -350,7 +349,7 @@ test_PageBoundarySplit() {
 	};
 
 	sl::String fileName = io::createTempFile();
-	TEST_ASSERT(!fileName.isEmpty());
+	AXL_TEST_ASSERT(!fileName.isEmpty());
 	io::AutoDeleteFile autoDelete(fileName);
 
 	sl::Array<Alloc> live;
@@ -359,7 +358,7 @@ test_PageBoundarySplit() {
 	heap.setup(io::FileHeap::MinDynamicViewCount, 0);
 
 	bool result = heap.open(fileName);
-	TEST_ASSERT(result);
+	AXL_TEST_ASSERT(result);
 
 	for (size_t i = 0; i < SeedBlockCount; i++) {
 		Alloc alloc;
@@ -367,7 +366,7 @@ test_PageBoundarySplit() {
 		alloc.m_fill = (uint8_t)(i + 1);
 
 		io::FileHeapPtr<> ptr = heap.allocate<void>(alloc.m_size, false);
-		TEST_ASSERT(ptr.p());
+		AXL_TEST_ASSERT(ptr.p());
 
 		alloc.m_offset = ptr.getOffset();
 		writePattern(ptr.p(), alloc.m_size, alloc.m_fill);
@@ -378,7 +377,7 @@ test_PageBoundarySplit() {
 
 	const Alloc& last = live[live.getCount() - 1];
 	io::FileHeapPtr<> lastPtr = heap.materialize<void>(last.m_offset, false);
-	TEST_ASSERT(lastPtr.p());
+	AXL_TEST_ASSERT(lastPtr.p());
 
 	uint64_t tailOffset = last.m_offset + lastPtr.getSize();
 
@@ -392,12 +391,12 @@ test_PageBoundarySplit() {
 	// size instead of being served from one of the seed views
 
 	for (size_t i = 0; i < io::FileHeap::MinDynamicViewCount; i++)
-		TEST_ASSERT(heap.materialize<void>(live[i].m_offset, false).p());
+		AXL_TEST_ASSERT(heap.materialize<void>(live[i].m_offset, false).p());
 
 	io::FileHeapPtr<> ptr = heap.allocate<void>(blockSize - sizeof(io::FileHeapBlock), false);
-	TEST_ASSERT(ptr.p());
-	TEST_ASSERT(ptr.getOffset() == tailOffset + sizeof(io::FileHeapBlock)); // took the tail
-	TEST_ASSERT(ptr.getOffset() + ptr.getSize() == boundary);
+	AXL_TEST_ASSERT(ptr.p());
+	AXL_TEST_ASSERT(ptr.getOffset() == tailOffset + sizeof(io::FileHeapBlock)); // took the tail
+	AXL_TEST_ASSERT(ptr.getOffset() + ptr.getSize() == boundary);
 
 	writePattern(ptr.p(), blockSize - sizeof(io::FileHeapBlock), 0xc3);
 
@@ -405,12 +404,12 @@ test_PageBoundarySplit() {
 	// has to still walk on reopen
 
 	io::FileHeapPtr<> leftover = heap.allocate<void>(64, false);
-	TEST_ASSERT(leftover.p());
-	TEST_ASSERT(leftover.getOffset() == boundary + sizeof(io::FileHeapBlock));
+	AXL_TEST_ASSERT(leftover.p());
+	AXL_TEST_ASSERT(leftover.getOffset() == boundary + sizeof(io::FileHeapBlock));
 
 	heap.close();
 	result = heap.open(fileName);
-	TEST_ASSERT(result);
+	AXL_TEST_ASSERT(result);
 	verifyAll(&heap, live);
 	heap.close();
 }
@@ -429,7 +428,7 @@ test_Pin() {
 	};
 
 	sl::String fileName = io::createTempFile();
-	TEST_ASSERT(!fileName.isEmpty());
+	AXL_TEST_ASSERT(!fileName.isEmpty());
 	io::AutoDeleteFile autoDelete(fileName);
 
 	uint32_t seed = 0xfeedface;
@@ -442,36 +441,36 @@ test_Pin() {
 	heap.setup(io::FileHeap::MinDynamicViewCount, 0);
 
 	bool result = heap.open(fileName);
-	TEST_ASSERT(result);
+	AXL_TEST_ASSERT(result);
 
 	{
 		// pinned at allocation time -- allocate() pins by default
 
 		io::FileHeapPtr<> allocated = heap.allocate(PinnedSize);
-		TEST_ASSERT(allocated.p() && allocated.isPinned());
+		AXL_TEST_ASSERT(allocated.p() && allocated.isPinned());
 		writePattern(allocated.p(), PinnedSize, allocFill);
 
 		// pinned after the fact: allocate(..., false) hands back no pin, so the block is
 		// only held once the materialize() below picks it up
 
 		io::FileHeapPtr<> dynamic = heap.allocate<void>(PinnedSize, false);
-		TEST_ASSERT(dynamic.p() && !dynamic.isPinned());
+		AXL_TEST_ASSERT(dynamic.p() && !dynamic.isPinned());
 		writePattern(dynamic.p(), PinnedSize, materializeFill);
 
 		io::FileHeapPtr<> materialized = heap.materialize(dynamic.getOffset());
-		TEST_ASSERT(materialized.p() && materialized.isPinned());
-		TEST_ASSERT(materialized.getOffset() == dynamic.getOffset());
+		AXL_TEST_ASSERT(materialized.p() && materialized.isPinned());
+		AXL_TEST_ASSERT(materialized.getOffset() == dynamic.getOffset());
 
 		// a copy pins the same block a second time; a move transfers the pin and
 		// leaves the source null
 
 		io::FileHeapPtr<> copied = allocated;
-		TEST_ASSERT(copied.isPinned());
-		TEST_ASSERT(copied.p() == allocated.p() && copied.getOffset() == allocated.getOffset());
+		AXL_TEST_ASSERT(copied.isPinned());
+		AXL_TEST_ASSERT(copied.p() == allocated.p() && copied.getOffset() == allocated.getOffset());
 
 		io::FileHeapPtr<> moved = std::move(copied);
-		TEST_ASSERT(moved.isPinned() && moved.p() == allocated.p());
-		TEST_ASSERT(copied.isNull() && !copied.isPinned() && copied.getOffset() == (uint64_t)-1);
+		AXL_TEST_ASSERT(moved.isPinned() && moved.p() == allocated.p());
+		AXL_TEST_ASSERT(copied.isNull() && !copied.isPinned() && copied.getOffset() == (uint64_t)-1);
 
 		churn(&heap, &live, &seed, &fillCounter, IterationCount, MaxLiveTarget);
 
@@ -484,7 +483,7 @@ test_Pin() {
 		// dropping one pin of a doubly-pinned block must not unmap it
 
 		moved.clear();
-		TEST_ASSERT(moved.isNull());
+		AXL_TEST_ASSERT(moved.isNull());
 		checkPattern(allocated.p(), PinnedSize, allocFill);
 	}
 
@@ -512,7 +511,7 @@ test_Typed() {
 	};
 
 	sl::String fileName = io::createTempFile();
-	TEST_ASSERT(!fileName.isEmpty());
+	AXL_TEST_ASSERT(!fileName.isEmpty());
 	io::AutoDeleteFile autoDelete(fileName);
 
 	sl::Array<uint64_t> offsetArray;
@@ -521,14 +520,14 @@ test_Typed() {
 	heap.setup(io::FileHeap::MinDynamicViewCount, 0); // hostile LRU, as in test_Pin
 
 	bool result = heap.open(fileName);
-	TEST_ASSERT(result);
+	AXL_TEST_ASSERT(result);
 
 	// write through operator -> on a pinned typed pointer
 
 	for (size_t i = 0; i < RecCount; i++) {
 		io::FileHeapPtr<Rec> rec = heap.allocate<Rec>(sizeof(Rec));
-		TEST_ASSERT(rec.p() && rec.isPinned());
-		TEST_ASSERT(rec.getSize() >= sizeof(Rec));
+		AXL_TEST_ASSERT(rec.p() && rec.isPinned());
+		AXL_TEST_ASSERT(rec.getSize() >= sizeof(Rec));
 
 		rec->m_signature = Signature;
 		rec->m_index = (uint32_t)i;
@@ -540,10 +539,10 @@ test_Typed() {
 
 	for (size_t i = 0; i < RecCount; i++) {
 		io::FileHeapPtr<Rec> rec = heap.materialize<Rec>(offsetArray[i], false);
-		TEST_ASSERT(rec.p() && !rec.isPinned());
-		TEST_ASSERT(rec->m_signature == Signature);
-		TEST_ASSERT(rec->m_index == i);
-		TEST_ASSERT(rec->m_payload == i * 0x0101010101010101ull);
+		AXL_TEST_ASSERT(rec.p() && !rec.isPinned());
+		AXL_TEST_ASSERT(rec->m_signature == Signature);
+		AXL_TEST_ASSERT(rec->m_index == i);
+		AXL_TEST_ASSERT(rec->m_payload == i * 0x0101010101010101ull);
 	}
 
 	{
@@ -551,25 +550,25 @@ test_Typed() {
 		// record stays readable through every conversion after heavy churn
 
 		io::FileHeapPtr<Rec> rec = heap.materialize<Rec>(offsetArray[0]);
-		TEST_ASSERT(rec.isPinned());
+		AXL_TEST_ASSERT(rec.isPinned());
 
 		io::FileHeapPtr<void> raw = rec;             // converting copy: Rec* -> void*
 		io::ConstFileHeapPtr<Rec> constRec = rec;    // converting copy: Rec* -> const Rec*
-		TEST_ASSERT(raw.isPinned() && constRec.isPinned());
-		TEST_ASSERT(raw.p() == rec.p() && constRec.p() == rec.p());
-		TEST_ASSERT(raw.getOffset() == rec.getOffset() && raw.getSize() == rec.getSize());
+		AXL_TEST_ASSERT(raw.isPinned() && constRec.isPinned());
+		AXL_TEST_ASSERT(raw.p() == rec.p() && constRec.p() == rec.p());
+		AXL_TEST_ASSERT(raw.getOffset() == rec.getOffset() && raw.getSize() == rec.getSize());
 
 		for (size_t i = 1; i < RecCount; i++)
-			TEST_ASSERT(heap.materialize<Rec>(offsetArray[i], false).p());
+			AXL_TEST_ASSERT(heap.materialize<Rec>(offsetArray[i], false).p());
 
-		TEST_ASSERT(rec->m_signature == Signature && rec->m_index == 0);
-		TEST_ASSERT(constRec->m_signature == Signature);
+		AXL_TEST_ASSERT(rec->m_signature == Signature && rec->m_index == 0);
+		AXL_TEST_ASSERT(constRec->m_signature == Signature);
 
 		// a converting move leaves the source null and keeps the block pinned
 
 		io::FileHeapPtr<void> movedRaw = std::move(rec);
-		TEST_ASSERT(movedRaw.isPinned() && rec.isNull() && !rec.isPinned());
-		TEST_ASSERT(constRec->m_index == 0); // still mapped, held by constRec/movedRaw
+		AXL_TEST_ASSERT(movedRaw.isPinned() && rec.isNull() && !rec.isPinned());
+		AXL_TEST_ASSERT(constRec->m_index == 0); // still mapped, held by constRec/movedRaw
 	}
 
 	heap.close();
@@ -590,7 +589,7 @@ test_Reallocate() {
 	};
 
 	sl::String fileName = io::createTempFile();
-	TEST_ASSERT(!fileName.isEmpty());
+	AXL_TEST_ASSERT(!fileName.isEmpty());
 	io::AutoDeleteFile autoDelete(fileName);
 
 	uint32_t seed = 0x1234abcd;
@@ -601,12 +600,12 @@ test_Reallocate() {
 	heap.setup(io::FileHeap::MinDynamicViewCount, 0); // hostile LRU, no read-ahead
 
 	bool result = heap.open(fileName);
-	TEST_ASSERT(result);
+	AXL_TEST_ASSERT(result);
 
 	// a null handle allocates
 
 	io::FileHeapPtr<> grown = heap.reallocate((uint64_t)-1, StepSize);
-	TEST_ASSERT(grown.p() && grown.isPinned() && grown.getSize() >= StepSize);
+	AXL_TEST_ASSERT(grown.p() && grown.isPinned() && grown.getSize() >= StepSize);
 	writePattern(grown.p(), StepSize, 0x11);
 
 	// grow repeatedly, interleaved with churn so the block is rarely the last one and
@@ -621,8 +620,8 @@ test_Reallocate() {
 
 		size_t newSize = size + StepSize;
 		io::FileHeapPtr<> next = heap.reallocate(grown.getOffset(), newSize);
-		TEST_ASSERT(next.p() && next.isPinned());
-		TEST_ASSERT(next.getSize() >= newSize);
+		AXL_TEST_ASSERT(next.p() && next.isPinned());
+		AXL_TEST_ASSERT(next.getSize() >= newSize);
 
 		checkPattern(next.p(), size, 0x11); // everything written so far survived
 		writePattern((char*)next.p() + size, StepSize, (uint8_t)(0x11 + size));
@@ -636,20 +635,20 @@ test_Reallocate() {
 	// every block must stay 8-byte aligned: an unaligned m_size would shift every
 	// later block in the chain and only surface as corruption on reopen
 
-	TEST_ASSERT(grown.getOffset() % io::FileHeap::Alignment == 0);
-	TEST_ASSERT((grown.getOffset() + grown.getSize()) % io::FileHeap::Alignment == 0);
+	AXL_TEST_ASSERT(grown.getOffset() % io::FileHeap::Alignment == 0);
+	AXL_TEST_ASSERT((grown.getOffset() + grown.getSize()) % io::FileHeap::Alignment == 0);
 
 	// a request that already fits keeps the same block
 
 	uint64_t offset = grown.getOffset();
 	io::FileHeapPtr<> same = heap.reallocate(offset, StepSize);
-	TEST_ASSERT(same.p() && same.getOffset() == offset);
+	AXL_TEST_ASSERT(same.p() && same.getOffset() == offset);
 	checkPattern(same.p(), StepSize, 0x11);
 
 	// honoring isPinned = false
 
 	io::FileHeapPtr<> unpinned = heap.reallocate(offset, StepSize, false);
-	TEST_ASSERT(unpinned.p() && !unpinned.isPinned());
+	AXL_TEST_ASSERT(unpinned.p() && !unpinned.isPinned());
 
 	same.clear();
 	unpinned.clear();
@@ -660,7 +659,7 @@ test_Reallocate() {
 	verifyAll(&heap, live);
 	heap.close();
 	result = heap.open(fileName);
-	TEST_ASSERT(result);
+	AXL_TEST_ASSERT(result);
 	verifyAll(&heap, live);
 	heap.close();
 }
@@ -694,7 +693,7 @@ test_ViewPressure() {
 	};
 
 	sl::String fileName = io::createTempFile();
-	TEST_ASSERT(!fileName.isEmpty());
+	AXL_TEST_ASSERT(!fileName.isEmpty());
 	io::AutoDeleteFile autoDelete(fileName);
 
 	size_t granule = getViewGranule();
@@ -707,7 +706,7 @@ test_ViewPressure() {
 	heap.setup(io::FileHeap::MinDynamicViewCount, 0);
 
 	bool result = heap.open(fileName);
-	TEST_ASSERT(result);
+	AXL_TEST_ASSERT(result);
 
 	for (size_t i = 0; i < IterationCount; i++) {
 		uint32_t size = (uint32_t)(granule + lcg(&seed) % granule);
@@ -746,7 +745,7 @@ test_ViewPressure() {
 
 	heap.close();
 	result = heap.open(fileName);
-	TEST_ASSERT(result);
+	AXL_TEST_ASSERT(result);
 	verifyAll(&heap, live);
 	heap.close();
 }
@@ -761,7 +760,7 @@ test_MergeViews() {
 	};
 
 	sl::String fileName = io::createTempFile();
-	TEST_ASSERT(!fileName.isEmpty());
+	AXL_TEST_ASSERT(!fileName.isEmpty());
 	io::AutoDeleteFile autoDelete(fileName);
 
 	size_t granule = getViewGranule();
@@ -770,7 +769,7 @@ test_MergeViews() {
 	heap.setup(io::FileHeap::MinDynamicViewCount, 0);
 
 	bool result = heap.open(fileName);
-	TEST_ASSERT(result);
+	AXL_TEST_ASSERT(result);
 
 	// a fresh heap splits blocks off the front, so these come out physically adjacent --
 	// asserted below, since both layouts rest on it. [0..3] go to free(), [4..7] to
@@ -783,25 +782,25 @@ test_MergeViews() {
 		sizes[i] = (uint32_t)(i == 5 ? granule * 2 : granule);
 
 		io::FileHeapPtr<> ptr = heap.allocate<void>(sizes[i], false);
-		TEST_ASSERT(ptr.p() && ptr.getSize() == sizes[i]); // exact: the leftover always splits
+		AXL_TEST_ASSERT(ptr.p() && ptr.getSize() == sizes[i]); // exact: the leftover always splits
 
 		offsets[i] = ptr.getOffset();
 		writePattern(ptr.p(), sizes[i], (uint8_t)(0x40 + i));
 
 		if (i)
-			TEST_ASSERT(offsets[i] == offsets[i - 1] + sizes[i - 1] + sizeof(io::FileHeapBlock));
+			AXL_TEST_ASSERT(offsets[i] == offsets[i - 1] + sizes[i - 1] + sizeof(io::FileHeapBlock));
 	}
 
 	// free(): with [0] and [2] already free, freeing [1] merges in both directions and
 	// still has to reach [3], the block past the successor it swallows. four views, and
 	// [1]'s own is the one that dies
 
-	TEST_ASSERT(heap.free(offsets[0])); // heap start before it, allocated block after
-	TEST_ASSERT(heap.free(offsets[2])); // both neighbours allocated
-	TEST_ASSERT(heap.free(offsets[1])); // merges both ways
+	AXL_TEST_ASSERT(heap.free(offsets[0])); // heap start before it, allocated block after
+	AXL_TEST_ASSERT(heap.free(offsets[2])); // both neighbours allocated
+	AXL_TEST_ASSERT(heap.free(offsets[1])); // merges both ways
 
 	io::FileHeapPtr<> survivor = heap.materialize<void>(offsets[3], false);
-	TEST_ASSERT(survivor.p());
+	AXL_TEST_ASSERT(survivor.p());
 	checkPattern(survivor.p(), sizes[3], 0x43);
 
 	// the three must have collapsed into exactly one block -- two headers absorbed. it is
@@ -812,28 +811,28 @@ test_MergeViews() {
 		(uint32_t)sizeof(io::FileHeapBlock) * 2;
 
 	io::FileHeapPtr<> merged = heap.allocate<void>(mergedSize, false);
-	TEST_ASSERT(merged.p() && merged.getOffset() == offsets[0]);
-	TEST_ASSERT(merged.getSize() == mergedSize); // an exact fit -- nothing left to split
+	AXL_TEST_ASSERT(merged.p() && merged.getOffset() == offsets[0]);
+	AXL_TEST_ASSERT(merged.getSize() == mergedSize); // an exact fit -- nothing left to split
 
 	// reallocate(): free [5] so [4] can absorb it, then grow [4] over both. the request
 	// leaves a granule of leftover whose successor is [6] -- the fourth view -- and [6]
 	// is not the last block, so createFreeBlock() really does have to update it
 
-	TEST_ASSERT(heap.free(offsets[5]));
+	AXL_TEST_ASSERT(heap.free(offsets[5]));
 
 	uint32_t newSize = sizes[4] + sizes[5] / 2;
 
 	io::FileHeapPtr<> grown = heap.reallocate(offsets[4], newSize);
-	TEST_ASSERT(grown.p() && grown.getOffset() == offsets[4]); // absorbed [5] in place
-	TEST_ASSERT(grown.getSize() == newSize);
+	AXL_TEST_ASSERT(grown.p() && grown.getOffset() == offsets[4]); // absorbed [5] in place
+	AXL_TEST_ASSERT(grown.getSize() == newSize);
 	checkPattern(grown.p(), sizes[4], 0x44); // [4]'s payload survived the merge
 
 	io::FileHeapPtr<> next = heap.materialize<void>(offsets[6], false);
-	TEST_ASSERT(next.p());
+	AXL_TEST_ASSERT(next.p());
 	checkPattern(next.p(), sizes[6], 0x46);
 
 	io::FileHeapPtr<> last = heap.materialize<void>(offsets[7], false);
-	TEST_ASSERT(last.p());
+	AXL_TEST_ASSERT(last.p());
 	checkPattern(last.p(), sizes[7], 0x47);
 
 	grown.clear(); // close() needs every pin released
@@ -842,14 +841,14 @@ test_MergeViews() {
 
 	heap.close();
 	result = heap.open(fileName);
-	TEST_ASSERT(result);
+	AXL_TEST_ASSERT(result);
 
 	io::FileHeapPtr<> reloaded = heap.materialize<void>(offsets[6], false);
-	TEST_ASSERT(reloaded.p());
+	AXL_TEST_ASSERT(reloaded.p());
 	checkPattern(reloaded.p(), sizes[6], 0x46);
 
 	reloaded = heap.materialize<void>(offsets[7], false);
-	TEST_ASSERT(reloaded.p());
+	AXL_TEST_ASSERT(reloaded.p());
 	checkPattern(reloaded.p(), sizes[7], 0x47);
 	heap.close();
 }
@@ -871,6 +870,6 @@ run() {
 
 //..............................................................................
 
-ADD_TEST_CASE("test_FileHeap", run)
+AXL_TEST_ADD("test_FileHeap", run)
 
 } // namespace

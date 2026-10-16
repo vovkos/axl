@@ -12,7 +12,6 @@
 #include "pch.h"
 #include "axl_json_YajlGen.h"
 #include "axl_json_YajlParser.h"
-#include "test.h"
 
 namespace {
 
@@ -105,7 +104,7 @@ checkLog(
 		printf("actual:   %s\n", parser.m_log.sz());
 	}
 
-	TEST_ASSERT(parser.m_log == expected);
+	AXL_TEST_ASSERT(parser.m_log == expected);
 }
 
 // every writer, round-tripped through the parser
@@ -132,20 +131,20 @@ testGen() {
 		gen.closeMap() &&
 		gen.closeMap();
 
-	TEST_ASSERT(result);
+	AXL_TEST_ASSERT(result);
 
 	sl::String json = gen.getString();
 	printf("generated: %s\n", json.sz());
 
 	// the quote, backslash and CR/LF must have been escaped, not passed through
 
-	TEST_ASSERT(json.find("\\\"") != -1);
-	TEST_ASSERT(json.find("\\\\") != -1);
-	TEST_ASSERT(json.find("\\r\\n") != -1);
-	TEST_ASSERT(json.find('\r') == -1);
+	AXL_TEST_ASSERT(json.find("\\\"") != -1);
+	AXL_TEST_ASSERT(json.find("\\\\") != -1);
+	AXL_TEST_ASSERT(json.find("\\r\\n") != -1);
+	AXL_TEST_ASSERT(json.find('\r') == -1);
 
 	TestParser parser;
-	TEST_ASSERT(parser.parse(json));
+	AXL_TEST_ASSERT(parser.parse(json));
 
 	checkLog(
 		parser,
@@ -178,7 +177,7 @@ testParse() {
 		"}";
 
 	TestParser parser;
-	TEST_ASSERT(parser.parse(json));
+	AXL_TEST_ASSERT(parser.parse(json));
 
 	checkLog(
 		parser,
@@ -199,7 +198,7 @@ testParse() {
 void
 testParseError() {
 	TestParser parser;
-	TEST_ASSERT(!parser.parse("{ \"a\": }"));
+	AXL_TEST_ASSERT(!parser.parse("{ \"a\": }"));
 	printf("parse error: %s\n", err::getLastErrorDescription().sz());
 }
 
@@ -208,8 +207,8 @@ testParseError() {
 void
 testGenError() {
 	json::YajlGen gen;
-	TEST_ASSERT(gen.openMap());
-	TEST_ASSERT(!gen.addInteger(1));
+	AXL_TEST_ASSERT(gen.openMap());
+	AXL_TEST_ASSERT(!gen.addInteger(1));
 	printf("gen error: %s\n", err::getLastErrorDescription().sz());
 }
 
@@ -227,6 +226,6 @@ run() {
 
 //..............................................................................
 
-ADD_TEST_CASE("test_Json", run)
+AXL_TEST_ADD("test_Json", run)
 
 }

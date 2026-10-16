@@ -10,7 +10,6 @@
 //..............................................................................
 
 #include "pch.h"
-#include "test.h"
 #include "axl_enc_Unicode.h"
 
 namespace {
@@ -106,7 +105,7 @@ void testProps() {
 			"U+%05X props: 0x%04x expected: 0x%04x  (%s)\n",
 			table[i].m_cp, actual, table[i].m_expected, table[i].m_desc
 		);
-		TEST_ASSERT(actual == table[i].m_expected);
+		AXL_TEST_ASSERT(actual == table[i].m_expected);
 	}
 }
 
@@ -150,9 +149,9 @@ void testCaseMapping() {
 			"U+%05X lower:U+%05X upper:U+%05X fold:U+%05X  (%s)\n",
 			table[i].m_cp, lower, upper, fold, table[i].m_desc
 		);
-		TEST_ASSERT(lower == table[i].m_lower);
-		TEST_ASSERT(upper == table[i].m_upper);
-		TEST_ASSERT(fold  == table[i].m_fold);
+		AXL_TEST_ASSERT(lower == table[i].m_lower);
+		AXL_TEST_ASSERT(upper == table[i].m_upper);
+		AXL_TEST_ASSERT(fold  == table[i].m_fold);
 	}
 }
 
@@ -165,6 +164,6 @@ void run() {
 
 //..............................................................................
 
-ADD_TEST_CASE("test_Unicode", run)
+AXL_TEST_ADD("test_Unicode", run)
 
 } // namespace

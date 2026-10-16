@@ -10,7 +10,6 @@
 //..............................................................................
 
 #include "pch.h"
-#include "test.h"
 
 namespace {
 
@@ -224,22 +223,22 @@ void run() {
 		for (size_t j = 0; j < to + Overshoot; j++) {
 			bool b = bitMap.getBit(j);
 			bool b2 = bitMapInv.getBit(j);
-			TEST_ASSERT(b == !b2);
+			AXL_TEST_ASSERT(b == !b2);
 
 			bool isInside = j >= from && j < to;
-			TEST_ASSERT(b && isInside || !b && !isInside);
+			AXL_TEST_ASSERT(b && isInside || !b && !isInside);
 		}
 
 		if (from >= to) {
-			TEST_ASSERT(bitMap.findBit() == -1);
-			TEST_ASSERT(bitMap.findBitReverse() == -1);
-			TEST_ASSERT(bitMapInv.findZeroBit() == -1);
-			TEST_ASSERT(bitMapInv.findZeroBitReverse() == -1);
+			AXL_TEST_ASSERT(bitMap.findBit() == -1);
+			AXL_TEST_ASSERT(bitMap.findBitReverse() == -1);
+			AXL_TEST_ASSERT(bitMapInv.findZeroBit() == -1);
+			AXL_TEST_ASSERT(bitMapInv.findZeroBitReverse() == -1);
 		} else  {
-			TEST_ASSERT(bitMap.findBit() == from);
-			TEST_ASSERT(bitMap.findBitReverse() == to - 1);
-			TEST_ASSERT(bitMapInv.findZeroBit() == from);
-			TEST_ASSERT(bitMapInv.findZeroBitReverse() == to - 1);
+			AXL_TEST_ASSERT(bitMap.findBit() == from);
+			AXL_TEST_ASSERT(bitMap.findBitReverse() == to - 1);
+			AXL_TEST_ASSERT(bitMapInv.findZeroBit() == from);
+			AXL_TEST_ASSERT(bitMapInv.findZeroBitReverse() == to - 1);
 		}
 
 		printf("  SHR\n");
@@ -258,15 +257,15 @@ void run() {
 			for (size_t j = 0; j < to + Overshoot; j++) {
 				bool b = bitMapShr.getBit(j);
 				bool isInside = j >= from && j < to;
-				TEST_ASSERT(b && isInside || !b && !isInside);
+				AXL_TEST_ASSERT(b && isInside || !b && !isInside);
 			}
 
 			if (from >= to || to == 0) { // all shifted out
-				TEST_ASSERT(bitMapShr.findBit() == -1);
-				TEST_ASSERT(bitMapShr.findBitReverse() == - 1);
+				AXL_TEST_ASSERT(bitMapShr.findBit() == -1);
+				AXL_TEST_ASSERT(bitMapShr.findBitReverse() == - 1);
 			} else {
-				TEST_ASSERT(bitMapShr.findBit() == from);
-				TEST_ASSERT(bitMapShr.findBitReverse() == to - 1);
+				AXL_TEST_ASSERT(bitMapShr.findBit() == from);
+				AXL_TEST_ASSERT(bitMapShr.findBitReverse() == to - 1);
 			}
 		}
 
@@ -288,11 +287,11 @@ void run() {
 			}
 
 			if (from >= to) {
-				TEST_ASSERT(bitMapShl.findBit() == -1);
-				TEST_ASSERT(bitMapShl.findBitReverse() == -1);
+				AXL_TEST_ASSERT(bitMapShl.findBit() == -1);
+				AXL_TEST_ASSERT(bitMapShl.findBitReverse() == -1);
 			} else {
-				TEST_ASSERT(bitMapShl.findBit() == from);
-				TEST_ASSERT(bitMapShl.findBitReverse() == to - 1);
+				AXL_TEST_ASSERT(bitMapShl.findBit() == from);
+				AXL_TEST_ASSERT(bitMapShl.findBitReverse() == to - 1);
 			}
 		}
 	}
@@ -300,6 +299,6 @@ void run() {
 
 //..............................................................................
 
-ADD_TEST_CASE("test_BitMap", run)
+AXL_TEST_ADD("test_BitMap", run)
 
 }

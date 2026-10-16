@@ -12,7 +12,6 @@
 #include "pch.h"
 #include "axl_cry_EcKey.h"
 #include "axl_cry_EcPoint.h"
-#include "test.h"
 
 namespace {
 
@@ -88,7 +87,7 @@ void run() {
 
 	bool result = verifyEcProductKey(key, userName, productKey);
 	printf("verify:  %d\n", result);
-	TEST_ASSERT(result);
+	AXL_TEST_ASSERT(result);
 
 	privateKey.detach();
 	publicKey.detach();
@@ -97,6 +96,6 @@ void run() {
 
 //..............................................................................
 
-ADD_TEST_CASE("test_Crypto", run)
+AXL_TEST_ADD("test_Crypto", run)
 
 }

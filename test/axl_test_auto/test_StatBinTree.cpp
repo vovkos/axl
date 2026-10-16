@@ -10,7 +10,6 @@
 //..............................................................................
 
 #include "pch.h"
-#include "test.h"
 
 namespace {
 
@@ -269,21 +268,21 @@ verifyTree(
 #endif
 
 	size_t count = reference.getCount();
-	TEST_ASSERT(tree.getCount() == count);
-	TEST_ASSERT(tree.isEmpty() == (count == 0));
+	AXL_TEST_ASSERT(tree.getCount() == count);
+	AXL_TEST_ASSERT(tree.isEmpty() == (count == 0));
 
 	Stat total = Stat();
 	size_t i = 0;
 
 	typename Tree::ConstIterator it = tree.getHead();
 	for (; it; it++, i++) {
-		TEST_ASSERT(i < count);
-		TEST_ASSERT(it->m_value == reference[i]);
+		AXL_TEST_ASSERT(i < count);
+		AXL_TEST_ASSERT(it->m_value == reference[i]);
 		total += Stat(reference[i]);
 	}
 
-	TEST_ASSERT(i == count);
-	TEST_ASSERT(tree.getFullStat() == total);
+	AXL_TEST_ASSERT(i == count);
+	AXL_TEST_ASSERT(tree.getFullStat() == total);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -310,11 +309,11 @@ verifyQueries(
 	for (; it; it++, i++) {
 		running += reference[i].*field;
 		SubStat stat = tree.template calcPrefixSubStat<SubStat>(it);
-		TEST_ASSERT(stat == SubStat(running));
+		AXL_TEST_ASSERT(stat == SubStat(running));
 	}
 
-	TEST_ASSERT(i == count);
-	TEST_ASSERT(tree.template getFullSubStat<SubStat>() == SubStat(running));
+	AXL_TEST_ASSERT(i == count);
+	AXL_TEST_ASSERT(tree.template getFullSubStat<SubStat>() == SubStat(running));
 
 	// 2. findPrefixSubStatGe: first element whose inclusive prefix sum is >= target
 
@@ -336,12 +335,12 @@ verifyQueries(
 		}
 
 		if (expected == -1) {
-			TEST_ASSERT(!foundIt);
+			AXL_TEST_ASSERT(!foundIt);
 			continue;
 		}
 
-		TEST_ASSERT(foundIt);
-		TEST_ASSERT(foundIt->m_value == reference[expected]);
+		AXL_TEST_ASSERT(foundIt);
+		AXL_TEST_ASSERT(foundIt->m_value == reference[expected]);
 
 		// remainder == target - (cumulative BEFORE the found element)
 
@@ -352,7 +351,7 @@ verifyQueries(
 		for (size_t k = 0; k < expected; k++)
 			before += reference[k].*field;
 
-		TEST_ASSERT(remainder == SubStat(target - before));
+		AXL_TEST_ASSERT(remainder == SubStat(target - before));
 
 		// findPrefixSubStatEq: the same element, but ONLY when target lands exactly on its
 		// inclusive prefix -- i.e. when the remainder is the element's own stat
@@ -361,10 +360,10 @@ verifyQueries(
 			((const ItemTree&)tree).findPrefixSubStatEq(SubStat(target));
 
 		if (target == cum) {
-			TEST_ASSERT(exactIt);
-			TEST_ASSERT(exactIt->m_value == reference[expected]);
+			AXL_TEST_ASSERT(exactIt);
+			AXL_TEST_ASSERT(exactIt->m_value == reference[expected]);
 		} else {
-			TEST_ASSERT(!exactIt);
+			AXL_TEST_ASSERT(!exactIt);
 		}
 	}
 }
@@ -377,14 +376,14 @@ test_Empty() {
 	typedef sl::StatBinTree<Node, sl::RbBalancer> Tree;
 
 	Tree tree;
-	TEST_ASSERT(tree.isEmpty());
-	TEST_ASSERT(tree.getCount() == 0);
-	TEST_ASSERT(tree.getFullStat() == 0);
-	TEST_ASSERT(!tree.getHead());
-	TEST_ASSERT(!tree.getTail());
+	AXL_TEST_ASSERT(tree.isEmpty());
+	AXL_TEST_ASSERT(tree.getCount() == 0);
+	AXL_TEST_ASSERT(tree.getFullStat() == 0);
+	AXL_TEST_ASSERT(!tree.getHead());
+	AXL_TEST_ASSERT(!tree.getTail());
 
 	tree.clear(); // clearing an empty tree must be a no-op
-	TEST_ASSERT(tree.isEmpty());
+	AXL_TEST_ASSERT(tree.isEmpty());
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -431,7 +430,7 @@ testAppendSweep(size_t elementCount) {
 	for (size_t i = 0; i < elementCount; i++) {
 		Item item = makeItem(&seed);
 		ItemTree::Iterator it = tree.insertTail(ItemStat(item), item);
-		TEST_ASSERT(it && it->m_value == item);
+		AXL_TEST_ASSERT(it && it->m_value == item);
 		reference.append(item);
 		verifyTree<ItemTree, ItemStat, Item>(tree, reference);
 	}
@@ -448,7 +447,7 @@ testPrependSweep(size_t elementCount) {
 	for (size_t i = 0; i < elementCount; i++) {
 		Item item = makeItem(&seed);
 		ItemTree::Iterator it = tree.insertHead(ItemStat(item), item);
-		TEST_ASSERT(it && it->m_value == item);
+		AXL_TEST_ASSERT(it && it->m_value == item);
 		reference.insert(0, item);
 		verifyTree<ItemTree, ItemStat, Item>(tree, reference);
 	}
@@ -541,8 +540,8 @@ testRandomErase(size_t elementCount) {
 		verifyTree<ItemTree, ItemStat, Item>(tree, reference);
 	}
 
-	TEST_ASSERT(tree.isEmpty());
-	TEST_ASSERT(tree.getFullStat() == ItemStat());
+	AXL_TEST_ASSERT(tree.isEmpty());
+	AXL_TEST_ASSERT(tree.getFullStat() == ItemStat());
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -643,14 +642,14 @@ testScalarQueries(size_t elementCount) {
 	Tree::ConstIterator it = tree.getHead();
 	for (; it; it++, i++) {
 		running += reference[i];
-		TEST_ASSERT(tree.calcPrefixStat(it) == running);
+		AXL_TEST_ASSERT(tree.calcPrefixStat(it) == running);
 	}
 
 	uint64_t total = running;
-	TEST_ASSERT(tree.getFullStat() == total);
+	AXL_TEST_ASSERT(tree.getFullStat() == total);
 	// a NULL iterator yields the identity
 
-	TEST_ASSERT(tree.calcPrefixStat(Tree::ConstIterator()) == 0);
+	AXL_TEST_ASSERT(tree.calcPrefixStat(Tree::ConstIterator()) == 0);
 
 	for (uint64_t target = 0; target <= total + 2; target++) {
 		uint64_t remainder = 0;
@@ -670,13 +669,13 @@ testScalarQueries(size_t elementCount) {
 		}
 
 		if (expected == -1) {
-			TEST_ASSERT(!foundIt);
+			AXL_TEST_ASSERT(!foundIt);
 			continue;
 		}
 
-		TEST_ASSERT(foundIt);
-		TEST_ASSERT(tree.calcPrefixStat(foundIt) >= target);
-		TEST_ASSERT(remainder == target - before);
+		AXL_TEST_ASSERT(foundIt);
+		AXL_TEST_ASSERT(tree.calcPrefixStat(foundIt) >= target);
+		AXL_TEST_ASSERT(remainder == target - before);
 	}
 }
 
@@ -726,7 +725,7 @@ testModify(size_t elementCount) {
 		verifyTree<ItemTree, ItemStat, Item>(tree, reference);
 	}
 
-	TEST_ASSERT(tree.getFullStat() == ItemStat());
+	AXL_TEST_ASSERT(tree.getFullStat() == ItemStat());
 
 	// queries must still hold after all that rewriting
 
@@ -770,7 +769,7 @@ testModifySubStat(size_t elementCount) {
 		reference.rwi()[index].m_lineCount = newLines;
 
 		verifyTree<ItemTree, ItemStat, Item>(tree, reference);
-		TEST_ASSERT(tree.getFullSubStat<CharStat>() == charTotal);
+		AXL_TEST_ASSERT(tree.getFullSubStat<CharStat>() == charTotal);
 	}
 
 	// and the other projection, on the same tree
@@ -789,7 +788,7 @@ testModifySubStat(size_t elementCount) {
 		reference.rwi()[index].m_charCount = newChars;
 
 		verifyTree<ItemTree, ItemStat, Item>(tree, reference);
-		TEST_ASSERT(tree.getFullSubStat<LineStat>() == lineTotal);
+		AXL_TEST_ASSERT(tree.getFullSubStat<LineStat>() == lineTotal);
 	}
 
 	// a projected round trip must land back exactly where it started -- this is
@@ -806,7 +805,7 @@ testModifySubStat(size_t elementCount) {
 		it->subSubStat(delta);
 	}
 
-	TEST_ASSERT(tree.getFullStat() == before);
+	AXL_TEST_ASSERT(tree.getFullStat() == before);
 	verifyTree<ItemTree, ItemStat, Item>(tree, reference);
 
 	// the projected queries must still hold -- a stat that drifted on an interior
@@ -866,10 +865,10 @@ testInsertNoValue(size_t elementCount) {
 
 		runningTotal += ItemStat(item);
 
-		TEST_ASSERT(it);
-		TEST_ASSERT(it->m_value == Item());              // default-constructed, not garbage
-		TEST_ASSERT(it->getSelfStat() == ItemStat(item)); // the stat landed...
-		TEST_ASSERT(tree.getFullStat() == runningTotal);  // ...and aggregated, with no value yet
+		AXL_TEST_ASSERT(it);
+		AXL_TEST_ASSERT(it->m_value == Item());              // default-constructed, not garbage
+		AXL_TEST_ASSERT(it->getSelfStat() == ItemStat(item)); // the stat landed...
+		AXL_TEST_ASSERT(tree.getFullStat() == runningTotal);  // ...and aggregated, with no value yet
 
 		it->m_value = item; // only now the payload
 
@@ -906,12 +905,12 @@ testInsertNoValueEquivalence(size_t elementCount) {
 	ItemTree::ConstIterator it1 = noValueTree.getHead();
 	ItemTree::ConstIterator it2 = valueTree.getHead();
 	for (; it1 && it2; it1++, it2++) {
-		TEST_ASSERT(it1->m_value == it2->m_value);
-		TEST_ASSERT(it1->getSelfStat() == it2->getSelfStat());
-		TEST_ASSERT(it1->getFullStat() == it2->getFullStat()); // identical shape
+		AXL_TEST_ASSERT(it1->m_value == it2->m_value);
+		AXL_TEST_ASSERT(it1->getSelfStat() == it2->getSelfStat());
+		AXL_TEST_ASSERT(it1->getFullStat() == it2->getFullStat()); // identical shape
 	}
 
-	TEST_ASSERT(!it1 && !it2);
+	AXL_TEST_ASSERT(!it1 && !it2);
 }
 
 //..............................................................................
@@ -938,6 +937,6 @@ run() {
 
 //..............................................................................
 
-ADD_TEST_CASE("test_StatBinTree", run)
+AXL_TEST_ADD("test_StatBinTree", run)
 
 } // namespace

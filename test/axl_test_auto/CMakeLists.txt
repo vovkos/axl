@@ -14,11 +14,6 @@
 #
 
 set(
-	APP_H_LIST
-	test.h
-)
-
-set(
 	APP_CPP_LIST
 	main.cpp
 	test_BitMap.cpp
@@ -55,7 +50,6 @@ set(
 source_group(
 	app
 	FILES
-	${APP_H_LIST}
 	${APP_CPP_LIST}
 )
 
@@ -131,7 +125,6 @@ endif()
 add_executable(
 	axl_test_auto
 	${PCH_H}
-	${APP_H_LIST}
 	${APP_CPP_LIST}
 )
 
@@ -150,6 +143,7 @@ set_target_properties(
 target_link_libraries(
 	axl_test_auto
 	${OPT_LIB_LIST}
+	axl_test
 	axl_lex
 	axl_io
 	axl_core

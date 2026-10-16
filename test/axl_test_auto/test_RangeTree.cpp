@@ -10,7 +10,6 @@
 //..............................................................................
 
 #include "pch.h"
-#include "test.h"
 
 namespace {
 
@@ -36,8 +35,8 @@ addReferenceRange(
 	size_t length,
 	int value
 ) {
-	TEST_ASSERT(length);
-	TEST_ASSERT(offset + length <= SpaceSize);
+	AXL_TEST_ASSERT(length);
+	AXL_TEST_ASSERT(offset + length <= SpaceSize);
 
 	for (size_t i = offset; i < offset + length; i++)
 		reference[i] = value;
@@ -52,10 +51,10 @@ addRange(
 	int value
 ) {
 	RangeTree::ConstIterator it = tree->addRange(offset, length, value);
-	TEST_ASSERT(it);
-	TEST_ASSERT(it->getKey() <= offset);
-	TEST_ASSERT(it->m_value.getEndOffset() >= offset + length);
-	TEST_ASSERT(it->m_value.getValue() == value);
+	AXL_TEST_ASSERT(it);
+	AXL_TEST_ASSERT(it->getKey() <= offset);
+	AXL_TEST_ASSERT(it->m_value.getEndOffset() >= offset + length);
+	AXL_TEST_ASSERT(it->m_value.getValue() == value);
 
 	addReferenceRange(reference, offset, length, value);
 }
@@ -81,24 +80,24 @@ verifyTree(
 			i++;
 		while (i < SpaceSize && reference[i] == value);
 
-		TEST_ASSERT(it);
-		TEST_ASSERT(it->getKey() == offset);
-		TEST_ASSERT(it->m_value.getEndOffset() == i);
-		TEST_ASSERT(it->m_value.getValue() == value);
+		AXL_TEST_ASSERT(it);
+		AXL_TEST_ASSERT(it->getKey() == offset);
+		AXL_TEST_ASSERT(it->m_value.getEndOffset() == i);
+		AXL_TEST_ASSERT(it->m_value.getValue() == value);
 
 		RangeTree::ConstIterator nextIt = it.getNext();
 		if (nextIt) {
-			TEST_ASSERT(nextIt->getKey() >= it->m_value.getEndOffset());
+			AXL_TEST_ASSERT(nextIt->getKey() >= it->m_value.getEndOffset());
 			if (nextIt->getKey() == it->m_value.getEndOffset())
-				TEST_ASSERT(nextIt->m_value.getValue() != value);
+				AXL_TEST_ASSERT(nextIt->m_value.getValue() != value);
 		}
 
 		it++;
 		count++;
 	}
 
-	TEST_ASSERT(!it);
-	TEST_ASSERT(tree.getCount() == count);
+	AXL_TEST_ASSERT(!it);
+	AXL_TEST_ASSERT(tree.getCount() == count);
 }
 
 void
@@ -239,6 +238,6 @@ run() {
 
 //..............................................................................
 
-ADD_TEST_CASE("test_RangeTree", run)
+AXL_TEST_ADD("test_RangeTree", run)
 
 } // namespace

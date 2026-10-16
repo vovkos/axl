@@ -11,7 +11,6 @@
 
 #include "pch.h"
 #include "axl_st_LuaStringTemplate.h"
-#include "test.h"
 
 namespace {
 
@@ -47,6 +46,6 @@ run() {
 
 //..............................................................................
 
-ADD_TEST_CASE("test_StringTemplate", run)
+AXL_TEST_ADD("test_StringTemplate", run)
 
 } // namespace test_StringTemplate

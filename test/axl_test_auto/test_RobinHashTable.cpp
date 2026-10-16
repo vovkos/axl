@@ -10,7 +10,6 @@
 //..............................................................................
 
 #include "pch.h"
-#include "test.h"
 
 namespace {
 
@@ -41,54 +40,54 @@ void
 test_Basic() {
 	sl::RobinHashTable<uint_t, uint_t, IdentityHash> map;
 
-	TEST_ASSERT(map.isEmpty());
-	TEST_ASSERT(map.getCount() == 0);
-	TEST_ASSERT(map.find(1) == NULL);
+	AXL_TEST_ASSERT(map.isEmpty());
+	AXL_TEST_ASSERT(map.getCount() == 0);
+	AXL_TEST_ASSERT(map.find(1) == NULL);
 
 	for (uint_t i = 0; i < 1000; i++) {
 		sl::RobinHashTable<uint_t, uint_t, IdentityHash>::Iterator it = map.visit(i);
-		TEST_ASSERT(it);
+		AXL_TEST_ASSERT(it);
 		it->m_value = i * 10;
 	}
 
-	TEST_ASSERT(!map.isEmpty());
-	TEST_ASSERT(map.getCount() == 1000);
+	AXL_TEST_ASSERT(!map.isEmpty());
+	AXL_TEST_ASSERT(map.getCount() == 1000);
 
 	for (uint_t i = 0; i < 1000; i++) {
 		sl::RobinHashTable<uint_t, uint_t, IdentityHash>::Iterator it = map.find(i);
-		TEST_ASSERT(it && it->m_value == i * 10);
+		AXL_TEST_ASSERT(it && it->m_value == i * 10);
 	}
 
 	for (uint_t i = 1000; i < 1200; i++)
-		TEST_ASSERT(map.find(i) == NULL);
+		AXL_TEST_ASSERT(map.find(i) == NULL);
 
 	for (uint_t i = 0; i < 1000; i += 3) {
 		sl::RobinHashTable<uint_t, uint_t, IdentityHash>::Iterator it = map.visit(i);
-		TEST_ASSERT(it);
+		AXL_TEST_ASSERT(it);
 		it->m_value = i * 20;
 	}
 
-	TEST_ASSERT(map.getCount() == 1000);
+	AXL_TEST_ASSERT(map.getCount() == 1000);
 
 	for (uint_t i = 0; i < 1000; i++) {
 		sl::RobinHashTable<uint_t, uint_t, IdentityHash>::Iterator it = map.find(i);
-		TEST_ASSERT(it);
-		TEST_ASSERT(it->m_value == (i % 3 ? i * 10 : i * 20));
+		AXL_TEST_ASSERT(it);
+		AXL_TEST_ASSERT(it->m_value == (i % 3 ? i * 10 : i * 20));
 	}
 
 	map.clear();
-	TEST_ASSERT(map.isEmpty());
-	TEST_ASSERT(map.getCount() == 0);
+	AXL_TEST_ASSERT(map.isEmpty());
+	AXL_TEST_ASSERT(map.getCount() == 0);
 
 	for (uint_t i = 0; i < 1000; i++)
-		TEST_ASSERT(map.find(i) == NULL);
+		AXL_TEST_ASSERT(map.find(i) == NULL);
 
 	for (uint_t i = 0; i < 128; i++)
-		TEST_ASSERT(map.add(i, i + 1));
+		AXL_TEST_ASSERT(map.add(i, i + 1));
 
 	for (uint_t i = 0; i < 128; i++) {
 		sl::RobinHashTable<uint_t, uint_t, IdentityHash>::Iterator it = map.find(i);
-		TEST_ASSERT(it && it->m_value == i + 1);
+		AXL_TEST_ASSERT(it && it->m_value == i + 1);
 	}
 }
 
@@ -99,21 +98,21 @@ test_Collisions() {
 	for (uint_t i = 0; i < 2048; i++) {
 		uint_t key = i * 8 + (i & 7);
 		sl::RobinHashTable<uint_t, uint_t, LowBitsHash>::Iterator it = map.visit(key);
-		TEST_ASSERT(it);
+		AXL_TEST_ASSERT(it);
 		it->m_value = i;
 	}
 
-	TEST_ASSERT(map.getCount() == 2048);
+	AXL_TEST_ASSERT(map.getCount() == 2048);
 
 	for (uint_t i = 0; i < 2048; i++) {
 		uint_t key = i * 8 + (i & 7);
 		sl::RobinHashTable<uint_t, uint_t, LowBitsHash>::Iterator it = map.find(key);
-		TEST_ASSERT(it && it->m_value == i);
+		AXL_TEST_ASSERT(it && it->m_value == i);
 	}
 
 	for (uint_t i = 0; i < 2048; i++) {
 		uint_t key = i * 8 + ((i + 1) & 7);
-		TEST_ASSERT(map.find(key) == NULL);
+		AXL_TEST_ASSERT(map.find(key) == NULL);
 	}
 }
 
@@ -123,54 +122,54 @@ test_Erase() {
 
 	for (uint_t i = 0; i < 512; i++) {
 		sl::RobinHashTable<uint_t, uint_t, ZeroHash>::Iterator it = map.visit(i);
-		TEST_ASSERT(it);
+		AXL_TEST_ASSERT(it);
 		it->m_value = i * 10;
 	}
 
 	sl::RobinHashTable<uint_t, uint_t, ZeroHash>::Iterator stableIt = map.find(17);
-	TEST_ASSERT(stableIt);
-	TEST_ASSERT(stableIt->m_value == 170);
+	AXL_TEST_ASSERT(stableIt);
+	AXL_TEST_ASSERT(stableIt->m_value == 170);
 
 	for (uint_t i = 0; i < 512; i += 2) {
 		if (i == 17)
 			continue;
 
-		TEST_ASSERT(map.eraseKey(i));
-		TEST_ASSERT(map.find(i) == NULL);
+		AXL_TEST_ASSERT(map.eraseKey(i));
+		AXL_TEST_ASSERT(map.find(i) == NULL);
 	}
 
-	TEST_ASSERT(map.getCount() == 256);
-	TEST_ASSERT(stableIt);
-	TEST_ASSERT(stableIt->getKey() == 17);
-	TEST_ASSERT(stableIt->m_value == 170);
-	TEST_ASSERT(map.find(17) == stableIt);
+	AXL_TEST_ASSERT(map.getCount() == 256);
+	AXL_TEST_ASSERT(stableIt);
+	AXL_TEST_ASSERT(stableIt->getKey() == 17);
+	AXL_TEST_ASSERT(stableIt->m_value == 170);
+	AXL_TEST_ASSERT(map.find(17) == stableIt);
 
 	for (uint_t i = 1; i < 512; i += 2) {
 		sl::RobinHashTable<uint_t, uint_t, ZeroHash>::Iterator it = map.find(i);
-		TEST_ASSERT(it);
-		TEST_ASSERT(it->m_value == i * 10);
+		AXL_TEST_ASSERT(it);
+		AXL_TEST_ASSERT(it->m_value == i * 10);
 	}
 
 	for (uint_t i = 0; i < 512; i += 2) {
 		sl::RobinHashTable<uint_t, uint_t, ZeroHash>::Iterator it = map.visit(i);
-		TEST_ASSERT(it);
+		AXL_TEST_ASSERT(it);
 		it->m_value = i + 10000;
 	}
 
-	TEST_ASSERT(map.getCount() == 512);
+	AXL_TEST_ASSERT(map.getCount() == 512);
 
 	for (uint_t i = 0; i < 512; i++) {
 		sl::RobinHashTable<uint_t, uint_t, ZeroHash>::Iterator it = map.find(i);
-		TEST_ASSERT(it);
-		TEST_ASSERT(it->m_value == (i & 1 ? i * 10 : i + 10000));
+		AXL_TEST_ASSERT(it);
+		AXL_TEST_ASSERT(it->m_value == (i & 1 ? i * 10 : i + 10000));
 	}
 
 	sl::RobinHashTable<uint_t, uint_t, ZeroHash>::Iterator it = map.find(400);
-	TEST_ASSERT(it);
+	AXL_TEST_ASSERT(it);
 	map.erase(it);
-	TEST_ASSERT(map.find(400) == NULL);
-	TEST_ASSERT(!map.eraseKey(400));
-	TEST_ASSERT(map.getCount() == 511);
+	AXL_TEST_ASSERT(map.find(400) == NULL);
+	AXL_TEST_ASSERT(!map.eraseKey(400));
+	AXL_TEST_ASSERT(map.getCount() == 511);
 }
 
 void
@@ -179,32 +178,32 @@ test_SaturatedPsl() {
 
 	for (uint_t i = 0; i < 512; i++) {
 		sl::RobinHashTable<uint_t, uint_t, ZeroHash>::Iterator it = map.visit(i);
-		TEST_ASSERT(it);
+		AXL_TEST_ASSERT(it);
 		it->m_value = i ^ 0x5a5a;
 	}
 
-	TEST_ASSERT(map.getCount() == 512);
+	AXL_TEST_ASSERT(map.getCount() == 512);
 
 	for (uint_t i = 0; i < 512; i++) {
 		sl::RobinHashTable<uint_t, uint_t, ZeroHash>::Iterator it = map.find(i);
-		TEST_ASSERT(it && it->m_value == (i ^ 0x5a5a));
+		AXL_TEST_ASSERT(it && it->m_value == (i ^ 0x5a5a));
 	}
 
 	for (uint_t i = 0; i < 512; i += 17) {
 		sl::RobinHashTable<uint_t, uint_t, ZeroHash>::Iterator it = map.visit(i);
-		TEST_ASSERT(it);
+		AXL_TEST_ASSERT(it);
 		it->m_value = i;
 	}
 
-	TEST_ASSERT(map.getCount() == 512);
+	AXL_TEST_ASSERT(map.getCount() == 512);
 
 	for (uint_t i = 0; i < 512; i++) {
 		sl::RobinHashTable<uint_t, uint_t, ZeroHash>::Iterator it = map.find(i);
-		TEST_ASSERT(it);
-		TEST_ASSERT(it->m_value == (i % 17 ? (i ^ 0x5a5a) : i));
+		AXL_TEST_ASSERT(it);
+		AXL_TEST_ASSERT(it->m_value == (i % 17 ? (i ^ 0x5a5a) : i));
 	}
 
-	TEST_ASSERT(map.find(700) == NULL);
+	AXL_TEST_ASSERT(map.find(700) == NULL);
 }
 
 void
@@ -226,7 +225,7 @@ test_Randomized() {
 		uint_t value = seed ^ i;
 
 		sl::RobinHashTable<uint_t, uint_t, LowBitsHash>::Iterator it = map.visit(key);
-		TEST_ASSERT(it);
+		AXL_TEST_ASSERT(it);
 		it->m_value = value;
 
 		if (!isPresent[key]) {
@@ -235,21 +234,21 @@ test_Randomized() {
 		}
 
 		valueArray[key] = value;
-		TEST_ASSERT(map.getCount() == expectedCount);
+		AXL_TEST_ASSERT(map.getCount() == expectedCount);
 
 		seed = seed * 1664525 + 1013904223;
 		key = (seed >> 8) & (KeyCount - 1);
 		it = map.find(key);
-		TEST_ASSERT((it != NULL) == isPresent[key]);
+		AXL_TEST_ASSERT((it != NULL) == isPresent[key]);
 		if (it)
-			TEST_ASSERT(it->m_value == valueArray[key]);
+			AXL_TEST_ASSERT(it->m_value == valueArray[key]);
 	}
 
 	for (uint_t key = 0; key < KeyCount; key++) {
 		sl::RobinHashTable<uint_t, uint_t, LowBitsHash>::Iterator it = map.find(key);
-		TEST_ASSERT((it != NULL) == isPresent[key]);
+		AXL_TEST_ASSERT((it != NULL) == isPresent[key]);
 		if (it)
-			TEST_ASSERT(it->m_value == valueArray[key]);
+			AXL_TEST_ASSERT(it->m_value == valueArray[key]);
 	}
 }
 
@@ -264,6 +263,6 @@ run() {
 
 //..............................................................................
 
-ADD_TEST_CASE("test_RobinHashTable", run)
+AXL_TEST_ADD("test_RobinHashTable", run)
 
 } // namespace

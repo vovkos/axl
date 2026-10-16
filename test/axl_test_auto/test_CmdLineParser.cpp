@@ -10,7 +10,6 @@
 //..............................................................................
 
 #include "pch.h"
-#include "test.h"
 
 namespace {
 
@@ -70,6 +69,6 @@ run() {
 
 //..............................................................................
 
-ADD_TEST_CASE("test_CmdLineParser", run)
+AXL_TEST_ADD("test_CmdLineParser", run)
 
 }

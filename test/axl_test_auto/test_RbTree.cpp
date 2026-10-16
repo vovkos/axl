@@ -10,7 +10,6 @@
 //..............................................................................
 
 #include "pch.h"
-#include "test.h"
 
 namespace {
 
@@ -42,45 +41,45 @@ test_BasicOrderAndLookup() {
 	for (size_t i = 0; i < countof(keyTable); i++) {
 		bool isNew = false;
 		sl::RbTree<int, int>::Iterator it = tree.add(keyTable[i], keyTable[i] * 10, &isNew);
-		TEST_ASSERT(it && isNew);
+		AXL_TEST_ASSERT(it && isNew);
 	}
 
-	TEST_ASSERT(tree.getCount() == countof(keyTable));
+	AXL_TEST_ASSERT(tree.getCount() == countof(keyTable));
 
 	for (size_t i = 0; i < countof(keyTable); i++) {
 		bool isNew = true;
 		sl::RbTree<int, int>::Iterator it = tree.add(keyTable[i], keyTable[i] * 20, &isNew);
-		TEST_ASSERT(it && !isNew);
-		TEST_ASSERT(it->m_value == keyTable[i] * 20);
+		AXL_TEST_ASSERT(it && !isNew);
+		AXL_TEST_ASSERT(it->m_value == keyTable[i] * 20);
 	}
 
-	TEST_ASSERT(tree.getCount() == countof(keyTable));
+	AXL_TEST_ASSERT(tree.getCount() == countof(keyTable));
 
 	int prev = -1;
 	size_t count = 0;
 	sl::RbTree<int, int>::Iterator it = tree.getHead();
 	for (; it; it++) {
-		TEST_ASSERT(it->getKey() > prev);
-		TEST_ASSERT(it->m_value == it->getKey() * 20);
+		AXL_TEST_ASSERT(it->getKey() > prev);
+		AXL_TEST_ASSERT(it->m_value == it->getKey() * 20);
 		prev = it->getKey();
 		count++;
 	}
 
-	TEST_ASSERT(count == tree.getCount());
-	TEST_ASSERT(tree.findValue(25, -1) == 500);
-	TEST_ASSERT(tree.findValue(26, -1) == -1);
-	TEST_ASSERT(tree.find<sl::RelOpKind_Lt>(25)->getKey() == 20);
-	TEST_ASSERT(tree.find<sl::RelOpKind_Le>(25)->getKey() == 25);
-	TEST_ASSERT(tree.find<sl::RelOpKind_Gt>(25)->getKey() == 30);
-	TEST_ASSERT(tree.find<sl::RelOpKind_Ge>(25)->getKey() == 25);
-	TEST_ASSERT(tree.find<sl::RelOpKind_Ge>(26)->getKey() == 30);
-	TEST_ASSERT(!tree.find<sl::RelOpKind_Lt>(10));
-	TEST_ASSERT(!tree.find<sl::RelOpKind_Gt>(80));
+	AXL_TEST_ASSERT(count == tree.getCount());
+	AXL_TEST_ASSERT(tree.findValue(25, -1) == 500);
+	AXL_TEST_ASSERT(tree.findValue(26, -1) == -1);
+	AXL_TEST_ASSERT(tree.find<sl::RelOpKind_Lt>(25)->getKey() == 20);
+	AXL_TEST_ASSERT(tree.find<sl::RelOpKind_Le>(25)->getKey() == 25);
+	AXL_TEST_ASSERT(tree.find<sl::RelOpKind_Gt>(25)->getKey() == 30);
+	AXL_TEST_ASSERT(tree.find<sl::RelOpKind_Ge>(25)->getKey() == 25);
+	AXL_TEST_ASSERT(tree.find<sl::RelOpKind_Ge>(26)->getKey() == 30);
+	AXL_TEST_ASSERT(!tree.find<sl::RelOpKind_Lt>(10));
+	AXL_TEST_ASSERT(!tree.find<sl::RelOpKind_Gt>(80));
 
-	TEST_ASSERT(!tree.addIfNotExists(25, 1));
+	AXL_TEST_ASSERT(!tree.addIfNotExists(25, 1));
 	it = tree.addIfNotExists(26, 260);
-	TEST_ASSERT(it && it->getKey() == 26 && it->m_value == 260);
-	TEST_ASSERT(tree.find(26)->m_value == 260);
+	AXL_TEST_ASSERT(it && it->getKey() == 26 && it->m_value == 260);
+	AXL_TEST_ASSERT(tree.find(26)->m_value == 260);
 }
 
 void
@@ -90,25 +89,25 @@ test_ErasePatterns() {
 	for (int i = 0; i < 256; i++)
 		tree.add(i, i + 1);
 
-	TEST_ASSERT(tree.getCount() == 256);
+	AXL_TEST_ASSERT(tree.getCount() == 256);
 
 	for (int i = 0; i < 256; i += 2)
-		TEST_ASSERT(tree.eraseKey(i));
+		AXL_TEST_ASSERT(tree.eraseKey(i));
 
-	TEST_ASSERT(tree.getCount() == 128);
+	AXL_TEST_ASSERT(tree.getCount() == 128);
 
 	for (int i = 0; i < 256; i++) {
 		sl::RbTree<int, int>::Iterator it = tree.find(i);
-		TEST_ASSERT((it != NULL) == (i & 1));
+		AXL_TEST_ASSERT((it != NULL) == (i & 1));
 		if (it)
-			TEST_ASSERT(it->m_value == i + 1);
+			AXL_TEST_ASSERT(it->m_value == i + 1);
 	}
 
 	for (int i = 1; i < 256; i += 2)
-		TEST_ASSERT(tree.eraseKey(i));
+		AXL_TEST_ASSERT(tree.eraseKey(i));
 
-	TEST_ASSERT(tree.isEmpty());
-	TEST_ASSERT(!tree.eraseKey(1));
+	AXL_TEST_ASSERT(tree.isEmpty());
+	AXL_TEST_ASSERT(!tree.eraseKey(1));
 }
 
 void
@@ -131,7 +130,7 @@ test_Randomized() {
 		if (seed & 1) {
 			uint_t value = seed ^ i;
 			sl::RbTree<uint_t, uint_t>::Iterator it = tree.add(key, value);
-			TEST_ASSERT(it);
+			AXL_TEST_ASSERT(it);
 			if (!isPresent[key]) {
 				isPresent[key] = true;
 				expectedCount++;
@@ -139,14 +138,14 @@ test_Randomized() {
 			valueArray[key] = value;
 		} else {
 			bool result = tree.eraseKey(key);
-			TEST_ASSERT(result == isPresent[key]);
+			AXL_TEST_ASSERT(result == isPresent[key]);
 			if (isPresent[key]) {
 				isPresent[key] = false;
 				expectedCount--;
 			}
 		}
 
-		TEST_ASSERT(tree.getCount() == expectedCount);
+		AXL_TEST_ASSERT(tree.getCount() == expectedCount);
 
 #ifdef _AXL_DEBUG
 		// full O(n) structural check -- periodic, so the debug run stays quick
@@ -157,19 +156,19 @@ test_Randomized() {
 		seed = seed * 1664525 + 1013904223;
 		key = (seed >> 8) & (KeyCount - 1);
 		sl::RbTree<uint_t, uint_t>::Iterator it = tree.find(key);
-		TEST_ASSERT((it != NULL) == isPresent[key]);
+		AXL_TEST_ASSERT((it != NULL) == isPresent[key]);
 		if (it)
-			TEST_ASSERT(it->m_value == valueArray[key]);
+			AXL_TEST_ASSERT(it->m_value == valueArray[key]);
 	}
 
 	uint_t prev = 0;
 	bool hasPrev = false;
 	sl::RbTree<uint_t, uint_t>::Iterator it = tree.getHead();
 	for (; it; it++) {
-		TEST_ASSERT(isPresent[it->getKey()]);
-		TEST_ASSERT(it->m_value == valueArray[it->getKey()]);
+		AXL_TEST_ASSERT(isPresent[it->getKey()]);
+		AXL_TEST_ASSERT(it->m_value == valueArray[it->getKey()]);
 		if (hasPrev)
-			TEST_ASSERT(prev < it->getKey());
+			AXL_TEST_ASSERT(prev < it->getKey());
 		prev = it->getKey();
 		hasPrev = true;
 	}
@@ -189,6 +188,6 @@ run() {
 
 //..............................................................................
 
-ADD_TEST_CASE("test_RbTree", run)
+AXL_TEST_ADD("test_RbTree", run)
 
 } // namespace

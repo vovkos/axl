@@ -10,7 +10,6 @@
 //..............................................................................
 
 #include "pch.h"
-#include "test.h"
 
 namespace {
 
@@ -34,32 +33,32 @@ test_Basic() {
 	uintptr_t h3 = table.add(300);
 	uintptr_t h4 = table.add(400);
 
-	TEST_ASSERT(h1 == seed);
-	TEST_ASSERT(h2 == seed + 1);
-	TEST_ASSERT(h3 == seed + 2);
-	TEST_ASSERT(h4 == seed + 3);
-	TEST_ASSERT(table.getCount() == 4);
+	AXL_TEST_ASSERT(h1 == seed);
+	AXL_TEST_ASSERT(h2 == seed + 1);
+	AXL_TEST_ASSERT(h3 == seed + 2);
+	AXL_TEST_ASSERT(h4 == seed + 3);
+	AXL_TEST_ASSERT(table.getCount() == 4);
 
-	TEST_ASSERT(table.find(h1)->m_value == 100);
-	TEST_ASSERT(table.find(h2)->m_value == 200);
-	TEST_ASSERT(table.find(h3)->m_value == 300);
-	TEST_ASSERT(table.find(h4)->m_value == 400);
-	TEST_ASSERT(!table.find(0));
+	AXL_TEST_ASSERT(table.find(h1)->m_value == 100);
+	AXL_TEST_ASSERT(table.find(h2)->m_value == 200);
+	AXL_TEST_ASSERT(table.find(h3)->m_value == 300);
+	AXL_TEST_ASSERT(table.find(h4)->m_value == 400);
+	AXL_TEST_ASSERT(!table.find(0));
 
-	TEST_ASSERT(table.eraseKey(h2));
-	TEST_ASSERT(!table.find(h2));
-	TEST_ASSERT(table.getCount() == 3);
+	AXL_TEST_ASSERT(table.eraseKey(h2));
+	AXL_TEST_ASSERT(!table.find(h2));
+	AXL_TEST_ASSERT(table.getCount() == 3);
 
 	uintptr_t h5 = table.add(h2, 500);
-	TEST_ASSERT(h5 == h2);
-	TEST_ASSERT(table.find(h5)->m_value == 500);
-	TEST_ASSERT(table.getCount() == 4);
+	AXL_TEST_ASSERT(h5 == h2);
+	AXL_TEST_ASSERT(table.find(h5)->m_value == 500);
+	AXL_TEST_ASSERT(table.getCount() == 4);
 
 	uintptr_t h6 = table.add(h2, 600);
-	TEST_ASSERT(h6 != h2);
-	TEST_ASSERT(table.find(h2)->m_value == 500);
-	TEST_ASSERT(table.find(h6)->m_value == 600);
-	TEST_ASSERT(table.getCount() == 5);
+	AXL_TEST_ASSERT(h6 != h2);
+	AXL_TEST_ASSERT(table.find(h2)->m_value == 500);
+	AXL_TEST_ASSERT(table.find(h6)->m_value == 600);
+	AXL_TEST_ASSERT(table.getCount() == 5);
 }
 
 void
@@ -69,19 +68,19 @@ test_ResetAndZero() {
 	uintptr_t h1 = table.add(10);
 	uintptr_t h2 = table.add(20);
 
-	TEST_ASSERT(h1 == 1);
-	TEST_ASSERT(h2 == 2);
-	TEST_ASSERT(table.find(h1)->m_value == 10);
-	TEST_ASSERT(table.find(h2)->m_value == 20);
+	AXL_TEST_ASSERT(h1 == 1);
+	AXL_TEST_ASSERT(h2 == 2);
+	AXL_TEST_ASSERT(table.find(h1)->m_value == 10);
+	AXL_TEST_ASSERT(table.find(h2)->m_value == 20);
 
 	table.reset(100);
-	TEST_ASSERT(table.isEmpty());
-	TEST_ASSERT(!table.find(h1));
+	AXL_TEST_ASSERT(table.isEmpty());
+	AXL_TEST_ASSERT(!table.find(h1));
 
 	uintptr_t h3 = table.add(30);
-	TEST_ASSERT(h3 == 100);
-	TEST_ASSERT(table.getCount() == 1);
-	TEST_ASSERT(table.find(h3)->m_value == 30);
+	AXL_TEST_ASSERT(h3 == 100);
+	AXL_TEST_ASSERT(table.getCount() == 1);
+	AXL_TEST_ASSERT(table.find(h3)->m_value == 30);
 }
 
 void
@@ -104,7 +103,7 @@ test_Randomized() {
 		if (seed & 1) {
 			uint_t value = seed ^ i;
 			uintptr_t handle = table.add(key, value);
-			TEST_ASSERT(handle);
+			AXL_TEST_ASSERT(handle);
 			if (handle < KeyCount + 1 && !isPresent[handle - 1]) {
 				isPresent[handle - 1] = true;
 				expectedCount++;
@@ -113,21 +112,21 @@ test_Randomized() {
 				valueArray[handle - 1] = value;
 		} else {
 			bool result = table.eraseKey(key);
-			TEST_ASSERT(result == isPresent[key - 1]);
+			AXL_TEST_ASSERT(result == isPresent[key - 1]);
 			if (isPresent[key - 1]) {
 				isPresent[key - 1] = false;
 				expectedCount--;
 			}
 		}
 
-		TEST_ASSERT(table.getCount() >= expectedCount);
+		AXL_TEST_ASSERT(table.getCount() >= expectedCount);
 
 		seed = seed * 1664525 + 1013904223;
 		key = ((seed >> 8) & (KeyCount - 1)) + 1;
 		sl::HandleTable<uint_t>::Iterator it = table.find(key);
-		TEST_ASSERT((it != NULL) == isPresent[key - 1]);
+		AXL_TEST_ASSERT((it != NULL) == isPresent[key - 1]);
 		if (it)
-			TEST_ASSERT(it->m_value == valueArray[key - 1]);
+			AXL_TEST_ASSERT(it->m_value == valueArray[key - 1]);
 	}
 }
 
@@ -140,6 +139,6 @@ run() {
 
 //..............................................................................
 
-ADD_TEST_CASE("test_HandleTable", run)
+AXL_TEST_ADD("test_HandleTable", run)
 
 } // namespace

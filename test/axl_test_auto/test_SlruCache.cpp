@@ -10,7 +10,6 @@
 //..............................................................................
 
 #include "pch.h"
-#include "test.h"
 
 namespace {
 
@@ -100,15 +99,15 @@ public:
 		const uint_t* keyArray,
 		size_t count
 	) const {
-		TEST_ASSERT(this->m_probationList.getCount() == count);
+		AXL_TEST_ASSERT(this->m_probationList.getCount() == count);
 
 		auto it = this->m_probationList.getHead();
 		for (size_t i = 0; i < count; i++, it++) {
-			TEST_ASSERT(it);
-			TEST_ASSERT(it->getKey() == keyArray[i]);
+			AXL_TEST_ASSERT(it);
+			AXL_TEST_ASSERT(it->getKey() == keyArray[i]);
 		}
 
-		TEST_ASSERT(!it);
+		AXL_TEST_ASSERT(!it);
 	}
 
 	void
@@ -116,15 +115,15 @@ public:
 		const uint_t* keyArray,
 		size_t count
 	) const {
-		TEST_ASSERT(this->m_protectedList.getCount() == count);
+		AXL_TEST_ASSERT(this->m_protectedList.getCount() == count);
 
 		auto it = this->m_protectedList.getHead();
 		for (size_t i = 0; i < count; i++, it++) {
-			TEST_ASSERT(it);
-			TEST_ASSERT(it->getKey() == keyArray[i]);
+			AXL_TEST_ASSERT(it);
+			AXL_TEST_ASSERT(it->getKey() == keyArray[i]);
 		}
 
-		TEST_ASSERT(!it);
+		AXL_TEST_ASSERT(!it);
 	}
 };
 
@@ -155,22 +154,22 @@ assertKeys(
 	const uint_t* keyArray,
 	size_t count
 ) {
-	TEST_ASSERT(cache->getCount() == count);
+	AXL_TEST_ASSERT(cache->getCount() == count);
 
 	typename Cache::ConstIterator it = cache->getHead();
 	for (size_t i = 0; i < count; i++, it++) {
-		TEST_ASSERT(it);
-		TEST_ASSERT(it->getKey() == keyArray[i]);
+		AXL_TEST_ASSERT(it);
+		AXL_TEST_ASSERT(it->getKey() == keyArray[i]);
 	}
 
-	TEST_ASSERT(!it);
+	AXL_TEST_ASSERT(!it);
 
 	if (count) {
-		TEST_ASSERT(cache->getHead()->getKey() == keyArray[0]);
-		TEST_ASSERT(cache->getTail()->getKey() == keyArray[count - 1]);
+		AXL_TEST_ASSERT(cache->getHead()->getKey() == keyArray[0]);
+		AXL_TEST_ASSERT(cache->getTail()->getKey() == keyArray[count - 1]);
 	} else {
-		TEST_ASSERT(!cache->getHead());
-		TEST_ASSERT(!cache->getTail());
+		AXL_TEST_ASSERT(!cache->getHead());
+		AXL_TEST_ASSERT(!cache->getTail());
 	}
 }
 
@@ -181,10 +180,10 @@ test_BasicPromotionAndEviction() {
 
 	for (uint_t i = 1; i <= 4; i++) {
 		typename Cache::Iterator it = cache.add(i, i * 10);
-		TEST_ASSERT(it);
+		AXL_TEST_ASSERT(it);
 	}
 
-	TEST_ASSERT(cache.getCount() == 4);
+	AXL_TEST_ASSERT(cache.getCount() == 4);
 
 	{
 		uint_t keys[] = { 1, 2, 3, 4 };
@@ -194,7 +193,7 @@ test_BasicPromotionAndEviction() {
 		assertProtectedKeys(&cache, (const uint_t*)NULL, 0);
 	}
 
-	TEST_ASSERT(cache.find(2));
+	AXL_TEST_ASSERT(cache.find(2));
 	{
 		uint_t keys[] = { 1, 2, 3, 4 };
 		uint_t probation[] = { 4, 3, 2, 1 };
@@ -203,7 +202,7 @@ test_BasicPromotionAndEviction() {
 		assertProtectedKeys(&cache, (const uint_t*)NULL, 0);
 	}
 
-	TEST_ASSERT(cache.visit(2));
+	AXL_TEST_ASSERT(cache.visit(2));
 	{
 		uint_t keys[] = { 1, 2, 3, 4 };
 		uint_t probation[] = { 4, 3, 1 };
@@ -213,7 +212,7 @@ test_BasicPromotionAndEviction() {
 		assertProtectedKeys(&cache, protected_, countof(protected_));
 	}
 
-	TEST_ASSERT(cache.visit(3));
+	AXL_TEST_ASSERT(cache.visit(3));
 	{
 		uint_t keys[] = { 1, 2, 3, 4 };
 		uint_t probation[] = { 4, 1 };
@@ -223,7 +222,7 @@ test_BasicPromotionAndEviction() {
 		assertProtectedKeys(&cache, protected_, countof(protected_));
 	}
 
-	TEST_ASSERT(cache.visit(4));
+	AXL_TEST_ASSERT(cache.visit(4));
 	{
 		uint_t keys[] = { 1, 2, 3, 4 };
 		uint_t probation[] = { 2, 1 };
@@ -233,13 +232,13 @@ test_BasicPromotionAndEviction() {
 		assertProtectedKeys(&cache, protected_, countof(protected_));
 	}
 
-	TEST_ASSERT(cache.add(5, 50));
-	TEST_ASSERT(cache.getCount() == 5);
-	TEST_ASSERT(cache.contains(1));
-	TEST_ASSERT(cache.contains(2));
-	TEST_ASSERT(cache.contains(3));
-	TEST_ASSERT(cache.contains(4));
-	TEST_ASSERT(cache.contains(5));
+	AXL_TEST_ASSERT(cache.add(5, 50));
+	AXL_TEST_ASSERT(cache.getCount() == 5);
+	AXL_TEST_ASSERT(cache.contains(1));
+	AXL_TEST_ASSERT(cache.contains(2));
+	AXL_TEST_ASSERT(cache.contains(3));
+	AXL_TEST_ASSERT(cache.contains(4));
+	AXL_TEST_ASSERT(cache.contains(5));
 
 	{
 		uint_t keys[] = { 1, 2, 3, 4, 5 };
@@ -250,16 +249,16 @@ test_BasicPromotionAndEviction() {
 		assertProtectedKeys(&cache, protected_, countof(protected_));
 	}
 
-	TEST_ASSERT(cache.add(6, 60));
-	TEST_ASSERT(cache.add(7, 70));
-	TEST_ASSERT(cache.getCount() == 6);
-	TEST_ASSERT(!cache.contains(1));
-	TEST_ASSERT(cache.contains(2));
-	TEST_ASSERT(cache.contains(3));
-	TEST_ASSERT(cache.contains(4));
-	TEST_ASSERT(cache.contains(5));
-	TEST_ASSERT(cache.contains(6));
-	TEST_ASSERT(cache.contains(7));
+	AXL_TEST_ASSERT(cache.add(6, 60));
+	AXL_TEST_ASSERT(cache.add(7, 70));
+	AXL_TEST_ASSERT(cache.getCount() == 6);
+	AXL_TEST_ASSERT(!cache.contains(1));
+	AXL_TEST_ASSERT(cache.contains(2));
+	AXL_TEST_ASSERT(cache.contains(3));
+	AXL_TEST_ASSERT(cache.contains(4));
+	AXL_TEST_ASSERT(cache.contains(5));
+	AXL_TEST_ASSERT(cache.contains(6));
+	AXL_TEST_ASSERT(cache.contains(7));
 
 	{
 		uint_t keys[] = { 2, 3, 4, 5, 6, 7 };
@@ -276,41 +275,41 @@ void
 test_UpdateEraseClearAndResize() {
 	Cache cache(3, 1);
 
-	TEST_ASSERT(cache.add(1, 10));
-	TEST_ASSERT(cache.add(2, 20));
-	TEST_ASSERT(cache.add(3, 30));
-	TEST_ASSERT(cache.getCount() == 3);
+	AXL_TEST_ASSERT(cache.add(1, 10));
+	AXL_TEST_ASSERT(cache.add(2, 20));
+	AXL_TEST_ASSERT(cache.add(3, 30));
+	AXL_TEST_ASSERT(cache.getCount() == 3);
 
 	typename Cache::Iterator it = cache.add(2, 200);
-	TEST_ASSERT(it);
-	TEST_ASSERT(it->m_value == 200);
-	TEST_ASSERT(cache.getCount() == 3);
-	TEST_ASSERT(cache.getProtectedCount() == 1);
+	AXL_TEST_ASSERT(it);
+	AXL_TEST_ASSERT(it->m_value == 200);
+	AXL_TEST_ASSERT(cache.getCount() == 3);
+	AXL_TEST_ASSERT(cache.getProtectedCount() == 1);
 
-	TEST_ASSERT(cache.eraseKey(1));
-	TEST_ASSERT(!cache.eraseKey(1));
-	TEST_ASSERT(cache.getCount() == 2);
-	TEST_ASSERT(!cache.contains(1));
+	AXL_TEST_ASSERT(cache.eraseKey(1));
+	AXL_TEST_ASSERT(!cache.eraseKey(1));
+	AXL_TEST_ASSERT(cache.getCount() == 2);
+	AXL_TEST_ASSERT(!cache.contains(1));
 
-	TEST_ASSERT(cache.add(4, 40));
-	TEST_ASSERT(cache.add(5, 50));
-	TEST_ASSERT(cache.getCount() == 4);
-	TEST_ASSERT(cache.contains(3));
+	AXL_TEST_ASSERT(cache.add(4, 40));
+	AXL_TEST_ASSERT(cache.add(5, 50));
+	AXL_TEST_ASSERT(cache.getCount() == 4);
+	AXL_TEST_ASSERT(cache.contains(3));
 
 	cache.setCapacity(2, 1);
-	TEST_ASSERT(cache.getCount() == 3);
-	TEST_ASSERT(!cache.contains(3));
-	TEST_ASSERT(cache.getProbationCapacity() == 2);
-	TEST_ASSERT(cache.getProtectedCapacity() == 1);
+	AXL_TEST_ASSERT(cache.getCount() == 3);
+	AXL_TEST_ASSERT(!cache.contains(3));
+	AXL_TEST_ASSERT(cache.getProbationCapacity() == 2);
+	AXL_TEST_ASSERT(cache.getProtectedCapacity() == 1);
 
 	cache.clear();
-	TEST_ASSERT(cache.isEmpty());
-	TEST_ASSERT(cache.getCount() == 0);
-	TEST_ASSERT(!cache.getHead());
-	TEST_ASSERT(!cache.getTail());
-	TEST_ASSERT(cache.getProbationCount() == 0);
-	TEST_ASSERT(cache.getProtectedCount() == 0);
-	TEST_ASSERT(!cache.contains(2));
+	AXL_TEST_ASSERT(cache.isEmpty());
+	AXL_TEST_ASSERT(cache.getCount() == 0);
+	AXL_TEST_ASSERT(!cache.getHead());
+	AXL_TEST_ASSERT(!cache.getTail());
+	AXL_TEST_ASSERT(cache.getProbationCount() == 0);
+	AXL_TEST_ASSERT(cache.getProtectedCount() == 0);
+	AXL_TEST_ASSERT(!cache.contains(2));
 }
 
 template <typename Cache>
@@ -318,22 +317,22 @@ void
 test_ZeroCapacity() {
 	Cache cache(1, 1);
 
-	TEST_ASSERT(cache.isEmpty());
-	TEST_ASSERT(cache.add(1, 10));
-	TEST_ASSERT(cache.getCount() == 1);
-	TEST_ASSERT(cache.add(2, 20));
-	TEST_ASSERT(cache.getCount() == 1);
-	TEST_ASSERT(!cache.contains(1));
-	TEST_ASSERT(cache.contains(2));
+	AXL_TEST_ASSERT(cache.isEmpty());
+	AXL_TEST_ASSERT(cache.add(1, 10));
+	AXL_TEST_ASSERT(cache.getCount() == 1);
+	AXL_TEST_ASSERT(cache.add(2, 20));
+	AXL_TEST_ASSERT(cache.getCount() == 1);
+	AXL_TEST_ASSERT(!cache.contains(1));
+	AXL_TEST_ASSERT(cache.contains(2));
 
-	TEST_ASSERT(cache.visit(2));
-	TEST_ASSERT(cache.getProbationCount() == 0);
-	TEST_ASSERT(cache.getProtectedCount() == 1);
+	AXL_TEST_ASSERT(cache.visit(2));
+	AXL_TEST_ASSERT(cache.getProbationCount() == 0);
+	AXL_TEST_ASSERT(cache.getProtectedCount() == 1);
 
-	TEST_ASSERT(cache.add(3, 30));
-	TEST_ASSERT(cache.getCount() == 2);
-	TEST_ASSERT(cache.contains(2));
-	TEST_ASSERT(cache.contains(3));
+	AXL_TEST_ASSERT(cache.add(3, 30));
+	AXL_TEST_ASSERT(cache.getCount() == 2);
+	AXL_TEST_ASSERT(cache.contains(2));
+	AXL_TEST_ASSERT(cache.contains(3));
 }
 
 template <typename Cache>
@@ -341,23 +340,23 @@ void
 test_ProtectedFifo() {
 	Cache cache(2, 2);
 
-	TEST_ASSERT(cache.add(1, 10));
-	TEST_ASSERT(cache.add(2, 20));
-	TEST_ASSERT(cache.visit(1));
-	TEST_ASSERT(cache.visit(2));
+	AXL_TEST_ASSERT(cache.add(1, 10));
+	AXL_TEST_ASSERT(cache.add(2, 20));
+	AXL_TEST_ASSERT(cache.visit(1));
+	AXL_TEST_ASSERT(cache.visit(2));
 	{
 		uint_t protected_[] = { 2, 1 };
 		assertProtectedKeys(&cache, protected_, countof(protected_));
 	}
 
-	TEST_ASSERT(cache.visit(1));
+	AXL_TEST_ASSERT(cache.visit(1));
 	{
 		uint_t protected_[] = { 2, 1 };
 		assertProtectedKeys(&cache, protected_, countof(protected_));
 	}
 
-	TEST_ASSERT(cache.add(3, 30));
-	TEST_ASSERT(cache.visit(3));
+	AXL_TEST_ASSERT(cache.add(3, 30));
+	AXL_TEST_ASSERT(cache.visit(3));
 	{
 		uint_t probation[] = { 1 };
 		uint_t protected_[] = { 3, 2 };
@@ -371,23 +370,23 @@ void
 test_ProtectedLru() {
 	Cache cache(2, 2);
 
-	TEST_ASSERT(cache.add(1, 10));
-	TEST_ASSERT(cache.add(2, 20));
-	TEST_ASSERT(cache.visit(1));
-	TEST_ASSERT(cache.visit(2));
+	AXL_TEST_ASSERT(cache.add(1, 10));
+	AXL_TEST_ASSERT(cache.add(2, 20));
+	AXL_TEST_ASSERT(cache.visit(1));
+	AXL_TEST_ASSERT(cache.visit(2));
 	{
 		uint_t protected_[] = { 2, 1 };
 		assertProtectedKeys(&cache, protected_, countof(protected_));
 	}
 
-	TEST_ASSERT(cache.visit(1));
+	AXL_TEST_ASSERT(cache.visit(1));
 	{
 		uint_t protected_[] = { 1, 2 };
 		assertProtectedKeys(&cache, protected_, countof(protected_));
 	}
 
-	TEST_ASSERT(cache.add(3, 30));
-	TEST_ASSERT(cache.visit(3));
+	AXL_TEST_ASSERT(cache.add(3, 30));
+	AXL_TEST_ASSERT(cache.visit(3));
 	{
 		uint_t probation[] = { 2 };
 		uint_t protected_[] = { 3, 1 };
@@ -424,6 +423,6 @@ run() {
 
 //..............................................................................
 
-ADD_TEST_CASE("test_SlruCache", run)
+AXL_TEST_ADD("test_SlruCache", run)
 
 } // namespace

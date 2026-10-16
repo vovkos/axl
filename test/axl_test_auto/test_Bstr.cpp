@@ -10,7 +10,6 @@
 //..............................................................................
 
 #include "pch.h"
-#include "test.h"
 #include "axl_sys_win_Bstr.h"
 
 namespace {
@@ -32,6 +31,6 @@ void run() {
 
 //..............................................................................
 
-ADD_TEST_CASE("test_Bstr", run)
+AXL_TEST_ADD("test_Bstr", run)
 
 }

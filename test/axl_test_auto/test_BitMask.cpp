@@ -10,7 +10,6 @@
 //..............................................................................
 
 #include "pch.h"
-#include "test.h"
 
 namespace {
 
@@ -37,7 +36,7 @@ void run() {
 		uint64_t expected = lo64[i][1];
 		uint64_t result = sl::getLoBitmask64(shift);
 		printf("getLoBitmask64(%llu): 0x%016llx\n", shift, result);
-		TEST_ASSERT(result == expected);
+		AXL_TEST_ASSERT(result == expected);
 	}
 
 	uint64_t hi64[][2] = {
@@ -60,7 +59,7 @@ void run() {
 		uint64_t expected = hi64[i][1];
 		uint64_t result = sl::getHiBitmask64(shift);
 		printf("getHiBitmask64(%llu): 0x%016llx\n", shift, result);
-		TEST_ASSERT(result == expected);
+		AXL_TEST_ASSERT(result == expected);
 	}
 
 	uint32_t lo32[][2] = {
@@ -78,7 +77,7 @@ void run() {
 		uint32_t expected = lo32[i][1];
 		uint32_t result = sl::getLoBitmask32(shift);
 		printf("getLoBitmask32(%llu): 0x%08x\n", shift, result);
-		TEST_ASSERT(result == expected);
+		AXL_TEST_ASSERT(result == expected);
 	}
 
 	uint32_t hi32[][2] = {
@@ -96,7 +95,7 @@ void run() {
 		uint64_t expected = hi32[i][1];
 		uint64_t result = sl::getHiBitmask32(shift);
 		printf("getHiBitmask32(%llu): 0x%08x\n", shift, result);
-		TEST_ASSERT(result == expected);
+		AXL_TEST_ASSERT(result == expected);
 	}
 
 	uint16_t lo16[][2] = {
@@ -112,7 +111,7 @@ void run() {
 		uint16_t expected = lo16[i][1];
 		uint16_t result = sl::getLoBitmask16(shift);
 		printf("getLoBitmask16(%llu): 0x%08x\n", shift, result);
-		TEST_ASSERT(result == expected);
+		AXL_TEST_ASSERT(result == expected);
 	}
 
 	uint16_t hi16[][2] = {
@@ -128,7 +127,7 @@ void run() {
 		uint64_t expected = hi16[i][1];
 		uint64_t result = sl::getHiBitmask16(shift);
 		printf("getHiBitmask16(%llu): 0x%08x\n", shift, result);
-		TEST_ASSERT(result == expected);
+		AXL_TEST_ASSERT(result == expected);
 	}
 
 	uint8_t lo8[][2] = {
@@ -144,7 +143,7 @@ void run() {
 		uint8_t expected = lo8[i][1];
 		uint8_t result = sl::getLoBitmask8(shift);
 		printf("getLoBitmask8(%llu): 0x%08x\n", shift, result);
-		TEST_ASSERT(result == expected);
+		AXL_TEST_ASSERT(result == expected);
 	}
 
 	uint8_t hi8[][2] = {
@@ -160,12 +159,12 @@ void run() {
 		uint64_t expected = hi8[i][1];
 		uint64_t result = sl::getHiBitmask8(shift);
 		printf("getHiBitmask8(%llu): 0x%08x\n", shift, result);
-		TEST_ASSERT(result == expected);
+		AXL_TEST_ASSERT(result == expected);
 	}
 }
 
 //..............................................................................
 
-ADD_TEST_CASE("test_BitMask", run)
+AXL_TEST_ADD("test_BitMask", run)
 
 }

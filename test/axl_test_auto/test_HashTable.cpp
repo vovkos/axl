@@ -10,7 +10,6 @@
 //..............................................................................
 
 #include "pch.h"
-#include "test.h"
 
 namespace {
 
@@ -27,71 +26,71 @@ void
 test_IntHashTable() {
 	sl::SimpleHashTable<int, int> map;
 
-	TEST_ASSERT(map.isEmpty());
-	TEST_ASSERT(map.getCount() == 0);
-	TEST_ASSERT(!map.find(10));
-	TEST_ASSERT(map.findValue(10, -1) == -1);
+	AXL_TEST_ASSERT(map.isEmpty());
+	AXL_TEST_ASSERT(map.getCount() == 0);
+	AXL_TEST_ASSERT(!map.find(10));
+	AXL_TEST_ASSERT(map.findValue(10, -1) == -1);
 
 	for (int i = 0; i < 1000; i++) {
 		bool isNew = false;
 		sl::SimpleHashTable<int, int>::Iterator it = map.add(i, i * 10, &isNew);
-		TEST_ASSERT(it && isNew);
-		TEST_ASSERT(it->getKey() == i);
-		TEST_ASSERT(it->m_value == i * 10);
+		AXL_TEST_ASSERT(it && isNew);
+		AXL_TEST_ASSERT(it->getKey() == i);
+		AXL_TEST_ASSERT(it->m_value == i * 10);
 	}
 
-	TEST_ASSERT(!map.isEmpty());
-	TEST_ASSERT(map.getCount() == 1000);
+	AXL_TEST_ASSERT(!map.isEmpty());
+	AXL_TEST_ASSERT(map.getCount() == 1000);
 
 	for (int i = 0; i < 1000; i++) {
 		sl::SimpleHashTable<int, int>::Iterator it = map.find(i);
-		TEST_ASSERT(it && it->m_value == i * 10);
+		AXL_TEST_ASSERT(it && it->m_value == i * 10);
 	}
 
 	for (int i = 1000; i < 1200; i++)
-		TEST_ASSERT(!map.find(i));
+		AXL_TEST_ASSERT(!map.find(i));
 
 	for (int i = 0; i < 1000; i += 3) {
 		bool isNew = true;
 		sl::SimpleHashTable<int, int>::Iterator it = map.add(i, i * 20, &isNew);
-		TEST_ASSERT(it && !isNew);
-		TEST_ASSERT(it->m_value == i * 20);
+		AXL_TEST_ASSERT(it && !isNew);
+		AXL_TEST_ASSERT(it->m_value == i * 20);
 	}
 
-	TEST_ASSERT(map.getCount() == 1000);
+	AXL_TEST_ASSERT(map.getCount() == 1000);
 
 	for (int i = 0; i < 1000; i++) {
 		sl::SimpleHashTable<int, int>::Iterator it = map.find(i);
-		TEST_ASSERT(it);
-		TEST_ASSERT(it->m_value == (i % 3 ? i * 10 : i * 20));
+		AXL_TEST_ASSERT(it);
+		AXL_TEST_ASSERT(it->m_value == (i % 3 ? i * 10 : i * 20));
 	}
 
-	TEST_ASSERT(!map.addIfNotExists(30, 3000));
-	TEST_ASSERT(map.getCount() == 1000);
+	AXL_TEST_ASSERT(!map.addIfNotExists(30, 3000));
+	AXL_TEST_ASSERT(map.getCount() == 1000);
 
 	sl::SimpleHashTable<int, int>::Iterator it = map.addIfNotExists(2000, 20000);
-	TEST_ASSERT(it && it->m_value == 20000);
-	TEST_ASSERT(map.getCount() == 1001);
+	AXL_TEST_ASSERT(it && it->m_value == 20000);
+	AXL_TEST_ASSERT(map.getCount() == 1001);
 
 	for (int i = 0; i < 1000; i += 2)
-		TEST_ASSERT(map.eraseKey(i));
+		AXL_TEST_ASSERT(map.eraseKey(i));
 
 	for (int i = 0; i < 1000; i++) {
 		sl::SimpleHashTable<int, int>::Iterator it2 = map.find(i);
 		if (i % 2)
-			TEST_ASSERT(it2);
+			AXL_TEST_ASSERT(it2);
 		else
-			TEST_ASSERT(!it2);
+			AXL_TEST_ASSERT(!it2);
 	}
 
-	TEST_ASSERT(!map.eraseKey(0));
-	TEST_ASSERT(map.eraseKey(2000));
-	TEST_ASSERT(map.getCount() == 500);
+	AXL_TEST_ASSERT(!map.eraseKey(0));
+	AXL_TEST_ASSERT(map.eraseKey(2000));
+	AXL_TEST_ASSERT(map.getCount() == 500);
 
 	map.clear();
-	TEST_ASSERT(map.isEmpty());
-	TEST_ASSERT(map.getCount() == 0);
-	TEST_ASSERT(!map.find(1));
+	AXL_TEST_ASSERT(map.isEmpty());
+	AXL_TEST_ASSERT(map.getCount() == 0);
+	AXL_TEST_ASSERT(!map.find(1));
 }
 
 void
@@ -101,33 +100,33 @@ test_Collisions() {
 	for (uint_t i = 0; i < 2048; i++) {
 		uint_t key = i * 8 + (i & 7);
 		sl::HashTable<uint_t, uint_t, LowBitsHash>::Iterator it = map.add(key, i);
-		TEST_ASSERT(it && it->m_value == i);
+		AXL_TEST_ASSERT(it && it->m_value == i);
 	}
 
-	TEST_ASSERT(map.getCount() == 2048);
+	AXL_TEST_ASSERT(map.getCount() == 2048);
 
 	for (uint_t i = 0; i < 2048; i++) {
 		uint_t key = i * 8 + (i & 7);
 		sl::HashTable<uint_t, uint_t, LowBitsHash>::Iterator it = map.find(key);
-		TEST_ASSERT(it && it->m_value == i);
+		AXL_TEST_ASSERT(it && it->m_value == i);
 	}
 
 	for (uint_t i = 0; i < 2048; i++) {
 		uint_t key = i * 8 + ((i + 1) & 7);
-		TEST_ASSERT(!map.find(key));
+		AXL_TEST_ASSERT(!map.find(key));
 	}
 
 	for (uint_t i = 0; i < 2048; i += 5) {
 		uint_t key = i * 8 + (i & 7);
-		TEST_ASSERT(map.eraseKey(key));
+		AXL_TEST_ASSERT(map.eraseKey(key));
 	}
 
 	for (uint_t i = 0; i < 2048; i++) {
 		uint_t key = i * 8 + (i & 7);
 		sl::HashTable<uint_t, uint_t, LowBitsHash>::Iterator it = map.find(key);
-		TEST_ASSERT((it != NULL) == (i % 5 != 0));
+		AXL_TEST_ASSERT((it != NULL) == (i % 5 != 0));
 		if (it)
-			TEST_ASSERT(it->m_value == i);
+			AXL_TEST_ASSERT(it->m_value == i);
 	}
 }
 
@@ -151,7 +150,7 @@ test_Randomized() {
 		if (seed & 1) {
 			uint_t value = seed ^ i;
 			sl::HashTable<uint_t, uint_t, LowBitsHash>::Iterator it = map.add(key, value);
-			TEST_ASSERT(it);
+			AXL_TEST_ASSERT(it);
 			if (!isPresent[key]) {
 				isPresent[key] = true;
 				expectedCount++;
@@ -159,21 +158,21 @@ test_Randomized() {
 			valueArray[key] = value;
 		} else {
 			bool result = map.eraseKey(key);
-			TEST_ASSERT(result == isPresent[key]);
+			AXL_TEST_ASSERT(result == isPresent[key]);
 			if (isPresent[key]) {
 				isPresent[key] = false;
 				expectedCount--;
 			}
 		}
 
-		TEST_ASSERT(map.getCount() == expectedCount);
+		AXL_TEST_ASSERT(map.getCount() == expectedCount);
 
 		seed = seed * 1664525 + 1013904223;
 		key = (seed >> 8) & (KeyCount - 1);
 		sl::HashTable<uint_t, uint_t, LowBitsHash>::Iterator it = map.find(key);
-		TEST_ASSERT((it != NULL) == isPresent[key]);
+		AXL_TEST_ASSERT((it != NULL) == isPresent[key]);
 		if (it)
-			TEST_ASSERT(it->m_value == valueArray[key]);
+			AXL_TEST_ASSERT(it->m_value == valueArray[key]);
 	}
 }
 
@@ -205,12 +204,12 @@ test_StringHashTableIgnoreCase() {
 		map_pcp.add(stringTable[i], (int)strlen(stringTable[i]));
 	}
 
-	TEST_ASSERT(map_pcu.find("multi-FUNCTION")->m_value == 14);
-	TEST_ASSERT(map_pcp.find("multi-FUNCTION")->m_value == 14);
-	TEST_ASSERT(map_pcu.find("usb hub")->m_value == 7);
-	TEST_ASSERT(map_pcp.find("usb hub")->m_value == 7);
-	TEST_ASSERT(!map_pcu.find("definitely absent"));
-	TEST_ASSERT(!map_pcp.find("definitely absent"));
+	AXL_TEST_ASSERT(map_pcu.find("multi-FUNCTION")->m_value == 14);
+	AXL_TEST_ASSERT(map_pcp.find("multi-FUNCTION")->m_value == 14);
+	AXL_TEST_ASSERT(map_pcu.find("usb hub")->m_value == 7);
+	AXL_TEST_ASSERT(map_pcp.find("usb hub")->m_value == 7);
+	AXL_TEST_ASSERT(!map_pcu.find("definitely absent"));
+	AXL_TEST_ASSERT(!map_pcp.find("definitely absent"));
 }
 
 void
@@ -223,6 +222,6 @@ run() {
 
 //..............................................................................
 
-ADD_TEST_CASE("test_HashTable", run)
+AXL_TEST_ADD("test_HashTable", run)
 
 } // namespace
