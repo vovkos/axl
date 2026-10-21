@@ -28,6 +28,7 @@ jobs:
                     OS:         windows-2022
                 -   TARGET_CPU: arm64
                     OS:         windows-11-arm
+                    TOOLCHAIN:  msvc18 v143
 
         steps:
         -   name: Checkout repo
@@ -36,14 +37,14 @@ jobs:
         -   name: Install
             shell: cmd
             run: |
-                call ci\github-actions\set-env.bat ${{matrix.TARGET_CPU}} ${{matrix.CONFIGURATION}}
+                call ci\github-actions\set-env.bat ${{matrix.TARGET_CPU}} ${{matrix.TOOLCHAIN}} ${{matrix.CONFIGURATION}}
                 call ci\github-actions\install-windows.bat
                 git clone --branch re2s-no-abseil --depth 1 https://github.com/vovkos/re2s
 
         -   name: Build and test
             shell: cmd
             run: |
-                call ci\github-actions\set-env.bat ${{matrix.TARGET_CPU}} ${{matrix.CONFIGURATION}}
+                call ci\github-actions\set-env.bat ${{matrix.TARGET_CPU}} ${{matrix.TOOLCHAIN}} ${{matrix.CONFIGURATION}}
                 call ci\github-actions\build-re2s.bat
                 call ci\github-actions\build-lua.bat
                 call ci\github-actions\build-expat.bat
