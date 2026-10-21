@@ -102,6 +102,7 @@ enumerateModules(ModuleIterator* iterator) {
 #elif (_AXL_OS_DARWIN)
 
 ModuleIterator::ModuleIterator(size_t count) {
+	m_module = NULL;
 	m_count = count;
 	m_index = 0;
 }
@@ -112,16 +113,20 @@ ModuleIterator::operator ++ () {
 		return *this;
 
 	m_index++;
+	m_module = NULL;
 	m_moduleFileName.clear();
 	return *this;
 }
 
 void*
 ModuleIterator::prepareModule() const {
-	ASSERT(!m_module.isOpen() && "module handle is already set");
+	ASSERT(!m_module && "module handle is already set");
 
-	if (m_index < m_count)
-		m_module.open(getModuleFileName(), RTLD_NOLOAD);
+	if (m_index < m_count) {
+		sys::psx::DynamicLib lib;
+		lib.open(getModuleFileName(), RTLD_NOLOAD); // already loaded...
+		m_module = lib; // ...so stays valid after sys::psx::DynamicLib dlclose
+	}
 
 	return m_module;
 }

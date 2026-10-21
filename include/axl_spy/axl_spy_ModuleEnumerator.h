@@ -92,7 +92,7 @@ protected:
 
 class ModuleIterator {
 protected:
-	mutable sys::psx::DynamicLib m_module;
+	mutable void* m_module;
 	mutable sl::StringRef m_moduleFileName;
 	size_t m_count;
 	size_t m_index;
@@ -112,7 +112,7 @@ public:
 
 	void*
 	getModule() const {
-		return m_module.isOpen() ? (void*)m_module : prepareModule();
+		return m_module ? m_module : prepareModule();
 	}
 
 	const sl::StringRef&
