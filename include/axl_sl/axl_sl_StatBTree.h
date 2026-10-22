@@ -637,7 +637,10 @@ public:
 
 	Iterator
 	getHead() {
-		return !m_leafList.isEmpty() ? Iterator(m_leafList.getHead(), 0) : Iterator();
+		if (!m_leafList.isEmpty())
+			return Iterator(m_leafList.getHead(), 0);
+		else
+			return Iterator();
 	}
 
 	ConstIterator
@@ -648,7 +651,10 @@ public:
 	Iterator
 	getTail() {
 		sl::Iterator<Leaf> it = m_leafList.getTail();
-		return it ? Iterator(it, it->m_count - 1) : Iterator();
+		if (it)
+			return Iterator(it, it->m_count - 1);
+		else
+			return Iterator();
 	}
 
 	ConstIterator
@@ -679,7 +685,10 @@ public:
 	template <typename SubStat>
 	SubStat
 	getFullSubStat() const {
-		return m_root ? SubStat(m_root->m_stat) : SubStat();
+		if (m_root)
+			return SubStat(m_root->m_stat);
+		else
+			return SubStat();
 	}
 
 	// everything up to (and including) iterator
@@ -779,9 +788,10 @@ public:
 
 	Iterator
 	insertHead(StatArg stat) {
-		return m_leafList.isEmpty() ?
-			insertFirst(stat) :
-			insert((Leaf*)*m_leafList.getHead(), 0, stat);
+		if (m_leafList.isEmpty())
+			return insertFirst(stat);
+		else
+			return insert((Leaf*)*m_leafList.getHead(), 0, stat);
 	}
 
 	Iterator
@@ -818,9 +828,10 @@ public:
 		StatArg stat,
 		Iterator beforeIt
 	) {
-		return beforeIt ?
-			insert(*beforeIt.getLeafIterator(), beforeIt.getSlot(), stat) :
-			insertTail(stat);
+		if (beforeIt)
+			return insert(*beforeIt.getLeafIterator(), beforeIt.getSlot(), stat);
+		else
+			return insertTail(stat);
 	}
 
 	Iterator
@@ -839,9 +850,10 @@ public:
 		StatArg stat,
 		Iterator afterIt
 	) {
-		return afterIt ?
-			insert(*afterIt.getLeafIterator(), afterIt.getSlot() + 1, stat) :
-			insertHead(stat);
+		if (afterIt)
+			return insert(*afterIt.getLeafIterator(), afterIt.getSlot() + 1, stat);
+		else
+			return insertHead(stat);
 	}
 
 	Iterator
@@ -952,7 +964,10 @@ protected:
 	findPrefixStatEqImpl(StatArg2 targetStat) {
 		Stat2 offset;
 		Iterator it = findPrefixStatGeImpl<Stat2, StatArg2>(targetStat, &offset);
-		return it && offset == Stat2(it.getStat()) ? it : Iterator();
+		if (it && offset == Stat2(it.getStat()))
+			return it;
+		else
+			return Iterator();
 	}
 
 	Iterator
