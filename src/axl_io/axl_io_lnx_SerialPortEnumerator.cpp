@@ -85,12 +85,24 @@ SerialPortEnumerator::createPortList(
 		if (!parentDevice) // no parent device, this is a virtual tty
 			continue;
 
+		// linux-6.5 and up insert "serial-base" devices between the serial device driver
+		// and tty device -- walk up to find the "real" driver
+
+		while (parentDevice.getSubsystem() == "serial-base")
+			parentDevice = sys::lnx::UdevDevice(parentDevice.getParent());
+
 		sl::StringRef name = device.getDevNode();
 		sl::StringRef driver = parentDevice.getDriver();
-		if (driver == "serial8250") {
-			// serial8250 driver has a hardcoded number of ports
-			// the only way to tell which actually exist on a given system
-			// is to try to open them and make an ioctl call
+
+		// serial core ports without an actual UART behind them report type = PORT_UNKNOWN
+
+		sl::StringRef type = device.getSysAttrValue("type"); // only on linux-3.7 and up
+		if (!type.isEmpty()) {
+			if (atoi(type.sz()) == PORT_UNKNOWN)
+				continue;
+		} else if (driver == "serial8250") {
+			// serial8250 hardcodes the number of ports (CONFIG_SERIAL_8250_RUNTIME_UARTS)
+			// if the sysattr check above failed, fallback to open + ioctl:
 
 			serial_struct serialInfo;
 			io::psx::File file;
@@ -98,7 +110,7 @@ SerialPortEnumerator::createPortList(
 				file.open(name, O_RDWR | O_NONBLOCK | O_NOCTTY) &&
 				file.ioctl(TIOCGSERIAL, &serialInfo);
 
-			if (!result || serialInfo.type == PORT_UNKNOWN)
+			if (result && serialInfo.type == PORT_UNKNOWN)
 				continue;
 		}
 

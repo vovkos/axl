@@ -11000,11 +11000,7 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-#if (_AXL_IO_SSL)
-	testSsl();
-#endif
-
-
+	testEnumSerial();
 	return 0;
 }
 
