@@ -17,5 +17,6 @@
 #include "axl_err_Error.h"
 
 #define MDNS_NO_IO
+#define MDNS_NO_TRAILING_DOT
 
 #include "mdns.h"

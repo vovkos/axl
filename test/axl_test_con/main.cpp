@@ -10777,12 +10777,9 @@ mdnsRecordCallback(
 		if (count == -1)
 			break;
 
-		sl::String key;
-		sl::String value;
-
 		for (size_t i = 0; i < count; i++) {
-			io::mdns2Axl(&key, txtArray[i].key);
-			io::mdns2Axl(&value, txtArray[i].value);
+			sl::StringRef key = io::getStringFromMdnsString(txtArray[i].key);
+			sl::StringRef value = io::getStringFromMdnsString(txtArray[i].value);
 			printf("    -> %s = %s\n", key.sz(), value.sz());
 		}
 
@@ -10811,7 +10808,9 @@ testMdnsPass(
 	uint_t queryId,
 	uint_t timeout // in seconds
 ) {
+	uint64_t startTimestamp = sys::getPreciseTimestamp();
 	uint64_t endTimestamp = sys::getTimestamp() + (uint64_t)timeout * 10000000;
+	uint64_t lastTimestamp = startTimestamp;
 	size_t recordCount = 0;
 	static char buffer[MdnsConst_RecvBufferSize];
 
@@ -10825,6 +10824,14 @@ testMdnsPass(
 		if (size == -1)
 			break;
 
+		lastTimestamp = sys::getPreciseTimestamp();
+
+		printf(
+			"[+%.3f ms] %d bytes from %s\n",
+			(double)(lastTimestamp - startTimestamp) / 10000,
+			(int)size,
+			context.m_addr.getString().sz()
+		);
 
 		recordCount += passKind == MdnsPassKind_Discovery ?
 			::mdns_discovery_parse(
@@ -10842,7 +10849,11 @@ testMdnsPass(
 			);
 	}
 
-	printf("(%d record(s))\n", (int)recordCount);
+	printf(
+		"(%d record(s), last at +%.3f ms)\n",
+		(int)recordCount,
+		(double)(lastTimestamp - startTimestamp) / 10000
+	);
 }
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -10910,7 +10921,7 @@ testMdnsAdapter(const sockaddr* ifaceAddr) {
 
 	printf("-- discovery --\n");
 
-	if (sendMdnsQuery(&socket, "_services._dns-sd._udp.local.", 0) == -1) {
+	if (sendMdnsQuery(&socket, "_services._dns-sd._udp.local", 0) == -1) {
 		printf("cannot send discovery: %s\n", err::getLastErrorDescription().sz());
 		return;
 	}
@@ -10937,12 +10948,50 @@ testMdnsAdapter(const sockaddr* ifaceAddr) {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+// subtypes are not listed by DNS-SD discovery, so query them explicitly
+
+void
+testMdnsIoninjaHwcEnumAdapter(const sockaddr* ifaceAddr) {
+	static const char* queryTable[] = {
+		"_ioninja-hwc._tcp.local",
+		"_serial._sub._ioninja-hwc._tcp.local",
+		"_ethernet-tap._sub._ioninja-hwc._tcp.local",
+	};
+
+	io::Socket socket;
+
+	bool result =
+		socket.open(ifaceAddr->sa_family, SOCK_DGRAM, IPPROTO_UDP) &&
+		io::setupMdnsSocketOptions(&socket, ifaceAddr) &&
+		socket.setBlockingMode(false);
+
+	if (!result) {
+		printf("cannot open mDNS socket: %s\n", err::getLastErrorDescription().sz());
+		return;
+	}
+
+	// distinct query ids filter out stragglers from the previous query
+
+	for (size_t i = 0; i < countof(queryTable); i++) {
+		printf("\n-- PTR query: %s --\n", queryTable[i]);
+		int queryId = sendMdnsQuery(&socket, queryTable[i], (uint_t)i + 1);
+		if (queryId == -1) {
+			printf("cannot send query: %s\n", err::getLastErrorDescription().sz());
+			return;
+		}
+
+		testMdnsPass(&socket, MdnsPassKind_Query, NULL, queryId, 1);
+	}
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 // a query only reaches the segment behind the interface it goes out of, so a
 // multi-homed host needs one socket per adapter -- the routing table would
 // otherwise pick just one (often a virtual switch with nothing on it)
 
 void
-testMdns() {
+forEachMdnsAdapter(void (*func)(const sockaddr* ifaceAddr)) {
 	sl::List<io::NetworkAdapterDesc> adapterList;
 	io::enumerateNetworkAdapters(&adapterList);
 
@@ -10966,9 +11015,19 @@ testMdns() {
 				address->getString().sz()
 			);
 
-			testMdnsAdapter(&address->m_addr);
+			func(&address->m_addr);
 		}
 	}
+}
+
+void
+testMdns() {
+	forEachMdnsAdapter(testMdnsAdapter);
+}
+
+void
+testMdnsIoninjaHwcEnum() {
+	forEachMdnsAdapter(testMdnsIoninjaHwcEnumAdapter);
 }
 
 #endif
@@ -11000,7 +11059,9 @@ main(
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	testEnumSerial();
+#if (_AXL_IO_MDNS)
+	testMdnsIoninjaHwcEnum();
+#endif
 	return 0;
 }
 

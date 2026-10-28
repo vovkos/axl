@@ -51,6 +51,14 @@ extern "C" {
  * Without MDNS_NO_IO nothing changes: same signatures, mdns.c builds untouched.
  */
 
+/* MDNS_NO_TRAILING_DOT -- names extracted from packets (mdns_string_extract,
+ * mdns_record_parse_ptr, mdns_record_parse_srv) come without the trailing dot:
+ * "_http._tcp.local" rather than "_http._tcp.local.". Names passed in for building
+ * packets may come either way.
+ *
+ * Without MDNS_NO_TRAILING_DOT names end with a dot, as upstream.
+ */
+
 #define MDNS_INVALID_POS ((size_t)-1)
 
 #define MDNS_STRING_CONST(s) (s), (sizeof((s)) - 1)
@@ -746,14 +754,22 @@ mdns_string_extract(const void* buffer, size_t size, size_t* offset, char* str, 
 		if (substr.ref && (end == MDNS_INVALID_POS))
 			end = cur + 2;
 		if (substr.length) {
+#ifdef MDNS_NO_TRAILING_DOT
+			if ((dst != str) && remain) {
+				*dst++ = '.';
+				--remain;
+			}
+#endif
 			size_t to_copy = (substr.length < remain) ? substr.length : remain;
 			memcpy(dst, (const char*)buffer + substr.offset, to_copy);
 			dst += to_copy;
 			remain -= to_copy;
+#ifndef MDNS_NO_TRAILING_DOT
 			if (remain) {
 				*dst++ = '.';
 				--remain;
 			}
+#endif
 		}
 		cur = substr.offset + substr.length;
 	} while (substr.length);

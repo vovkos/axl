@@ -23,24 +23,15 @@ namespace io {
 // mdns_string_t and sl::StringRef are essentially the same thing
 
 inline
-sl::StringRef
-mdns2Axl(const mdns_string_t& string) {
-	return sl::StringRef(string.str, string.length);
-}
-
-inline
-bool
-mdns2Axl(
-	sl::String* string_axl,
-	const mdns_string_t& string_mdns
-) {
-	return string_axl->copy(string_mdns.str, string_mdns.length) != -1;
-}
-
-inline
 mdns_string_t
-axl2Mdns(const sl::StringRef& string) {
+createMdnsString(const sl::StringRef& string) {
 	return mdns_string_t { string.cp(), string.getLength() };
+}
+
+inline
+sl::StringRef
+getStringFromMdnsString(const mdns_string_t& string) {
+	return sl::StringRef(string.str, string.length);
 }
 
 //..............................................................................
@@ -62,7 +53,7 @@ public:
 		uint_t ttl
 	) {
 		setup(name, MDNS_RECORDTYPE_PTR, ttl);
-		data.ptr.name = axl2Mdns(target);
+		data.ptr.name = createMdnsString(target);
 	}
 
 	void
@@ -133,7 +124,7 @@ MdnsRecord::setSrv(
 	uint_t ttl
 ) {
 	setup(name, MDNS_RECORDTYPE_SRV, ttl);
-	data.srv.name = axl2Mdns(target);
+	data.srv.name = createMdnsString(target);
 	data.srv.priority = (uint16_t)priority;
 	data.srv.weight = (uint16_t)weight;
 	data.srv.port = (uint16_t)port;
@@ -148,8 +139,8 @@ MdnsRecord::setTxt(
 	uint_t ttl
 ) {
 	setup(name, MDNS_RECORDTYPE_TXT, ttl);
-	data.txt.key = axl2Mdns(key);
-	data.txt.value = axl2Mdns(value);
+	data.txt.key = createMdnsString(key);
+	data.txt.value = createMdnsString(value);
 }
 
 inline
@@ -160,7 +151,7 @@ MdnsRecord::setup(
 	uint_t ttl
 ) {
 	memset(&data, 0, sizeof(data));
-	this->name = axl2Mdns(name);
+	this->name = createMdnsString(name);
 	this->type = recordType;
 	this->ttl = ttl;
 }
@@ -220,7 +211,7 @@ public:
 		size_t dataLength
 	);
 
-	// the record owner name, e.g. "_http._tcp.local."
+	// the record owner name, e.g. "_http._tcp.local"
 
 	size_t
 	getName(sl::String* name) const {
@@ -355,11 +346,11 @@ MdnsRecordParser::parseSrv(MdnsRecordSrv* srv_o) const {
 	srv_o->priority = srv.priority;
 	srv_o->weight = srv.weight;
 	srv_o->port = srv.port;
-	size_t result = mdns2Axl(&srv_o->m_name, srv.name);
+	size_t result = srv_o->m_name.copy(srv.name.str, srv.name.length);
 	if (result == -1)
 		return -1;
 
-	srv_o->name = axl2Mdns(srv_o->m_name);
+	srv_o->name = createMdnsString(srv_o->m_name);
 	return result;
 }
 
