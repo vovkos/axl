@@ -13,6 +13,9 @@
 #include <string.h>
 #include <spawn.h>
 #include <time.h>
+#include <errno.h>
+#include <unistd.h>
+#include <sys/syscall.h>
 
 // secure_getenv is in <stdlib.h> but it's a GNU extension
 // and its declaration may be ifdef-ed out
@@ -102,6 +105,28 @@ __wrap_posix_spawnp(
 char*
 __wrap_secure_getenv(const char *name) {
 	return secure_getenv(name);
+}
+
+// getrandom introduced in glibc-2.25
+// fallback: use SYS_getrandom (linux-3.17) or read from /dev/urandom
+
+ssize_t
+__wrap_getrandom(
+	void* buffer,
+	size_t size,
+	unsigned int flags
+) {
+	ssize_t result = syscall(SYS_getrandom, buffer, size, flags);
+	if (result != -1 || errno != ENOSYS)
+		return result;
+
+	int fd = open("/dev/urandom", O_RDONLY | O_CLOEXEC);
+	if (fd == -1)
+		return -1;
+
+	result = read(fd, buffer, size);
+	close(fd);
+	return result;
 }
 
 //..............................................................................

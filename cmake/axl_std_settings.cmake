@@ -644,6 +644,11 @@ axl_apply_gcc_settings)
 
 		if(GCC_LINK_GLIBC_WRAPPERS)
 			set(
+				_LIBC_FUNC_LIST
+				getrandom
+			)
+
+			set(
 				_LIBM_FUNC_LIST
 				exp
 				exp2
@@ -651,6 +656,11 @@ axl_apply_gcc_settings)
 				log2
 				log2f
 				pow
+			)
+
+			set(
+				_LIBPTHREAD_FUNC_LIST
+				pthread_cond_clockwait
 			)
 
 			if(${TARGET_CPU} STREQUAL "amd64")
@@ -686,16 +696,15 @@ axl_apply_gcc_settings)
 				)
 			else()
 				# so far so good -- GLIBC_2.17 is the oldest we can target on aarch64
-				set(_LIBC_FUNC_LIST)
 			endif()
 
 			set(_WRAPPER_FLAGS "-Wl")
 
-			foreach(_FUNC ${_LIBC_FUNC_LIST} ${_LIBM_FUNC_LIST})
+			foreach(_FUNC ${_LIBC_FUNC_LIST} ${_LIBM_FUNC_LIST} ${_LIBPTHREAD_FUNC_LIST})
 				string(APPEND _WRAPPER_FLAGS ",--wrap=${_FUNC}")
 			endforeach()
 
-			set(_AXL_GLIBC "-Wl,--whole-archive -laxl_glibc_libc -Wl,--no-whole-archive -laxl_glibc_libm -lm")
+			set(_AXL_GLIBC "-laxl_glibc_libpthread -lpthread -laxl_glibc_libm -lm -Wl,--whole-archive -laxl_glibc_libc -Wl,--no-whole-archive")
 
 			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${_WRAPPER_FLAGS}")
 			set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${_WRAPPER_FLAGS}")
