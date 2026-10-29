@@ -11030,6 +11030,97 @@ testMdnsIoninjaHwcEnum() {
 	forEachMdnsAdapter(testMdnsIoninjaHwcEnumAdapter);
 }
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// crafted packets -- every parse must fail cleanly (no hang, no out-of-bounds)
+
+int
+mdnsMalformedCallback(
+	mdns_entry_type_t entryType,
+	uint16_t queryId,
+	uint16_t recordType,
+	uint16_t recordClass,
+	uint32_t ttl,
+	const void* packet,
+	size_t packetSize,
+	size_t nameOffset,
+	size_t nameLength,
+	size_t dataOffset,
+	size_t dataLength,
+	void* context
+) {
+	io::MdnsRecordParser parser(packet, packetSize, nameOffset, nameLength, dataOffset, dataLength);
+
+	size_t result;
+	switch (recordType) {
+	case MDNS_RECORDTYPE_TXT: {
+		sl::Array<mdns_record_txt_t> txtArray;
+		result = parser.parseTxt(&txtArray);
+		break;
+		}
+
+	case MDNS_RECORDTYPE_PTR: {
+		sl::String name;
+		result = parser.parsePtr(&name);
+		break;
+		}
+
+	case MDNS_RECORDTYPE_SRV: {
+		io::MdnsRecordSrv srv;
+		result = parser.parseSrv(&srv);
+		break;
+		}
+
+	default:
+		result = 0;
+	}
+
+	printf(
+		"%s: %s\n",
+		getMdnsRecordTypeString(recordType),
+		result == -1 ? err::getLastErrorDescription().sz() : "parsed (UNEXPECTED)"
+	);
+
+	return 0;
+}
+
+void
+testMdnsMalformed() {
+	static const uint8_t txtPacket[] = {
+		0, 0, 0x84, 0, 0, 0, 0, 1, 0, 0, 0, 0, // 1 answer
+		1, 'a', 0,
+		0, MDNS_RECORDTYPE_TXT, 0, 1, 0, 0, 0, 10, 0, 2,
+		5, 'a', // the string length overruns the record
+	};
+
+	static const uint8_t ptrPacket[] = {
+		0, 0, 0x84, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+		1, 'a', 0,
+		0, MDNS_RECORDTYPE_PTR, 0, 1, 0, 0, 0, 10, 0, 2,
+		0xc0, 25, // a compression pointer to itself
+	};
+
+	static const uint8_t srvPacket[] = {
+		0, 0, 0x84, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+		1, 'a', 0,
+		0, MDNS_RECORDTYPE_SRV, 0, 1, 0, 0, 0, 10, 0, 7,
+		0, 0, 0, 0, 0, 80, 0, // too short for priority, weight, port + name
+	};
+
+	static const uint8_t shortPacket[] = { 0, 0, 0x84 };
+
+	::mdns_query_parse(txtPacket, sizeof(txtPacket), mdnsMalformedCallback, NULL, 0);
+	::mdns_query_parse(ptrPacket, sizeof(ptrPacket), mdnsMalformedCallback, NULL, 0);
+	::mdns_query_parse(srvPacket, sizeof(srvPacket), mdnsMalformedCallback, NULL, 0);
+
+	size_t count = ::mdns_query_parse(shortPacket, sizeof(shortPacket), mdnsMalformedCallback, NULL, 0);
+	printf("short packet: %d record(s)\n", (int)count);
+
+	char buffer[18]; // header + 6 -- passes the up-front check, but "abc" needs 21
+	int size = ::mdns_query_build(MDNS_RECORDTYPE_PTR, "abc", 3, buffer, sizeof(buffer), 0, MDNS_CLASS_IN);
+	printf("tight query build: %d\n", size);
+}
+
 #endif
 
 #if (_AXL_OS_WIN)
@@ -11060,6 +11151,7 @@ main(
 #endif
 
 #if (_AXL_IO_MDNS)
+	testMdnsMalformed();
 	testMdnsIoninjaHwcEnum();
 #endif
 	return 0;

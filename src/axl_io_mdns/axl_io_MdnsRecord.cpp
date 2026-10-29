@@ -39,6 +39,9 @@ MdnsRecordParser::parseTxt(sl::Array<mdns_record_txt_t>* array) const {
 			&finalOffset
 		);
 
+		if (finalOffset == offset) // an entry overruns the record
+			return err::fail<size_t>(-1, "malformed mDNS TXT record");
+
 		bool result = array->append(buffer, count) != -1;
 		if (!result)
 			return -1;

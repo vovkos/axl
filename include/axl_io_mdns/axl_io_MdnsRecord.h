@@ -158,8 +158,7 @@ MdnsRecord::setup(
 
 //..............................................................................
 
-// name of mdns_record_srv_t returned by mdns_record_parse_srv points to
-// a scratch buffer -- we need to lift it to heap
+// m_name owns the SRV target; mdns_record_srv_t::name points into it
 
 struct MdnsRecordSrv: mdns_record_srv_t {
 	sl::String m_name;
@@ -300,14 +299,19 @@ MdnsRecordParser::extractString(
 	size_t offset
 ) const {
 	char buffer[MaxNameLength + 1];
+	size_t nextOffset = offset;
 
 	mdns_string_t result = ::mdns_string_extract(
 		m_packet,
 		m_packetSize,
-		&offset,
+		&nextOffset,
 		buffer,
 		sizeof(buffer)
 	);
+
+	// a malformed name leaves the offset untouched; a valid one advances it
+	if (nextOffset == offset)
+		return err::fail<size_t>(-1, "malformed mDNS name");
 
 	return string->copy(result.str, result.length);
 }
@@ -315,42 +319,29 @@ MdnsRecordParser::extractString(
 inline
 size_t
 MdnsRecordParser::parsePtr(sl::String* name) const {
-	char buffer[MaxNameLength + 1];
+	if (m_dataLength < 2) // a compressed name takes at least 2 bytes
+		return err::fail<size_t>(-1, "malformed mDNS PTR record");
 
-	mdns_string_t result = ::mdns_record_parse_ptr(
-		m_packet,
-		m_packetSize,
-		m_dataOffset,
-		m_dataLength,
-		buffer,
-		sizeof(buffer)
-	);
-
-	return name->copy(result.str, result.length);
+	return extractString(name, m_dataOffset);
 }
 
 inline
 size_t
-MdnsRecordParser::parseSrv(MdnsRecordSrv* srv_o) const {
-	char buffer[MaxNameLength + 1];
+MdnsRecordParser::parseSrv(MdnsRecordSrv* srv) const {
+	// priority, weight, port + a compressed name (at least 2 bytes)
+	if (m_dataLength < 8 || m_dataOffset + m_dataLength > m_packetSize)
+		return err::fail<size_t>(-1, "malformed mDNS SRV record");
 
-	mdns_record_srv_t srv = ::mdns_record_parse_srv(
-		m_packet,
-		m_packetSize,
-		m_dataOffset,
-		m_dataLength,
-		buffer,
-		sizeof(buffer)
-	);
+	const char* p = (const char*)m_packet + m_dataOffset;
+	srv->priority = ::mdns_ntohs(p);
+	srv->weight = ::mdns_ntohs(p + 2);
+	srv->port = ::mdns_ntohs(p + 4);
 
-	srv_o->priority = srv.priority;
-	srv_o->weight = srv.weight;
-	srv_o->port = srv.port;
-	size_t result = srv_o->m_name.copy(srv.name.str, srv.name.length);
+	size_t result = extractString(&srv->m_name, m_dataOffset + 6);
 	if (result == -1)
 		return -1;
 
-	srv_o->name = createMdnsString(srv_o->m_name);
+	srv->name = createMdnsString(srv->m_name);
 	return result;
 }
 
