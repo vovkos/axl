@@ -906,7 +906,8 @@ mdns_records_parse(
 	size_t parsed = 0;
 	for (size_t i = 0; i < records; ++i) {
 		size_t name_offset = *offset;
-		mdns_string_skip(buffer, size, offset);
+		if (!mdns_string_skip(buffer, size, offset))
+			return parsed;
 		if (((*offset) + 10) > size)
 			return parsed;
 		size_t name_length = (*offset) - name_offset;
@@ -1022,6 +1023,9 @@ mdns_discovery_parse(
                      int sock, const struct sockaddr* saddr, size_t addrlen,
 #endif
                      const void* buffer, size_t data_size, mdns_record_callback_fn callback, void* user_data) {
+	if (data_size < sizeof(struct mdns_header_t))
+		return 0;
+
 	size_t records = 0;
 	const uint16_t* data = (uint16_t*)buffer;
 
@@ -1048,6 +1052,8 @@ mdns_discovery_parse(
 		// Verify it's our question, _services._dns-sd._udp.local.
 		if (!mdns_string_equal(buffer, data_size, &offset, mdns_services_query,
 		                       sizeof(mdns_services_query), &verify_offset))
+			return 0;
+		if ((offset + 4) > data_size)
 			return 0;
 		data = (const uint16_t*)MDNS_POINTER_OFFSET(buffer, offset);
 
@@ -1078,7 +1084,7 @@ mdns_discovery_parse(
 		uint32_t ttl = mdns_ntohl(data);
 		data += 2;
 		uint16_t length = mdns_ntohs(data++);
-		if (length > (data_size - offset))
+		if ((offset + 10 + length) > data_size)
 			return 0;
 
 		if (is_answer) {
@@ -1129,6 +1135,9 @@ mdns_listen_parse(
                   int sock, const struct sockaddr* saddr, size_t addrlen,
 #endif
                   const void* buffer, size_t data_size, mdns_record_callback_fn callback, void* user_data) {
+	if (data_size < sizeof(struct mdns_header_t))
+		return 0;
+
 	const uint16_t* data = (const uint16_t*)buffer;
 
 	uint16_t query_id = mdns_ntohs(data++);
@@ -1151,6 +1160,8 @@ mdns_listen_parse(
 		} else if (!mdns_string_skip(buffer, data_size, &offset)) {
 			break;
 		}
+		if ((offset + 4) > data_size)
+			break;
 		size_t length = offset - question_offset;
 		data = (const uint16_t*)MDNS_POINTER_OFFSET_CONST(buffer, offset);
 
@@ -1246,7 +1257,7 @@ mdns_multiquery_build(const mdns_query_t* query, size_t count, void* buffer, siz
 	for (size_t iq = 0; iq < count; ++iq) {
 		// Name string
 		data = mdns_string_make(buffer, capacity, data, query[iq].name, query[iq].length, 0);
-		if (!data)
+		if (!data || ((MDNS_POINTER_DIFF(data, buffer) + 4) > capacity))
 			return -1;
 		// Record type
 		data = mdns_htons(data, query[iq].type);
@@ -1311,6 +1322,9 @@ mdns_query_parse(
 #endif
                  const void* buffer, size_t data_size, mdns_record_callback_fn callback, void* user_data,
                  int only_query_id) {
+	if (data_size < sizeof(struct mdns_header_t))
+		return 0;
+
 	const uint16_t* data = (const uint16_t*)buffer;
 
 	uint16_t query_id = mdns_ntohs(data++);
@@ -1328,7 +1342,7 @@ mdns_query_parse(
 	int i;
 	for (i = 0; i < questions; ++i) {
 		size_t offset = MDNS_POINTER_DIFF(data, buffer);
-		if (!mdns_string_skip(buffer, data_size, &offset))
+		if (!mdns_string_skip(buffer, data_size, &offset) || ((offset + 4) > data_size))
 			return 0;
 		data = (const uint16_t*)MDNS_POINTER_OFFSET_CONST(buffer, offset);
 		// Record type and class not used, skip
