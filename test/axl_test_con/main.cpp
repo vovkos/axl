@@ -6348,12 +6348,12 @@ void testUnnamedPipes() {
 #if (_AXL_IO_SSL)
 
 void
-printX509Name(X509_name_st* name) {
+printX509Name(const X509_NAME* name) {
 	int count = X509_NAME_entry_count(name);
 	for (int i = 0; i < count; i++) {
-		X509_NAME_ENTRY* entry = X509_NAME_get_entry(name, i);
-		ASN1_OBJECT* object = X509_NAME_ENTRY_get_object(entry);
-		ASN1_STRING* data = X509_NAME_ENTRY_get_data(entry);
+		const X509_NAME_ENTRY* entry = X509_NAME_get_entry(name, i);
+		const ASN1_OBJECT* object = X509_NAME_ENTRY_get_object(entry);
+		const ASN1_STRING* data = X509_NAME_ENTRY_get_data(entry);
 
 		printf("    %4d: %s: %s\n", OBJ_obj2nid(object), cry::getAsn1ObjectString(object).sz(), cry::getAsn1StringString(data).sz());
 	}
@@ -6367,8 +6367,8 @@ printSslCertificate(X509* cert) {
 	ASN1_INTEGER* serialNumber = X509_get_serialNumber(cert);
 	ASN1_TIME* notBeforeTime = X509_get_notBefore(cert);
 	ASN1_TIME* notAfterTime = X509_get_notAfter(cert);
-	X509_name_st* subjectName = X509_get_subject_name(cert);
-	X509_name_st* issuerName = X509_get_issuer_name(cert);
+	const X509_NAME* subjectName = X509_get_subject_name(cert);
+	const X509_NAME* issuerName = X509_get_issuer_name(cert);
 
 	cry::BigNum bigNum;
 	bigNum.create();
