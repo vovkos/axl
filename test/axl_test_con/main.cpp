@@ -6348,7 +6348,7 @@ void testUnnamedPipes() {
 #if (_AXL_IO_SSL)
 
 void
-printX509Name(const X509_NAME* name) {
+printX509Name(const X509_name_st* name) {
 	int count = X509_NAME_entry_count(name);
 	for (int i = 0; i < count; i++) {
 		const X509_NAME_ENTRY* entry = X509_NAME_get_entry(name, i);
@@ -6367,8 +6367,8 @@ printSslCertificate(X509* cert) {
 	ASN1_INTEGER* serialNumber = X509_get_serialNumber(cert);
 	ASN1_TIME* notBeforeTime = X509_get_notBefore(cert);
 	ASN1_TIME* notAfterTime = X509_get_notAfter(cert);
-	const X509_NAME* subjectName = X509_get_subject_name(cert);
-	const X509_NAME* issuerName = X509_get_issuer_name(cert);
+	const X509_name_st* subjectName = X509_get_subject_name(cert);
+	const X509_name_st* issuerName = X509_get_issuer_name(cert);
 
 	cry::BigNum bigNum;
 	bigNum.create();
