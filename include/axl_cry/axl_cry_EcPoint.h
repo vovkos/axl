@@ -32,7 +32,7 @@ public:
 
 class EcPoint: public sl::Handle<EC_POINT*, FreeEcPoint> {
 public:
-	EcPoint(EC_GROUP* group) {
+	EcPoint(const EC_GROUP* group) {
 		create(group);
 	}
 
@@ -40,16 +40,16 @@ public:
 		sl::Handle<EC_POINT*, FreeEcPoint>(h) {}
 
 	bool
-	create(EC_GROUP* group);
+	create(const EC_GROUP* group);
 
 	bool
 	createCopy(
-		EC_POINT* src,
-		EC_GROUP* group
+		const EC_POINT* src,
+		const EC_GROUP* group
 	);
 
 	bool
-	copy(EC_POINT* src) {
+	copy(const EC_POINT* src) {
 		int result = EC_POINT_copy(m_h, src);
 		return completeWithLastCryptoError(result);
 	}
@@ -57,17 +57,17 @@ public:
 	bool
 	getData(
 		sl::Array<char>* data,
-		EC_GROUP* group,
+		const EC_GROUP* group,
 		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
 		BN_CTX* ctx = NULL
-	);
+	) const;
 
 	sl::Array<char>
 	getData(
-		EC_GROUP* group,
+		const EC_GROUP* group,
 		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
 		BN_CTX* ctx = NULL
-	) {
+	) const {
 		sl::Array<char> data;
 		getData(&data, group, form, ctx);
 		return data;
@@ -75,7 +75,7 @@ public:
 
 	bool
 	setData(
-		EC_GROUP* group,
+		const EC_GROUP* group,
 		const void* p,
 		size_t size,
 		BN_CTX* ctx = NULL
@@ -86,18 +86,18 @@ public:
 
 	bool
 	getBigNum(
-		EC_GROUP* group,
+		const EC_GROUP* group,
 		BIGNUM* bigNum,
 		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
 		BN_CTX* ctx = NULL
-	) {
+	) const {
 		BIGNUM* result = EC_POINT_point2bn(group, m_h, form, bigNum, ctx);
 		return completeWithLastCryptoError(result != NULL);
 	}
 
 	bool
 	setBigNum(
-		EC_GROUP* group,
+		const EC_GROUP* group,
 		const BIGNUM* bigNum,
 		BN_CTX* ctx = NULL
 	) {
@@ -108,20 +108,20 @@ public:
 	bool
 	getDecString(
 		sl::String* string,
-		EC_GROUP* group,
+		const EC_GROUP* group,
 		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
 		BN_CTX* ctx = NULL
-	) {
+	) const {
 		BigNum bigNum;
 		return getBigNum(group, bigNum, form, ctx) && bigNum.getDecString(string);
 	}
 
 	sl::String
 	getDecString(
-		EC_GROUP* group,
+		const EC_GROUP* group,
 		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
 		BN_CTX* ctx = NULL
-	) {
+	) const {
 		sl::String string;
 		getDecString(&string, group, form, ctx);
 		return string;
@@ -129,7 +129,7 @@ public:
 
 	bool
 	setDecString(
-		EC_GROUP* group,
+		const EC_GROUP* group,
 		const sl::StringRef& string,
 		BN_CTX* ctx = NULL
 	) {
@@ -140,17 +140,17 @@ public:
 	bool
 	getHexString(
 		sl::String* string,
-		EC_GROUP* group,
+		const EC_GROUP* group,
 		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
 		BN_CTX* ctx = NULL
-	);
+	) const;
 
 	sl::String
 	getHexString(
-		EC_GROUP* group,
+		const EC_GROUP* group,
 		point_conversion_form_t form = POINT_CONVERSION_COMPRESSED,
 		BN_CTX* ctx = NULL
-	) {
+	) const {
 		sl::String string;
 		getHexString(&string, group, form, ctx);
 		return string;
@@ -158,7 +158,7 @@ public:
 
 	bool
 	setHexString(
-		EC_GROUP* group,
+		const EC_GROUP* group,
 		const sl::StringRef& string,
 		BN_CTX* ctx = NULL
 	) {
@@ -167,32 +167,32 @@ public:
 	}
 
 	bool
-	isAtInfinity(EC_GROUP* group) {
+	isAtInfinity(const EC_GROUP* group) const {
 		return EC_POINT_is_at_infinity(group, m_h) == 1;
 	}
 
 	bool
 	isOnCurve(
-		EC_GROUP* group,
+		const EC_GROUP* group,
 		BN_CTX* ctx = NULL
-	) {
+	) const {
 		return EC_POINT_is_on_curve(group, m_h, ctx) == 1;
 	}
 
 	bool
 	isEqual(
-		EC_GROUP* group,
-		EC_POINT* op,
+		const EC_GROUP* group,
+		const EC_POINT* op,
 		BN_CTX* ctx = NULL
-	) {
+	) const {
 		return EC_POINT_cmp(group, m_h, op, ctx) == 1;
 	}
 
 	bool
 	add(
-		EC_GROUP* group,
-		EC_POINT* op1,
-		EC_POINT* op2,
+		const EC_GROUP* group,
+		const EC_POINT* op1,
+		const EC_POINT* op2,
 		BN_CTX* ctx = NULL
 	) {
 		int result = EC_POINT_add(group, m_h, op1, op2, ctx);
@@ -201,10 +201,10 @@ public:
 
 	bool
 	mul(
-		EC_GROUP* group,
-		BIGNUM* op1,
-		EC_POINT* op2,
-		BIGNUM* op3,
+		const EC_GROUP* group,
+		const BIGNUM* op1,
+		const EC_POINT* op2,
+		const BIGNUM* op3,
 		BN_CTX* ctx = NULL
 	) {
 		int result = EC_POINT_mul(group, m_h, op1, op2, op3, ctx);
@@ -213,8 +213,8 @@ public:
 
 	bool
 	mul(
-		EC_GROUP* group,
-		BIGNUM* op,
+		const EC_GROUP* group,
+		const BIGNUM* op,
 		BN_CTX* ctx = NULL
 	) {
 		int result = EC_POINT_mul(group, m_h, op, NULL, NULL, ctx);
@@ -223,8 +223,8 @@ public:
 
 	bool
 	dbl(
-		EC_GROUP* group,
-		EC_POINT* op,
+		const EC_GROUP* group,
+		const EC_POINT* op,
 		BN_CTX* ctx = NULL
 	) {
 		int result = EC_POINT_dbl(group, m_h, op, ctx);
@@ -233,7 +233,7 @@ public:
 
 	bool
 	invert(
-		EC_GROUP* group,
+		const EC_GROUP* group,
 		BN_CTX* ctx = NULL
 	) {
 		int result = EC_POINT_invert(group, m_h, ctx);
@@ -242,7 +242,7 @@ public:
 
 	bool
 	makeAffine(
-		EC_GROUP* group,
+		const EC_GROUP* group,
 		BN_CTX* ctx = NULL
 	) {
 		int result = EC_POINT_make_affine(group, m_h, ctx);

@@ -77,21 +77,21 @@ public:
 	create();
 
 	bool
-	createCopy(BIGNUM* src);
+	createCopy(const BIGNUM* src);
 
 	bool
-	copy(BIGNUM* src) {
+	copy(const BIGNUM* src) {
 		BIGNUM* result = BN_copy(m_h, src);
 		return completeWithLastCryptoError(result != NULL);
 	}
 
 	size_t
-	getBitCount() {
+	getBitCount() const {
 		return BN_num_bits(m_h);
 	}
 
 	size_t
-	getSize() {
+	getSize() const {
 		return BN_num_bytes(m_h);
 	}
 
@@ -99,16 +99,16 @@ public:
 	getData(
 		void* p,
 		size_t size
-	) {
+	) const {
 		ASSERT(size >= getSize());
 		return BN_bn2bin(m_h, (uchar_t*)p); // can't fail; 0 for a zero value
 	}
 
 	bool
-	getData(sl::Array<char>* data);
+	getData(sl::Array<char>* data) const;
 
 	sl::Array<char>
-	getData() {
+	getData() const {
 		sl::Array<char> data;
 		getData(&data);
 		return data;
@@ -124,10 +124,10 @@ public:
 	}
 
 	bool
-	getDecString(sl::String* string);
+	getDecString(sl::String* string) const;
 
 	sl::String
-	getDecString() {
+	getDecString() const {
 		sl::String string;
 		getDecString(&string);
 		return string;
@@ -140,10 +140,10 @@ public:
 	}
 
 	bool
-	getHexString(sl::String* string);
+	getHexString(sl::String* string) const;
 
 	sl::String
-	getHexString() {
+	getHexString() const {
 		sl::String string;
 		getHexString(&string);
 		return string;
@@ -156,7 +156,7 @@ public:
 	}
 
 	BN_ULONG
-	getWord() {
+	getWord() const {
 		return BN_get_word(m_h);
 	}
 
@@ -183,7 +183,7 @@ public:
 
 inline
 bool
-BigNum::getData(sl::Array<char>* data) {
+BigNum::getData(sl::Array<char>* data) const {
 	size_t size = getSize();
 	if (!data->setCount(size))
 		return false;

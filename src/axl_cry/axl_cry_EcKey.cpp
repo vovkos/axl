@@ -42,7 +42,7 @@ EcKey::create(uint_t curveId) {
 }
 
 bool
-EcKey::createCopy(EC_KEY* src) {
+EcKey::createCopy(const EC_KEY* src) {
 	close();
 
 	m_h = EC_KEY_dup(src);
@@ -55,7 +55,7 @@ EcKey::setPublicKeyData(
 	size_t size,
 	BN_CTX* ctx
 ) {
-	EC_GROUP* group = getGroup();
+	const EC_GROUP* group = getGroup();
 	EcPoint key(group);
 
 	return
@@ -68,7 +68,7 @@ EcKey::setPublicKeyDecString(
 	const sl::StringRef& string,
 	BN_CTX* ctx
 ) {
-	EC_GROUP* group = getGroup();
+	const EC_GROUP* group = getGroup();
 	EcPoint key(group);
 
 	return
@@ -81,7 +81,7 @@ EcKey::setPublicKeyHexString(
 	const sl::StringRef& string,
 	BN_CTX* ctx
 ) {
-	EC_GROUP* group = getGroup();
+	const EC_GROUP* group = getGroup();
 	EcPoint key(group);
 
 	return

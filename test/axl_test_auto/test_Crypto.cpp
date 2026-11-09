@@ -74,8 +74,12 @@ void run() {
 	cry::EcKey key(NID_secp112r1);
 	key.generateKey();
 
-	cry::BigNum privateKey = key.getPrivateKey();
-	cry::EcPoint publicKey = key.getPublicKey();
+	cry::BigNum privateKey;
+	privateKey.copy(key.getPrivateKey());
+
+	cry::EcPoint publicKey(key.getGroup());
+	publicKey.copy(key.getPublicKey());
+
 	printf("private: %s\n", privateKey.getHexString().sz());
 	printf("public:  %s\n", publicKey.getHexString(key.getGroup()).sz());
 
@@ -88,10 +92,6 @@ void run() {
 	bool result = verifyEcProductKey(key, userName, productKey);
 	printf("verify:  %d\n", result);
 	AXL_TEST_ASSERT(result);
-
-	privateKey.detach();
-	publicKey.detach();
-
 }
 
 //..............................................................................

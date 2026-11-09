@@ -51,10 +51,10 @@ public:
 	create(uint_t curveId);
 
 	bool
-	createCopy(EC_KEY* src);
+	createCopy(const EC_KEY* src);
 
 	bool
-	copy(EC_KEY* src) {
+	copy(const EC_KEY* src) {
 		EC_KEY* result = EC_KEY_copy(m_h, src);
 		return completeWithLastCryptoError(result != NULL);
 	}
@@ -66,7 +66,7 @@ public:
 	}
 
 	uint_t
-	getFlags() {
+	getFlags() const {
 		return EC_KEY_get_flags(m_h);
 	}
 
@@ -84,7 +84,7 @@ public:
 	setFlags(uint_t flags);
 
 	uint_t
-	getEncFlags() {
+	getEncFlags() const {
 		return EC_KEY_get_enc_flags(m_h);
 	}
 
@@ -93,24 +93,24 @@ public:
 		EC_KEY_set_enc_flags(m_h, flags);
 	}
 
-	EC_GROUP*
-	getGroup() {
-		return (EC_GROUP*)EC_KEY_get0_group(m_h);
+	const EC_GROUP*
+	getGroup() const {
+		return EC_KEY_get0_group(m_h);
 	}
 
 	bool
-	setGroup(EC_GROUP* group) {
+	setGroup(const EC_GROUP* group) {
 		int result = EC_KEY_set_group(m_h, group);
 		return completeWithLastCryptoError(result);
 	}
 
-	BIGNUM*
-	getPrivateKey() {
-		return (BIGNUM*)EC_KEY_get0_private_key(m_h);
+	const BIGNUM*
+	getPrivateKey() const {
+		return EC_KEY_get0_private_key(m_h);
 	}
 
 	bool
-	setPrivateKey(BIGNUM* key) {
+	setPrivateKey(const BIGNUM* key) {
 		int result = EC_KEY_set_private_key(m_h, key);
 		return completeWithLastCryptoError(result);
 	}
@@ -136,13 +136,13 @@ public:
 		return key.setHexString(string) && setPrivateKey(key);
 	}
 
-	EC_POINT*
-	getPublicKey() {
-		return (EC_POINT*)EC_KEY_get0_public_key(m_h);
+	const EC_POINT*
+	getPublicKey() const {
+		return EC_KEY_get0_public_key(m_h);
 	}
 
 	bool
-	setPublicKey(EC_POINT* key) {
+	setPublicKey(const EC_POINT* key) {
 		int result = EC_KEY_set_public_key(m_h, key);
 		return completeWithLastCryptoError(result);
 	}
@@ -173,7 +173,7 @@ public:
 	}
 
 	size_t
-	getMaxSignatureSize() {
+	getMaxSignatureSize() const {
 		return ECDSA_size(m_h);
 	}
 

@@ -273,7 +273,7 @@ public:
 	}
 
 	bool
-	useCertificate(const X509* cert);
+	useCertificate(X509* cert);
 
 	bool
 	useCertificateFile(
@@ -288,7 +288,7 @@ public:
 	}
 
 	bool
-	usePrivateKey(const EVP_PKEY* key);
+	usePrivateKey(EVP_PKEY* key);
 
 	bool
 	usePrivateKeyFile(

@@ -58,9 +58,9 @@ SslCtx::setCipherList(const sl::StringRef& listString) {
 }
 
 bool
-SslCtx::useCertificate(const X509* cert) {
+SslCtx::useCertificate(X509* cert) {
 	ASSERT(m_h);
-	int result = ::SSL_CTX_use_certificate(m_h, (X509*)cert);
+	int result = ::SSL_CTX_use_certificate(m_h, cert);
 	return cry::completeWithLastCryptoError(result);
 }
 
@@ -75,9 +75,9 @@ SslCtx::useCertificateFile(
 }
 
 bool
-SslCtx::usePrivateKey(const EVP_PKEY* key) {
+SslCtx::usePrivateKey(EVP_PKEY* key) {
 	ASSERT(m_h);
-	int result = ::SSL_CTX_use_PrivateKey(m_h, (EVP_PKEY*)key);
+	int result = ::SSL_CTX_use_PrivateKey(m_h, key);
 	return cry::completeWithLastCryptoError(result);
 }
 
@@ -126,9 +126,9 @@ SslCtx::usePrivateKeyPemFile(
 }
 
 bool
-SslCtx::addExtraChainCertificate(const X509* cert) {
+SslCtx::addExtraChainCertificate(X509* cert) {
 	ASSERT(m_h);
-	int result = ::SSL_CTX_add_extra_chain_cert(m_h, (X509*)cert);
+	int result = ::SSL_CTX_add_extra_chain_cert(m_h, cert);
 	return cry::completeWithLastCryptoError(result);
 }
 

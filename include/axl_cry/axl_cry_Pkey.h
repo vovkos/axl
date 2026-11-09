@@ -57,10 +57,10 @@ public:
 		::EVP_PKEY_up_ref(m_h);
 	}
 
-	EC_KEY*
+	const EC_KEY*
 	getEcKey() const {
 		ASSERT(m_h);
-		return (EC_KEY*)::EVP_PKEY_get0_EC_KEY(m_h);
+		return ::EVP_PKEY_get0_EC_KEY(m_h);
 	}
 
 	PrivateKeyResult

@@ -34,7 +34,7 @@ BigNum::create() {
 }
 
 bool
-BigNum::createCopy(BIGNUM* src) {
+BigNum::createCopy(const BIGNUM* src) {
 	close();
 
 	m_h = BN_dup(src);
@@ -42,7 +42,7 @@ BigNum::createCopy(BIGNUM* src) {
 }
 
 bool
-BigNum::getDecString(sl::String* string) {
+BigNum::getDecString(sl::String* string) const {
 	char* p = BN_bn2dec(m_h);
 	if (!p)
 		return failWithLastCryptoError();
@@ -53,7 +53,7 @@ BigNum::getDecString(sl::String* string) {
 }
 
 bool
-BigNum::getHexString(sl::String* string) {
+BigNum::getHexString(sl::String* string) const {
 	char* p = BN_bn2hex(m_h);
 	if (!p)
 		return failWithLastCryptoError();

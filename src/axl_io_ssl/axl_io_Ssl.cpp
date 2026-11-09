@@ -13,7 +13,6 @@
 #include "axl_io_Ssl.h"
 #include "axl_io_SslCipher.h"
 #include "axl_cry_Pkey.h"
-#include "axl_cry_EcKey.h"
 #include "axl_cry_EcGroup.h"
 
 namespace axl {
@@ -85,11 +84,9 @@ Ssl::getKeyExchangeGroupName() {
 			return sl::formatString("DH %d", ::EVP_PKEY_bits(key));
 
 		if (nid == EVP_PKEY_EC) { // the curve is inside the key
-			cry::EcKey ecKey(key.getEcKey());
-			cry::EcGroup ecGroup(ecKey.getGroup());
-			nid = ecGroup.getCurveId();
-			ecKey.detach();
-			ecGroup.detach();
+			const EC_KEY* ecKey = key.getEcKey();
+			const EC_GROUP* group = ::EC_KEY_get0_group(ecKey);
+			nid = ::EC_GROUP_get_curve_name(group);
 		}
 	} else {
 		const SSL_CIPHER* cipher = getCurrentCipher();
@@ -120,9 +117,9 @@ Ssl::setExtraData(
 }
 
 bool
-Ssl::useCertificate(const X509* cert) {
+Ssl::useCertificate(X509* cert) {
 	ASSERT(m_h);
-	int result = ::SSL_use_certificate(m_h, (X509*)cert);
+	int result = ::SSL_use_certificate(m_h, cert);
 	return complete(result);
 }
 
@@ -137,9 +134,9 @@ Ssl::useCertificateFile(
 }
 
 bool
-Ssl::usePrivateKey(const EVP_PKEY* key) {
+Ssl::usePrivateKey(EVP_PKEY* key) {
 	ASSERT(m_h);
-	int result = ::SSL_use_PrivateKey(m_h, (EVP_PKEY*)key);
+	int result = ::SSL_use_PrivateKey(m_h, key);
 	return complete(result);
 }
 
