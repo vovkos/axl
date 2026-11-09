@@ -129,7 +129,11 @@ bool
 SslCtx::addExtraChainCertificate(X509* cert) {
 	ASSERT(m_h);
 	int result = ::SSL_CTX_add_extra_chain_cert(m_h, cert);
-	return cry::completeWithLastCryptoError(result);
+	if (!result)
+		return cry::failWithLastCryptoError();
+
+	::X509_up_ref(cert); // SSL_CTX_add_extra_chain_cert() takes ownership of the cert
+	return true;
 }
 
 //..............................................................................

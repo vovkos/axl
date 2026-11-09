@@ -222,7 +222,7 @@ public:
 	void
 	clearExtraChainCertificates() {
 		ASSERT(m_h);
-		::SSL_CTX_clear_chain_certs(m_h);
+		::SSL_CTX_clear_extra_chain_certs(m_h);
 	}
 };
 
