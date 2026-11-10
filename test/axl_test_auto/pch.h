@@ -39,6 +39,7 @@
 #include "axl_rc_Child.h"
 #include "axl_io_File.h"
 #include "axl_io_MappedFile.h"
+#include "axl_io_SockAddr.h"
 #include "axl_lex_RagelLexer.h"
 
 #include "axl_ini_Parser.h"

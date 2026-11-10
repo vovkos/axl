@@ -38,6 +38,7 @@ set(
 	test_Ref.cpp
 	test_QuadraticHashTable.cpp
 	test_RobinHashTable.cpp
+	test_SockAddr.cpp
 	test_SlruCache.cpp
 	test_StatBTree.cpp
 	test_StatBinTree.cpp
