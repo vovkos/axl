@@ -13,7 +13,6 @@
 #include "axl_io_SockAddr.h"
 #include "axl_io_SockAddrParser.h"
 #include "axl_err_Error.h"
-#include "axl_sl_BitMap.h"
 
 namespace axl {
 namespace io {
@@ -29,6 +28,11 @@ getSockAddrFamilyString(uint_t family) {
 	case AF_INET6:
 		return "IPv6";
 
+#if (_AXL_IO_SOCKADDR_UN)
+	case AF_UNIX:
+		return "Unix";
+#endif
+
 	default:
 		return "unknown-sock-addr-family";
 	}
@@ -42,6 +46,11 @@ getSockAddrFamilySize(uint_t family) {
 
 	case AF_INET6:
 		return sizeof(sockaddr_in6);
+
+#if (_AXL_IO_SOCKADDR_UN)
+	case AF_UNIX:
+		return sizeof(sockaddr_un);
+#endif
 
 	default:
 		return sizeof(sockaddr);
@@ -66,23 +75,6 @@ getSockProtoString(uint_t proto) {
 }
 
 //..............................................................................
-
-size_t
-getSockAddrNetMaskBitCount_ip4(const sockaddr_in* addr) {
-	size_t bitIdx = sl::findZeroBit((size_t*)&addr->sin_addr, 1, 0);
-	return AXL_MIN(bitIdx, 32);
-}
-
-size_t
-getSockAddrNetMaskBitCount_ip6(const sockaddr_in6* addr) {
-	size_t bitIdx = sl::findZeroBit(
-		(size_t*)&addr->sin6_addr,
-		sizeof(addr->sin6_addr) / sizeof(size_t),
-		0
-	);
-
-	return AXL_MIN(bitIdx, 128);
-}
 
 size_t
 getSockAddrNetMaskBitCount(const sockaddr* addr) {
@@ -138,27 +130,6 @@ createSockAddrNetMask_ip6(
 //..............................................................................
 
 bool
-isSockAddrEqual_ip4(
-	const sockaddr_in* addr1,
-	const sockaddr_in* addr2
-) {
-	return
-		addr1->sin_port == addr2->sin_port &&
-		*(const uint32_t*)&addr1->sin_addr == *(const uint32_t*)&addr2->sin_addr;
-}
-
-bool
-isSockAddrEqual_ip6(
-	const sockaddr_in6* addr1,
-	const sockaddr_in6* addr2
-) {
-	return
-		addr1->sin6_port == addr2->sin6_port &&
-		addr1->sin6_scope_id == addr2->sin6_scope_id &&
-		memcmp(&addr1->sin6_addr, &addr2->sin6_addr, sizeof(addr1->sin6_addr)) == 0;
-}
-
-bool
 isSockAddrEqual(
 	const sockaddr* addr1,
 	const sockaddr* addr2
@@ -172,6 +143,11 @@ isSockAddrEqual(
 
 	case AF_INET6:
 		return isSockAddrEqual_ip6((const sockaddr_in6*)addr1, (const sockaddr_in6*)addr2);
+
+#if (_AXL_IO_SOCKADDR_UN)
+	case AF_UNIX:
+		return isSockAddrEqual_un((const sockaddr_un*)addr1, (const sockaddr_un*)addr2);
+#endif
 
 	default:
 		return false;
@@ -224,6 +200,13 @@ isSockAddrMatch(
 			addr->sa_family == AF_INET6 &&
 			isSockAddrMatch_ip6((const sockaddr_in6*)addr, (const sockaddr_in6*)filterAddr);
 
+#if (_AXL_IO_SOCKADDR_UN)
+	case AF_UNIX:
+		return
+			addr->sa_family == AF_UNIX &&
+			isSockAddrMatch_un((const sockaddr_un*)addr, (const sockaddr_un*)filterAddr);
+#endif
+
 	default:
 		return false;
 	}
@@ -265,6 +248,19 @@ parseSockAddr_ip6(
 	SockAddrParser parser(string);
 	return parser.parse(addr);
 }
+
+#if (_AXL_IO_SOCKADDR_UN)
+
+bool
+parseSockAddr_un(
+	sockaddr_un* addr,
+	const sl::StringRef& string
+) {
+	SockAddrParser parser(string);
+	return parser.parse(addr);
+}
+
+#endif
 
 bool
 parseSockAddr(
@@ -426,6 +422,11 @@ getSockAddrString(
 	case AF_INET6:
 		return getSockAddrString_ip6(string, (const sockaddr_in6*)addr);
 
+#if (_AXL_IO_SOCKADDR_UN)
+	case AF_UNIX:
+		return getSockAddrString_un(string, (const sockaddr_un*)addr);
+#endif
+
 	default:
 		string->clear();
 		return 0;
@@ -512,6 +513,20 @@ SockAddr::createNetMask(
 		m_addr.sa_family = family;
 	}
 }
+
+//..............................................................................
+
+#if (_AXL_IO_SOCKADDR_UN)
+
+void
+UnixSockAddr::setup(const sockaddr* addr) {
+	clear();
+
+	size_t size = getSockAddrSize(addr);
+	memcpy(this, addr, AXL_MIN(size, sizeof(UnixSockAddrStorage)));
+}
+
+#endif
 
 //..............................................................................
 

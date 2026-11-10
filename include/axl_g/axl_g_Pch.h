@@ -228,6 +228,12 @@
 #	include <shellapi.h>
 #	include <crtdbg.h>
 #	include <intrin.h>
+#	ifdef __has_include
+#		if __has_include(<afunix.h>) // Windows SDK 10.0.17063+
+#			include <afunix.h>
+#			define _AXL_IO_SOCKADDR_UN 1
+#		endif
+#	endif
 #elif (_AXL_OS_POSIX)
 #	include <unistd.h>
 #	include <assert.h>
@@ -247,7 +253,8 @@
 #	include <termios.h>
 #	include <libgen.h>
 #	include <dirent.h>
-
+#	include <sys/un.h>
+#	define _AXL_IO_SOCKADDR_UN 1
 #	if (_AXL_OS_DARWIN)
 #		include <machine/endian.h>
 #		include <mach/mach_error.h>

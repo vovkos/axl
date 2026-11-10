@@ -209,6 +209,27 @@ SockAddrParser::parse(sockaddr_in6* addr) {
 	return true;
 }
 
+#if (_AXL_IO_SOCKADDR_UN)
+
+bool
+SockAddrParser::parse(sockaddr_un* addr) {
+	memset(addr, 0, sizeof(sockaddr_un));
+	addr->sun_family = AF_UNIX;
+
+	size_t length = m_end - m_p;
+	if (!length)
+		return err::fail(err::SystemErrorCode_InvalidAddress);
+
+	if (length >= sizeof(addr->sun_path)) // leave room for '\0'
+		return err::fail(err::SystemErrorCode_BufferTooSmall);
+
+	memcpy(addr->sun_path, m_p, length);
+	m_p = m_end;
+	return true;
+}
+
+#endif
+
 bool
 SockAddrParser::parse(
 	sockaddr* addr,

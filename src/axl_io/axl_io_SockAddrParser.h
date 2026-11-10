@@ -53,6 +53,11 @@ public:
 	bool
 	parse(sockaddr_in6* addr);
 
+#if (_AXL_IO_SOCKADDR_UN)
+	bool
+	parse(sockaddr_un* addr); // the whole remaining string is the path
+#endif
+
 	bool
 	parse(
 		sockaddr* addr,
