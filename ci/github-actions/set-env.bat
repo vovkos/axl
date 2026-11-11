@@ -40,8 +40,6 @@ exit -1
 :x86
 set TARGET_CPU=x86
 set CMAKE_ARCH_OPTIONS=-A Win32
-set OPENSSL_DIR_SUFFIX=-Win32
-set OPENSSL_DLL_SUFFIX=-1_1
 set CHOCO_PLATFORM=--x86
 set PROGRAM_FILES_DIR_SUFFIX= (x86)
 shift
@@ -50,8 +48,6 @@ goto :loop
 :amd64
 set TARGET_CPU=amd64
 set CMAKE_ARCH_OPTIONS=-A x64
-set OPENSSL_DIR_SUFFIX=
-set OPENSSL_DLL_SUFFIX=-1_1-x64
 set CHOCO_PLATFORM=
 set PROGRAM_FILES_DIR_SUFFIX=
 shift
@@ -60,8 +56,6 @@ goto :loop
 :arm64
 set TARGET_CPU=arm64
 set CMAKE_ARCH_OPTIONS=-A ARM64
-set OPENSSL_DIR_SUFFIX=
-set OPENSSL_DLL_SUFFIX=-3-arm64
 set CHOCO_PLATFORM=
 set PROGRAM_FILES_DIR_SUFFIX=
 shift
@@ -118,24 +112,3 @@ set CMAKE_BUILD_FLAGS= ^
 	/nologo ^
 	/verbosity:minimal ^
 	/consoleloggerparameters:Summary
-
-:: . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-
-set EXPAT_VERSION=2.7.5
-set EXPAT_VERSION_TAG=R_2_7_5
-set EXPAT_DOWNLOAD_FILE=expat-%EXPAT_VERSION%.tar.gz
-set EXPAT_DOWNLOAD_URL=https://github.com/libexpat/libexpat/releases/download/%EXPAT_VERSION_TAG%/%EXPAT_DOWNLOAD_FILE%
-
-set LUA_VERSION=5.4.7
-set LUA_DOWNLOAD_URL=https://github.com/walterschell/Lua/archive/refs/tags/v%LUA_VERSION%.zip
-
-set OPENSSL_VERSION=1.1.1.2100
-
-set RAGEL_DOWNLOAD_URL=https://github.com/eloraiby/ragel-windows/raw/master/ragel.exe
-
-echo ---------------------------------------------------------------------------
-echo EXPAT_DOWNLOAD_URL: %EXPAT_DOWNLOAD_URL%
-echo LUA_DOWNLOAD_URL:   %LUA_DOWNLOAD_URL%
-echo OPENSSL_VERSION:    %OPENSSL_VERSION%
-echo RAGEL_DOWNLOAD_URL: %RAGEL_DOWNLOAD_URL%
-echo ---------------------------------------------------------------------------

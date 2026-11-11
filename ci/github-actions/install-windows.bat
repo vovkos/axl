@@ -16,6 +16,22 @@ set DOWNLOAD_DIR_CMAKE=%DOWNLOAD_DIR:\=/%
 
 :: . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
+:: Dependency versions
+
+set EXPAT_VERSION=2.7.5
+set EXPAT_VERSION_TAG=R_2_7_5
+set EXPAT_DOWNLOAD_FILE=expat-%EXPAT_VERSION%.tar.gz
+set EXPAT_DOWNLOAD_URL=https://github.com/libexpat/libexpat/releases/download/%EXPAT_VERSION_TAG%/%EXPAT_DOWNLOAD_FILE%
+
+set LUA_VERSION=5.4.7
+set LUA_DOWNLOAD_URL=https://github.com/walterschell/Lua/archive/refs/tags/v%LUA_VERSION%.zip
+
+set OPENSSL_VERSION=1.1.1.2100
+
+set RAGEL_DOWNLOAD_URL=https://github.com/eloraiby/ragel-windows/raw/master/ragel.exe
+
+:: . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 :: wget
 
 echo Installing wget...
@@ -57,12 +73,23 @@ ren expat-%EXPAT_VERSION% expat || exit
 
 :: OpenSSL
 
-:: choco doesn't ship arm64 builds only
+if /i "%TARGET_CPU%" == "arm64" goto :openssl_arm64
+if /i "%TARGET_CPU%" == "x86" goto :openssl_x86
 
-if /i not "%TARGET_CPU%" == "arm64" goto :openssl_install
+set OPENSSL_DIR_SUFFIX=
+set OPENSSL_DLL_SUFFIX=-1_1-x64
+goto :openssl_install
 
-:: on arm64 we use preinstalled OpenSSL 3 (libs are at lib/VC/<arch>/<crt>)
+:openssl_x86
+set OPENSSL_DIR_SUFFIX=-Win32
+set OPENSSL_DLL_SUFFIX=-1_1
+goto :openssl_install
 
+:: choco doesn't ship arm64 builds; on arm64 we use preinstalled OpenSSL 3
+:: (libs are at lib/VC/<arch>/<crt>)
+
+:openssl_arm64
+set OPENSSL_DLL_SUFFIX=-3-arm64
 set OPENSSL_ROOT_DIR=C:/Program Files/OpenSSL
 
 if /i "%CONFIGURATION%" == "Debug" (
