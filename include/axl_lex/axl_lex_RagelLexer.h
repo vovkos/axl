@@ -189,8 +189,8 @@ public:
 		int col,
 		size_t offset
 	) {
-		setLineCol(line, col);
 		m_begin -= offset;
+		setLineCol(line, col);
 	}
 
 	void
