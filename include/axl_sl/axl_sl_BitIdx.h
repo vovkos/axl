@@ -48,11 +48,14 @@ getLoBit64(uint64_t x) {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// finding the highest set bit, branch-free -- from Hacker's Delight
+// constexpr versions below are branch-free folds from Hacker's Delight;
+// however, compilers emit them literally (~4x longer than the getHiBitIdx-based versions)
+
+// finding the highest set bit
 
 constexpr
 uint8_t
-getHiBit8(uint8_t x) {
+getHiBit8_const(uint8_t x) {
 	x = x | (x >> 1);
 	x = x | (x >> 2);
 	x = x | (x >> 4);
@@ -61,7 +64,7 @@ getHiBit8(uint8_t x) {
 
 constexpr
 uint16_t
-getHiBit16(uint16_t x) {
+getHiBit16_const(uint16_t x) {
 	x = x | (x >> 1);
 	x = x | (x >> 2);
 	x = x | (x >> 4);
@@ -71,7 +74,7 @@ getHiBit16(uint16_t x) {
 
 constexpr
 uint32_t
-getHiBit32(uint32_t x) {
+getHiBit32_const(uint32_t x) {
 	x = x | (x >> 1);
 	x = x | (x >> 2);
 	x = x | (x >> 4);
@@ -82,7 +85,7 @@ getHiBit32(uint32_t x) {
 
 constexpr
 uint64_t
-getHiBit64(uint64_t x) {
+getHiBit64_const(uint64_t x) {
 	x = x | (x >> 1);
 	x = x | (x >> 2);
 	x = x | (x >> 4);
@@ -94,11 +97,11 @@ getHiBit64(uint64_t x) {
 
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-// finding closest power-of-2, branch-free -- from Hacker's Delight
+// finding closest power-of-2
 
 constexpr
 uint8_t
-getPowerOf2Ge8(uint8_t x) {
+getPowerOf2Ge8_const(uint8_t x) {
 	x = x - 1;
 	x = x | (x >> 1);
 	x = x | (x >> 2);
@@ -108,7 +111,7 @@ getPowerOf2Ge8(uint8_t x) {
 
 constexpr
 uint16_t
-getPowerOf2Ge16(uint16_t x) {
+getPowerOf2Ge16_const(uint16_t x) {
 	x = x - 1;
 	x = x | (x >> 1);
 	x = x | (x >> 2);
@@ -119,7 +122,7 @@ getPowerOf2Ge16(uint16_t x) {
 
 constexpr
 uint32_t
-getPowerOf2Ge32(uint32_t x) {
+getPowerOf2Ge32_const(uint32_t x) {
 	x = x - 1;
 	x = x | (x >> 1);
 	x = x | (x >> 2);
@@ -131,7 +134,7 @@ getPowerOf2Ge32(uint32_t x) {
 
 constexpr
 uint64_t
-getPowerOf2Ge64(uint64_t x) {
+getPowerOf2Ge64_const(uint64_t x) {
 	x = x - 1;
 	x = x | (x >> 1);
 	x = x | (x >> 2);
@@ -145,13 +148,13 @@ getPowerOf2Ge64(uint64_t x) {
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 #if (AXL_PTR_BITS == 64)
-#	define getLoBit      getLoBit64
-#	define getHiBit      getHiBit64
-#	define getPowerOf2Ge getPowerOf2Ge64
+#	define getLoBit            getLoBit64
+#	define getHiBit_const      getHiBit64_const
+#	define getPowerOf2Ge_const getPowerOf2Ge64_const
 #else
-#	define getLoBit      getLoBit32
-#	define getHiBit      getHiBit32
-#	define getPowerOf2Ge getPowerOf2Ge32
+#	define getLoBit            getLoBit32
+#	define getHiBit_const      getHiBit32_const
+#	define getPowerOf2Ge_const getPowerOf2Ge32_const
 #endif
 
 //..............................................................................
@@ -271,12 +274,74 @@ getHiBitIdx16(uint16_t x) {
     return getHiBitIdx32(x);
 }
 
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// finding the highest set bit via its index, branch-free
+
+inline
+uint8_t
+getHiBit8(uint8_t x) {
+	return (uint8_t)((1 << getHiBitIdx8((uint8_t)(x | 1))) & x);
+}
+
+inline
+uint16_t
+getHiBit16(uint16_t x) {
+	return (uint16_t)((1 << getHiBitIdx16((uint16_t)(x | 1))) & x);
+}
+
+inline
+uint32_t
+getHiBit32(uint32_t x) {
+	return ((uint32_t)1 << getHiBitIdx32(x | 1)) & x;
+}
+
+inline
+uint64_t
+getHiBit64(uint64_t x) {
+	return ((uint64_t)1 << getHiBitIdx64(x | 1)) & x;
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+// finding closest power-of-2 via the highest bit's index, branch-free
+
+inline
+uint8_t
+getPowerOf2Ge8(uint8_t x) {
+	return (uint8_t)((2 << getHiBitIdx8((uint8_t)((x - 1) | 1))) - (x == 1));
+}
+
+inline
+uint16_t
+getPowerOf2Ge16(uint16_t x) {
+	return (uint16_t)((2 << getHiBitIdx16((uint16_t)((x - 1) | 1))) - (x == 1));
+}
+
+inline
+uint32_t
+getPowerOf2Ge32(uint32_t x) {
+	return ((uint32_t)2 << getHiBitIdx32((x - 1) | 1)) - (x == 1);
+}
+
+inline
+uint64_t
+getPowerOf2Ge64(uint64_t x) {
+	return ((uint64_t)2 << getHiBitIdx64((x - 1) | 1)) - (x == 1);
+}
+
+// . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 #if (AXL_PTR_BITS == 64)
-#	define getLoBitIdx  getLoBitIdx64
-#	define getHiBitIdx  getHiBitIdx64
+#	define getLoBitIdx   getLoBitIdx64
+#	define getHiBitIdx   getHiBitIdx64
+#	define getHiBit      getHiBit64
+#	define getPowerOf2Ge getPowerOf2Ge64
 #else
-#	define getLoBitIdx  getLoBitIdx32
-#	define getHiBitIdx  getHiBitIdx32
+#	define getLoBitIdx   getLoBitIdx32
+#	define getHiBitIdx   getHiBitIdx32
+#	define getHiBit      getHiBit32
+#	define getPowerOf2Ge getPowerOf2Ge32
 #endif
 
 //..............................................................................
@@ -446,14 +511,13 @@ align(T x) {
 // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
 template <size_t growLimit>
-constexpr
 size_t
 getAllocSize(size_t size) {
 	static_assert(isPowerOf2(growLimit), "grow limit must be a power of 2");
 	return size < growLimit ? getPowerOf2Ge(size) : align<growLimit>(size);
 }
 
-constexpr
+inline
 size_t
 getAllocSize(size_t size) {
 	return getAllocSize<4 * 1024>(size); // 4K grow limit
@@ -463,11 +527,10 @@ template <
 	typename T,
 	size_t growSizeLimit = 4 * 1024 // same 4K grow limit
 >
-constexpr
 size_t
 getAllocCount(size_t count) {
 	constexpr size_t growLimit = growSizeLimit > sizeof(T) ?
-		getPowerOf2Ge(growSizeLimit / sizeof(T)) :
+		getPowerOf2Ge_const(growSizeLimit / sizeof(T)) :
 		1;
 
 	return getAllocSize<growLimit>(count);
