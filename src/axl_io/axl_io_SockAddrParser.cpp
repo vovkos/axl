@@ -96,8 +96,13 @@ SockAddrParser::parse(in6_addr* addr) {
 	size_t i = 0;
 	while (i < 8) {
 		result = tryChar(':');
-		if (result)
+		if (result) {
 			zeroRunIdx = i;
+
+			skipWhiteSpace();
+			if (m_p >= m_end || !isxdigit(*m_p)) // trailing zero run, e.g. "fe80::" or "::"
+				break;
+		}
 
 		uint_t word;
 		result = parseInt(&word, 16);
@@ -156,13 +161,12 @@ SockAddrParser::parse(in6_addr* addr) {
 
 		size_t zeroRunLength = 8 - i;
 
-		if (zeroRunIdx < i) {
+		if (zeroRunIdx < i)
 			memmove(&ip[zeroRunIdx + zeroRunLength], &ip[zeroRunIdx], (i - zeroRunIdx) * sizeof(uint16_t));
-			memset(&ip[zeroRunIdx], 0, zeroRunLength * sizeof(uint16_t));
-		}
-	} else if (i != 8) {
+
+		memset(&ip[zeroRunIdx], 0, zeroRunLength * sizeof(uint16_t));
+	} else if (i != 8)
 		return err::fail(err::SystemErrorCode_InvalidAddress);
-	}
 
 	return true;
 }

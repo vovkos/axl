@@ -125,7 +125,16 @@ testIp6() {
 	testRoundTrip("[::1]", AF_INET6, "::1");
 	testRoundTrip("::ffff:192.168.1.1", AF_INET6); // IPv4-mapped
 	testRoundTrip("::1.2.3.4", AF_INET6); // IPv4-compatible
+	testRoundTrip("::", AF_INET6); // trailing zero run
+	testRoundTrip("fe80::", AF_INET6);
+	testRoundTrip("2001:db8::", AF_INET6);
+	testRoundTrip("1:2:3:4:5:6:7::", AF_INET6, "1:2:3:4:5:6:7:0");
+	testRoundTrip("fe80::%3", AF_INET6);
+	testRoundTrip("[::]:5353", AF_INET6);
+	testRoundTrip("[fe80::%3]:5353", AF_INET6);
 
+	testAddr_ip6("::");
+	testAddr_ip6("fe80::");
 	testAddr_ip6("::1");
 	testAddr_ip6("1:2:3:4:5:6:1.2.3.4");
 	testAddr_ip6("2001:db8::1");
@@ -140,7 +149,17 @@ testIp6() {
 	AXL_TEST_ASSERT(addr.getPort() == 5353);
 	AXL_TEST_ASSERT(addr.m_addr_ip6.sin6_scope_id == 7);
 
+	// a trailing zero run must be zero-filled even if the target is not pre-zeroed
+
+	in6_addr addr6;
+	in6_addr expected6;
+	memset(&addr6, 0xff, sizeof(addr6));
+	AXL_TEST_ASSERT(io::parseAddr_ip6(&addr6, "fe80::"));
+	AXL_TEST_ASSERT(inet_pton(AF_INET6, "fe80::", &expected6) == 1);
+	AXL_TEST_ASSERT(memcmp(&addr6, &expected6, sizeof(addr6)) == 0);
+
 	testParseFail("1:2:3");
+	testParseFail("[::");
 	testParseFail("[::1");
 	testParseFail("[::1]:");
 	testParseFail("fe80::1%");
