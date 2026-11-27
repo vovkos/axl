@@ -17,6 +17,10 @@
 #include "axl_sys_win_CfgMgrError.h"
 #include "axl_sl_Handle.h"
 
+#ifndef _WIN32_WINNT_WIN8
+#	define _WIN32_WINNT_WIN8 0x0602
+#endif
+
 #if (WINVER < _WIN32_WINNT_WIN8)
 
 // required excerpt from cfgmgr32.h
